@@ -7,8 +7,8 @@
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
 //
-// @updateURL    https://github.com/Mr-MiuYi1/T-Scripts-C-of-U/blob/main/AutoTableTools/AutoTabletools.meta.js
-// @downloadURL  https://github.com/Mr-MiuYi1/T-Scripts-C-of-U/blob/main/AutoTableTools/AutoTabletools.user.js
+// @updateURL    https://raw.githubusercontent.com/Mr-MiuYi1/T-Scripts-C-of-U/main/AutoTableTools/AutoTabletools.meta.js
+// @downloadURL  https://raw.githubusercontent.com/Mr-MiuYi1/T-Scripts-C-of-U/main/AutoTableTools/AutoTabletools.user.js
 //
 // @run-at       document-start
 // @grant        GM_getValue
