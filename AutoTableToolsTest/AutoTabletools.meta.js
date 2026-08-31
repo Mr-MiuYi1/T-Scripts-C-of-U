@@ -1,29 +1,29 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.6.0
+// @version      7.8.1
 // @description  AutoTable 一体化效率增强工具：智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆、自定义表格视觉样式、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
 //
-// @updateURL    https://github.com/Mr-MiuYi1/T-Scripts-C-of-U/AutoTableTools/AutoTabletools.meta.js
-// @downloadURL  https://github.com/Mr-MiuYi1/T-Scripts-C-of-U/AutoTableTools/AutoTabletools.user.js
+// @updateURL    https://raw.githubusercontent.com/Mr-MiuYi1/T-Scripts-C-of-U/main/AutoTableToolsTest/AutoTabletools.meta.js
+// @downloadURL  https://raw.githubusercontent.com/Mr-MiuYi1/T-Scripts-C-of-U/main/AutoTableToolsTest/AutoTabletools.user.js
 //
 // ==/UserScript==
 
 
 /* ============================================================================
- * AutoTable 工具集 V7.6.0
+ * AutoTable 工具集 V7.8.1
  * 当前整合能力：
- * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、可自定义置顶边界/当前格/行列高亮视觉样式、快捷表头置顶、分页增强、滚轮横纵轴反转
+ * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，整行上下强调边缘可独立配置，支持快捷开关）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
  * - 编辑：统一快捷短语中心；双栏独立滚动、固定页头/页脚、批量选择、批量启停、批量编辑与安全高级模板表达式
  * - 规则：支持可视化条件 + 代码式 {{=表达式}} / {{#if}} 条件内容；系统规则可恢复默认；旧配置自动迁移
  * - 主题：可回退 Edge / Fluent 深色优化；可选丝滑高级全局交互动效；记录详情只动画抽屉、不扰动底层页面，并可选择是否忽略系统 Reduce Motion
  * - 文档：原生风格大纲、滚动跟随、查找/替换/定位、正则表达式与高亮
  * - 界面：可隐藏关联字段复制按钮，并释放按钮原先占用的文字空间
- * - 设置：支持全部工具配置 JSON 备份、跨版本导入恢复与全部重置；导入/重置后统一刷新确保各独立模块同步生效
+ * - 设置：支持字段条件高亮规则中心；全部工具配置 JSON 备份、跨版本导入恢复与全部重置；导入/重置后统一刷新确保各独立模块同步生效
  * - 渲染：按真实行号稳定斑马纹；虚拟滚动增量渲染；聚焦行/字段分别保存稳定身份；横向虚拟化时绝不回退到其它字段；编辑与置顶表头保持稳定层级；置顶表头高亮使用不透明底层防止滚动表头穿透
  * - 置顶：右置顶严格镜像；“+ 添加列”保持 AutoTable 原生末端位置，不参与置顶 sticky/offset
  * - 面板：分区式导航、统一卡片层级、紧凑间距和当前页说明；原功能与设置项完整保留

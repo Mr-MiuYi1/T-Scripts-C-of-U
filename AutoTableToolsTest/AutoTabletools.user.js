@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.6.0
-// @description  AutoTable 一体化效率增强工具：智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆、自定义表格视觉样式、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.8.1
+// @description  AutoTable 一体化效率增强工具：智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
 //
-// @updateURL    https://github.com/Mr-MiuYi1/T-Scripts-C-of-U/AutoTableTools/AutoTabletools.meta.js
-// @downloadURL  https://github.com/Mr-MiuYi1/T-Scripts-C-of-U/AutoTableTools/AutoTabletools.user.js
+// @updateURL    https://raw.githubusercontent.com/Mr-MiuYi1/T-Scripts-C-of-U/main/AutoTableToolsTest/AutoTabletools.meta.js
+// @downloadURL  https://raw.githubusercontent.com/Mr-MiuYi1/T-Scripts-C-of-U/main/AutoTableToolsTest/AutoTabletools.user.js
 //
 // @run-at       document-start
 // @grant        GM_getValue
@@ -21,16 +21,16 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.6.0
+ * AutoTable 工具集 V7.8.1
  * 当前整合能力：
- * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、可自定义置顶边界/当前格/行列高亮视觉样式、快捷表头置顶、分页增强、滚轮横纵轴反转
+ * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，整行上下强调边缘可独立配置，支持快捷开关）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
  * - 编辑：统一快捷短语中心；双栏独立滚动、固定页头/页脚、批量选择、批量启停、批量编辑与安全高级模板表达式
  * - 规则：支持可视化条件 + 代码式 {{=表达式}} / {{#if}} 条件内容；系统规则可恢复默认；旧配置自动迁移
  * - 主题：可回退 Edge / Fluent 深色优化；可选丝滑高级全局交互动效；记录详情只动画抽屉、不扰动底层页面，并可选择是否忽略系统 Reduce Motion
  * - 文档：原生风格大纲、滚动跟随、查找/替换/定位、正则表达式与高亮
  * - 界面：可隐藏关联字段复制按钮，并释放按钮原先占用的文字空间
- * - 设置：支持全部工具配置 JSON 备份、跨版本导入恢复与全部重置；导入/重置后统一刷新确保各独立模块同步生效
+ * - 设置：支持字段条件高亮规则中心；全部工具配置 JSON 备份、跨版本导入恢复与全部重置；导入/重置后统一刷新确保各独立模块同步生效
  * - 渲染：按真实行号稳定斑马纹；虚拟滚动增量渲染；聚焦行/字段分别保存稳定身份；横向虚拟化时绝不回退到其它字段；编辑与置顶表头保持稳定层级；置顶表头高亮使用不透明底层防止滚动表头穿透
  * - 置顶：右置顶严格镜像；“+ 添加列”保持 AutoTable 原生末端位置，不参与置顶 sticky/offset
  * - 面板：分区式导航、统一卡片层级、紧凑间距和当前页说明；原功能与设置项完整保留
@@ -40,7 +40,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.6.0',
+        version: 'V7.8.1',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -122,6 +122,8 @@
             openBulkProgress: 'Alt+B',
             // V7.2：滚轮横纵轴反转。W = Wheel，默认快捷键可在设置页修改。
             toggleTableWheelReverse: 'Alt+W',
+            // V7.8.1：字段条件高亮总开关。H = Highlight，可在功能快捷键中重新录制。
+            toggleConditionalHighlight: 'Alt+H',
 
             // 以下功能提供快捷键入口，但默认留空，避免一次占用过多按键。
             copyCurrentCell: '',
@@ -10327,6 +10329,7 @@
             { type: 'action', id: 'openPinSettings', label: '打开列置顶设置', hotkey: state.hotkeys.openPinSettings },
             { type: 'action', id: 'openBulkProgress', label: '打开批量追加进展', hotkey: state.hotkeys.openBulkProgress },
             { type: 'action', id: 'toggleTableWheelReverse', label: '开关表格滚轮轴反转', hotkey: state.hotkeys.toggleTableWheelReverse },
+            { type: 'action', id: 'toggleConditionalHighlight', label: '开关字段条件高亮', hotkey: state.hotkeys.toggleConditionalHighlight },
             { type: 'action', id: 'toggleEdgeTheme', label: '开关 Edge 深色优化', hotkey: state.hotkeys.toggleEdgeTheme },
 
             { type: 'action', id: 'nextCombo', label: '切换下一个字段组合', hotkey: state.hotkeys.nextCombo },
@@ -10480,6 +10483,20 @@
                         : '表格滚轮反转已关闭：恢复浏览器 / AutoTable 原生滚轮'
                 );
                 break;
+
+            case 'toggleConditionalHighlight': {
+                // 条件高亮是独立模块，使用其 GM 总开关作为唯一真值；
+                // 同时派发事件，让模块无需刷新即可立即应用 / 清理。
+                const storageKey = 'att_v3_conditionalHighlightEnabled';
+                const nextEnabled = !Boolean(GM_getValue(storageKey, false));
+                GM_setValue(storageKey, nextEnabled);
+                window.dispatchEvent(new CustomEvent('att:conditional-highlight:set', {
+                    detail: { enabled: nextEnabled, source: 'hotkey' }
+                }));
+                renderPanel();
+                showToast(`字段条件高亮：已${nextEnabled ? '开启' : '关闭'}`);
+                break;
+            }
 
             case 'toggleEdgeTheme':
                 state.darkModeOptimized = !state.darkModeOptimized;
@@ -11376,6 +11393,12 @@
                 ]
             },
             {
+                title: '条件高亮',
+                rows: [
+                    ['toggleConditionalHighlight', '开关字段条件高亮', '默认 Alt+H；立即显示 / 隐藏全部条件规则高亮']
+                ]
+            },
+            {
                 title: '字段组合',
                 rows: [
                     ['nextCombo', '切换下一个字段组合'],
@@ -11659,7 +11682,7 @@
 
             <div class="att-card">
                 <div class="att-card-title">功能快捷键</div>
-                <div class="att-card-desc">已补齐列置顶、表格滚轮反转、批量进展、行列高亮、Edge 主题等高频功能。点击“设置”后直接按组合键；Esc 取消，Backspace / Delete 清空。字段组合仍可在“字段组合”页单独设置专属快捷键。</div>
+                <div class="att-card-desc">已补齐列置顶、表格滚轮反转、字段条件高亮、批量进展、行列高亮、Edge 主题等高频功能。点击“设置”后直接按组合键；Esc 取消，Backspace / Delete 清空。字段组合仍可在“字段组合”页单独设置专属快捷键。</div>
                 <div class="att-divider"></div>
                 ${actionRows}
             </div>
@@ -25748,4 +25771,1209 @@
     `;
     document.documentElement.appendChild(style);
     console.log('[AutoTable 工具集 V7.5.5] 已加载：置顶表头高亮不透明底层 / 防止滚动表头穿透叠影');
+})();
+
+
+/* ============================================================================
+ * AutoTable 字段条件高亮规则中心 V7.8.1
+ * --------------------------------------------------------------------------
+ * 设计目标：
+ * 1) 指定字段内容符合规则时，支持只高亮该单元格或高亮整行；
+ * 2) 支持当前表 / 全部表、文本 / 正则 / 空值 / 数值比较等条件；
+ * 3) 每条规则独立配置底色/透明度、边缘颜色/强度/宽度和文字加粗；整行模式默认同时绘制顶部与底部强调边缘；
+ * 4) 虚拟表格只处理当前可见行，新增 / 复用 / 编辑后的行增量重算；
+ * 5) 规则优先级按列表从上到下，同一目标先命中的规则优先；
+ * 6) 整行强调边缘逐单元格连续绘制，左置顶 / 主体 / 右置顶区域保持同一颜色与宽度；高亮不把置顶列改成透明背景；
+ * 7) 聚焦模式优先级高于条件高亮，二者不会互相抢当前格 / 行列聚焦状态；
+ * 8) 高级模式使用受限表达式解析器（非 eval / new Function），可组合同行字段、日期、正则与逻辑运算；
+ * 9) 配置使用 att_v3_ 前缀 GM 存储，自动进入 V7.6+ 的全部设置导入导出 / 重置。
+ * ========================================================================== */
+(function () {
+    'use strict';
+
+    const MOD = {
+        version: 'V7.8.1',
+        keyEnabled: 'att_v3_conditionalHighlightEnabled',
+        keyRules: 'att_v3_conditionalHighlightRules',
+        cardId: 'att-cond-highlight-card-v770',
+        modalId: 'att-cond-highlight-manager-v770',
+        styleId: 'att-cond-highlight-style-v770'
+    };
+
+    const OP_META = {
+        contains: '包含',
+        notContains: '不包含',
+        equals: '等于',
+        notEquals: '不等于',
+        startsWith: '开头是',
+        endsWith: '结尾是',
+        regex: '正则表达式',
+        empty: '为空',
+        notEmpty: '非空',
+        gt: '数值 >',
+        gte: '数值 ≥',
+        lt: '数值 <',
+        lte: '数值 ≤',
+        dateToday: '日期 = 今天',
+        dateYesterday: '日期 = 昨天',
+        dateTomorrow: '日期 = 明天',
+        dateBeforeToday: '日期 < 今天（已逾期）',
+        dateAfterToday: '日期 > 今天',
+        dateWithinNextDays: '未来 N 天内',
+        dateWithinPastDays: '过去 N 天内',
+        dateEquals: '日期 = 指定日期'
+    };
+
+    const DATE_OPERATORS = new Set(['dateToday','dateYesterday','dateTomorrow','dateBeforeToday','dateAfterToday','dateWithinNextDays','dateWithinPastDays','dateEquals']);
+    const TEXT_OPERATORS = new Set(['contains','notContains','equals','notEquals','startsWith','endsWith','regex']);
+    const VALID_MODES = new Set(['cell', 'row']);
+    const VALID_SCOPES = new Set(['table', 'global']);
+    const VALID_RULE_TYPES = new Set(['standard','advanced']);
+    const exprTokenCache = new Map();
+    let enabled = Boolean(GM_getValue(MOD.keyEnabled, false));
+    let rules = normalizeRules(GM_getValue(MOD.keyRules, []));
+    let managerDraft = [];
+    let managerSelectedId = '';
+    let managerFilter = '';
+
+    const bodyObservers = new Map();
+    const dirtyRows = new Set();
+    const headerCache = new WeakMap();
+    let flushRaf = 0;
+    let scanRaf = 0;
+    let toolboxObserver = null;
+    let pageObserver = null;
+
+    function clamp(value, min, max, fallback) {
+        const n = Number(value);
+        return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : fallback;
+    }
+
+    function escHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function escAttr(value) {
+        return escHtml(value).replace(/`/g, '&#96;');
+    }
+
+    function cssEsc(value) {
+        if (window.CSS?.escape) return CSS.escape(String(value));
+        return String(value).replace(/["\\]/g, '\\$&');
+    }
+
+    function cleanText(value) {
+        return String(value ?? '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    function makeId() {
+        return `chr_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+    }
+
+    function normalizeColor(value, fallback = '#f59e0b') {
+        const s = String(value || '').trim();
+        return /^#[0-9a-f]{6}$/i.test(s) ? s.toLowerCase() : fallback;
+    }
+
+    function normalizeRule(raw, index = 0) {
+        const r = raw && typeof raw === 'object' ? raw : {};
+        const operator = OP_META[r.operator] ? r.operator : 'contains';
+        return {
+            id: String(r.id || makeId()),
+            enabled: r.enabled !== false,
+            name: cleanText(r.name) || `高亮规则 ${index + 1}`,
+            scope: VALID_SCOPES.has(r.scope) ? r.scope : 'table',
+            tableKey: String(r.tableKey || ''),
+            tableName: cleanText(r.tableName || ''),
+            fieldId: String(r.fieldId || ''),
+            fieldName: cleanText(r.fieldName || ''),
+            ruleType: VALID_RULE_TYPES.has(r.ruleType) ? r.ruleType : 'standard',
+            operator,
+            value: String(r.value ?? ''),
+            advancedExpr: String(r.advancedExpr ?? ''),
+            caseSensitive: Boolean(r.caseSensitive),
+            mode: VALID_MODES.has(r.mode) ? r.mode : 'cell',
+            color: normalizeColor(r.color),
+            opacity: Math.round(clamp(r.opacity, 4, 80, 24)),
+            // V7.8.1：边缘从填充视觉中独立出来。旧规则缺少这些字段时自动迁移。
+            edgeColor: normalizeColor(r.edgeColor, normalizeColor(r.color)),
+            edgeOpacity: Math.round(clamp(r.edgeOpacity, 0, 100, Math.min(100, Math.round(clamp(r.opacity, 4, 80, 24)) + 34))),
+            edgeWidth: Math.round(clamp(r.edgeWidth, 0, 5, 1)),
+            edgeTop: r.edgeTop !== false,
+            edgeBottom: r.edgeBottom !== false,
+            bold: Boolean(r.bold)
+        };
+    }
+
+    function normalizeRules(value) {
+        if (!Array.isArray(value)) return [];
+        const seen = new Set();
+        return value.map((r, i) => normalizeRule(r, i)).filter(r => {
+            if (!r.id || seen.has(r.id)) r.id = makeId();
+            seen.add(r.id);
+            return true;
+        });
+    }
+
+    function saveRules(nextRules = rules) {
+        rules = normalizeRules(nextRules);
+        GM_setValue(MOD.keyRules, rules);
+        updateSettingsCard();
+        rescanAllVisibleRows();
+    }
+
+    function setEnabled(value) {
+        enabled = Boolean(value);
+        GM_setValue(MOD.keyEnabled, enabled);
+        updateSettingsCard();
+        syncEngineState();
+    }
+
+    function hexToRgb(hex) {
+        const s = normalizeColor(hex).slice(1);
+        return {
+            r: parseInt(s.slice(0, 2), 16),
+            g: parseInt(s.slice(2, 4), 16),
+            b: parseInt(s.slice(4, 6), 16)
+        };
+    }
+
+    function rgba(hex, opacityPercent) {
+        const { r, g, b } = hexToRgb(hex);
+        const a = clamp(opacityPercent, 0, 100, 20) / 100;
+        return `rgba(${r}, ${g}, ${b}, ${a.toFixed(3)})`;
+    }
+
+    function getVisibleGridRoots() {
+        return Array.from(document.querySelectorAll('.grid-root')).filter(root => {
+            if (!(root instanceof HTMLElement) || !root.isConnected) return false;
+            const rect = root.getBoundingClientRect();
+            return rect.width > 40 && rect.height > 40;
+        });
+    }
+
+    function getPrimaryGridRoot() {
+        return getVisibleGridRoots()[0] || null;
+    }
+
+    function getTableContext(root = getPrimaryGridRoot()) {
+        if (!root) return null;
+        const path = location.pathname || '';
+        const tableMatch = path.match(/\/t\/(tbl_[^/]+)/i);
+        const baseMatch = path.match(/\/b\/([^/]+)/i);
+        const tableId = tableMatch?.[1] || '';
+        const baseId = baseMatch?.[1] || 'base';
+        const title = cleanText(
+            document.querySelector('.grid-page-title')?.textContent ||
+            document.querySelector('.grid-page-header h1')?.textContent ||
+            document.querySelector('main h1')?.textContent ||
+            tableId || '当前表格'
+        );
+        const key = tableId
+            ? `${baseId}::${tableId}`
+            : `path::${path.replace(/\/v\/[^/]+.*$/i, '').replace(/\/+$/, '') || '/'}`;
+        return { root, key, tableId, baseId, tableName: title };
+    }
+
+    function extractHeaderName(header) {
+        if (!(header instanceof Element)) return '';
+        const node = header.querySelector('.grid-header-text,.grid-header-title');
+        return cleanText(
+            node?.getAttribute?.('title') || node?.textContent ||
+            header.getAttribute('title') || header.getAttribute('aria-label') || ''
+        );
+    }
+
+    function buildHeaderMap(root, force = false) {
+        if (!root) return { defs: [], byId: new Map(), byName: new Map() };
+        if (!force) {
+            const cached = headerCache.get(root);
+            if (cached) return cached;
+        }
+        const defs = [];
+        const byId = new Map();
+        const byName = new Map();
+        root.querySelectorAll('.grid-header-cell[data-grid-field-id]').forEach((header, index) => {
+            const fieldId = header.getAttribute('data-grid-field-id') || '';
+            const name = extractHeaderName(header);
+            if (!fieldId || !name || byId.has(fieldId)) return;
+            const def = { fieldId, name, header, index };
+            defs.push(def);
+            byId.set(fieldId, def);
+            if (!byName.has(name)) byName.set(name, def);
+        });
+        const result = { defs, byId, byName };
+        headerCache.set(root, result);
+        return result;
+    }
+
+    function getCurrentFields() {
+        const root = getPrimaryGridRoot();
+        return root ? buildHeaderMap(root, true).defs : [];
+    }
+
+    function getCellValue(cell) {
+        if (!(cell instanceof Element)) return '';
+        const editor = cell.querySelector('input:not([type="checkbox"]),textarea,select');
+        if (editor && 'value' in editor) return cleanText(editor.value);
+        if (cell.querySelector('.cell-empty')) return '';
+        const title = cleanText(cell.getAttribute('title') || '');
+        if (title) return title;
+        const preferred = cell.querySelector(
+            '.cell-relation-label,.member-token__label,.cell-badge-text,.cell-date-badge__primary,.cell-text,.cell-textarea'
+        );
+        if (preferred) return cleanText(preferred.textContent || '');
+        return cleanText(cell.textContent || '');
+    }
+
+    function resolveFieldId(rule, root, map) {
+        const context = getTableContext(root);
+        if (rule.scope === 'table' && rule.tableKey && context?.key !== rule.tableKey) return '';
+        if (rule.scope === 'table' && rule.fieldId && map.byId.has(rule.fieldId)) return rule.fieldId;
+        if (rule.fieldName && map.byName.has(rule.fieldName)) return map.byName.get(rule.fieldName).fieldId;
+        return '';
+    }
+
+    function localMidnight(date = new Date()) {
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0);
+        return d.getTime();
+    }
+
+    function parseLocalDateValue(value) {
+        if (value instanceof Date && Number.isFinite(value.getTime())) return localMidnight(value);
+        const text = cleanText(value);
+        if (!text) return NaN;
+        let m = text.match(/(\d{4})\s*[-\/.年]\s*(\d{1,2})\s*[-\/.月]\s*(\d{1,2})\s*日?/);
+        let y, mo, d;
+        if (m) {
+            y = Number(m[1]); mo = Number(m[2]); d = Number(m[3]);
+        } else {
+            m = text.match(/(?:^|\D)(\d{1,2})\s*[-\/.月]\s*(\d{1,2})(?:\s*日)?(?:\D|$)/);
+            if (!m) return NaN;
+            y = new Date().getFullYear(); mo = Number(m[1]); d = Number(m[2]);
+        }
+        const parsed = new Date(y, mo - 1, d);
+        if (parsed.getFullYear() !== y || parsed.getMonth() !== mo - 1 || parsed.getDate() !== d) return NaN;
+        return localMidnight(parsed);
+    }
+
+    function dateOffsetMidnight(days = 0) {
+        const d = new Date();
+        d.setHours(0,0,0,0);
+        d.setDate(d.getDate() + Number(days || 0));
+        return d.getTime();
+    }
+
+    function tokenizeHighlightExpr(input) {
+        const src = String(input ?? '');
+        if (exprTokenCache.has(src)) return exprTokenCache.get(src);
+        const out = []; let i = 0;
+        const isIdStart = ch => /[A-Za-z_]/.test(ch);
+        const isId = ch => /[A-Za-z0-9_]/.test(ch);
+        while (i < src.length) {
+            const ch = src[i];
+            if (/\s/.test(ch)) { i++; continue; }
+            if (ch === '"' || ch === "'") {
+                const quote = ch; let value = ''; i++; let closed = false;
+                while (i < src.length) {
+                    const c = src[i++];
+                    if (c === quote) { closed = true; break; }
+                    if (c === '\\') {
+                        if (i >= src.length) break;
+                        const e = src[i++];
+                        const map = { n:'\n', r:'\r', t:'\t', '\\':'\\', '"':'"', "'":"'" };
+                        value += Object.prototype.hasOwnProperty.call(map, e) ? map[e] : ('\\' + e);
+                    } else value += c;
+                }
+                if (!closed) throw new Error('字符串没有结束引号');
+                out.push({type:'string',value}); continue;
+            }
+            if (/\d/.test(ch) || (ch === '.' && /\d/.test(src[i+1] || ''))) {
+                const m = src.slice(i).match(/^(?:\d+(?:\.\d*)?|\.\d+)/);
+                out.push({type:'number',value:Number(m[0])}); i += m[0].length; continue;
+            }
+            if (isIdStart(ch)) {
+                let j=i+1; while(j<src.length && isId(src[j])) j++;
+                out.push({type:'id',value:src.slice(i,j)}); i=j; continue;
+            }
+            const op3=src.slice(i,i+3), op2=src.slice(i,i+2);
+            if (['===','!=='].includes(op3)) { out.push({type:'op',value:op3}); i+=3; continue; }
+            if (['&&','||','==','!=','>=','<='].includes(op2)) { out.push({type:'op',value:op2}); i+=2; continue; }
+            if ('+-*/%!><()?,:'.includes(ch)) { out.push({type:'op',value:ch}); i++; continue; }
+            throw new Error(`不支持的字符：${ch}`);
+        }
+        out.push({type:'eof',value:''});
+        if (exprTokenCache.size > 80) exprTokenCache.clear();
+        exprTokenCache.set(src,out);
+        return out;
+    }
+
+    function getRowFieldValue(row, root, map, name) {
+        if (!(row instanceof Element) || !map?.byName) return '';
+        const fieldName = cleanText(name);
+        if (!fieldName) return '';
+        const def = map.byName.get(fieldName);
+        if (!def) return '';
+        const cell = row.querySelector(`.grid-cell[data-grid-field-id="${cssEsc(def.fieldId)}"]`);
+        return cell ? getCellValue(cell) : '';
+    }
+
+    function evalHighlightExpr(expression, context) {
+        const tokens = tokenizeHighlightExpr(expression); let p = 0;
+        const todayTs = dateOffsetMidnight(0);
+        const getField = name => getRowFieldValue(context.row, context.root, context.map, name);
+        const funcs = {
+            field: getField, row: getField,
+            contains: (a,b) => String(a??'').includes(String(b??'')),
+            startsWith: (a,b) => String(a??'').startsWith(String(b??'')),
+            endsWith: (a,b) => String(a??'').endsWith(String(b??'')),
+            lower: a => String(a??'').toLowerCase(), upper: a => String(a??'').toUpperCase(), trim: a => String(a??'').trim(),
+            len: a => String(a??'').length, num: a => Number(String(a??'').replace(/,/g,'').trim()), str: a => String(a??''),
+            empty: a => cleanText(a) === '', notEmpty: a => cleanText(a) !== '',
+            regex: (a,pattern,flags='i') => { try { return new RegExp(String(pattern??''),String(flags??'i')).test(String(a??'')); } catch { return false; } },
+            date: a => parseLocalDateValue(a),
+            daysFromToday: a => { const ts=parseLocalDateValue(a); return Number.isFinite(ts) ? Math.round((ts-todayTs)/86400000) : NaN; },
+            isToday: a => parseLocalDateValue(a) === todayTs,
+            isYesterday: a => parseLocalDateValue(a) === dateOffsetMidnight(-1),
+            isTomorrow: a => parseLocalDateValue(a) === dateOffsetMidnight(1),
+            isPast: a => { const ts=parseLocalDateValue(a); return Number.isFinite(ts) && ts < todayTs; },
+            isFuture: a => { const ts=parseLocalDateValue(a); return Number.isFinite(ts) && ts > todayTs; },
+            withinNextDays: (a,n) => { const x=funcs.daysFromToday(a),days=Number(n); return Number.isFinite(x)&&Number.isFinite(days)&&x>=0&&x<=days; },
+            withinPastDays: (a,n) => { const x=funcs.daysFromToday(a),days=Number(n); return Number.isFinite(x)&&Number.isFinite(days)&&x<=0&&x>=-days; },
+            between: (x,a,b) => x>=a && x<=b,
+            choose: (cond,a,b) => cond ? a : b,
+            coalesce: (...args) => args.find(v => v !== null && v !== undefined && String(v) !== '') ?? ''
+        };
+        const vars = {
+            value: context.value, fieldName: context.rule?.fieldName || '', table: getTableContext(context.root)?.tableName || '',
+            today: todayTs, yesterday: dateOffsetMidnight(-1), tomorrow: dateOffsetMidnight(1), now: Date.now(),
+            true:true, false:false, null:null
+        };
+        const peek=()=>tokens[p]||{type:'eof',value:''};
+        const take=(value=null)=>{const t=peek(); if(value!==null&&t.value!==value)throw new Error(`期望 ${value}，实际 ${t.value||'结束'}`); p++; return t;};
+        const prec={'||':1,'&&':2,'==':3,'!=':3,'===':3,'!==':3,'>':4,'>=':4,'<':4,'<=':4,'+':5,'-':5,'*':6,'/':6,'%':6};
+        const apply=(op,a,b)=>{switch(op){
+            case'||':return a||b; case'&&':return a&&b; case'==':return a==b; case'!=':return a!=b; case'===':return a===b; case'!==':return a!==b;
+            case'>':return a>b; case'>=':return a>=b; case'<':return a<b; case'<=':return a<=b;
+            case'+':return (typeof a==='string'||typeof b==='string')?String(a??'')+String(b??''):Number(a)+Number(b);
+            case'-':return Number(a)-Number(b); case'*':return Number(a)*Number(b); case'/':return Number(a)/Number(b); case'%':return Number(a)%Number(b);
+            default:throw new Error(`不支持运算符 ${op}`);
+        }};
+        const primary=()=>{
+            const t=peek();
+            if(t.type==='number'||t.type==='string'){p++;return t.value;}
+            if(t.type==='op'&&t.value==='('){take('(');const v=ternary();take(')');return v;}
+            if(t.type==='id'){
+                p++; const name=t.value;
+                if(peek().type==='op'&&peek().value==='('){
+                    take('('); const args=[];
+                    if(!(peek().type==='op'&&peek().value===')')){while(true){args.push(ternary());if(peek().type==='op'&&peek().value===','){take(',');continue;}break;}}
+                    take(')'); const fn=funcs[name]; if(typeof fn!=='function')throw new Error(`不允许的函数：${name}`); return fn(...args);
+                }
+                if(Object.prototype.hasOwnProperty.call(vars,name))return vars[name];
+                throw new Error(`未知变量：${name}`);
+            }
+            throw new Error(`无法解析：${t.value||'表达式结束'}`);
+        };
+        const unary=()=>{const tok=peek(),op=tok.value;if(tok.type==='op'&&['!','+','-'].includes(op)){take(op);const v=unary();return op==='!'?!v:op==='+'?Number(v):-Number(v);}return primary();};
+        const binary=(min=1)=>{let left=unary();while(true){const tok=peek(),op=tok.value,pr=tok.type==='op'?prec[op]:0;if(!pr||pr<min)break;take(op);const right=binary(pr+1);left=apply(op,left,right);}return left;};
+        const ternary=()=>{let v=binary(1);if(peek().type==='op'&&peek().value==='?'){take('?');const yes=ternary();take(':');const no=ternary();v=v?yes:no;}return v;};
+        const result=ternary(); if(peek().type!=='eof')throw new Error(`多余内容：${peek().value}`); return result;
+    }
+
+    function validateAdvancedExpression(rule, root = getPrimaryGridRoot()) {
+        if (rule.ruleType !== 'advanced') return {ok:true,error:''};
+        if (!cleanText(rule.advancedExpr)) return {ok:false,error:'高级表达式为空'};
+        try {
+            const row=root?.querySelector('.grid-row'); const map=root?buildHeaderMap(root):{byName:new Map()};
+            evalHighlightExpr(rule.advancedExpr,{rule,row,root,map,value:''});
+            return {ok:true,error:''};
+        } catch (err) { return {ok:false,error:err?.message||String(err)}; }
+    }
+
+    function matchRule(rule, rawValue, row = null, root = null, map = null) {
+        const actualRaw = String(rawValue ?? '');
+        const expectedRaw = String(rule.value ?? '');
+        const actual = rule.caseSensitive ? actualRaw : actualRaw.toLocaleLowerCase();
+        const expected = rule.caseSensitive ? expectedRaw : expectedRaw.toLocaleLowerCase();
+
+        if (rule.ruleType === 'advanced') {
+            if (!row || !root || !map || !cleanText(rule.advancedExpr)) return false;
+            try { return Boolean(evalHighlightExpr(rule.advancedExpr, { rule, row, root, map, value: actualRaw })); }
+            catch { return false; }
+        }
+
+        if (DATE_OPERATORS.has(rule.operator)) {
+            const ts = parseLocalDateValue(actualRaw);
+            if (!Number.isFinite(ts)) return false;
+            const today = dateOffsetMidnight(0);
+            if (rule.operator === 'dateToday') return ts === today;
+            if (rule.operator === 'dateYesterday') return ts === dateOffsetMidnight(-1);
+            if (rule.operator === 'dateTomorrow') return ts === dateOffsetMidnight(1);
+            if (rule.operator === 'dateBeforeToday') return ts < today;
+            if (rule.operator === 'dateAfterToday') return ts > today;
+            if (rule.operator === 'dateEquals') { const expectedTs=parseLocalDateValue(expectedRaw); return Number.isFinite(expectedTs)&&ts===expectedTs; }
+            const n = Math.max(0, Number(expectedRaw === '' ? '3' : expectedRaw)); if (!Number.isFinite(n)) return false;
+            const diff = Math.round((ts - today) / 86400000);
+            if (rule.operator === 'dateWithinNextDays') return diff >= 0 && diff <= n;
+            if (rule.operator === 'dateWithinPastDays') return diff <= 0 && diff >= -n;
+        }
+
+        if (rule.operator === 'empty') return cleanText(actualRaw) === '';
+        if (rule.operator === 'notEmpty') return cleanText(actualRaw) !== '';
+        if (!expectedRaw && ['contains','notContains','startsWith','endsWith','regex','gt','gte','lt','lte'].includes(rule.operator)) return false;
+
+        switch (rule.operator) {
+            case 'contains': return actual.includes(expected);
+            case 'notContains': return !actual.includes(expected);
+            case 'equals': return actual === expected;
+            case 'notEquals': return actual !== expected;
+            case 'startsWith': return actual.startsWith(expected);
+            case 'endsWith': return actual.endsWith(expected);
+            case 'regex':
+                try { return new RegExp(expectedRaw, rule.caseSensitive ? '' : 'i').test(actualRaw); }
+                catch { return false; }
+            case 'gt':
+            case 'gte':
+            case 'lt':
+            case 'lte': {
+                const a = Number(String(actualRaw).replace(/,/g, '').trim());
+                const b = Number(String(expectedRaw).replace(/,/g, '').trim());
+                if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
+                if (rule.operator === 'gt') return a > b;
+                if (rule.operator === 'gte') return a >= b;
+                if (rule.operator === 'lt') return a < b;
+                return a <= b;
+            }
+            default: return false;
+        }
+    }
+
+    function clearCellConditional(cell) {
+        if (!(cell instanceof HTMLElement)) return;
+        cell.classList.remove('att-cond-cell-v770');
+        cell.style.removeProperty('--att-cond-cell-fill');
+        cell.style.removeProperty('--att-cond-cell-edge');
+        cell.style.removeProperty('--att-cond-cell-edge-width');
+        cell.style.removeProperty('--att-cond-cell-font-weight');
+        cell.removeAttribute('data-att-cond-rule');
+    }
+
+    function clearRowConditional(row) {
+        if (!(row instanceof HTMLElement)) return;
+        row.classList.remove('att-cond-row-v770');
+        row.style.removeProperty('--att-cond-row-fill');
+        row.style.removeProperty('--att-cond-row-edge');
+        row.style.removeProperty('--att-cond-row-edge-top');
+        row.style.removeProperty('--att-cond-row-edge-bottom');
+        row.style.removeProperty('--att-cond-row-edge-width');
+        row.style.removeProperty('--att-cond-row-font-weight');
+        row.removeAttribute('data-att-cond-rule');
+        row.querySelectorAll('.grid-cell.att-cond-cell-v770').forEach(clearCellConditional);
+    }
+
+    function setRuleVars(el, prefix, rule) {
+        if (!(el instanceof HTMLElement)) return;
+        const edgeColor = rgba(rule.edgeColor || rule.color, rule.edgeOpacity);
+        el.style.setProperty(`--att-cond-${prefix}-fill`, rgba(rule.color, rule.opacity));
+        el.style.setProperty(`--att-cond-${prefix}-edge`, edgeColor);
+        el.style.setProperty(`--att-cond-${prefix}-edge-width`, `${rule.edgeWidth}px`);
+        el.style.setProperty(`--att-cond-${prefix}-font-weight`, rule.bold ? '650' : 'inherit');
+        if (prefix === 'row') {
+            el.style.setProperty('--att-cond-row-edge-top', rule.edgeTop ? edgeColor : 'transparent');
+            el.style.setProperty('--att-cond-row-edge-bottom', rule.edgeBottom ? edgeColor : 'transparent');
+        }
+    }
+
+    function evaluateRow(row) {
+        if (!(row instanceof HTMLElement) || !row.isConnected || !row.matches('.grid-row')) return;
+        clearRowConditional(row);
+        if (!enabled || !rules.length) return;
+        const root = row.closest('.grid-root');
+        if (!root) return;
+        const map = buildHeaderMap(root);
+        const active = rules.filter(r => r.enabled);
+        if (!active.length) return;
+
+        let rowWinner = null;
+        const cellWinners = new Set();
+        for (const rule of active) {
+            const fieldId = resolveFieldId(rule, root, map);
+            if (!fieldId) continue;
+            const cell = row.querySelector(`.grid-cell[data-grid-field-id="${cssEsc(fieldId)}"]`);
+            if (!cell) continue;
+            if (!matchRule(rule, getCellValue(cell), row, root, map)) continue;
+
+            if (rule.mode === 'row') {
+                if (!rowWinner) rowWinner = rule;
+            } else if (!cellWinners.has(fieldId)) {
+                cellWinners.add(fieldId);
+                cell.classList.add('att-cond-cell-v770');
+                cell.setAttribute('data-att-cond-rule', rule.id);
+                setRuleVars(cell, 'cell', rule);
+            }
+        }
+
+        if (rowWinner) {
+            row.classList.add('att-cond-row-v770');
+            row.setAttribute('data-att-cond-rule', rowWinner.id);
+            setRuleVars(row, 'row', rowWinner);
+        }
+    }
+
+    function markRowDirty(row) {
+        if (!(row instanceof HTMLElement) || !row.matches('.grid-row')) return;
+        dirtyRows.add(row);
+        if (!flushRaf) flushRaf = requestAnimationFrame(flushDirtyRows);
+    }
+
+    function flushDirtyRows() {
+        flushRaf = 0;
+        if (!enabled) {
+            dirtyRows.clear();
+            return;
+        }
+        const batch = Array.from(dirtyRows);
+        dirtyRows.clear();
+        batch.forEach(evaluateRow);
+    }
+
+    function collectRowsFromNode(node, set) {
+        if (!(node instanceof Element)) return;
+        if (node.matches('.grid-row')) set.add(node);
+        const own = node.closest?.('.grid-row');
+        if (own) set.add(own);
+        node.querySelectorAll?.('.grid-row').forEach(row => set.add(row));
+    }
+
+    function installBodyObserver(body) {
+        if (!(body instanceof Element) || bodyObservers.has(body)) return;
+        const observer = new MutationObserver(records => {
+            if (!enabled) return;
+            const rows = new Set();
+            for (const record of records) {
+                const targetEl = record.target instanceof Element ? record.target : record.target.parentElement;
+                const targetRow = targetEl?.closest?.('.grid-row');
+                if (targetRow) rows.add(targetRow);
+                if (record.type === 'childList') {
+                    record.addedNodes.forEach(node => collectRowsFromNode(node, rows));
+                }
+            }
+            rows.forEach(markRowDirty);
+        });
+        observer.observe(body, {
+            subtree: true,
+            childList: true,
+            characterData: true,
+            attributes: true,
+            attributeFilter: ['title']
+        });
+        bodyObservers.set(body, observer);
+        body.querySelectorAll('.grid-row').forEach(markRowDirty);
+    }
+
+    function cleanupBodyObservers() {
+        for (const [body, observer] of bodyObservers) {
+            if (body.isConnected && enabled) continue;
+            try { observer.disconnect(); } catch {}
+            bodyObservers.delete(body);
+        }
+    }
+
+    function scanGridBodies() {
+        scanRaf = 0;
+        if (!enabled) return cleanupBodyObservers();
+        getVisibleGridRoots().forEach(root => {
+            const body = root.querySelector('.grid-virtual-body') || root;
+            installBodyObserver(body);
+        });
+        cleanupBodyObservers();
+    }
+
+    function scheduleGridScan() {
+        if (scanRaf) return;
+        scanRaf = requestAnimationFrame(scanGridBodies);
+    }
+
+    function clearAllHighlights() {
+        document.querySelectorAll('.grid-row.att-cond-row-v770').forEach(clearRowConditional);
+        document.querySelectorAll('.grid-cell.att-cond-cell-v770').forEach(clearCellConditional);
+    }
+
+    function rescanAllVisibleRows() {
+        clearAllHighlights();
+        if (!enabled) return;
+        headerCacheCleanup();
+        getVisibleGridRoots().forEach(root => {
+            buildHeaderMap(root, true);
+            root.querySelectorAll('.grid-row').forEach(markRowDirty);
+        });
+        scheduleGridScan();
+    }
+
+    function headerCacheCleanup() {
+        // WeakMap 无需手动删除；此函数保留语义，强制重建通过 buildHeaderMap(..., true)。
+    }
+
+    function syncEngineState() {
+        if (!enabled) {
+            cleanupBodyObservers();
+            clearAllHighlights();
+            return;
+        }
+        scheduleGridScan();
+        rescanAllVisibleRows();
+    }
+
+    function countVisibleMatches(rule) {
+        let count = 0;
+        getVisibleGridRoots().forEach(root => {
+            const map = buildHeaderMap(root, true);
+            const fieldId = resolveFieldId(rule, root, map);
+            if (!fieldId) return;
+            root.querySelectorAll('.grid-row').forEach(row => {
+                const cell = row.querySelector(`.grid-cell[data-grid-field-id="${cssEsc(fieldId)}"]`);
+                if (cell && matchRule(rule, getCellValue(cell), row, root, map)) count++;
+            });
+        });
+        return count;
+    }
+
+    function ensureStyles() {
+        if (document.getElementById(MOD.styleId)) return;
+        const style = document.createElement('style');
+        style.id = MOD.styleId;
+        style.textContent = `
+            /*
+             * V7.8.1 整行条件高亮：顶部 + 底部双边缘。
+             * 每一个可见 cell（包括左右置顶 cell、复选框列、行号列）绘制完全相同的水平边缘，
+             * 因而横向滚动时不会在 pinned / normal 区域交界处断线。
+             */
+            #root .grid-root .grid-row.att-cond-row-v770 > .grid-cell:not(.att-focus-cell):not(.att-focus-row-cell):not(.att-focus-column),
+            #root .grid-root .grid-row.att-cond-row-v770 > .grid-selectcol,
+            #root .grid-root .grid-row.att-cond-row-v770 > .grid-rownum {
+                background-image:
+                    linear-gradient(to bottom,
+                        var(--att-cond-row-edge-top) 0,
+                        var(--att-cond-row-edge-top) var(--att-cond-row-edge-width),
+                        transparent var(--att-cond-row-edge-width),
+                        transparent 100%),
+                    linear-gradient(to top,
+                        var(--att-cond-row-edge-bottom) 0,
+                        var(--att-cond-row-edge-bottom) var(--att-cond-row-edge-width),
+                        transparent var(--att-cond-row-edge-width),
+                        transparent 100%),
+                    linear-gradient(var(--att-cond-row-fill), var(--att-cond-row-fill)) !important;
+                font-weight: var(--att-cond-row-font-weight) !important;
+            }
+
+            #root .grid-root .grid-row .grid-cell.att-cond-cell-v770:not(.att-focus-cell):not(.att-focus-row-cell):not(.att-focus-column) {
+                background-image:
+                    linear-gradient(to right,
+                        var(--att-cond-cell-edge) 0,
+                        var(--att-cond-cell-edge) var(--att-cond-cell-edge-width),
+                        transparent var(--att-cond-cell-edge-width),
+                        transparent 100%),
+                    linear-gradient(var(--att-cond-cell-fill), var(--att-cond-cell-fill)) !important;
+                font-weight: var(--att-cond-cell-font-weight) !important;
+            }
+
+            /* 单元格规则比同一行的整行规则优先。 */
+            #root .grid-root .grid-row.att-cond-row-v770 > .grid-cell.att-cond-cell-v770:not(.att-focus-cell):not(.att-focus-row-cell):not(.att-focus-column) {
+                background-image:
+                    linear-gradient(to right,
+                        var(--att-cond-cell-edge) 0,
+                        var(--att-cond-cell-edge) var(--att-cond-cell-edge-width),
+                        transparent var(--att-cond-cell-edge-width),
+                        transparent 100%),
+                    linear-gradient(var(--att-cond-cell-fill), var(--att-cond-cell-fill)) !important;
+                font-weight: var(--att-cond-cell-font-weight) !important;
+            }
+
+            /* 管理器 */
+            #${MOD.modalId} {
+                position: fixed; inset: 0; z-index: 2147483000;
+                display: none; align-items: center; justify-content: center;
+                padding: 22px; background: rgba(0,0,0,.56); backdrop-filter: blur(3px);
+                color: #e8eaed; font-family: inherit;
+            }
+            #${MOD.modalId}.att-show { display:flex; }
+            #${MOD.modalId} .chr-shell {
+                width: min(1080px, calc(100vw - 36px)); height: min(760px, calc(100vh - 36px));
+                min-height: 520px; display:grid; grid-template-rows:auto minmax(0,1fr) auto;
+                background:#202124; border:1px solid #3b3d40; border-radius:14px;
+                box-shadow:0 22px 70px rgba(0,0,0,.46); overflow:hidden;
+            }
+            #${MOD.modalId} .chr-head,
+            #${MOD.modalId} .chr-foot { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; }
+            #${MOD.modalId} .chr-head { border-bottom:1px solid #34363a; }
+            #${MOD.modalId} .chr-foot { border-top:1px solid #34363a; }
+            #${MOD.modalId} .chr-title { font-size:16px; font-weight:700; }
+            #${MOD.modalId} .chr-sub { margin-top:3px; color:#9aa0a6; font-size:12px; }
+            #${MOD.modalId} .chr-main { min-height:0; display:grid; grid-template-columns:300px minmax(0,1fr); }
+            #${MOD.modalId} .chr-side { min-height:0; display:grid; grid-template-rows:auto auto minmax(0,1fr); border-right:1px solid #34363a; }
+            #${MOD.modalId} .chr-side-tools { padding:12px; display:flex; gap:8px; }
+            #${MOD.modalId} input[type="text"], #${MOD.modalId} input[type="search"], #${MOD.modalId} select {
+                width:100%; min-width:0; box-sizing:border-box; height:34px; padding:0 9px;
+                color:#e8eaed; background:#292a2d; border:1px solid #424448; border-radius:7px; outline:none;
+            }
+            #${MOD.modalId} input:focus, #${MOD.modalId} select:focus { border-color:#4c8bf5; box-shadow:0 0 0 2px rgba(76,139,245,.16); }
+            #${MOD.modalId} .chr-filter { padding:0 12px 10px; }
+            #${MOD.modalId} .chr-list { min-height:0; overflow:auto; padding:0 8px 12px; scrollbar-gutter:stable; }
+            #${MOD.modalId} .chr-item { display:grid; grid-template-columns:auto minmax(0,1fr); gap:8px; padding:9px 8px; margin:3px 0; border:1px solid transparent; border-radius:8px; cursor:pointer; }
+            #${MOD.modalId} .chr-item:hover { background:#292b2f; }
+            #${MOD.modalId} .chr-item.active { background:#26354a; border-color:#315b91; }
+            #${MOD.modalId} .chr-dot { width:8px; height:8px; border-radius:50%; margin-top:5px; background:var(--chr-color,#6b7280); box-shadow:0 0 0 3px color-mix(in srgb, var(--chr-color,#6b7280) 16%, transparent); }
+            #${MOD.modalId} .chr-item-name { font-weight:650; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+            #${MOD.modalId} .chr-item-meta { margin-top:3px; color:#9aa0a6; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+            #${MOD.modalId} .chr-detail { min-width:0; min-height:0; overflow:auto; padding:16px 18px 24px; scrollbar-gutter:stable; }
+            #${MOD.modalId} .chr-empty { height:100%; min-height:260px; display:grid; place-items:center; color:#9aa0a6; text-align:center; }
+            #${MOD.modalId} .chr-section { padding:13px; margin-bottom:12px; background:#252629; border:1px solid #383a3e; border-radius:10px; }
+            #${MOD.modalId} .chr-section-title { margin-bottom:10px; font-weight:700; font-size:13px; }
+            #${MOD.modalId} .chr-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+            #${MOD.modalId} .chr-field { min-width:0; }
+            #${MOD.modalId} .chr-field > span { display:block; margin-bottom:5px; color:#b7bbc0; font-size:11px; }
+            #${MOD.modalId} .chr-check { display:flex; align-items:center; gap:7px; min-height:34px; font-size:12px; }
+            #${MOD.modalId} .chr-range { display:grid; grid-template-columns:minmax(0,1fr) 52px; align-items:center; gap:8px; }
+            #${MOD.modalId} input[type="range"] { width:100%; }
+            #${MOD.modalId} .chr-range b { font-size:11px; color:#c9ccd1; text-align:right; }
+            #${MOD.modalId} .chr-actions { display:flex; flex-wrap:wrap; gap:7px; }
+            #${MOD.modalId} button { height:32px; padding:0 11px; color:#e8eaed; background:#303134; border:1px solid #46484d; border-radius:7px; cursor:pointer; }
+            #${MOD.modalId} button:hover { background:#3a3c40; }
+            #${MOD.modalId} button.primary { background:#1a73e8; border-color:#1a73e8; color:white; }
+            #${MOD.modalId} button.danger { color:#ff8a80; border-color:#69413f; }
+            #${MOD.modalId} button:disabled { opacity:.45; cursor:not-allowed; }
+            #${MOD.modalId} .chr-preview { padding:9px 10px; border-radius:8px; background:#1f2023; color:#b9c0c8; font-size:12px; line-height:1.5; }
+            #${MOD.modalId} .chr-mode { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+            #${MOD.modalId} .chr-mode label { display:flex; align-items:center; justify-content:center; gap:6px; height:34px; border:1px solid #424448; border-radius:7px; cursor:pointer; }
+            #${MOD.modalId} .chr-mode label:has(input:checked) { background:#263b58; border-color:#3f78bd; color:#dbeafe; }
+            #${MOD.modalId} .chr-mode input { display:none; }
+            #${MOD.modalId} .chr-rule-type { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:8px; }
+            #${MOD.modalId} .chr-rule-type label { display:flex;align-items:center;justify-content:center;gap:6px;height:34px;border:1px solid #424448;border-radius:7px;cursor:pointer; }
+            #${MOD.modalId} .chr-rule-type label:has(input:checked) { background:#263b58;border-color:#3f78bd;color:#dbeafe; }
+            #${MOD.modalId} .chr-rule-type input { display:none; }
+            #${MOD.modalId} .chr-code { width:100%; min-height:150px; resize:vertical; padding:10px 11px; color:#e7eef7; background:#17191d; border:1px solid #41454b; border-radius:8px; font:12px/1.65 Consolas,'Cascadia Code',monospace; tab-size:4; }
+            #${MOD.modalId} .chr-code:focus { border-color:#3f78bd; box-shadow:0 0 0 2px rgba(63,120,189,.16); outline:none; }
+            #${MOD.modalId} .chr-code-tools { display:flex;flex-wrap:wrap;gap:6px;margin:8px 0; }
+            #${MOD.modalId} .chr-code-tools button { height:27px;padding:0 8px;color:#b9d7ff;background:#202c3d;border-color:#355171;font-size:11px; }
+            #${MOD.modalId} .chr-guide { margin-top:8px;padding:9px 10px;background:#1f2023;border:1px solid #36383c;border-radius:8px;color:#aeb5bd;font-size:11px;line-height:1.65; }
+            #${MOD.modalId} .chr-guide code { color:#9ecbff;background:#182333;padding:1px 4px;border-radius:4px; }
+            @media(max-width:820px){ #${MOD.modalId} .chr-main{grid-template-columns:240px minmax(0,1fr)} #${MOD.modalId} .chr-grid2{grid-template-columns:1fr} }
+        `;
+        (document.head || document.documentElement).appendChild(style);
+    }
+
+    function ruleScopeLabel(rule) {
+        return rule.scope === 'global' ? '全部表' : (rule.tableName || '当前表');
+    }
+
+    function updateSettingsCard() {
+        const card = document.getElementById(MOD.cardId);
+        if (!card) return;
+        const toggle = card.querySelector('[data-cond-setting="enabled"]');
+        if (toggle) toggle.checked = enabled;
+        const active = rules.filter(r => r.enabled).length;
+        const summary = card.querySelector('[data-cond-summary]');
+        if (summary) summary.textContent = `已配置 ${rules.length} 条 · 启用 ${active} 条`;
+    }
+
+    function ensureSettingsCard() {
+        const section = document.querySelector('[data-section="settings"]');
+        if (!section || document.getElementById(MOD.cardId)) return;
+        const card = document.createElement('div');
+        card.id = MOD.cardId;
+        card.className = 'att-card';
+        card.innerHTML = `
+            <div class="att-card-title">字段条件高亮</div>
+            <div class="att-card-desc">指定字段内容符合规则时自动高亮。支持文本、数值、日期语义和安全高级表达式；整行模式默认使用上下双强调边缘，并可独立调整边缘颜色、强度和宽度。</div>
+            <div class="att-divider"></div>
+            <div class="att-row">
+                <div style="min-width:0;">
+                    <div class="att-label">启用字段条件高亮</div>
+                    <div class="att-sub-label" data-cond-summary>已配置 ${rules.length} 条 · 启用 ${rules.filter(r => r.enabled).length} 条</div>
+                    <div class="att-sub-label">快捷开关：默认 <span class="att-kbd">Alt+H</span>，可在下方“功能快捷键 → 条件高亮”修改</div>
+                </div>
+                <label class="att-switch"><input type="checkbox" data-cond-setting="enabled" ${enabled ? 'checked' : ''}><span class="att-slider"></span></label>
+            </div>
+            <div class="att-actions" style="margin-top:8px;">
+                <button type="button" class="att-btn att-primary" data-cond-act="manage">管理高亮规则</button>
+                <button type="button" class="att-btn" data-cond-act="refresh">重新扫描当前表</button>
+            </div>
+        `;
+        // 条件高亮与表格视觉样式关系紧密，放在视觉样式卡片后面；找不到则放到设置顶部。
+        const cards = Array.from(section.querySelectorAll(':scope > .att-card'));
+        const visual = cards.find(el => cleanText(el.querySelector('.att-card-title')?.textContent) === '表格视觉样式');
+        if (visual?.nextSibling) section.insertBefore(card, visual.nextSibling);
+        else if (visual) section.appendChild(card);
+        else section.prepend(card);
+    }
+
+    function openManager() {
+        managerDraft = normalizeRules(JSON.parse(JSON.stringify(rules)));
+        managerSelectedId = managerDraft[0]?.id || '';
+        managerFilter = '';
+        const modal = ensureManager();
+        modal.classList.add('att-show');
+        renderManager();
+    }
+
+    function closeManager() {
+        document.getElementById(MOD.modalId)?.classList.remove('att-show');
+    }
+
+    function ensureManager() {
+        let modal = document.getElementById(MOD.modalId);
+        if (modal) return modal;
+        modal = document.createElement('div');
+        modal.id = MOD.modalId;
+        modal.innerHTML = `
+            <div class="chr-shell" role="dialog" aria-modal="true" aria-label="字段条件高亮规则">
+                <div class="chr-head">
+                    <div><div class="chr-title">字段条件高亮规则</div><div class="chr-sub">V7.8.1 · 单元格 / 整行 · 上下强调边缘 · 日期语义 · 安全高级表达式 · 快捷开关</div></div>
+                    <button type="button" data-chr-act="close">×</button>
+                </div>
+                <div class="chr-main">
+                    <aside class="chr-side">
+                        <div class="chr-side-tools"><button type="button" class="primary" data-chr-act="new">+ 新建规则</button><button type="button" data-chr-act="enable-all">全启用</button><button type="button" data-chr-act="disable-all">全停用</button></div>
+                        <div class="chr-filter"><input type="search" data-chr-filter placeholder="搜索规则 / 字段…"></div>
+                        <div class="chr-list" data-chr-list></div>
+                    </aside>
+                    <main class="chr-detail" data-chr-detail></main>
+                </div>
+                <div class="chr-foot"><div class="chr-sub">规则从上到下为优先级；聚焦高亮优先于条件高亮。</div><div class="chr-actions"><button type="button" data-chr-act="cancel">取消</button><button type="button" class="primary" data-chr-act="save">保存全部</button></div></div>
+            </div>`;
+        document.body.appendChild(modal);
+        modal.addEventListener('click', onManagerClick);
+        modal.addEventListener('input', onManagerInput);
+        modal.addEventListener('change', onManagerChange);
+        return modal;
+    }
+
+    function getSelectedDraftRule() {
+        return managerDraft.find(r => r.id === managerSelectedId) || null;
+    }
+
+    function renderManager() {
+        const modal = ensureManager();
+        const filter = modal.querySelector('[data-chr-filter]');
+        if (filter && document.activeElement !== filter) filter.value = managerFilter;
+        renderManagerList();
+        renderManagerDetail();
+    }
+
+    function renderManagerList() {
+        const list = document.querySelector(`#${MOD.modalId} [data-chr-list]`);
+        if (!list) return;
+        const q = cleanText(managerFilter).toLowerCase();
+        const visible = managerDraft.filter(r => !q || `${r.name} ${r.fieldName} ${r.tableName}`.toLowerCase().includes(q));
+        if (!visible.length) {
+            list.innerHTML = '<div class="chr-empty" style="height:auto;min-height:140px;">没有匹配的规则</div>';
+            return;
+        }
+        list.innerHTML = visible.map((r, index) => `
+            <div class="chr-item ${r.id === managerSelectedId ? 'active' : ''}" data-chr-rule-id="${escAttr(r.id)}" style="--chr-color:${escAttr(r.color)}">
+                <span class="chr-dot"></span>
+                <div style="min-width:0;"><div class="chr-item-name">${r.enabled ? '' : '○ '}${escHtml(r.name)}</div><div class="chr-item-meta">${escHtml(r.fieldName || '未选字段')} · ${r.ruleType==='advanced'?'高级表达式':OP_META[r.operator]} · ${r.mode === 'row' ? '整行' : '单元格'} · ${escHtml(ruleScopeLabel(r))}</div></div>
+            </div>`).join('');
+    }
+
+    function buildFieldOptions(rule) {
+        const fields = getCurrentFields();
+        const options = [];
+        if (rule.fieldName && !fields.some(f => f.fieldId === rule.fieldId || f.name === rule.fieldName)) {
+            options.push(`<option value="${escAttr(rule.fieldId || `name:${rule.fieldName}`)}" selected>${escHtml(rule.fieldName)}（当前表未找到）</option>`);
+        }
+        options.push(...fields.map(f => `<option value="${escAttr(f.fieldId)}" ${f.fieldId === rule.fieldId || (!rule.fieldId && f.name === rule.fieldName) ? 'selected' : ''}>${escHtml(f.name)}</option>`));
+        return options.join('');
+    }
+
+    function renderManagerDetail() {
+        const detail = document.querySelector(`#${MOD.modalId} [data-chr-detail]`);
+        if (!detail) return;
+        const rule = getSelectedDraftRule();
+        if (!rule) {
+            detail.innerHTML = '<div class="chr-empty"><div><b>还没有高亮规则</b><br><span>点击左侧“新建规则”开始配置。</span></div></div>';
+            return;
+        }
+        const context = getTableContext();
+        const valueDisabled = ['empty','notEmpty','dateToday','dateYesterday','dateTomorrow','dateBeforeToday','dateAfterToday'].includes(rule.operator);
+        const matchCount = countVisibleMatches(rule);
+        detail.innerHTML = `
+            <div class="chr-section">
+                <div class="chr-grid2">
+                    <label class="chr-field"><span>规则名称</span><input type="text" data-chr-edit="name" value="${escAttr(rule.name)}"></label>
+                    <label class="chr-check"><input type="checkbox" data-chr-edit="enabled" ${rule.enabled ? 'checked' : ''}> 启用这条规则</label>
+                </div>
+            </div>
+            <div class="chr-section">
+                <div class="chr-section-title">规则模式</div>
+                <div class="chr-rule-type">
+                    <label><input type="radio" name="chr-rule-type" data-chr-edit="ruleType" value="standard" ${rule.ruleType==='standard'?'checked':''}>标准规则</label>
+                    <label><input type="radio" name="chr-rule-type" data-chr-edit="ruleType" value="advanced" ${rule.ruleType==='advanced'?'checked':''}>高级表达式</label>
+                </div>
+                <div class="chr-guide">标准模式适合常用文本、数值和日期判断；高级模式使用安全表达式，不执行 JavaScript，不允许访问 window / document / 网络 / 存储。</div>
+            </div>
+            <div class="chr-section">
+                <div class="chr-section-title">匹配规则</div>
+                <div class="chr-grid2">
+                    <label class="chr-field"><span>作用范围</span><select data-chr-edit="scope"><option value="table" ${rule.scope === 'table' ? 'selected' : ''}>仅当前表${context ? `：${escHtml(context.tableName)}` : ''}</option><option value="global" ${rule.scope === 'global' ? 'selected' : ''}>全部表（按字段名称匹配）</option></select></label>
+                    <label class="chr-field"><span>${rule.ruleType==='advanced'?'高亮目标字段 / value':'目标字段'}</span><select data-chr-edit="field">${buildFieldOptions(rule)}</select></label>
+                </div>
+                ${rule.ruleType === 'standard' ? `
+                <div class="chr-grid2" style="margin-top:10px;">
+                    <label class="chr-field"><span>判断方式</span><select data-chr-edit="operator">${Object.entries(OP_META).map(([v,l]) => `<option value="${v}" ${v===rule.operator?'selected':''}>${l}</option>`).join('')}</select></label>
+                    <label class="chr-field"><span>${rule.operator === 'dateWithinNextDays' || rule.operator === 'dateWithinPastDays' ? '天数 N' : rule.operator === 'dateEquals' ? '指定日期' : '匹配内容'}</span>${valueDisabled
+                        ? `<input type="text" disabled placeholder="此判断无需填写内容">`
+                        : rule.operator === 'dateEquals'
+                            ? `<input type="date" data-chr-edit="value" value="${escAttr(rule.value)}">`
+                            : (rule.operator === 'dateWithinNextDays' || rule.operator === 'dateWithinPastDays')
+                                ? `<input type="number" min="0" step="1" data-chr-edit="value" value="${escAttr(rule.value || '3')}" placeholder="例如：3">`
+                                : `<input type="text" data-chr-edit="value" value="${escAttr(rule.value)}" placeholder="${rule.operator === 'regex' ? '例如：^BRL\\d+$' : '输入要匹配的内容'}">`}</label>
+                </div>
+                ${TEXT_OPERATORS.has(rule.operator) ? `<div class="chr-check" style="margin-top:8px;"><input type="checkbox" data-chr-edit="caseSensitive" ${rule.caseSensitive ? 'checked' : ''}> 区分大小写 <span style="color:#8f949b;">（正则同样适用）</span></div>` : ''}
+                ${DATE_OPERATORS.has(rule.operator) ? `<div class="chr-guide">日期支持 <code>YYYY-MM-DD</code>、<code>YYYY/MM/DD</code>、<code>YYYY年M月D日</code>。其中“未来 N 天内”包含今天和第 N 天，“已逾期”严格早于今天。</div>` : ''}
+                ` : `
+                <div style="margin-top:10px;">
+                    <label class="chr-field"><span>高级条件表达式（结果为 true 时命中）</span><textarea class="chr-code" data-chr-edit="advancedExpr" spellcheck="false" placeholder='例如：date(value) < today && field("二级阶段") == "商业流程中"'>${escHtml(rule.advancedExpr)}</textarea></label>
+                    <div class="chr-code-tools">
+                        <button type="button" data-chr-expr='date(value) == today'>今天</button>
+                        <button type="button" data-chr-expr='date(value) < today'>已逾期</button>
+                        <button type="button" data-chr-expr='withinNextDays(value, 3)'>未来3天</button>
+                        <button type="button" data-chr-expr='field("二级阶段") == "商业流程中"'>同行字段</button>
+                        <button type="button" data-chr-expr='contains(field("商业名称"), "国药")'>包含字段</button>
+                        <button type="button" data-chr-expr='regex(value, "^BRL\\d+$")'>正则</button>
+                        <button type="button" data-chr-expr=' && '>AND</button>
+                        <button type="button" data-chr-expr=' || '>OR</button>
+                        <button type="button" data-chr-act="validate-expr">验证表达式</button>
+                    </div>
+                    <div class="chr-guide"><b>可用变量：</b><code>value</code> 当前目标字段、<code>today</code>、<code>yesterday</code>、<code>tomorrow</code>、<code>now</code>、<code>table</code>。<br><b>同行字段：</b><code>field("字段名")</code>。<b>日期：</b><code>date(x)</code>、<code>daysFromToday(x)</code>、<code>isToday(x)</code>、<code>isPast(x)</code>、<code>withinNextDays(x,n)</code>。<br><b>文本：</b><code>contains</code>、<code>startsWith</code>、<code>endsWith</code>、<code>regex</code>、<code>empty</code>、<code>notEmpty</code>、<code>len</code>。支持 <code>== != &gt; &gt;= &lt; &lt;= && || ! + - * / % ?:</code>。</div>
+                </div>`}
+            </div>
+            <div class="chr-section">
+                <div class="chr-section-title">高亮范围</div>
+                <div class="chr-mode">
+                    <label><input type="radio" name="chr-mode" data-chr-edit="mode" value="cell" ${rule.mode==='cell'?'checked':''}>只高亮匹配单元格</label>
+                    <label><input type="radio" name="chr-mode" data-chr-edit="mode" value="row" ${rule.mode==='row'?'checked':''}>高亮整行</label>
+                </div>
+            </div>
+            <div class="chr-section">
+                <div class="chr-section-title">视觉样式</div>
+                <div class="chr-grid2">
+                    <label class="chr-field"><span>高亮底色</span><input type="color" data-chr-edit="color" value="${escAttr(rule.color)}" style="width:100%;height:34px;padding:2px;background:#292a2d;border:1px solid #424448;border-radius:7px;"></label>
+                    <label class="chr-field"><span>边缘颜色</span><input type="color" data-chr-edit="edgeColor" value="${escAttr(rule.edgeColor)}" style="width:100%;height:34px;padding:2px;background:#292a2d;border:1px solid #424448;border-radius:7px;"></label>
+                    <label class="chr-field"><span>底色高亮程度</span><div class="chr-range"><input type="range" min="4" max="80" step="1" data-chr-edit="opacity" value="${rule.opacity}"><b data-chr-value="opacity">${rule.opacity}%</b></div></label>
+                    <label class="chr-field"><span>边缘强度（透明度）</span><div class="chr-range"><input type="range" min="0" max="100" step="1" data-chr-edit="edgeOpacity" value="${rule.edgeOpacity}"><b data-chr-value="edgeOpacity">${rule.edgeOpacity}%</b></div></label>
+                    <label class="chr-field"><span>强调边缘宽度</span><div class="chr-range"><input type="range" min="0" max="5" step="1" data-chr-edit="edgeWidth" value="${rule.edgeWidth}"><b data-chr-value="edgeWidth">${rule.edgeWidth}px</b></div></label>
+                    <label class="chr-check"><input type="checkbox" data-chr-edit="bold" ${rule.bold?'checked':''}> 高亮内容文字加粗</label>
+                </div>
+                ${rule.mode === 'row' ? `
+                <div class="chr-guide" style="margin-top:10px;">
+                    <b>整行强调边缘</b>
+                    <div style="display:flex;gap:18px;align-items:center;margin-top:7px;">
+                        <label class="chr-check" style="min-height:auto;"><input type="checkbox" data-chr-edit="edgeTop" ${rule.edgeTop?'checked':''}> 顶部边缘</label>
+                        <label class="chr-check" style="min-height:auto;"><input type="checkbox" data-chr-edit="edgeBottom" ${rule.edgeBottom?'checked':''}> 底部边缘</label>
+                    </div>
+                    <div style="margin-top:5px;color:#8f949b;">默认上下同时开启；左置顶区、滚动主体和右置顶区使用同一套边缘参数。</div>
+                </div>` : `
+                <div class="chr-guide" style="margin-top:10px;">单元格模式继续使用左侧强调边缘；边缘颜色、强度和宽度与上方设置一致。</div>`}
+            </div>
+            <div class="chr-section">
+                <div class="chr-section-title">规则检查</div>
+                <div class="chr-preview">当前页面可见区域命中 <b>${matchCount}</b> 行。${rule.ruleType === 'advanced' ? (()=>{const v=validateAdvancedExpression(rule);return v.ok?'<br><span style="color:#81c995;">高级表达式语法有效</span>':`<br><span style="color:#ff8a80;">表达式错误：${escHtml(v.error)}</span>`;})() : ''}${rule.scope === 'table' && context && rule.tableKey && rule.tableKey !== context.key ? '<br>注意：此规则属于另一张表，当前表不会生效。' : ''}</div>
+                <div class="chr-actions" style="margin-top:9px;"><button type="button" data-chr-act="test">重新测试</button><button type="button" data-chr-act="up">提高优先级</button><button type="button" data-chr-act="down">降低优先级</button><button type="button" data-chr-act="duplicate">复制规则</button><button type="button" class="danger" data-chr-act="delete">删除规则</button></div>
+            </div>`;
+    }
+
+    function createDefaultRule() {
+        const context = getTableContext();
+        const field = getCurrentFields()[0] || null;
+        return normalizeRule({
+            id: makeId(), enabled: true, name: '新高亮规则',
+            scope: context ? 'table' : 'global', tableKey: context?.key || '', tableName: context?.tableName || '',
+            fieldId: field?.fieldId || '', fieldName: field?.name || '',
+            ruleType:'standard', operator: 'contains', value: '', advancedExpr:'', mode: 'cell',
+            color: '#f59e0b', opacity: 24, edgeColor: '#f59e0b', edgeOpacity: 58, edgeWidth: 1,
+            edgeTop: true, edgeBottom: true, bold: false
+        }, managerDraft.length);
+    }
+
+    function onManagerClick(event) {
+        const item = event.target.closest('[data-chr-rule-id]');
+        if (item) {
+            managerSelectedId = item.dataset.chrRuleId || '';
+            renderManager();
+            return;
+        }
+        const exprBtn = event.target.closest('[data-chr-expr]');
+        if (exprBtn) {
+            const rule = getSelectedDraftRule();
+            const ta = document.querySelector(`#${MOD.modalId} textarea[data-chr-edit="advancedExpr"]`);
+            if (rule && ta) {
+                const insert = exprBtn.getAttribute('data-chr-expr') || '';
+                const start = Number.isInteger(ta.selectionStart) ? ta.selectionStart : ta.value.length;
+                const end = Number.isInteger(ta.selectionEnd) ? ta.selectionEnd : start;
+                ta.value = ta.value.slice(0,start) + insert + ta.value.slice(end);
+                rule.advancedExpr = ta.value;
+                const pos = start + insert.length; ta.focus(); ta.setSelectionRange(pos,pos);
+            }
+            return;
+        }
+        const action = event.target.closest('[data-chr-act]')?.dataset.chrAct;
+        if (!action) return;
+        const selected = getSelectedDraftRule();
+        if (action === 'close' || action === 'cancel') return closeManager();
+        if (action === 'new') {
+            const rule = createDefaultRule(); managerDraft.push(rule); managerSelectedId = rule.id; return renderManager();
+        }
+        if (action === 'enable-all' || action === 'disable-all') {
+            managerDraft.forEach(r => r.enabled = action === 'enable-all'); return renderManager();
+        }
+        if (action === 'save') {
+            const bad = managerDraft.find(r => r.enabled && r.ruleType === 'advanced' && !validateAdvancedExpression(r).ok);
+            if (bad) { const v=validateAdvancedExpression(bad); alert(`规则“${bad.name}”的高级表达式有误：${v.error}`); managerSelectedId=bad.id; renderManager(); return; }
+            rules = normalizeRules(managerDraft); GM_setValue(MOD.keyRules, rules); closeManager(); updateSettingsCard(); rescanAllVisibleRows(); return;
+        }
+        if (!selected) return;
+        const index = managerDraft.findIndex(r => r.id === selected.id);
+        if (action === 'delete') {
+            if (!confirm(`删除高亮规则“${selected.name}”吗？`)) return;
+            managerDraft.splice(index,1); managerSelectedId = managerDraft[index]?.id || managerDraft[index-1]?.id || ''; return renderManager();
+        }
+        if (action === 'duplicate') {
+            const copy = normalizeRule({...JSON.parse(JSON.stringify(selected)), id:makeId(), name:`${selected.name} - 副本`}, managerDraft.length);
+            managerDraft.splice(index+1,0,copy); managerSelectedId=copy.id; return renderManager();
+        }
+        if (action === 'up' && index > 0) {
+            [managerDraft[index-1],managerDraft[index]]=[managerDraft[index],managerDraft[index-1]]; return renderManager();
+        }
+        if (action === 'down' && index >= 0 && index < managerDraft.length-1) {
+            [managerDraft[index+1],managerDraft[index]]=[managerDraft[index],managerDraft[index+1]]; return renderManager();
+        }
+        if (action === 'validate-expr') {
+            const v = validateAdvancedExpression(selected);
+            alert(v.ok ? '高级表达式语法有效。' : `高级表达式错误：${v.error}`);
+            return renderManagerDetail();
+        }
+        if (action === 'test') return renderManagerDetail();
+    }
+
+    function onManagerInput(event) {
+        if (event.target.matches('[data-chr-filter]')) {
+            managerFilter = event.target.value || ''; renderManagerList(); return;
+        }
+        const key = event.target.dataset.chrEdit;
+        const rule = getSelectedDraftRule();
+        if (!key || !rule) return;
+        if (['name','value','advancedExpr'].includes(key)) rule[key] = event.target.value;
+        if (key === 'opacity') { rule.opacity = Math.round(clamp(event.target.value,4,80,24)); const b=document.querySelector(`#${MOD.modalId} [data-chr-value="opacity"]`); if(b)b.textContent=`${rule.opacity}%`; }
+        if (key === 'edgeOpacity') { rule.edgeOpacity = Math.round(clamp(event.target.value,0,100,58)); const b=document.querySelector(`#${MOD.modalId} [data-chr-value="edgeOpacity"]`); if(b)b.textContent=`${rule.edgeOpacity}%`; }
+        if (key === 'edgeWidth') { rule.edgeWidth = Math.round(clamp(event.target.value,0,5,1)); const b=document.querySelector(`#${MOD.modalId} [data-chr-value="edgeWidth"]`); if(b)b.textContent=`${rule.edgeWidth}px`; }
+        if (key === 'color') rule.color = normalizeColor(event.target.value);
+        if (key === 'edgeColor') rule.edgeColor = normalizeColor(event.target.value, rule.color);
+        if (key === 'name') renderManagerList();
+    }
+
+    function onManagerChange(event) {
+        const key = event.target.dataset.chrEdit;
+        const rule = getSelectedDraftRule();
+        if (!key || !rule) return;
+        if (key === 'enabled' || key === 'caseSensitive' || key === 'bold' || key === 'edgeTop' || key === 'edgeBottom') rule[key] = Boolean(event.target.checked);
+        if (key === 'scope') {
+            rule.scope = VALID_SCOPES.has(event.target.value) ? event.target.value : 'table';
+            if (rule.scope === 'table') {
+                const c = getTableContext(); rule.tableKey = c?.key || rule.tableKey; rule.tableName = c?.tableName || rule.tableName;
+            }
+            return renderManager();
+        }
+        if (key === 'field') {
+            const fields = getCurrentFields();
+            const def = fields.find(f => f.fieldId === event.target.value);
+            if (def) { rule.fieldId = rule.scope === 'table' ? def.fieldId : ''; rule.fieldName = def.name; }
+            return renderManager();
+        }
+        if (key === 'ruleType') { rule.ruleType = VALID_RULE_TYPES.has(event.target.value) ? event.target.value : 'standard'; return renderManager(); }
+        if (key === 'operator') { rule.operator = OP_META[event.target.value] ? event.target.value : 'contains'; if (['dateWithinNextDays','dateWithinPastDays'].includes(rule.operator) && !cleanText(rule.value)) rule.value='3'; return renderManagerDetail(); }
+        if (key === 'mode') { rule.mode = VALID_MODES.has(event.target.value) ? event.target.value : 'cell'; renderManagerList(); return renderManagerDetail(); }
+        if (key === 'color') { rule.color = normalizeColor(event.target.value); renderManagerList(); }
+    }
+
+    function bindSettingsCardEvents() {
+        document.addEventListener('change', event => {
+            const input = event.target.closest?.(`#${MOD.cardId} [data-cond-setting="enabled"]`);
+            if (input) setEnabled(input.checked);
+        }, true);
+        document.addEventListener('click', event => {
+            const action = event.target.closest?.(`#${MOD.cardId} [data-cond-act]`)?.dataset.condAct;
+            if (action === 'manage') openManager();
+            if (action === 'refresh') rescanAllVisibleRows();
+        }, true);
+    }
+
+    function attachToolboxObserver() {
+        const attach = () => {
+            const root = document.getElementById('att-toolbox-root');
+            if (!root) return false;
+            if (!toolboxObserver) {
+                toolboxObserver = new MutationObserver(() => requestAnimationFrame(ensureSettingsCard));
+                toolboxObserver.observe(root, { childList:true, subtree:true });
+            }
+            ensureSettingsCard();
+            return true;
+        };
+        if (attach()) return;
+        const wait = new MutationObserver(() => { if (attach()) wait.disconnect(); });
+        wait.observe(document.documentElement, { childList:true, subtree:true });
+    }
+
+    function attachPageObserver() {
+        if (pageObserver) return;
+        pageObserver = new MutationObserver(records => {
+            let needScan = false;
+            for (const record of records) {
+                const target = record.target instanceof Element ? record.target : record.target.parentElement;
+                if (target?.closest?.('.grid-virtual-body')) continue; // 已由专用 observer 增量处理。
+                for (const node of record.addedNodes || []) {
+                    if (!(node instanceof Element)) continue;
+                    if (node.matches?.('.grid-root,.grid-virtual-body,.grid-header-cell') || node.querySelector?.('.grid-root,.grid-virtual-body,.grid-header-cell')) {
+                        needScan = true; break;
+                    }
+                }
+                if (needScan) break;
+            }
+            if (needScan) {
+                getVisibleGridRoots().forEach(root => buildHeaderMap(root, true));
+                scheduleGridScan();
+                if (enabled) rescanAllVisibleRows();
+            }
+        });
+        pageObserver.observe(document.documentElement, { childList:true, subtree:true });
+    }
+
+    function bindHotkeyBridge() {
+        window.addEventListener('att:conditional-highlight:set', event => {
+            const next = Boolean(event?.detail?.enabled);
+            // 直接走模块自己的状态入口，保证关闭时清理、开启时重扫都即时生效。
+            if (enabled !== next) setEnabled(next);
+            else {
+                updateSettingsCard();
+                syncEngineState();
+            }
+        });
+    }
+
+    function init() {
+        ensureStyles();
+        bindHotkeyBridge();
+        bindSettingsCardEvents();
+        attachToolboxObserver();
+        attachPageObserver();
+        syncEngineState();
+        console.log('[AutoTable 条件高亮] V7.8.1 已加载：字段规则 / 日期语义 / 安全高级表达式 / 整行上下强调边缘 / 虚拟滚动增量高亮 / Alt+H 快捷总开关');
+    }
+
+    if (document.body) init();
+    else window.addEventListener('DOMContentLoaded', init, { once:true });
 })();
