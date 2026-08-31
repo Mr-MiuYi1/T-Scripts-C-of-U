@@ -7,8 +7,8 @@
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
 //
-// @updateURL    https://github.com/Mr-MiuYi1/T-Scripts-C-of-U/AutoTableTools/AutoTabletools.meta.js
-// @downloadURL  https://github.com/Mr-MiuYi1/T-Scripts-C-of-U/AutoTableTools/AutoTabletools.user.js
+// @updateURL    https://github.com/Mr-MiuYi1/T-Scripts-C-of-U/blob/main/AutoTableTools/AutoTabletools.meta.js
+// @downloadURL  https://github.com/Mr-MiuYi1/T-Scripts-C-of-U/blob/main/AutoTableTools/AutoTabletools.user.js
 //
 // ==/UserScript==
 
