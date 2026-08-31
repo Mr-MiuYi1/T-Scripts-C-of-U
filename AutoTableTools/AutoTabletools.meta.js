@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.5.0
+// @version      7.6.0
 // @description  AutoTable 一体化效率增强工具：智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆、自定义表格视觉样式、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
