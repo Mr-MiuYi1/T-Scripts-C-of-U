@@ -6,6 +6,8 @@
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
+// @match        http://106.54.31.31/*
+// @match        https://106.54.31.31/*
 //
 // @updateURL    https://raw.githubusercontent.com/Mr-MiuYi1/T-Scripts-C-of-U/main/AutoTableToolsTest/AutoTabletools.meta.js
 // @downloadURL  https://raw.githubusercontent.com/Mr-MiuYi1/T-Scripts-C-of-U/main/AutoTableToolsTest/AutoTabletools.user.js
