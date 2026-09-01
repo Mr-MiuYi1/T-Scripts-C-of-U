@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.8.1
+// @version      7.8.2
 // @description  AutoTable 一体化效率增强工具：智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.8.1
+ * AutoTable 工具集 V7.8.2
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，整行上下强调边缘可独立配置，支持快捷开关）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -42,7 +42,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.8.1',
+        version: 'V7.8.2',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -10533,11 +10533,13 @@
         const root = document.createElement('div');
         root.id = APP.rootId;
         root.dataset.direction = 'left';
+        // V7.8.2：主版本作为 UI 唯一版本源，后续视觉模块不再维护重复版本号。
+        root.dataset.appVersion = APP.version;
         root.innerHTML = `
             <div id="${APP.panelId}">
                 <div class="att-head">
                     <div>
-                        <div class="att-head-title">AutoTable 工具集</div>
+                        <div class="att-head-title" data-att-version="${APP.version}">AutoTable 工具集</div>
                         <div class="att-head-sub" id="att-panel-context">${APP.version} · 常用功能</div>
                     </div>
                     <button type="button" class="att-icon-btn" data-act="close-panel" title="关闭">×</button>
@@ -22981,7 +22983,7 @@
     'use strict';
 
     const UI = {
-        version: 'V6.9.1',
+        // 此模块是历史 UI polish 层，业务版本统一读取主 APP.version 渲染出的 data 属性。
         styleId: 'att-toolbox-ui-polish-v690',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -23059,7 +23061,8 @@
             }
 
             #${UI.panelId} .att-head-title::after {
-                content: '${UI.version}';
+                /* V7.8.2：版本徽标直接读取主标题 data-att-version，彻底避免版本号不同步。 */
+                content: attr(data-att-version);
                 display: inline-flex;
                 align-items: center;
                 min-height: 18px;
@@ -23430,7 +23433,8 @@
         const sub = document.getElementById(UI.contextId) || root.querySelector('.att-head-sub');
         if (sub) {
             sub.textContent = `${meta.title} · ${meta.desc}`;
-            sub.title = `${UI.version} · ${meta.title} · ${meta.desc}`;
+            const appVersion = root.dataset.appVersion || root.querySelector('.att-head-title')?.getAttribute('data-att-version') || '';
+            sub.title = `${appVersion ? appVersion + ' · ' : ''}${meta.title} · ${meta.desc}`;
         }
 
         root.querySelectorAll('.att-tab[data-tab]').forEach(tab => {
@@ -23441,9 +23445,16 @@
 
     function install() {
         addStyles();
-        updatePanelContext();
 
         const root = document.getElementById(UI.rootId);
+        if (root) {
+            const title = root.querySelector('.att-head-title');
+            // 老 DOM 或热更新场景：优先沿用主根节点版本，保证徽标仍能自动同步。
+            const appVersion = root.dataset.appVersion || title?.getAttribute('data-att-version') || '';
+            if (title && appVersion) title.setAttribute('data-att-version', appVersion);
+        }
+        updatePanelContext();
+
         if (!root || root.dataset.attUiPolishV690 === '1') return;
         root.dataset.attUiPolishV690 = '1';
 
