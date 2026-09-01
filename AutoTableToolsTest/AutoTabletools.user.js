@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.10.1
-// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、高性能全视图模糊搜索记录、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.11.0
+// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、紧凑可展开的全视图模糊搜索记录、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.10.0
+ * AutoTable 工具集 V7.11.0
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，整行上下强调边缘可独立配置，支持快捷开关）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -33,7 +33,7 @@
  * - 文档：原生风格大纲、滚动跟随、查找/替换/定位、正则表达式与高亮
  * - 界面：可隐藏关联字段复制按钮，并释放按钮原先占用的文字空间
  * - 悬浮菜单：V7.9 重整为“快捷 / 字段 / 置顶 / 文档 / 设置”，快捷页聚合高频操作，设置页提供分区导航与合理功能归类
- * - 搜索：全视图模糊搜索框支持按视图保存历史、混合历史模式、最大条数控制与全部视图搜索记录中心
+ * - 搜索：全视图模糊搜索支持紧凑历史层、列表/胶囊展示、字体大小、同表视图互通、原位丝滑展开全部记录与独立搜索记录管理面板
  * - 设置：支持字段条件高亮规则中心；全部工具配置 JSON 备份、跨版本导入恢复与全部重置；导入/重置后统一刷新确保各独立模块同步生效
  * - 渲染：按真实行号稳定斑马纹；虚拟滚动增量渲染；聚焦行/字段分别保存稳定身份；横向虚拟化时绝不回退到其它字段；编辑与置顶表头保持稳定层级；置顶表头高亮使用不透明底层防止滚动表头穿透
  * - 置顶：右置顶严格镜像；“+ 添加列”保持 AutoTable 原生末端位置，不参与置顶 sticky/offset
@@ -44,7 +44,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.10.1',
+        version: 'V7.11.0',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -27761,687 +27761,292 @@
         }
     `;
     document.documentElement.appendChild(style);
-    console.log('[AutoTable 工具集 V7.10.1] 悬浮菜单布局优化已加载：快捷操作聚合 / 设置分区导航 / 文档 Tab 顺序优化');
+    console.log('[AutoTable 工具集 V7.11.0] 悬浮菜单布局优化已加载：快捷操作聚合 / 设置分区导航 / 文档 Tab 顺序优化');
 })();
 
 
 /* ============================================================================
- * AutoTable 全视图模糊搜索记录 V7.10.1
+ * AutoTable 全视图模糊搜索记录 V7.11.0
  * --------------------------------------------------------------------------
- * 1) 聚焦 AutoTable 原生“全视图模糊搜索”时，在输入框下方显示搜索记录；
- * 2) 默认按 viewId 独立保存；设置可切换成跨视图混合显示；
- * 3) 每个视图的最大保存条数可配置，降低无边界历史数据积累；
- * 4) 搜索记录只监听原输入框，不改写 AutoTable 自身搜索逻辑；
- * 5) 点击历史项通过原生 input/change 事件回填，继续走 AutoTable 原搜索流程；
- * 6) 提供全部视图搜索记录中心，可查看、使用、删除单条、清空视图或全部清空；
- * 7) 使用独立 GM 设置，自动进入 V7.6+ “全部设置导入 / 导出 / 重置”；
- * 8) 兼容 SPA 视图切换，不依赖固定搜索框 DOM；
- * 9) V7.10.1：修复设置卡 MutationObserver 自触发重绘循环；搜索输入/滚动定位使用 RAF 合并；
- * 10) V7.10.1：当前视图上下文短时缓存，Enter/focusout/pointerdown 连续写历史自动去重。
+ * 1) 搜索框下方默认使用更紧凑的历史层，支持列表 / 胶囊自动填充两种展示；
+ * 2) 可调历史文字大小；每个视图最大保存条数继续独立控制；
+ * 3) 支持“同一个表中搜索记录互通”：当前视图可直接使用同表其它视图的历史；
+ * 4) “查看全部视图搜索记录”不再直接打开大弹窗，而是在原历史层下方丝滑展开；
+ * 5) 展开区可滚动查看全部视图记录，并提供“搜索记录管理”入口；
+ * 6) 原“全部视图搜索记录”大弹窗改为更紧凑的“搜索记录管理”面板，只负责维护；
+ * 7) 继续沿用 V7.10.1 的性能优化：Observer 去自循环、输入/定位 RAF 合并、写入去重；
+ * 8) 所有新增设置均使用 GM 存储，自动进入“全部设置导出 / 导入 / 重置”。
  * ========================================================================== */
 (function () {
     'use strict';
 
     const SH = {
-        version: 'V7.10.1',
+        version: 'V7.11.0',
         enabledKey: 'att_v3_viewSearchHistoryEnabled',
         maxKey: 'att_v3_viewSearchHistoryMaxPerView',
         perViewKey: 'att_v3_viewSearchHistoryPerViewMode',
         dataKey: 'att_v3_viewSearchHistoryData',
-        dropdownId: 'att-view-search-history-dropdown-v7100',
-        managerId: 'att-view-search-history-manager-v7100',
-        settingsCardId: 'att-view-search-history-settings-v7100',
-        styleId: 'att-view-search-history-style-v7100'
+        fontSizeKey: 'att_v3_viewSearchHistoryFontSize',
+        layoutKey: 'att_v3_viewSearchHistoryLayoutMode',
+        sameTableShareKey: 'att_v3_viewSearchHistorySameTableShare',
+        dropdownId: 'att-view-search-history-dropdown-v7110',
+        managerId: 'att-view-search-history-manager-v7110',
+        settingsCardId: 'att-view-search-history-settings-v7110',
+        styleId: 'att-view-search-history-style-v7110'
     };
 
     let enabled = GM_getValue(SH.enabledKey, true) !== false;
     let maxPerView = normalizeMax(GM_getValue(SH.maxKey, 20));
     let perViewMode = GM_getValue(SH.perViewKey, true) !== false;
+    let sameTableShare = Boolean(GM_getValue(SH.sameTableShareKey, false));
+    let historyFontSize = normalizeFontSize(GM_getValue(SH.fontSizeKey, 12));
+    let layoutMode = normalizeLayout(GM_getValue(SH.layoutKey, 'list'));
     let historyData = normalizeHistoryData(GM_getValue(SH.dataKey, {}));
+
     let activeSearchInput = null;
     let dropdownPointerDown = false;
+    let dropdownExpanded = false;
+    let expandedFilter = '';
     let managerSelectedView = 'all';
     let managerFilter = '';
     let toolboxObserver = null;
     let settingsAttachObserver = null;
-
-    // V7.10.1 性能状态：把输入/滚动高频事件合并到每帧最多一次，
-    // 并缓存当前视图上下文，避免每输入一个字符都扫描页面 Tab/链接 DOM。
     let dropdownRenderRaf = 0;
     let dropdownPositionRaf = 0;
     let pendingDropdownInput = null;
     let settingsEnsureRaf = 0;
     let lastRecordSignature = '';
     let lastRecordAt = 0;
-    let viewContextCache = { href: '', at: 0, value: null };
+    let viewContextCache = { href:'', at:0, value:null };
 
     function normalizeMax(value) {
-        const n = Number(value);
-        if (!Number.isFinite(n)) return 20;
-        return Math.min(100, Math.max(3, Math.round(n)));
+        const n=Number(value); return Number.isFinite(n) ? Math.min(100,Math.max(3,Math.round(n))) : 20;
     }
-
-    function cleanText(value) {
-        return String(value ?? '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+    function normalizeFontSize(value) {
+        const n=Number(value); return Number.isFinite(n) ? Math.min(16,Math.max(10,Math.round(n))) : 12;
     }
-
-    function escHtml(value) {
-        return String(value ?? '')
-            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    }
-
-    function escAttr(value) {
-        return escHtml(value).replace(/`/g, '&#96;');
-    }
-
-    function formatTime(ts, compact = false) {
-        const n = Number(ts || 0);
-        if (!n) return '';
-        const d = new Date(n);
-        if (Number.isNaN(d.getTime())) return '';
-        const now = new Date();
-        const sameDay = d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
-        const pad = v => String(v).padStart(2, '0');
-        if (sameDay) return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-        if (compact) return `${d.getMonth()+1}/${d.getDate()}`;
+    function normalizeLayout(value) { return value === 'capsule' ? 'capsule' : 'list'; }
+    function cleanText(value) { return String(value??'').replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim(); }
+    function escHtml(value) { return String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+    function escAttr(value) { return escHtml(value).replace(/`/g,'&#96;'); }
+    function cssEscape(value) { if(window.CSS?.escape)return CSS.escape(String(value)); return String(value).replace(/["\\]/g,'\\$&'); }
+    function formatTime(ts, compact=false) {
+        const n=Number(ts||0); if(!n)return ''; const d=new Date(n); if(Number.isNaN(d.getTime()))return '';
+        const now=new Date(), same=d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();
+        const pad=v=>String(v).padStart(2,'0');
+        if(same)return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        if(compact)return `${d.getMonth()+1}/${d.getDate()}`;
         return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
     }
 
     function normalizeHistoryData(raw) {
-        const out = {};
-        if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
-        for (const [key, value] of Object.entries(raw)) {
-            if (!value || typeof value !== 'object') continue;
-            const items = Array.isArray(value.items) ? value.items : [];
-            const cleanItems = [];
-            const seen = new Set();
-            for (const item of items) {
-                const query = cleanText(typeof item === 'string' ? item : item?.query);
-                if (!query || seen.has(query)) continue;
-                seen.add(query);
-                cleanItems.push({ query, ts: Number(item?.ts || item?.timestamp || Date.now()) });
-                if (cleanItems.length >= maxPerView) break;
+        const out={}; if(!raw||typeof raw!=='object'||Array.isArray(raw))return out;
+        for(const [key,value] of Object.entries(raw)){
+            if(!value||typeof value!=='object')continue;
+            const cleanItems=[],seen=new Set();
+            for(const item of (Array.isArray(value.items)?value.items:[])){
+                const query=cleanText(typeof item==='string'?item:item?.query); if(!query||seen.has(query))continue;
+                seen.add(query); cleanItems.push({query,ts:Number(item?.ts||item?.timestamp||Date.now())});
+                if(cleanItems.length>=maxPerView)break;
             }
-            out[key] = {
-                key,
-                baseId: String(value.baseId || ''),
-                tableId: String(value.tableId || ''),
-                viewId: String(value.viewId || ''),
-                tableName: cleanText(value.tableName || ''),
-                viewName: cleanText(value.viewName || ''),
-                path: String(value.path || ''),
-                updatedAt: Number(value.updatedAt || cleanItems[0]?.ts || 0),
-                items: cleanItems
-            };
+            out[key]={key,baseId:String(value.baseId||''),tableId:String(value.tableId||''),viewId:String(value.viewId||''),tableName:cleanText(value.tableName||''),viewName:cleanText(value.viewName||''),path:String(value.path||''),updatedAt:Number(value.updatedAt||cleanItems[0]?.ts||0),items:cleanItems};
         }
         return out;
     }
+    function trimAllProfiles(){ for(const p of Object.values(historyData)) if(p&&Array.isArray(p.items)) p.items=p.items.slice(0,maxPerView); }
+    function saveHistoryData(){ trimAllProfiles(); GM_setValue(SH.dataKey,historyData); updateSettingsCard(); }
 
-    function saveHistoryData() {
-        trimAllProfiles();
-        GM_setValue(SH.dataKey, historyData);
-        updateSettingsCard();
+    function isViewSearchInput(el){
+        if(!(el instanceof HTMLInputElement))return false;
+        const ph=cleanText(el.getAttribute('placeholder')||'').replace(/\s+/g,''), ar=cleanText(el.getAttribute('aria-label')||'').replace(/\s+/g,'');
+        return (ph.includes('全视图')&&ph.includes('搜索'))||(ar.includes('全视图')&&ar.includes('搜索'));
     }
 
-    function trimAllProfiles() {
-        for (const profile of Object.values(historyData)) {
-            if (!profile || !Array.isArray(profile.items)) continue;
-            profile.items = profile.items.slice(0, maxPerView);
+    function getCurrentViewContext(){
+        const hrefKey=`${location.pathname||''}${location.search||''}`,now=performance.now();
+        if(viewContextCache.value&&viewContextCache.href===hrefKey&&(now-viewContextCache.at)<1200)return viewContextCache.value;
+        const path=location.pathname||'',baseId=path.match(/\/b\/([^/]+)/i)?.[1]||'base',tableId=path.match(/\/t\/(tbl_[^/]+)/i)?.[1]||'',viewId=path.match(/\/v\/(viw_[^/]+)/i)?.[1]||'';
+        const tableName=cleanText(document.querySelector('.grid-page-title')?.textContent||document.querySelector('.grid-page-header h1')?.textContent||document.querySelector('main h1')?.textContent||tableId||'当前表格');
+        let viewName='';
+        if(viewId){
+            const candidates=[...document.querySelectorAll(`[data-view-id="${cssEscape(viewId)}"], [data-view-key="${cssEscape(viewId)}"]`),...document.querySelectorAll(`a[href*="/v/${cssEscape(viewId)}"]`)];
+            const names=candidates.map(el=>cleanText(el.getAttribute('title')||el.textContent||'')).filter(v=>v&&v.length<=80&&v!==tableName);
+            viewName=names.sort((a,b)=>a.length-b.length)[0]||'';
         }
+        if(!viewName){const tab=document.querySelector('.ant-tabs-tab-active,.view-tab.active,[aria-selected="true"]');const t=cleanText(tab?.getAttribute('title')||tab?.textContent||'');if(t&&t.length<=80&&t!==tableName)viewName=t;}
+        if(!viewName)viewName=viewId||'当前视图';
+        const fallback=path.replace(/\/+$/,'')||'/',key=`${baseId}::${tableId||'table'}::${viewId||fallback}`;
+        const value={key,baseId,tableId,viewId,tableName,viewName,path:location.pathname+location.search}; viewContextCache={href:hrefKey,at:now,value}; return value;
     }
 
-    function isViewSearchInput(el) {
-        if (!(el instanceof HTMLInputElement)) return false;
-        const placeholder = cleanText(el.getAttribute('placeholder') || '').replace(/\s+/g, '');
-        const aria = cleanText(el.getAttribute('aria-label') || '').replace(/\s+/g, '');
-        return (placeholder.includes('全视图') && placeholder.includes('搜索')) ||
-               (aria.includes('全视图') && aria.includes('搜索'));
+    function ensureProfile(context=getCurrentViewContext()){
+        let p=historyData[context.key];
+        if(!p)p=historyData[context.key]={key:context.key,baseId:context.baseId,tableId:context.tableId,viewId:context.viewId,tableName:context.tableName,viewName:context.viewName,path:context.path,updatedAt:0,items:[]};
+        else {p.baseId=context.baseId||p.baseId;p.tableId=context.tableId||p.tableId;p.viewId=context.viewId||p.viewId;p.tableName=context.tableName||p.tableName;p.viewName=context.viewName||p.viewName;p.path=context.path||p.path;}
+        return p;
     }
 
-    function getCurrentViewContext() {
-        const hrefKey = `${location.pathname || ''}${location.search || ''}`;
-        const now = performance.now();
-        if (viewContextCache.value && viewContextCache.href === hrefKey && (now - viewContextCache.at) < 1200) {
-            return viewContextCache.value;
-        }
-        const path = location.pathname || '';
-        const baseId = path.match(/\/b\/([^/]+)/i)?.[1] || 'base';
-        const tableId = path.match(/\/t\/(tbl_[^/]+)/i)?.[1] || '';
-        const viewId = path.match(/\/v\/(viw_[^/]+)/i)?.[1] || '';
-        const tableName = cleanText(
-            document.querySelector('.grid-page-title')?.textContent ||
-            document.querySelector('.grid-page-header h1')?.textContent ||
-            document.querySelector('main h1')?.textContent ||
-            tableId || '当前表格'
-        );
-
-        let viewName = '';
-        if (viewId) {
-            const candidates = [
-                ...document.querySelectorAll(`[data-view-id="${cssEscape(viewId)}"], [data-view-key="${cssEscape(viewId)}"]`),
-                ...document.querySelectorAll(`a[href*="/v/${cssEscape(viewId)}"]`)
-            ];
-            const names = candidates.map(el => cleanText(el.getAttribute('title') || el.textContent || ''))
-                .filter(v => v && v.length <= 80 && v !== tableName);
-            viewName = names.sort((a,b) => a.length - b.length)[0] || '';
-        }
-        if (!viewName) {
-            const activeTab = document.querySelector('.ant-tabs-tab-active,.view-tab.active,[aria-selected="true"]');
-            const activeText = cleanText(activeTab?.getAttribute('title') || activeTab?.textContent || '');
-            if (activeText && activeText.length <= 80 && activeText !== tableName) viewName = activeText;
-        }
-        if (!viewName) viewName = viewId || '当前视图';
-
-        const fallbackViewKey = path.replace(/\/+$/, '') || '/';
-        const key = `${baseId}::${tableId || 'table'}::${viewId || fallbackViewKey}`;
-        const value = { key, baseId, tableId, viewId, tableName, viewName, path: location.pathname + location.search };
-        viewContextCache = { href: hrefKey, at: now, value };
-        return value;
+    function recordSearch(query,context=getCurrentViewContext()){
+        if(!enabled)return; const q=cleanText(query); if(!q)return; const p=ensureProfile(context),now=Date.now(),sig=`${context.key}\n${q}`;
+        if(sig===lastRecordSignature&&(now-lastRecordAt)<1200)return;
+        if(p.items?.[0]?.query===q&&(now-Number(p.items[0].ts||0))<1200){lastRecordSignature=sig;lastRecordAt=now;return;}
+        lastRecordSignature=sig;lastRecordAt=now;p.items=[{query:q,ts:now},...p.items.filter(i=>cleanText(i.query)!==q)].slice(0,maxPerView);p.updatedAt=now;saveHistoryData();
+        if(activeSearchInput?.isConnected&&document.getElementById(SH.dropdownId)?.classList.contains('is-open'))scheduleDropdownRender(activeSearchInput);
     }
 
-    function cssEscape(value) {
-        if (window.CSS?.escape) return CSS.escape(String(value));
-        return String(value).replace(/["\\]/g, '\\$&');
+    function removeHistoryItem(viewKey,query){const p=historyData[viewKey];if(!p)return;p.items=p.items.filter(i=>i.query!==query);p.updatedAt=p.items[0]?.ts||p.updatedAt;saveHistoryData();if(activeSearchInput?.isConnected)scheduleDropdownRender(activeSearchInput);if(document.getElementById(SH.managerId)?.classList.contains('is-open'))renderManager();}
+    function clearViewHistory(viewKey){const p=historyData[viewKey];if(!p)return;p.items=[];p.updatedAt=Date.now();saveHistoryData();if(activeSearchInput?.isConnected)scheduleDropdownRender(activeSearchInput);if(document.getElementById(SH.managerId)?.classList.contains('is-open'))renderManager();}
+    function clearAllHistory(){for(const p of Object.values(historyData))p.items=[];saveHistoryData();if(activeSearchInput?.isConnected)scheduleDropdownRender(activeSearchInput);if(document.getElementById(SH.managerId)?.classList.contains('is-open'))renderManager();}
+
+    function getScopeProfiles(){
+        const current=getCurrentViewContext(),all=Object.values(historyData);
+        if(!perViewMode)return all;
+        if(sameTableShare)return all.filter(p=>p.baseId===current.baseId&&((current.tableId&&p.tableId===current.tableId)||(!current.tableId&&p.tableName===current.tableName)));
+        return [historyData[current.key]].filter(Boolean);
+    }
+    function scopeLabel(){ if(!perViewMode)return '全部视图'; if(sameTableShare)return '当前表互通'; return '当前视图'; }
+    function flattenProfiles(profiles,{filter='',dedupe=false,limit=Infinity}={}){
+        const q=cleanText(filter).toLocaleLowerCase(),rows=[];
+        for(const p of profiles){for(const item of p.items||[]){if(q&&!`${item.query} ${p.viewName} ${p.tableName}`.toLocaleLowerCase().includes(q))continue;rows.push({...item,viewKey:p.key,viewName:p.viewName||p.viewId||'视图',tableName:p.tableName||'',path:p.path||''});}}
+        rows.sort((a,b)=>b.ts-a.ts);
+        if(!dedupe)return rows.slice(0,limit);
+        const seen=new Set(),unique=[];
+        for(const row of rows){if(seen.has(row.query))continue;seen.add(row.query);unique.push(row);if(unique.length>=limit)break;}
+        return unique;
+    }
+    function getDisplayItems(inputValue=''){ return flattenProfiles(getScopeProfiles(),{filter:inputValue,dedupe:true,limit:layoutMode==='capsule'?14:8}); }
+    function getAllItems(filter=''){ return flattenProfiles(Object.values(historyData),{filter,dedupe:false}); }
+
+    function setNativeInputValue(input,value){const d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value');if(d?.set)d.set.call(input,value);else input.value=value;input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}));}
+    function findCurrentSearchInput(){return Array.from(document.querySelectorAll('input')).find(isViewSearchInput)||null;}
+    function useHistoryQuery(query){const input=activeSearchInput?.isConnected?activeSearchInput:findCurrentSearchInput();if(!input)return;setNativeInputValue(input,query);recordSearch(query);input.focus({preventScroll:true});dropdownExpanded=false;expandedFilter='';hideDropdown();}
+
+    function ensureDropdown(){
+        let d=document.getElementById(SH.dropdownId);if(d)return d;d=document.createElement('div');d.id=SH.dropdownId;d.setAttribute('role','dialog');
+        d.addEventListener('pointerdown',e=>{dropdownPointerDown=true;if(e.target.closest('button,[data-sh-query]'))e.preventDefault();});
+        d.addEventListener('pointerup',()=>{setTimeout(()=>dropdownPointerDown=false,0);});d.addEventListener('click',onDropdownClick);
+        d.addEventListener('input',e=>{if(e.target.matches('[data-sh-expanded-filter]')){expandedFilter=e.target.value||'';renderExpandedOnly(d);}});
+        document.body.appendChild(d);return d;
+    }
+    function scheduleDropdownRender(input=activeSearchInput){if(!enabled||!input?.isConnected)return;pendingDropdownInput=input;if(dropdownRenderRaf)return;dropdownRenderRaf=requestAnimationFrame(()=>{dropdownRenderRaf=0;const target=pendingDropdownInput;pendingDropdownInput=null;if(target?.isConnected)renderDropdown(target);});}
+    function scheduleDropdownPosition(){const d=document.getElementById(SH.dropdownId);if(!d?.classList.contains('is-open')||!activeSearchInput?.isConnected)return;if(dropdownPositionRaf)return;dropdownPositionRaf=requestAnimationFrame(()=>{dropdownPositionRaf=0;const cur=document.getElementById(SH.dropdownId);if(cur?.classList.contains('is-open')&&activeSearchInput?.isConnected)positionDropdown(activeSearchInput,cur);});}
+    function positionDropdown(input,d=ensureDropdown()){
+        if(!input?.isConnected||!d.classList.contains('is-open'))return;const r=input.getBoundingClientRect(),margin=10,gap=5;
+        const desired=dropdownExpanded?Math.min(580,Math.max(460,r.width*1.55)):Math.min(420,Math.max(300,r.width));
+        const width=Math.min(desired,window.innerWidth-margin*2);d.style.width=`${Math.round(width)}px`;
+        let left=r.right-width;left=Math.max(margin,Math.min(left,window.innerWidth-width-margin));
+        const cap=dropdownExpanded?Math.min(600,window.innerHeight-margin*2):280,measured=Math.min(d.scrollHeight||cap,cap),below=window.innerHeight-r.bottom-margin,above=r.top-margin;
+        let top;if(below>=Math.min(dropdownExpanded?390:170,measured)||below>=above)top=r.bottom+gap;else top=Math.max(margin,r.top-measured-gap);
+        d.style.left=`${Math.round(left)}px`;d.style.top=`${Math.round(top)}px`;
     }
 
-    function ensureProfile(context = getCurrentViewContext()) {
-        let profile = historyData[context.key];
-        if (!profile) {
-            profile = historyData[context.key] = {
-                key: context.key,
-                baseId: context.baseId,
-                tableId: context.tableId,
-                viewId: context.viewId,
-                tableName: context.tableName,
-                viewName: context.viewName,
-                path: context.path,
-                updatedAt: 0,
-                items: []
-            };
-        } else {
-            profile.baseId = context.baseId || profile.baseId;
-            profile.tableId = context.tableId || profile.tableId;
-            profile.viewId = context.viewId || profile.viewId;
-            profile.tableName = context.tableName || profile.tableName;
-            profile.viewName = context.viewName || profile.viewName;
-            profile.path = context.path || profile.path;
-        }
-        return profile;
+    function renderCompactItems(items,input){
+        if(!items.length)return `<div class="shd-empty">${cleanText(input.value)?'历史记录中没有匹配项':'暂无搜索记录'}<span>${scopeLabel()}的搜索会显示在这里</span></div>`;
+        if(layoutMode==='capsule')return `<div class="shd-capsules">${items.map(i=>`<span class="shd-chip"><button type="button" class="shd-chip-main" data-sh-query="${escAttr(i.query)}" title="${escAttr(i.query)}">${escHtml(i.query)}</button><button type="button" class="shd-chip-del" data-sh-act="delete" data-sh-query-delete="${escAttr(i.query)}" data-sh-view-key="${escAttr(i.viewKey)}" title="删除">×</button></span>`).join('')}</div>`;
+        return items.map(i=>`<div class="shd-item" data-sh-query="${escAttr(i.query)}"><span class="shd-clock">↺</span><div class="shd-main"><div class="shd-query">${escHtml(i.query)}</div>${(sameTableShare||!perViewMode)?`<div class="shd-source">${escHtml(i.tableName)} · ${escHtml(i.viewName)}</div>`:''}</div><span class="shd-time">${escHtml(formatTime(i.ts,true))}</span><button type="button" class="shd-del" data-sh-act="delete" data-sh-query-delete="${escAttr(i.query)}" data-sh-view-key="${escAttr(i.viewKey)}" title="删除">×</button></div>`).join('');
+    }
+    function renderExpandedRecords(){
+        const all=getAllItems(''),items=expandedFilter?all.filter(i=>`${i.query} ${i.viewName} ${i.tableName}`.toLocaleLowerCase().includes(cleanText(expandedFilter).toLocaleLowerCase())):all,total=all.length;
+        return `<div class="shd-expanded-head"><div><b>全部视图搜索记录</b><span>${items.length}${expandedFilter?` / ${total}`:''} 条</span></div><div class="shd-expanded-actions"><button type="button" data-sh-act="open-manager">管理记录</button><button type="button" data-sh-act="collapse">收起</button></div></div>
+        <div class="shd-expanded-search"><input type="search" data-sh-expanded-filter placeholder="筛选全部搜索记录…" value="${escAttr(expandedFilter)}"></div>
+        <div class="shd-expanded-list">${items.length?items.map(i=>`<div class="shd-expanded-item"><button type="button" class="shd-expanded-use" data-sh-query="${escAttr(i.query)}"><b>${escHtml(i.query)}</b><span>${escHtml(i.tableName)} · ${escHtml(i.viewName)} · ${escHtml(formatTime(i.ts))}</span></button><button type="button" class="shd-del" data-sh-act="delete" data-sh-query-delete="${escAttr(i.query)}" data-sh-view-key="${escAttr(i.viewKey)}">×</button></div>`).join(''):'<div class="shd-empty">没有符合条件的记录</div>'}</div>`;
+    }
+    function renderExpandedOnly(d=ensureDropdown()){
+        const box=d.querySelector('[data-sh-expanded-box]');if(!box)return;box.innerHTML=renderExpandedRecords();const f=box.querySelector('[data-sh-expanded-filter]');if(f){f.focus({preventScroll:true});const n=f.value.length;f.setSelectionRange(n,n);}scheduleDropdownPosition();
     }
 
-    function recordSearch(query, context = getCurrentViewContext()) {
-        if (!enabled) return;
-        const q = cleanText(query);
-        if (!q) return;
-        const profile = ensureProfile(context);
-        const now = Date.now();
-        const signature = `${context.key}\n${q}`;
-
-        // Enter -> focusout -> 外部 pointerdown 可能在几百毫秒内连续走 2~3 次。
-        // V7.10.0 每次都会 GM_setValue + 重绘 dropdown；这里直接去重。
-        if (signature === lastRecordSignature && (now - lastRecordAt) < 1200) return;
-        if (profile.items?.[0]?.query === q && (now - Number(profile.items[0].ts || 0)) < 1200) {
-            lastRecordSignature = signature;
-            lastRecordAt = now;
-            return;
-        }
-
-        lastRecordSignature = signature;
-        lastRecordAt = now;
-        profile.items = [
-            { query: q, ts: now },
-            ...profile.items.filter(item => cleanText(item.query) !== q)
-        ].slice(0, maxPerView);
-        profile.updatedAt = now;
-        saveHistoryData();
-        if (activeSearchInput?.isConnected && document.getElementById(SH.dropdownId)?.classList.contains('is-open')) {
-            scheduleDropdownRender(activeSearchInput);
-        }
+    function renderDropdown(input=activeSearchInput){
+        const d=ensureDropdown();if(!enabled||!input?.isConnected||!isViewSearchInput(input)){hideDropdown();return;}activeSearchInput=input;
+        const ctx=getCurrentViewContext(),items=getDisplayItems(input.value||''),profiles=getScopeProfiles(),total=profiles.reduce((n,p)=>n+(p.items?.length||0),0);
+        d.style.setProperty('--att-sh-font-size',`${historyFontSize}px`);d.classList.toggle('is-expanded',dropdownExpanded);d.classList.toggle('is-capsule',layoutMode==='capsule');
+        d.innerHTML=`<div class="shd-head"><div><b>${escHtml(scopeLabel()==='当前视图'?ctx.viewName:scopeLabel())}</b><span>${total} 条 · ${layoutMode==='capsule'?'胶囊':'列表'}</span></div>${perViewMode&&!sameTableShare&&historyData[ctx.key]?.items?.length?'<button type="button" data-sh-act="clear-current">清空</button>':''}</div>
+        <div class="shd-list">${renderCompactItems(items,input)}</div>
+        <button type="button" class="shd-all" data-sh-act="expand-all"><span>查看全部视图搜索记录</span><b>${dropdownExpanded?'⌄':'›'}</b></button>
+        <div class="shd-expanded" data-sh-expanded-box>${dropdownExpanded?renderExpandedRecords():''}</div>`;
+        d.classList.add('is-open');requestAnimationFrame(()=>positionDropdown(input,d));
+    }
+    function hideDropdown(){const d=document.getElementById(SH.dropdownId);d?.classList.remove('is-open','is-expanded');dropdownExpanded=false;expandedFilter='';}
+    function onDropdownClick(event){
+        const action=event.target.closest('[data-sh-act]')?.dataset.shAct;
+        if(action==='expand-all'){dropdownExpanded=true;renderDropdown(activeSearchInput);return;}
+        if(action==='collapse'){dropdownExpanded=false;expandedFilter='';renderDropdown(activeSearchInput);return;}
+        if(action==='open-manager'){openManager();return;}
+        if(action==='clear-current'){const c=getCurrentViewContext();if(historyData[c.key]&&confirm(`清空“${c.viewName}”的搜索记录吗？`))clearViewHistory(c.key);return;}
+        if(action==='delete'){const b=event.target.closest('[data-sh-act="delete"]');removeHistoryItem(b?.dataset.shViewKey||'',b?.dataset.shQueryDelete||'');return;}
+        const row=event.target.closest('[data-sh-query]');if(row)useHistoryQuery(row.dataset.shQuery||'');
     }
 
-    function removeHistoryItem(viewKey, query) {
-        const profile = historyData[viewKey];
-        if (!profile) return;
-        profile.items = profile.items.filter(item => item.query !== query);
-        profile.updatedAt = profile.items[0]?.ts || profile.updatedAt;
-        saveHistoryData();
-        if (activeSearchInput?.isConnected) scheduleDropdownRender(activeSearchInput);
-        if (document.getElementById(SH.managerId)?.classList.contains('is-open')) renderManager();
+    function getManagerProfiles(){return Object.values(historyData).filter(p=>(p.items||[]).length).sort((a,b)=>b.updatedAt-a.updatedAt);}
+    function ensureManager(){
+        let m=document.getElementById(SH.managerId);if(m)return m;m=document.createElement('div');m.id=SH.managerId;
+        m.innerHTML=`<div class="shm-shell" role="dialog" aria-modal="true"><header class="shm-head"><div><b>搜索记录管理</b><span>跨视图维护搜索历史：查看、使用、删除与清空</span></div><button type="button" data-shm-act="close">×</button></header><div class="shm-body"><aside class="shm-side"><div class="shm-side-search"><input type="search" data-shm-filter placeholder="搜索视图 / 表 / 内容…"></div><div class="shm-views" data-shm-views></div></aside><main class="shm-main" data-shm-main></main></div><footer class="shm-foot"><span></span><div><button type="button" data-shm-act="clear-all" class="danger">清空全部记录</button><button type="button" data-shm-act="close" class="primary">完成</button></div></footer></div>`;
+        m.addEventListener('click',onManagerClick);m.addEventListener('input',e=>{if(e.target.matches('[data-shm-filter]')){managerFilter=e.target.value||'';renderManager();}});m.style.setProperty('--att-sh-font-size',`${historyFontSize}px`);document.body.appendChild(m);return m;
+    }
+    function openManager(selectedKey=''){const ps=getManagerProfiles(),current=getCurrentViewContext().key;managerSelectedView=selectedKey||(historyData[current]?.items?.length?current:(ps[0]?.key||'all'));managerFilter='';const m=ensureManager(),f=m.querySelector('[data-shm-filter]');m.style.setProperty('--att-sh-font-size',`${historyFontSize}px`);if(f)f.value='';m.classList.add('is-open');renderManager();hideDropdown();}
+    function closeManager(){document.getElementById(SH.managerId)?.classList.remove('is-open');}
+    function renderManager(){
+        const m=ensureManager(),profiles=getManagerProfiles();if(managerSelectedView!=='all'&&!profiles.some(p=>p.key===managerSelectedView))managerSelectedView='all';const q=cleanText(managerFilter).toLocaleLowerCase();
+        const filtered=profiles.filter(p=>!q||`${p.tableName} ${p.viewName} ${(p.items||[]).map(i=>i.query).join(' ')}`.toLocaleLowerCase().includes(q));
+        m.querySelector('[data-shm-views]').innerHTML=`<button type="button" class="shm-view ${managerSelectedView==='all'?'active':''}" data-shm-view="all"><span><b>全部记录</b><small>${profiles.reduce((n,p)=>n+p.items.length,0)} 条</small></span></button>${filtered.map(p=>`<button type="button" class="shm-view ${managerSelectedView===p.key?'active':''}" data-shm-view="${escAttr(p.key)}"><span><b>${escHtml(p.viewName||p.viewId||'视图')}</b><small>${escHtml(p.tableName||'')} · ${p.items.length} 条</small></span><em>${escHtml(formatTime(p.updatedAt,true))}</em></button>`).join('')||'<div class="shm-none">暂无记录</div>'}`;
+        const selected=managerSelectedView==='all'?null:historyData[managerSelectedView];let items=selected?selected.items.map(i=>({...i,viewKey:selected.key,viewName:selected.viewName,tableName:selected.tableName,path:selected.path})):flattenProfiles(profiles);if(q)items=items.filter(i=>`${i.query} ${i.viewName} ${i.tableName}`.toLocaleLowerCase().includes(q));
+        const title=selected?`${selected.tableName} · ${selected.viewName}`:'全部记录';m.querySelector('[data-shm-main]').innerHTML=`<div class="shm-main-head"><div><b>${escHtml(title)}</b><span>${items.length} 条</span></div>${selected?`<button type="button" data-shm-act="clear-view" data-shm-view-key="${escAttr(selected.key)}">清空此视图</button>`:''}</div><div class="shm-records">${items.length?items.map(i=>`<div class="shm-record"><div class="shm-record-text"><b>${escHtml(i.query)}</b><span>${managerSelectedView==='all'?`${escHtml(i.tableName)} · ${escHtml(i.viewName)} · `:''}${escHtml(formatTime(i.ts))}</span></div><div class="shm-record-actions"><button type="button" data-shm-act="use" data-shm-query="${escAttr(i.query)}">使用</button>${i.path&&i.path!==location.pathname+location.search?`<button type="button" data-shm-act="open-view" data-shm-path="${escAttr(i.path)}">打开视图</button>`:''}<button type="button" class="danger" data-shm-act="delete" data-shm-view-key="${escAttr(i.viewKey)}" data-shm-query="${escAttr(i.query)}">删除</button></div></div>`).join(''):'<div class="shm-empty">没有符合条件的记录</div>'}</div>`;
+        const foot=m.querySelector('.shm-foot > span');if(foot)foot.textContent=`每视图最多 ${maxPerView} 条 · ${profiles.length} 个视图有记录`;
+    }
+    function onManagerClick(event){const vb=event.target.closest('[data-shm-view]');if(vb){managerSelectedView=vb.dataset.shmView||'all';renderManager();return;}const b=event.target.closest('[data-shm-act]');if(!b)return;const a=b.dataset.shmAct;if(a==='close')return closeManager();if(a==='use'){closeManager();useHistoryQuery(b.dataset.shmQuery||'');return;}if(a==='open-view'){const p=b.dataset.shmPath;if(p)location.href=p;return;}if(a==='delete'){removeHistoryItem(b.dataset.shmViewKey||'',b.dataset.shmQuery||'');return;}if(a==='clear-view'){const k=b.dataset.shmViewKey||'',p=historyData[k];if(p&&confirm(`清空“${p.viewName||'此视图'}”的全部搜索记录吗？`))clearViewHistory(k);return;}if(a==='clear-all'&&confirm('清空所有搜索记录吗？此操作不会影响 AutoTable 业务数据。'))clearAllHistory();}
+
+    function ensureSettingsCard(){
+        const section=document.querySelector('[data-section="settings"]');if(!section)return;let card=document.getElementById(SH.settingsCardId);if(card?.isConnected){updateSettingsCard();return;}card=document.createElement('div');card.id=SH.settingsCardId;card.className='att-card';const anchor=section.querySelector('[data-settings-anchor="visual"]');if(anchor)section.insertBefore(card,anchor);else section.appendChild(card);
+        card.innerHTML=`<div class="att-card-title">全视图搜索记录</div><div class="att-card-desc">搜索框下方使用紧凑历史层；可选择列表或胶囊展示，并支持原位展开全部记录。</div><div class="att-divider"></div>
+        <div class="att-row"><div><div class="att-label">启用搜索记录</div><div class="att-sub-label">关闭后停止记录并隐藏搜索历史层。</div></div><label class="att-switch"><input type="checkbox" data-sh-setting="enabled" ${enabled?'checked':''}><span class="att-slider"></span></label></div>
+        <div class="att-row"><div><div class="att-label">按视图显示搜索记录</div><div class="att-sub-label">开启后以当前视图为基础；关闭后直接混合全部视图记录。</div></div><label class="att-switch"><input type="checkbox" data-sh-setting="perViewMode" ${perViewMode?'checked':''}><span class="att-slider"></span></label></div>
+        <div class="att-row"><div><div class="att-label">同一个表中搜索记录互通</div><div class="att-sub-label">开启后，当前视图会同时显示同一张表其它视图的历史；仅在“按视图显示”开启时生效。</div></div><label class="att-switch"><input type="checkbox" data-sh-setting="sameTableShare" ${sameTableShare?'checked':''}><span class="att-slider"></span></label></div>
+        <div class="att-label" style="margin-top:9px;">搜索记录展示</div><div class="att-sh-layout-row-v7110"><button type="button" data-sh-layout="list">列表</button><button type="button" data-sh-layout="capsule">胶囊自动填充</button></div>
+        <div class="att-label" style="margin-top:10px;">搜索记录字体大小</div><div class="att-sh-range-row-v7110"><input type="range" min="10" max="16" step="1" value="${historyFontSize}" data-sh-setting="fontSize"><b data-sh-font-value>${historyFontSize}px</b></div>
+        <div class="att-label" style="margin-top:10px;">每个视图最多保存</div><div class="att-sh-range-row-v7110"><input type="range" min="3" max="100" step="1" value="${maxPerView}" data-sh-setting="maxPerView"><b data-sh-max-value>${maxPerView} 条</b></div>
+        <div class="att-sub-label">条数只限制每个视图自己的存储；同表互通不会额外复制记录。</div>
+        <div class="att-actions" style="margin-top:9px;"><button type="button" class="att-btn att-primary" data-sh-settings-act="open-manager">搜索记录管理</button><button type="button" class="att-btn" data-sh-settings-act="clear-current">清空当前视图</button></div>`;updateSettingsCard();
+    }
+    function updateSettingsCard(){const c=document.getElementById(SH.settingsCardId);if(!c)return;const set=(q,v)=>{const e=c.querySelector(q);if(e)e.checked=v;};set('[data-sh-setting="enabled"]',enabled);set('[data-sh-setting="perViewMode"]',perViewMode);set('[data-sh-setting="sameTableShare"]',sameTableShare);const max=c.querySelector('[data-sh-setting="maxPerView"]');if(max)max.value=maxPerView;const mv=c.querySelector('[data-sh-max-value]');if(mv)mv.textContent=`${maxPerView} 条`;const fs=c.querySelector('[data-sh-setting="fontSize"]');if(fs)fs.value=historyFontSize;const fv=c.querySelector('[data-sh-font-value]');if(fv)fv.textContent=`${historyFontSize}px`;c.querySelectorAll('[data-sh-layout]').forEach(b=>b.classList.toggle('active',b.dataset.shLayout===layoutMode));}
+    function bindSettingsEvents(){
+        document.addEventListener('change',e=>{const i=e.target.closest?.(`#${SH.settingsCardId} [data-sh-setting]`);if(!i)return;const k=i.dataset.shSetting;if(k==='enabled'){enabled=i.checked;GM_setValue(SH.enabledKey,enabled);if(!enabled)hideDropdown();}if(k==='perViewMode'){perViewMode=i.checked;GM_setValue(SH.perViewKey,perViewMode);}if(k==='sameTableShare'){sameTableShare=i.checked;GM_setValue(SH.sameTableShareKey,sameTableShare);}if(k==='maxPerView'){maxPerView=normalizeMax(i.value);GM_setValue(SH.maxKey,maxPerView);trimAllProfiles();saveHistoryData();}if(k==='fontSize'){historyFontSize=normalizeFontSize(i.value);GM_setValue(SH.fontSizeKey,historyFontSize);}updateSettingsCard();if(activeSearchInput?.isConnected&&enabled)scheduleDropdownRender(activeSearchInput);},true);
+        document.addEventListener('input',e=>{const i=e.target.closest?.(`#${SH.settingsCardId} input[data-sh-setting]`);if(!i)return;if(i.dataset.shSetting==='maxPerView'){const v=document.querySelector(`#${SH.settingsCardId} [data-sh-max-value]`);if(v)v.textContent=`${normalizeMax(i.value)} 条`;}if(i.dataset.shSetting==='fontSize'){const size=normalizeFontSize(i.value),v=document.querySelector(`#${SH.settingsCardId} [data-sh-font-value]`);if(v)v.textContent=`${size}px`;const d=document.getElementById(SH.dropdownId);if(d)d.style.setProperty('--att-sh-font-size',`${size}px`);const m=document.getElementById(SH.managerId);if(m)m.style.setProperty('--att-sh-font-size',`${size}px`);}},true);
+        document.addEventListener('click',e=>{const lb=e.target.closest?.(`#${SH.settingsCardId} [data-sh-layout]`);if(lb){layoutMode=normalizeLayout(lb.dataset.shLayout);GM_setValue(SH.layoutKey,layoutMode);updateSettingsCard();if(activeSearchInput?.isConnected)scheduleDropdownRender(activeSearchInput);return;}const a=e.target.closest?.(`#${SH.settingsCardId} [data-sh-settings-act]`)?.dataset.shSettingsAct;if(a==='open-manager')openManager();if(a==='clear-current'){const c=getCurrentViewContext(),p=historyData[c.key];if(p?.items?.length&&confirm(`清空“${c.viewName}”的搜索记录吗？`))clearViewHistory(c.key);}},true);
+    }
+    function attachSettingsObserver(){
+        const schedule=()=>{if(document.getElementById(SH.settingsCardId)?.isConnected)return;if(!document.querySelector('[data-section="settings"]'))return;if(settingsEnsureRaf)return;settingsEnsureRaf=requestAnimationFrame(()=>{settingsEnsureRaf=0;if(!document.getElementById(SH.settingsCardId)?.isConnected)ensureSettingsCard();});};
+        const attach=()=>{const root=document.getElementById('att-toolbox-root');if(!root)return false;if(!toolboxObserver){toolboxObserver=new MutationObserver(rs=>{const relevant=rs.some(r=>{const t=r.target instanceof Element?r.target:r.target.parentElement;if(t?.closest?.(`#${SH.settingsCardId}`))return false;return r.type==='childList';});if(relevant)schedule();});toolboxObserver.observe(root,{childList:true,subtree:true});}schedule();return true;};
+        if(attach())return;settingsAttachObserver=new MutationObserver(()=>{if(attach()){settingsAttachObserver.disconnect();settingsAttachObserver=null;}});settingsAttachObserver.observe(document.documentElement,{childList:true,subtree:true});
     }
 
-    function clearViewHistory(viewKey) {
-        const profile = historyData[viewKey];
-        if (!profile) return;
-        profile.items = [];
-        profile.updatedAt = Date.now();
-        saveHistoryData();
-        if (activeSearchInput?.isConnected) scheduleDropdownRender(activeSearchInput);
-        renderManager();
+    function bindSearchEvents(){
+        document.addEventListener('focusin',e=>{if(!isViewSearchInput(e.target))return;activeSearchInput=e.target;if(enabled)scheduleDropdownRender(activeSearchInput);},true);
+        document.addEventListener('input',e=>{if(!isViewSearchInput(e.target))return;activeSearchInput=e.target;if(enabled){dropdownExpanded=false;expandedFilter='';scheduleDropdownRender(activeSearchInput);}},true);
+        document.addEventListener('keydown',e=>{if(!isViewSearchInput(e.target))return;if(e.key==='Enter'){recordSearch(e.target.value);hideDropdown();}if(e.key==='Escape')hideDropdown();},true);
+        document.addEventListener('focusout',e=>{if(!isViewSearchInput(e.target))return;const input=e.target;setTimeout(()=>{const d=document.getElementById(SH.dropdownId);if(dropdownPointerDown||d?.contains(document.activeElement))return;recordSearch(input.value);if(document.activeElement!==input)hideDropdown();},120);},true);
+        document.addEventListener('pointerdown',e=>{const d=document.getElementById(SH.dropdownId);if(!d?.classList.contains('is-open'))return;if(e.target===activeSearchInput||d.contains(e.target))return;if(activeSearchInput?.value)recordSearch(activeSearchInput.value);hideDropdown();},true);
+        document.addEventListener('scroll',scheduleDropdownPosition,{capture:true,passive:true});window.addEventListener('resize',scheduleDropdownPosition,{passive:true});
     }
 
-    function clearAllHistory() {
-        for (const profile of Object.values(historyData)) profile.items = [];
-        saveHistoryData();
-        if (activeSearchInput?.isConnected) scheduleDropdownRender(activeSearchInput);
-        renderManager();
+    function ensureStyle(){
+        if(document.getElementById(SH.styleId))return;const st=document.createElement('style');st.id=SH.styleId;st.textContent=`
+        #${SH.dropdownId}{--att-sh-font-size:12px;position:fixed;z-index:2147482600;display:none;max-height:280px;overflow:hidden;background:#202124;color:#e8eaed;border:1px solid #414348;border-radius:9px;box-shadow:0 12px 34px rgba(0,0,0,.38);font-family:inherit;font-size:var(--att-sh-font-size);line-height:1.35;transition:width .22s cubic-bezier(.22,.61,.36,1),max-height .24s cubic-bezier(.22,.61,.36,1),box-shadow .2s ease;transform-origin:top right;}
+        #${SH.dropdownId}.is-open{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;} #${SH.dropdownId}.is-expanded{max-height:min(600px,calc(100vh - 22px));box-shadow:0 18px 48px rgba(0,0,0,.46);}
+        #${SH.dropdownId} button,#${SH.dropdownId} input{font:inherit;} #${SH.dropdownId} .shd-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px 6px;border-bottom:1px solid #34363a;} #${SH.dropdownId} .shd-head>div{min-width:0;display:flex;align-items:center;gap:6px;} #${SH.dropdownId} .shd-head b{font-size:1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-head span{color:#868b92;font-size:.82em;white-space:nowrap;} #${SH.dropdownId} .shd-head button{border:0;background:transparent;color:#8ab4f8;padding:2px 4px;cursor:pointer;border-radius:4px;}
+        #${SH.dropdownId} .shd-list{min-height:0;max-height:166px;overflow:auto;padding:3px 4px;scrollbar-gutter:stable;} #${SH.dropdownId}.is-capsule .shd-list{max-height:148px;padding:6px;}
+        #${SH.dropdownId} .shd-item{display:grid;grid-template-columns:17px minmax(0,1fr) auto 20px;align-items:center;gap:4px;min-height:29px;padding:2px 3px;border-radius:5px;cursor:pointer;} #${SH.dropdownId} .shd-item:hover{background:#2b2d31;} #${SH.dropdownId} .shd-clock{font-size:1em;color:#7e848b;text-align:center;} #${SH.dropdownId} .shd-main{min-width:0;} #${SH.dropdownId} .shd-query{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-source{margin-top:1px;color:#7d838a;font-size:.78em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-time{font-size:.78em;color:#747a81;} #${SH.dropdownId} .shd-del{width:19px;height:19px;padding:0;border:0;border-radius:4px;background:transparent;color:#7f858c;cursor:pointer;} #${SH.dropdownId} .shd-del:hover{background:#3b2929;color:#ff8a80;}
+        #${SH.dropdownId} .shd-capsules{display:flex;flex-wrap:wrap;align-content:flex-start;gap:5px;} #${SH.dropdownId} .shd-chip{display:inline-flex;align-items:center;max-width:100%;height:25px;background:#292d32;border:1px solid #3a4047;border-radius:999px;overflow:hidden;} #${SH.dropdownId} .shd-chip:hover{border-color:#4a6f9d;background:#283446;} #${SH.dropdownId} .shd-chip-main{max-width:190px;height:100%;padding:0 8px;border:0;background:transparent;color:#dfe7f1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;} #${SH.dropdownId} .shd-chip-del{width:22px;height:100%;border:0;border-left:1px solid rgba(255,255,255,.05);background:transparent;color:#7d858e;cursor:pointer;} #${SH.dropdownId} .shd-chip-del:hover{color:#ff8a80;background:#3b2929;}
+        #${SH.dropdownId} .shd-empty{padding:15px 9px;text-align:center;color:#a7adb4;} #${SH.dropdownId} .shd-empty span{display:block;margin-top:3px;color:#747a81;font-size:.8em;} #${SH.dropdownId} .shd-all{height:30px;display:flex;align-items:center;justify-content:space-between;padding:0 9px;border:0;border-top:1px solid #34363a;background:#232427;color:#9ecbff;cursor:pointer;} #${SH.dropdownId} .shd-all:hover{background:#292c31;} #${SH.dropdownId} .shd-all b{font-size:1.3em;font-weight:400;}
+        #${SH.dropdownId} .shd-expanded{max-height:0;opacity:0;overflow:hidden;background:#1e1f22;transition:max-height .25s cubic-bezier(.22,.61,.36,1),opacity .18s ease;} #${SH.dropdownId}.is-expanded .shd-expanded{max-height:365px;opacity:1;border-top:1px solid #34363a;display:grid;grid-template-rows:auto auto minmax(0,1fr);} #${SH.dropdownId} .shd-expanded-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 9px 5px;} #${SH.dropdownId} .shd-expanded-head>div{display:flex;align-items:baseline;gap:7px;min-width:0;} #${SH.dropdownId} .shd-expanded-head b{font-size:1.03em;} #${SH.dropdownId} .shd-expanded-head span{font-size:.8em;color:#7f858c;} #${SH.dropdownId} .shd-expanded-actions{display:flex;gap:5px;} #${SH.dropdownId} .shd-expanded-actions button{height:25px;padding:0 7px;border:1px solid #41454a;border-radius:5px;background:#292b2f;color:#cfd4da;cursor:pointer;} #${SH.dropdownId} .shd-expanded-actions button:first-child{color:#9ecbff;}
+        #${SH.dropdownId} .shd-expanded-search{padding:3px 8px 6px;} #${SH.dropdownId} .shd-expanded-search input{width:100%;height:28px;box-sizing:border-box;padding:0 8px;border:1px solid #3c4045;border-radius:6px;background:#27282b;color:#e8eaed;outline:none;} #${SH.dropdownId} .shd-expanded-search input:focus{border-color:#4b77ad;} #${SH.dropdownId} .shd-expanded-list{min-height:0;overflow:auto;padding:0 5px 7px;scrollbar-gutter:stable;} #${SH.dropdownId} .shd-expanded-item{display:grid;grid-template-columns:minmax(0,1fr) 22px;align-items:center;gap:5px;min-height:34px;padding:3px 3px;border-bottom:1px solid #2d2f33;content-visibility:auto;contain-intrinsic-size:36px;} #${SH.dropdownId} .shd-expanded-item:hover{background:#25272a;} #${SH.dropdownId} .shd-expanded-use{min-width:0;text-align:left;border:0;background:transparent;color:#e8eaed;padding:2px 4px;cursor:pointer;} #${SH.dropdownId} .shd-expanded-use b,#${SH.dropdownId} .shd-expanded-use span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-expanded-use b{font-size:1em;} #${SH.dropdownId} .shd-expanded-use span{margin-top:2px;color:#80868d;font-size:.78em;}
+
+        #${SH.managerId}{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.56);backdrop-filter:blur(3px);color:#e8eaed;font-family:inherit;} #${SH.managerId}.is-open{display:flex;} #${SH.managerId}{--att-sh-font-size:12px;} #${SH.managerId} .shm-shell{width:min(820px,calc(100vw - 32px));height:min(560px,calc(100vh - 32px));min-height:430px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:#202124;border:1px solid #3c3f43;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.46);overflow:hidden;font-size:var(--att-sh-font-size);} #${SH.managerId} .shm-head,#${SH.managerId} .shm-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;} #${SH.managerId} .shm-head{border-bottom:1px solid #34363a;} #${SH.managerId} .shm-foot{border-top:1px solid #34363a;color:#858b92;font-size:.82em;} #${SH.managerId} .shm-head>div{display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-head b{font-size:1.15em;} #${SH.managerId} .shm-head span{color:#8f949b;font-size:.82em;} #${SH.managerId} button{height:28px;padding:0 8px;border:1px solid #45484d;border-radius:6px;background:#303134;color:#e8eaed;cursor:pointer;font:inherit;} #${SH.managerId} button:hover{background:#3a3c40;} #${SH.managerId} button.primary{background:#1a73e8;border-color:#1a73e8;color:#fff;} #${SH.managerId} button.danger{color:#ff8a80;border-color:#67413f;}
+        #${SH.managerId} .shm-body{min-height:0;display:grid;grid-template-columns:235px minmax(0,1fr);} #${SH.managerId} .shm-side{min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);border-right:1px solid #34363a;} #${SH.managerId} .shm-side-search{padding:8px;} #${SH.managerId} input[type="search"]{width:100%;height:30px;box-sizing:border-box;padding:0 8px;border:1px solid #424448;border-radius:6px;background:#292a2d;color:#e8eaed;outline:none;} #${SH.managerId} .shm-views{min-height:0;overflow:auto;padding:0 5px 8px;} #${SH.managerId} .shm-view{width:100%;height:auto;min-height:39px;margin:1px 0;padding:5px 6px;display:flex;align-items:center;justify-content:space-between;gap:6px;text-align:left;border-color:transparent;background:transparent;} #${SH.managerId} .shm-view.active{background:#26364d;border-color:#345d90;} #${SH.managerId} .shm-view span{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-view b,#${SH.managerId} .shm-view small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-view small,#${SH.managerId} .shm-view em{color:#7f858c;font-size:.78em;font-style:normal;} #${SH.managerId} .shm-none{padding:18px 8px;text-align:center;color:#858b92;}
+        #${SH.managerId} .shm-main{min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);} #${SH.managerId} .shm-main-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid #34363a;} #${SH.managerId} .shm-main-head>div{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-main-head b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-main-head span{color:#7f858c;font-size:.78em;} #${SH.managerId} .shm-records{min-height:0;overflow:auto;padding:4px 7px 9px;scrollbar-gutter:stable;} #${SH.managerId} .shm-record{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:34px;padding:4px 5px;border-bottom:1px solid #303236;content-visibility:auto;contain-intrinsic-size:36px;} #${SH.managerId} .shm-record:hover{background:#25272a;} #${SH.managerId} .shm-record-text{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-record-text b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-record-text span{color:#7f858c;font-size:.78em;} #${SH.managerId} .shm-record-actions{display:flex;gap:4px;flex:0 0 auto;} #${SH.managerId} .shm-record-actions button{height:24px;padding:0 6px;font-size:.78em;} #${SH.managerId} .shm-empty{padding:35px 12px;text-align:center;color:#858b92;} #${SH.managerId} .shm-foot>div{display:flex;gap:5px;}
+        #${SH.settingsCardId} .att-sh-range-row-v7110{display:grid;grid-template-columns:minmax(0,1fr) 52px;align-items:center;gap:8px;margin-top:5px;} #${SH.settingsCardId} .att-sh-range-row-v7110 input{width:100%;} #${SH.settingsCardId} .att-sh-range-row-v7110 b{text-align:right;font-size:11px;color:inherit;opacity:.78;} #${SH.settingsCardId} .att-sh-layout-row-v7110{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:5px;} #${SH.settingsCardId} .att-sh-layout-row-v7110 button{height:30px;border:1px solid #40444a;border-radius:6px;background:#292b2f;color:inherit;cursor:pointer;} #${SH.settingsCardId} .att-sh-layout-row-v7110 button.active{background:#21466f;border-color:#3978b9;color:#dbeeff;box-shadow:inset 0 0 0 1px rgba(94,173,255,.12);}
+        @media(max-width:720px){#${SH.managerId} .shm-body{grid-template-columns:190px minmax(0,1fr);}#${SH.managerId} .shm-record-actions button[data-shm-act="open-view"]{display:none;}}
+        `;document.documentElement.appendChild(st);
     }
 
-    function getDisplayItems(inputValue = '') {
-        const filter = cleanText(inputValue).toLocaleLowerCase();
-        const current = getCurrentViewContext();
-        const rows = [];
-        const profiles = perViewMode
-            ? [historyData[current.key]].filter(Boolean)
-            : Object.values(historyData);
-        for (const profile of profiles) {
-            for (const item of profile.items || []) {
-                if (filter && !item.query.toLocaleLowerCase().includes(filter)) continue;
-                rows.push({ ...item, viewKey: profile.key, viewName: profile.viewName || profile.viewId || '视图', tableName: profile.tableName || '' });
-            }
-        }
-        rows.sort((a,b) => b.ts - a.ts);
-        return rows.slice(0, 10);
-    }
-
-    function setNativeInputValue(input, value) {
-        const descriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
-        if (descriptor?.set) descriptor.set.call(input, value);
-        else input.value = value;
-        input.dispatchEvent(new Event('input', { bubbles:true }));
-        input.dispatchEvent(new Event('change', { bubbles:true }));
-    }
-
-    function useHistoryQuery(query) {
-        const input = activeSearchInput?.isConnected ? activeSearchInput : findCurrentSearchInput();
-        if (!input) return;
-        setNativeInputValue(input, query);
-        recordSearch(query);
-        input.focus({ preventScroll:true });
-        hideDropdown();
-    }
-
-    function findCurrentSearchInput() {
-        return Array.from(document.querySelectorAll('input')).find(isViewSearchInput) || null;
-    }
-
-    function ensureDropdown() {
-        let dropdown = document.getElementById(SH.dropdownId);
-        if (dropdown) return dropdown;
-        dropdown = document.createElement('div');
-        dropdown.id = SH.dropdownId;
-        dropdown.setAttribute('role', 'dialog');
-        dropdown.addEventListener('pointerdown', event => {
-            dropdownPointerDown = true;
-            if (event.target.closest('button,[data-sh-query]')) event.preventDefault();
-        });
-        dropdown.addEventListener('pointerup', () => { setTimeout(() => dropdownPointerDown = false, 0); });
-        dropdown.addEventListener('click', onDropdownClick);
-        document.body.appendChild(dropdown);
-        return dropdown;
-    }
-
-    function scheduleDropdownRender(input = activeSearchInput) {
-        if (!enabled || !input?.isConnected) return;
-        pendingDropdownInput = input;
-        if (dropdownRenderRaf) return;
-        dropdownRenderRaf = requestAnimationFrame(() => {
-            dropdownRenderRaf = 0;
-            const target = pendingDropdownInput;
-            pendingDropdownInput = null;
-            if (target?.isConnected) renderDropdown(target);
-        });
-    }
-
-    function scheduleDropdownPosition() {
-        const dropdown = document.getElementById(SH.dropdownId);
-        if (!dropdown?.classList.contains('is-open') || !activeSearchInput?.isConnected) return;
-        if (dropdownPositionRaf) return;
-        dropdownPositionRaf = requestAnimationFrame(() => {
-            dropdownPositionRaf = 0;
-            const current = document.getElementById(SH.dropdownId);
-            if (current?.classList.contains('is-open') && activeSearchInput?.isConnected) {
-                positionDropdown(activeSearchInput, current);
-            }
-        });
-    }
-
-    function positionDropdown(input, dropdown = ensureDropdown()) {
-        if (!input?.isConnected || !dropdown.classList.contains('is-open')) return;
-        const r = input.getBoundingClientRect();
-        const width = Math.min(520, Math.max(330, r.width));
-        dropdown.style.width = `${width}px`;
-        const margin = 10, gap = 6;
-        let left = r.right - width;
-        left = Math.max(margin, Math.min(left, window.innerWidth - width - margin));
-        const measuredH = Math.min(dropdown.scrollHeight || 340, 410);
-        const below = window.innerHeight - r.bottom - margin;
-        const above = r.top - margin;
-        let top;
-        if (below >= Math.min(240, measuredH) || below >= above) top = r.bottom + gap;
-        else top = Math.max(margin, r.top - measuredH - gap);
-        dropdown.style.left = `${Math.round(left)}px`;
-        dropdown.style.top = `${Math.round(top)}px`;
-    }
-
-    function renderDropdown(input = activeSearchInput) {
-        const dropdown = ensureDropdown();
-        if (!enabled || !input?.isConnected || !isViewSearchInput(input)) {
-            hideDropdown();
-            return;
-        }
-        activeSearchInput = input;
-        const context = getCurrentViewContext();
-        const currentProfile = historyData[context.key];
-        const items = getDisplayItems(input.value || '');
-        const total = perViewMode
-            ? (currentProfile?.items?.length || 0)
-            : Object.values(historyData).reduce((sum,p) => sum + (p.items?.length || 0), 0);
-        dropdown.innerHTML = `
-            <div class="shd-head">
-                <div><b>${perViewMode ? escHtml(context.viewName) : '最近搜索'}</b><span>${perViewMode ? `当前视图 · ${total}/${maxPerView}` : `全部视图 · ${total} 条`}</span></div>
-                ${perViewMode && total ? '<button type="button" data-sh-act="clear-current">清空</button>' : ''}
-            </div>
-            <div class="shd-list">
-                ${items.length ? items.map(item => `
-                    <div class="shd-item" data-sh-query="${escAttr(item.query)}" data-sh-view-key="${escAttr(item.viewKey)}">
-                        <span class="shd-clock">↺</span>
-                        <div class="shd-main"><div class="shd-query">${escHtml(item.query)}</div>${perViewMode ? '' : `<div class="shd-source">${escHtml(item.tableName)} · ${escHtml(item.viewName)}</div>`}</div>
-                        <span class="shd-time">${escHtml(formatTime(item.ts, true))}</span>
-                        <button type="button" class="shd-del" title="删除这条记录" data-sh-act="delete" data-sh-query-delete="${escAttr(item.query)}" data-sh-view-key="${escAttr(item.viewKey)}">×</button>
-                    </div>`).join('') : `<div class="shd-empty">${cleanText(input.value) ? '历史记录中没有匹配项' : '暂无搜索记录'}<span>${perViewMode ? '当前视图的搜索会保存在这里' : '不同视图的最近搜索会混合显示'}</span></div>`}
-            </div>
-            <button type="button" class="shd-all" data-sh-act="open-manager"><span>查看全部视图搜索记录</span><b>›</b></button>`;
-        dropdown.classList.add('is-open');
-        positionDropdown(input, dropdown);
-    }
-
-    function hideDropdown() {
-        document.getElementById(SH.dropdownId)?.classList.remove('is-open');
-    }
-
-    function onDropdownClick(event) {
-        const action = event.target.closest('[data-sh-act]')?.dataset.shAct;
-        if (action === 'open-manager') { hideDropdown(); openManager(); return; }
-        if (action === 'clear-current') {
-            const ctx = getCurrentViewContext();
-            if (historyData[ctx.key] && confirm(`清空“${ctx.viewName}”的搜索记录吗？`)) clearViewHistory(ctx.key);
-            return;
-        }
-        if (action === 'delete') {
-            const btn = event.target.closest('[data-sh-act="delete"]');
-            removeHistoryItem(btn?.dataset.shViewKey || '', btn?.dataset.shQueryDelete || '');
-            return;
-        }
-        const row = event.target.closest('[data-sh-query]');
-        if (row) useHistoryQuery(row.dataset.shQuery || '');
-    }
-
-    function getManagerProfiles() {
-        return Object.values(historyData)
-            .filter(profile => (profile.items || []).length)
-            .sort((a,b) => b.updatedAt - a.updatedAt);
-    }
-
-    function ensureManager() {
-        let modal = document.getElementById(SH.managerId);
-        if (modal) return modal;
-        modal = document.createElement('div');
-        modal.id = SH.managerId;
-        modal.innerHTML = `<div class="shm-shell" role="dialog" aria-modal="true">
-            <header class="shm-head"><div><b>全部视图搜索记录</b><span>集中查看每个视图保存的全视图模糊搜索历史</span></div><button type="button" data-shm-act="close">×</button></header>
-            <div class="shm-body"><aside class="shm-side"><div class="shm-side-search"><input type="search" data-shm-filter placeholder="搜索视图 / 表 / 搜索内容…"></div><div class="shm-views" data-shm-views></div></aside><main class="shm-main" data-shm-main></main></div>
-            <footer class="shm-foot"><span>每个视图最多保存 ${maxPerView} 条，可在工具设置中调整。</span><div><button type="button" data-shm-act="clear-all" class="danger">清空全部记录</button><button type="button" data-shm-act="close" class="primary">完成</button></div></footer>
-        </div>`;
-        modal.addEventListener('click', onManagerClick);
-        modal.addEventListener('input', event => {
-            if (event.target.matches('[data-shm-filter]')) { managerFilter = event.target.value || ''; renderManager(); }
-        });
-        document.body.appendChild(modal);
-        return modal;
-    }
-
-    function openManager(selectedKey = '') {
-        const profiles = getManagerProfiles();
-        const currentKey = getCurrentViewContext().key;
-        managerSelectedView = selectedKey || (historyData[currentKey]?.items?.length ? currentKey : (profiles[0]?.key || 'all'));
-        managerFilter = '';
-        const modal = ensureManager();
-        const filter = modal.querySelector('[data-shm-filter]');
-        if (filter) filter.value = '';
-        modal.classList.add('is-open');
-        renderManager();
-    }
-
-    function closeManager() {
-        document.getElementById(SH.managerId)?.classList.remove('is-open');
-    }
-
-    function renderManager() {
-        const modal = ensureManager();
-        const profiles = getManagerProfiles();
-        if (managerSelectedView !== 'all' && !profiles.some(p => p.key === managerSelectedView)) managerSelectedView = 'all';
-        const q = cleanText(managerFilter).toLocaleLowerCase();
-        const filteredProfiles = profiles.filter(p => {
-            if (!q) return true;
-            return `${p.tableName} ${p.viewName} ${(p.items||[]).map(i=>i.query).join(' ')}`.toLocaleLowerCase().includes(q);
-        });
-        const views = modal.querySelector('[data-shm-views]');
-        views.innerHTML = `
-            <button type="button" class="shm-view ${managerSelectedView === 'all' ? 'active' : ''}" data-shm-view="all"><span><b>全部视图</b><small>${profiles.reduce((n,p)=>n+p.items.length,0)} 条记录</small></span></button>
-            ${filteredProfiles.map(p => `<button type="button" class="shm-view ${managerSelectedView === p.key ? 'active' : ''}" data-shm-view="${escAttr(p.key)}"><span><b>${escHtml(p.viewName || p.viewId || '视图')}</b><small>${escHtml(p.tableName || '')} · ${p.items.length} 条</small></span><em>${escHtml(formatTime(p.updatedAt,true))}</em></button>`).join('') || '<div class="shm-none">暂无搜索记录</div>'}`;
-
-        const main = modal.querySelector('[data-shm-main]');
-        const selectedProfile = managerSelectedView === 'all' ? null : historyData[managerSelectedView];
-        let items = [];
-        if (selectedProfile) {
-            items = selectedProfile.items.map(item => ({...item, viewKey:selectedProfile.key, viewName:selectedProfile.viewName, tableName:selectedProfile.tableName, path:selectedProfile.path}));
-        } else {
-            for (const p of profiles) items.push(...p.items.map(item => ({...item, viewKey:p.key, viewName:p.viewName, tableName:p.tableName, path:p.path})));
-            items.sort((a,b)=>b.ts-a.ts);
-        }
-        if (q) items = items.filter(item => `${item.query} ${item.viewName} ${item.tableName}`.toLocaleLowerCase().includes(q));
-        const title = selectedProfile ? `${selectedProfile.tableName} · ${selectedProfile.viewName}` : '全部视图';
-        main.innerHTML = `
-            <div class="shm-main-head"><div><b>${escHtml(title)}</b><span>${items.length} 条搜索记录</span></div>${selectedProfile ? `<button type="button" data-shm-act="clear-view" data-shm-view-key="${escAttr(selectedProfile.key)}">清空此视图</button>` : ''}</div>
-            <div class="shm-records">${items.length ? items.map(item => `<div class="shm-record"><div class="shm-record-text"><b>${escHtml(item.query)}</b><span>${managerSelectedView==='all' ? `${escHtml(item.tableName)} · ${escHtml(item.viewName)} · ` : ''}${escHtml(formatTime(item.ts))}</span></div><div class="shm-record-actions"><button type="button" data-shm-act="use" data-shm-query="${escAttr(item.query)}">使用</button>${item.path && item.path !== location.pathname+location.search ? `<button type="button" data-shm-act="open-view" data-shm-path="${escAttr(item.path)}">打开视图</button>` : ''}<button type="button" class="danger" data-shm-act="delete" data-shm-view-key="${escAttr(item.viewKey)}" data-shm-query="${escAttr(item.query)}">删除</button></div></div>`).join('') : '<div class="shm-empty">没有符合条件的搜索记录</div>'}</div>`;
-        const footText = modal.querySelector('.shm-foot > span');
-        if (footText) footText.textContent = `每个视图最多保存 ${maxPerView} 条 · 当前共 ${profiles.length} 个视图有记录`;
-    }
-
-    function onManagerClick(event) {
-        const viewBtn = event.target.closest('[data-shm-view]');
-        if (viewBtn) { managerSelectedView = viewBtn.dataset.shmView || 'all'; renderManager(); return; }
-        const btn = event.target.closest('[data-shm-act]');
-        if (!btn) return;
-        const action = btn.dataset.shmAct;
-        if (action === 'close') return closeManager();
-        if (action === 'use') { closeManager(); useHistoryQuery(btn.dataset.shmQuery || ''); return; }
-        if (action === 'open-view') { const path=btn.dataset.shmPath; if(path) location.href=path; return; }
-        if (action === 'delete') { removeHistoryItem(btn.dataset.shmViewKey || '', btn.dataset.shmQuery || ''); return; }
-        if (action === 'clear-view') {
-            const key=btn.dataset.shmViewKey || '';
-            const p=historyData[key];
-            if (p && confirm(`清空“${p.viewName || '此视图'}”的全部搜索记录吗？`)) clearViewHistory(key);
-            return;
-        }
-        if (action === 'clear-all' && confirm('清空所有视图的搜索记录吗？此操作不会影响 AutoTable 业务数据。')) clearAllHistory();
-    }
-
-    function ensureSettingsCard() {
-        const section = document.querySelector('[data-section="settings"]');
-        if (!section) return;
-        let card = document.getElementById(SH.settingsCardId);
-        if (card?.isConnected) {
-            updateSettingsCard();
-            return;
-        }
-        card = document.createElement('div');
-        card.id = SH.settingsCardId;
-        card.className = 'att-card';
-        const visualAnchor = section.querySelector('[data-settings-anchor="visual"]');
-        if (visualAnchor) section.insertBefore(card, visualAnchor);
-        else section.appendChild(card);
-        card.innerHTML = `
-            <div class="att-card-title">全视图搜索记录</div>
-            <div class="att-card-desc">增强 AutoTable 原生“全视图模糊搜索”。聚焦搜索框时在下方显示最近搜索，不改变原搜索逻辑。</div>
-            <div class="att-divider"></div>
-            <div class="att-row"><div><div class="att-label">启用搜索记录</div><div class="att-sub-label">关闭后不再记录，也不会在搜索框下方显示历史模块。</div></div><label class="att-switch"><input type="checkbox" data-sh-setting="enabled" ${enabled?'checked':''}><span class="att-slider"></span></label></div>
-            <div class="att-row"><div><div class="att-label">按视图显示搜索记录</div><div class="att-sub-label">开启：搜索框只显示当前视图记录；关闭：混合显示全部视图最近记录并标注来源。</div></div><label class="att-switch"><input type="checkbox" data-sh-setting="perViewMode" ${perViewMode?'checked':''}><span class="att-slider"></span></label></div>
-            <div class="att-label" style="margin-top:8px;">每个视图最多保存</div>
-            <div class="att-search-history-max-row-v7100"><input type="range" min="3" max="100" step="1" value="${maxPerView}" data-sh-setting="maxPerView"><b data-sh-max-value>${maxPerView} 条</b></div>
-            <div class="att-sub-label">降低条数会立即裁剪较旧记录；重复搜索会移动到最前面，不重复占用条数。</div>
-            <div class="att-actions" style="margin-top:9px;"><button type="button" class="att-btn att-primary" data-sh-settings-act="open-manager">查看全部视图搜索记录</button><button type="button" class="att-btn" data-sh-settings-act="clear-current">清空当前视图</button></div>`;
-    }
-
-    function updateSettingsCard() {
-        const card = document.getElementById(SH.settingsCardId);
-        if (!card) return;
-        const en=card.querySelector('[data-sh-setting="enabled"]'); if(en) en.checked=enabled;
-        const pv=card.querySelector('[data-sh-setting="perViewMode"]'); if(pv) pv.checked=perViewMode;
-        const max=card.querySelector('[data-sh-setting="maxPerView"]'); if(max) max.value=maxPerView;
-        const val=card.querySelector('[data-sh-max-value]'); if(val) val.textContent=`${maxPerView} 条`;
-    }
-
-    function bindSettingsEvents() {
-        document.addEventListener('change', event => {
-            const input = event.target.closest?.(`#${SH.settingsCardId} [data-sh-setting]`);
-            if (!input) return;
-            const key=input.dataset.shSetting;
-            if (key==='enabled') { enabled=input.checked; GM_setValue(SH.enabledKey,enabled); if(!enabled) hideDropdown(); }
-            if (key==='perViewMode') { perViewMode=input.checked; GM_setValue(SH.perViewKey,perViewMode); if(activeSearchInput?.isConnected) scheduleDropdownRender(activeSearchInput); }
-            if (key==='maxPerView') { maxPerView=normalizeMax(input.value); GM_setValue(SH.maxKey,maxPerView); trimAllProfiles(); saveHistoryData(); }
-            updateSettingsCard();
-        }, true);
-        document.addEventListener('input', event => {
-            const range=event.target.closest?.(`#${SH.settingsCardId} input[data-sh-setting="maxPerView"]`);
-            if (!range) return;
-            const val=document.querySelector(`#${SH.settingsCardId} [data-sh-max-value]`);
-            if(val) val.textContent=`${normalizeMax(range.value)} 条`;
-        }, true);
-        document.addEventListener('click', event => {
-            const action=event.target.closest?.(`#${SH.settingsCardId} [data-sh-settings-act]`)?.dataset.shSettingsAct;
-            if(action==='open-manager') openManager();
-            if(action==='clear-current') { const c=getCurrentViewContext(),p=historyData[c.key]; if(p?.items?.length && confirm(`清空“${c.viewName}”的搜索记录吗？`)) clearViewHistory(c.key); }
-        }, true);
-    }
-
-    function attachSettingsObserver() {
-        const scheduleEnsure = () => {
-            // 只有设置页已存在且搜索历史卡不存在时才插入。
-            // 绝不因为卡片内部自身 mutation 再次重建 innerHTML。
-            if (document.getElementById(SH.settingsCardId)?.isConnected) return;
-            if (!document.querySelector('[data-section="settings"]')) return;
-            if (settingsEnsureRaf) return;
-            settingsEnsureRaf = requestAnimationFrame(() => {
-                settingsEnsureRaf = 0;
-                if (!document.getElementById(SH.settingsCardId)?.isConnected) ensureSettingsCard();
-            });
-        };
-
-        const attach=()=>{
-            const root=document.getElementById('att-toolbox-root');
-            if(!root) return false;
-            if(!toolboxObserver){
-                toolboxObserver=new MutationObserver(records=>{
-                    // 忽略搜索记录卡自身产生的 mutation，彻底切断 V7.10.0 的自触发重绘循环。
-                    const relevant = records.some(record => {
-                        const target = record.target instanceof Element ? record.target : record.target.parentElement;
-                        if (target?.closest?.(`#${SH.settingsCardId}`)) return false;
-                        return record.type === 'childList';
-                    });
-                    if (relevant) scheduleEnsure();
-                });
-                toolboxObserver.observe(root,{childList:true,subtree:true});
-            }
-            scheduleEnsure();
-            return true;
-        };
-        if(attach()) return;
-        settingsAttachObserver=new MutationObserver(()=>{
-            if(attach()){
-                settingsAttachObserver.disconnect();
-                settingsAttachObserver=null;
-            }
-        });
-        settingsAttachObserver.observe(document.documentElement,{childList:true,subtree:true});
-    }
-
-    function bindSearchEvents() {
-        document.addEventListener('focusin', event => {
-            if (!isViewSearchInput(event.target)) return;
-            activeSearchInput=event.target;
-            if(enabled) scheduleDropdownRender(activeSearchInput);
-        }, true);
-        document.addEventListener('input', event => {
-            if (!isViewSearchInput(event.target)) return;
-            activeSearchInput=event.target;
-            if(enabled) scheduleDropdownRender(activeSearchInput);
-        }, true);
-        document.addEventListener('keydown', event => {
-            if (!isViewSearchInput(event.target)) return;
-            if(event.key==='Enter') { recordSearch(event.target.value); hideDropdown(); }
-            if(event.key==='Escape') hideDropdown();
-        }, true);
-        document.addEventListener('focusout', event => {
-            if (!isViewSearchInput(event.target)) return;
-            const input=event.target;
-            setTimeout(()=>{
-                if(dropdownPointerDown) return;
-                recordSearch(input.value);
-                if(document.activeElement!==input) hideDropdown();
-            },120);
-        }, true);
-        document.addEventListener('pointerdown', event => {
-            const dropdown=document.getElementById(SH.dropdownId);
-            if(!dropdown?.classList.contains('is-open')) return;
-            if(event.target===activeSearchInput || dropdown.contains(event.target)) return;
-            if(activeSearchInput?.value) recordSearch(activeSearchInput.value);
-            hideDropdown();
-        }, true);
-        document.addEventListener('scroll', scheduleDropdownPosition, {capture:true,passive:true});
-        window.addEventListener('resize', scheduleDropdownPosition, {passive:true});
-    }
-
-    function ensureStyle() {
-        if(document.getElementById(SH.styleId)) return;
-        const style=document.createElement('style');
-        style.id=SH.styleId;
-        style.textContent=`
-            #${SH.dropdownId}{position:fixed;z-index:2147482600;display:none;max-height:410px;overflow:hidden;background:#202124;color:#e8eaed;border:1px solid #414348;border-radius:10px;box-shadow:0 16px 42px rgba(0,0,0,.42);font:12px/1.4 inherit;}
-            #${SH.dropdownId}.is-open{display:grid;grid-template-rows:auto minmax(0,1fr) auto;}
-            #${SH.dropdownId} .shd-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 11px 8px;border-bottom:1px solid #34363a;}
-            #${SH.dropdownId} .shd-head>div{min-width:0;display:flex;align-items:center;gap:7px;} #${SH.dropdownId} .shd-head b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-head span{color:#8f949b;font-size:10px;white-space:nowrap;} #${SH.dropdownId} button{font:inherit;}
-            #${SH.dropdownId} .shd-head button{border:0;background:transparent;color:#8ab4f8;cursor:pointer;padding:3px 5px;border-radius:5px;} #${SH.dropdownId} .shd-head button:hover{background:#2b3037;}
-            #${SH.dropdownId} .shd-list{min-height:0;max-height:310px;overflow:auto;padding:5px;scrollbar-gutter:stable;}
-            #${SH.dropdownId} .shd-item{display:grid;grid-template-columns:22px minmax(0,1fr) auto 24px;align-items:center;gap:5px;min-height:38px;padding:4px 4px 4px 6px;border-radius:7px;cursor:pointer;} #${SH.dropdownId} .shd-item:hover{background:#2b2d31;}
-            #${SH.dropdownId} .shd-clock{color:#7f858d;font-size:15px;text-align:center;} #${SH.dropdownId} .shd-main{min-width:0;} #${SH.dropdownId} .shd-query{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#e8eaed;} #${SH.dropdownId} .shd-source{margin-top:2px;color:#81868d;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-time{color:#777d84;font-size:10px;white-space:nowrap;}
-            #${SH.dropdownId} .shd-del{width:23px;height:23px;border:0;border-radius:5px;background:transparent;color:#858b92;cursor:pointer;} #${SH.dropdownId} .shd-del:hover{background:#3b2a2a;color:#ff8a80;}
-            #${SH.dropdownId} .shd-empty{padding:22px 12px;text-align:center;color:#aeb3ba;} #${SH.dropdownId} .shd-empty span{display:block;margin-top:4px;color:#777d84;font-size:10px;}
-            #${SH.dropdownId} .shd-all{height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 11px;border:0;border-top:1px solid #34363a;background:#232427;color:#9ecbff;cursor:pointer;} #${SH.dropdownId} .shd-all:hover{background:#292c31;} #${SH.dropdownId} .shd-all b{font-size:18px;font-weight:400;}
-
-            #${SH.managerId}{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;padding:22px;background:rgba(0,0,0,.58);backdrop-filter:blur(3px);color:#e8eaed;font-family:inherit;} #${SH.managerId}.is-open{display:flex;}
-            #${SH.managerId} .shm-shell{width:min(980px,calc(100vw - 36px));height:min(700px,calc(100vh - 36px));min-height:500px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:#202124;border:1px solid #3c3f43;border-radius:14px;box-shadow:0 22px 70px rgba(0,0,0,.48);overflow:hidden;}
-            #${SH.managerId} .shm-head,#${SH.managerId} .shm-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;} #${SH.managerId} .shm-head{border-bottom:1px solid #34363a;} #${SH.managerId} .shm-foot{border-top:1px solid #34363a;color:#8f949b;font-size:11px;} #${SH.managerId} .shm-head>div{display:flex;flex-direction:column;gap:3px;} #${SH.managerId} .shm-head b{font-size:15px;} #${SH.managerId} .shm-head span{color:#969ba2;font-size:11px;}
-            #${SH.managerId} button{height:31px;padding:0 10px;border:1px solid #45484d;border-radius:7px;background:#303134;color:#e8eaed;cursor:pointer;} #${SH.managerId} button:hover{background:#3a3c40;} #${SH.managerId} button.primary{background:#1a73e8;border-color:#1a73e8;color:#fff;} #${SH.managerId} button.danger{color:#ff8a80;border-color:#67413f;}
-            #${SH.managerId} .shm-body{min-height:0;display:grid;grid-template-columns:285px minmax(0,1fr);} #${SH.managerId} .shm-side{min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);border-right:1px solid #34363a;} #${SH.managerId} .shm-side-search{padding:11px;} #${SH.managerId} input[type="search"]{width:100%;height:34px;box-sizing:border-box;padding:0 9px;border:1px solid #424448;border-radius:7px;background:#292a2d;color:#e8eaed;outline:none;} #${SH.managerId} input[type="search"]:focus{border-color:#4c8bf5;box-shadow:0 0 0 2px rgba(76,139,245,.15);}
-            #${SH.managerId} .shm-views{min-height:0;overflow:auto;padding:0 7px 10px;} #${SH.managerId} .shm-view{width:100%;height:auto;min-height:48px;margin:2px 0;padding:7px 8px;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;border-color:transparent;background:transparent;} #${SH.managerId} .shm-view.active{background:#26364d;border-color:#345d90;} #${SH.managerId} .shm-view span{min-width:0;display:flex;flex-direction:column;gap:3px;} #${SH.managerId} .shm-view b,#${SH.managerId} .shm-view small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-view b{font-size:12px;} #${SH.managerId} .shm-view small,#${SH.managerId} .shm-view em{color:#858b92;font-size:10px;font-style:normal;} #${SH.managerId} .shm-none{padding:25px 10px;text-align:center;color:#858b92;}
-            #${SH.managerId} .shm-main{min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);} #${SH.managerId} .shm-main-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid #34363a;} #${SH.managerId} .shm-main-head>div{min-width:0;display:flex;flex-direction:column;gap:3px;} #${SH.managerId} .shm-main-head b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-main-head span{color:#858b92;font-size:10px;} #${SH.managerId} .shm-records{min-height:0;overflow:auto;padding:7px 10px 14px;scrollbar-gutter:stable;} #${SH.managerId} .shm-record{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 7px;border-bottom:1px solid #303236;} #${SH.managerId} .shm-record:hover{background:#25272a;} #${SH.managerId} .shm-record-text{min-width:0;display:flex;flex-direction:column;gap:3px;} #${SH.managerId} .shm-record-text b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-record-text span{color:#858b92;font-size:10px;} #${SH.managerId} .shm-record-actions{display:flex;gap:5px;flex:0 0 auto;} #${SH.managerId} .shm-record-actions button{height:27px;padding:0 8px;font-size:10px;} #${SH.managerId} .shm-empty{padding:45px 15px;text-align:center;color:#858b92;}
-            #${SH.managerId} .shm-foot>div{display:flex;gap:7px;}
-            #${SH.settingsCardId} .att-search-history-max-row-v7100{display:grid;grid-template-columns:minmax(0,1fr) 54px;align-items:center;gap:9px;margin-top:6px;} #${SH.settingsCardId} .att-search-history-max-row-v7100 input{width:100%;} #${SH.settingsCardId} .att-search-history-max-row-v7100 b{text-align:right;font-size:11px;color:inherit;opacity:.76;}
-            @media(max-width:760px){#${SH.managerId} .shm-body{grid-template-columns:220px minmax(0,1fr);}#${SH.managerId} .shm-record-actions button[data-shm-act="open-view"]{display:none;}}
-        `;
-        document.documentElement.appendChild(style);
-    }
-
-    function init() {
-        ensureStyle();
-        bindSearchEvents();
-        bindSettingsEvents();
-        attachSettingsObserver();
-        console.log('[AutoTable 工具集 V7.10.1] 已加载：搜索记录性能优化 / Observer 去自循环 / 输入与定位 RAF 合并 / 历史写入去重');
-    }
-
-    if(document.body) init();
-    else window.addEventListener('DOMContentLoaded',init,{once:true});
+    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();console.log('[AutoTable 工具集 V7.11.0] 已加载：紧凑搜索历史 / 列表与胶囊 / 字体大小 / 同表互通 / 原位展开全部 / 搜索记录管理');}
+    if(document.body)init();else window.addEventListener('DOMContentLoaded',init,{once:true});
 })();
