@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.8.2
-// @description  AutoTable 一体化效率增强工具：智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.9.0
+// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.8.2
+ * AutoTable 工具集 V7.9.0
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，整行上下强调边缘可独立配置，支持快捷开关）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -32,6 +32,7 @@
  * - 主题：可回退 Edge / Fluent 深色优化；可选丝滑高级全局交互动效；记录详情只动画抽屉、不扰动底层页面，并可选择是否忽略系统 Reduce Motion
  * - 文档：原生风格大纲、滚动跟随、查找/替换/定位、正则表达式与高亮
  * - 界面：可隐藏关联字段复制按钮，并释放按钮原先占用的文字空间
+ * - 悬浮菜单：V7.9 重整为“快捷 / 字段 / 置顶 / 文档 / 设置”，快捷页聚合高频操作，设置页提供分区导航与合理功能归类
  * - 设置：支持字段条件高亮规则中心；全部工具配置 JSON 备份、跨版本导入恢复与全部重置；导入/重置后统一刷新确保各独立模块同步生效
  * - 渲染：按真实行号稳定斑马纹；虚拟滚动增量渲染；聚焦行/字段分别保存稳定身份；横向虚拟化时绝不回退到其它字段；编辑与置顶表头保持稳定层级；置顶表头高亮使用不透明底层防止滚动表头穿透
  * - 置顶：右置顶严格镜像；“+ 添加列”保持 AutoTable 原生末端位置，不参与置顶 sticky/offset
@@ -42,7 +43,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.8.2',
+        version: 'V7.9.0',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -691,6 +692,15 @@
         }
 
         #${APP.rootId}.att-open[data-direction="up"] #${APP.panelId} {
+            transform: translateY(0) scale(1);
+        }
+
+        #${APP.rootId}[data-direction="down"] #${APP.panelId} {
+            transform: translateY(-10px) scale(.97);
+            transform-origin: center top;
+        }
+
+        #${APP.rootId}.att-open[data-direction="down"] #${APP.panelId} {
             transform: translateY(0) scale(1);
         }
 
@@ -10546,9 +10556,9 @@
                 </div>
 
                 <div class="att-tabs">
-                    <button type="button" class="att-tab" data-tab="features">功能</button>
-                    <button type="button" class="att-tab" data-tab="combos">字段组合</button>
-                    <button type="button" class="att-tab" data-tab="pinning">列置顶</button>
+                    <button type="button" class="att-tab" data-tab="features">快捷</button>
+                    <button type="button" class="att-tab" data-tab="combos">字段</button>
+                    <button type="button" class="att-tab" data-tab="pinning">置顶</button>
                     <button type="button" class="att-tab" data-tab="settings">设置</button>
                 </div>
 
@@ -10784,6 +10794,16 @@
         if (!section) return;
 
         const activeComboId = getActiveComboIdForCurrentTable();
+        const activeCombo = getActiveCombo();
+        const context = getCurrentTableContext();
+        const activeCell = getActiveRowCell();
+        const currentHeader = activeCell ? (getHeaderTextForCell(activeCell) || '未知字段') : '未选择单元格';
+        const currentValueRaw = activeCell ? (getCellText(activeCell) || '（空）') : '点击表格中的任意单元格即可开始';
+        const currentValue = currentValueRaw.length > 72 ? currentValueRaw.slice(0, 72) + '…' : currentValueRaw;
+        const conditionEnabled = Boolean(GM_getValue('att_v3_conditionalHighlightEnabled', false));
+        const conditionRules = GM_getValue('att_v3_conditionalHighlightRules', []);
+        const conditionRuleCount = Array.isArray(conditionRules) ? conditionRules.filter(r => r && r.enabled !== false).length : 0;
+
         const comboOptions = state.combos.map(combo => {
             const status = getComboCompatibility(combo);
             const suffix = status.context
@@ -10797,112 +10817,90 @@
         }).join('');
 
         section.innerHTML = `
-            <div class="att-card">
-                <div class="att-row">
+            <div class="att-quick-context-v790">
+                <div class="att-quick-context-head-v790">
                     <div>
-                        <div class="att-card-title">智能复制增强</div>
-                        <div class="att-card-desc">
-                            普通单击只负责聚焦；Alt + 单击复制当前单元格；Ctrl + 单击复制当前行设定的字段组合。
-                        </div>
+                        <div class="att-quick-context-label-v790">当前上下文</div>
+                        <div class="att-quick-context-table-v790">${escapeHtml(context?.tableName || '当前页面')}</div>
+                    </div>
+                    <span class="att-quick-combo-badge-v790" title="当前 Ctrl + 单击字段组合">${escapeHtml(activeCombo?.name || '无字段组合')}</span>
+                </div>
+                <div class="att-quick-cell-v790">
+                    <span class="att-quick-cell-field-v790">${escapeHtml(currentHeader)}</span>
+                    <span class="att-quick-cell-value-v790">${escapeHtml(currentValue)}</span>
+                </div>
+            </div>
+
+            <div class="att-quick-action-grid-v790" aria-label="常用操作">
+                <button type="button" class="att-quick-action-v790" data-act="copy-current-cell" ${activeCell ? '' : 'disabled'}>
+                    <b>复制单元格</b><span>Alt + 单击</span>
+                </button>
+                <button type="button" class="att-quick-action-v790" data-act="copy-current-row" ${activeCell ? '' : 'disabled'}>
+                    <b>复制整行</b><span>Alt + R</span>
+                </button>
+                <button type="button" class="att-quick-action-v790" data-act="copy-ctrl-combo" ${activeCell && activeCombo ? '' : 'disabled'}>
+                    <b>复制字段组合</b><span>${escapeHtml(activeCombo?.name || '未配置')}</span>
+                </button>
+                <button type="button" class="att-quick-action-v790" data-act="quick-combo-picker" ${state.combos.length ? '' : 'disabled'}>
+                    <b>切换字段组合</b><span>${state.combos.length} 个可用</span>
+                </button>
+            </div>
+
+            <div class="att-card att-quick-state-card-v790">
+                <div class="att-card-title">常用状态</div>
+                <div class="att-card-desc">高频开关集中在这里；详细参数统一放到“设置”。</div>
+                <div class="att-quick-toggle-grid-v790">
+                    <label class="att-quick-toggle-v790 ${state.focusEnabled ? 'is-on' : ''}">
+                        <span><b>聚焦模式</b><small>${state.rowHighlightEnabled ? '行' : ''}${state.rowHighlightEnabled && state.columnHighlightEnabled ? ' + ' : ''}${state.columnHighlightEnabled ? '列' : ''}${!state.rowHighlightEnabled && !state.columnHighlightEnabled ? '仅当前格' : ''}</small></span>
+                        <span class="att-switch"><input type="checkbox" data-setting="focusEnabled" ${state.focusEnabled ? 'checked' : ''}><span class="att-slider"></span></span>
+                    </label>
+                    <button type="button" class="att-quick-toggle-v790 ${conditionEnabled ? 'is-on' : ''}" data-act="toggle-conditional-highlight-quick">
+                        <span><b>条件高亮</b><small>${conditionRuleCount} 条启用规则</small></span><i class="att-quick-state-dot-v790"></i>
+                    </button>
+                    <label class="att-quick-toggle-v790 ${state.tableWheelReverseEnabled ? 'is-on' : ''}">
+                        <span><b>滚轮横向</b><small>${escapeHtml(state.hotkeys.toggleTableWheelReverse || 'Alt+W')}</small></span>
+                        <span class="att-switch"><input type="checkbox" data-setting="tableWheelReverseEnabled" ${state.tableWheelReverseEnabled ? 'checked' : ''}><span class="att-slider"></span></span>
+                    </label>
+                    <label class="att-quick-toggle-v790 ${state.darkModeOptimized ? 'is-on' : ''}">
+                        <span><b>Edge 深色</b><small>${state.nativeThemeMode === 'dark' ? (state.darkModeOptimized ? '生效中' : '原版深色') : '仅深色模式生效'}</small></span>
+                        <span class="att-switch"><input type="checkbox" data-setting="darkModeOptimized" ${state.darkModeOptimized ? 'checked' : ''}><span class="att-slider"></span></span>
+                    </label>
+                </div>
+                <div class="att-quick-focus-sub-v790 ${state.focusEnabled ? '' : 'is-disabled'}">
+                    <label><input type="checkbox" data-setting="rowHighlightEnabled" ${state.rowHighlightEnabled ? 'checked' : ''} ${state.focusEnabled ? '' : 'disabled'}> 行高亮</label>
+                    <label><input type="checkbox" data-setting="columnHighlightEnabled" ${state.columnHighlightEnabled ? 'checked' : ''} ${state.focusEnabled ? '' : 'disabled'}> 列高亮</label>
+                    <button type="button" data-act="clear-focus" ${activeCell ? '' : 'disabled'}>清除聚焦</button>
+                    <button type="button" data-act="open-conditional-highlight-manager">管理高亮规则</button>
+                </div>
+            </div>
+
+            <div class="att-card att-quick-copy-card-v790">
+                <div class="att-row">
+                    <div style="min-width:0;">
+                        <div class="att-card-title">智能复制</div>
+                        <div class="att-card-desc">普通单击仅聚焦；Alt + 单击复制当前格；Ctrl + 单击按字段组合复制。</div>
                     </div>
                     <label class="att-switch">
                         <input type="checkbox" data-setting="clickCopyEnabled" ${state.clickCopyEnabled ? 'checked' : ''}>
                         <span class="att-slider"></span>
                     </label>
                 </div>
-
-                <div class="att-actions">
-                    <span class="att-kbd">单击：仅聚焦</span>
-                    <span class="att-kbd">Alt + 单击：单元格</span>
-                    <span class="att-kbd">Ctrl + 单击：字段组合</span>
-                    <span class="att-kbd">Alt + R：整行</span>
+                <div class="att-quick-copy-row-v790">
+                    <select class="att-select" data-setting="ctrlClickComboId">
+                        ${comboOptions || '<option value="">暂无字段组合</option>'}
+                    </select>
+                    <button type="button" class="att-btn" data-act="go-tab" data-tab-target="combos">管理字段</button>
                 </div>
-
-                <div class="att-divider"></div>
-
-                <div class="att-label">Ctrl + 单击使用的字段组合</div>
-                <select class="att-select" data-setting="ctrlClickComboId" style="margin-top:7px;">
-                    ${comboOptions || '<option value="">暂无字段组合</option>'}
-                </select>
-                <div class="att-card-desc">
-                    字段组合会按当前实际表保存字段映射；同一个组合在不同表可以使用完全不同的表头。
+                <div class="att-quick-hotkeys-v790">
+                    <span>Alt + 单击 <b>单元格</b></span>
+                    <span>Ctrl + 单击 <b>字段组合</b></span>
+                    <span>Alt + R <b>整行</b></span>
                 </div>
             </div>
 
-            <div class="att-card">
-                <div class="att-row">
-                    <div>
-                        <div class="att-card-title">Edge 风格深色主题</div>
-                        <div class="att-card-desc">
-                            完全重构 AutoTable 深色模式为 Edge / Fluent 风格：中性灰黑底、低对比边框、蓝色强调和统一浮层。
-                            仅在 AutoTable 原生深色模式下生效；关闭后立即恢复 AutoTable 原版深色配色。
-                        </div>
-                    </div>
-                    <label class="att-switch">
-                        <input type="checkbox" data-setting="darkModeOptimized" ${state.darkModeOptimized ? 'checked' : ''}>
-                        <span class="att-slider"></span>
-                    </label>
-                </div>
-
-                <div class="att-actions">
-                    <span class="att-kbd">当前：${state.nativeThemeMode === 'dark' ? '深色模式' : state.nativeThemeMode === 'light' ? '浅色模式' : '识别中'}</span>
-                    <span class="att-kbd">${state.darkModeOptimized && state.nativeThemeMode === 'dark' ? 'Edge 配色生效中' : state.darkModeOptimized ? '等待进入深色模式' : 'AutoTable 原版配色'}</span>
-                    <button type="button"
-                            class="att-btn ${state.darkModeOptimized ? '' : 'att-primary'}"
-                            data-act="toggle-edge-dark">
-                        ${state.darkModeOptimized ? '恢复原版深色' : '启用 Edge 配色'}
-                    </button>
-                </div>
-            </div>
-
-            <div class="att-card">
-                <div class="att-row">
-                    <div>
-                        <div class="att-card-title">表格聚焦模式</div>
-                        <div class="att-card-desc">当前单元格边框始终突出；行、列高亮可分别控制。</div>
-                    </div>
-                    <label class="att-switch">
-                        <input type="checkbox" data-setting="focusEnabled" ${state.focusEnabled ? 'checked' : ''}>
-                        <span class="att-slider"></span>
-                    </label>
-                </div>
-
-                <div class="att-divider"></div>
-
-                <div class="att-row">
-                    <div>
-                        <div class="att-label">高亮当前行</div>
-                        <div class="att-sub-label">整行使用淡蓝色背景</div>
-                    </div>
-                    <label class="att-switch">
-                        <input type="checkbox" data-setting="rowHighlightEnabled" ${state.rowHighlightEnabled ? 'checked' : ''}>
-                        <span class="att-slider"></span>
-                    </label>
-                </div>
-
-                <div class="att-row">
-                    <div>
-                        <div class="att-label">高亮当前列</div>
-                        <div class="att-sub-label">按字段 ID 精确匹配整列</div>
-                    </div>
-                    <label class="att-switch">
-                        <input type="checkbox" data-setting="columnHighlightEnabled" ${state.columnHighlightEnabled ? 'checked' : ''}>
-                        <span class="att-slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="att-card">
-                <div class="att-card-title">当前聚焦位置</div>
-                <div class="att-card-desc" id="att-current-cell-info">
-                    ${currentCellInfoHtml()}
-                </div>
-                <div class="att-actions">
-                    <button type="button" class="att-btn" data-act="copy-current-cell">复制当前单元格</button>
-                    <button type="button" class="att-btn" data-act="copy-current-row">复制当前整行</button>
-                    <button type="button" class="att-btn" data-act="copy-ctrl-combo">复制 Ctrl 字段组合</button>
-                    <button type="button" class="att-btn" data-act="clear-focus">清除聚焦</button>
-                </div>
+            <div class="att-quick-footer-v790">
+                <button type="button" data-act="go-tab" data-tab-target="pinning">置顶列设置</button>
+                <button type="button" data-act="go-tab" data-tab-target="settings">更多设置</button>
             </div>
         `;
     }
@@ -11428,6 +11426,16 @@
         `).join('');
 
         section.innerHTML = `
+            <div class="att-settings-nav-v790" aria-label="设置快速导航">
+                <button type="button" data-act="settings-jump" data-target="floating">悬浮球</button>
+                <button type="button" data-act="settings-jump" data-target="table">表格</button>
+                <button type="button" data-act="settings-jump" data-target="visual">外观</button>
+                <button type="button" data-act="settings-jump" data-target="editor">编辑</button>
+                <button type="button" data-act="settings-jump" data-target="data">备份</button>
+                <button type="button" data-act="settings-jump" data-target="hotkeys">快捷键</button>
+            </div>
+
+            <div class="att-settings-category-v790" data-settings-anchor="floating"><b>悬浮球与菜单</b><span>尺寸、位置和弹出方式</span></div>
             <div class="att-card">
                 <div class="att-card-title">悬浮球大小</div>
                 <div class="att-card-desc">可在 38–72 px 之间调整。</div>
@@ -11439,12 +11447,13 @@
 
             <div class="att-card">
                 <div class="att-card-title">菜单弹出方向</div>
-                <div class="att-card-desc">“自动”会根据悬浮球所在位置，在左 / 右 / 上方中自动选择最合适的位置。</div>
+                <div class="att-card-desc">“自动”会按菜单真实尺寸与当前视口空间，在左 / 右 / 上 / 下中选择最合适的位置。</div>
                 <select class="att-select" data-setting="menuDirection" style="margin-top:8px;">
                     <option value="auto" ${state.menuDirection === 'auto' ? 'selected' : ''}>自动</option>
                     <option value="left" ${state.menuDirection === 'left' ? 'selected' : ''}>向左</option>
                     <option value="right" ${state.menuDirection === 'right' ? 'selected' : ''}>向右</option>
                     <option value="up" ${state.menuDirection === 'up' ? 'selected' : ''}>向上</option>
+                    <option value="down" ${state.menuDirection === 'down' ? 'selected' : ''}>向下</option>
                 </select>
             </div>
 
@@ -11458,6 +11467,7 @@
                 </div>
             </div>
 
+            <div class="att-settings-category-v790" data-settings-anchor="table"><b>表格交互</b><span>分页、滚轮与表格操作方式</span></div>
             <div class="att-card">
                 <div class="att-row">
                     <div>
@@ -11501,6 +11511,18 @@
                     快捷键：<span class="att-kbd">${escapeHtml(state.hotkeys.toggleTableWheelReverse || '未设置')}</span>
                     · 默认 Alt+W，可在下方“功能快捷键 → 表格导航”修改。
                 </div>
+            </div>
+
+            <div class="att-settings-category-v790" data-settings-anchor="visual"><b>外观与高亮</b><span>主题、动效、聚焦和条件高亮视觉</span></div>
+            <div class="att-card">
+                <div class="att-row">
+                    <div style="min-width:0;">
+                        <div class="att-card-title">Edge / Fluent 深色优化</div>
+                        <div class="att-card-desc">仅在 AutoTable 原生深色模式下接管配色；浅色模式不会被改变。</div>
+                    </div>
+                    <label class="att-switch"><input type="checkbox" data-setting="darkModeOptimized" ${state.darkModeOptimized ? 'checked' : ''}><span class="att-slider"></span></label>
+                </div>
+                <div class="att-sub-label" style="margin-top:8px;">当前：${state.nativeThemeMode === 'dark' ? (state.darkModeOptimized ? 'Edge 配色生效中' : 'AutoTable 原版深色') : state.nativeThemeMode === 'light' ? '浅色模式' : '主题识别中'}</div>
             </div>
 
             <div class="att-card">
@@ -11631,6 +11653,7 @@
                 </div>
             </div>
 
+            <div class="att-settings-category-v790" data-settings-anchor="editor"><b>编辑效率</b><span>文本编辑与快捷语句</span></div>
             <div class="att-card">
                 <div class="att-card-title">文本编辑快捷语句</div>
                 <div class="att-card-desc">
@@ -11667,6 +11690,7 @@
                 </div>
             </div>
 
+            <div class="att-settings-category-v790" data-settings-anchor="data"><b>数据与维护</b><span>完整备份、导入和恢复默认</span></div>
             <div class="att-card">
                 <div class="att-card-title">全部设置备份与恢复</div>
                 <div class="att-card-desc">
@@ -11684,6 +11708,7 @@
                 </div>
             </div>
 
+            <div class="att-settings-category-v790" data-settings-anchor="hotkeys"><b>快捷键</b><span>集中管理所有键盘操作</span></div>
             <div class="att-card">
                 <div class="att-card-title">功能快捷键</div>
                 <div class="att-card-desc">已补齐列置顶、表格滚轮反转、字段条件高亮、批量进展、行列高亮、Edge 主题等高频功能。点击“设置”后直接按组合键；Esc 取消，Backspace / Delete 清空。字段组合仍可在“字段组合”页单独设置专属快捷键。</div>
@@ -11699,11 +11724,25 @@
             state.recordingHotkeyTarget.id === id;
     }
 
+    function switchPanelTab(tabId) {
+        const root = document.getElementById(APP.rootId);
+        const content = root?.querySelector('.att-content');
+        state.panelTabScrollPositions ||= {};
+        if (content && state.activeTab) {
+            state.panelTabScrollPositions[state.activeTab] = content.scrollTop;
+        }
+        state.activeTab = tabId;
+        renderPanel();
+        requestAnimationFrame(() => {
+            const nextContent = document.querySelector(`#${APP.panelId} .att-content`);
+            if (nextContent) nextContent.scrollTop = state.panelTabScrollPositions?.[tabId] || 0;
+        });
+    }
+
     function onPanelClick(event) {
         const tab = event.target.closest('[data-tab]');
         if (tab) {
-            state.activeTab = tab.dataset.tab;
-            renderPanel();
+            switchPanelTab(tab.dataset.tab);
             resetIdleTimer();
             return;
         }
@@ -11715,6 +11754,54 @@
         const id = action.dataset.id;
 
         switch (act) {
+            case 'go-tab': {
+                const targetTab = action.dataset.tabTarget || 'features';
+                const tabButton = document.querySelector(`#${APP.panelId} .att-tab[data-tab="${targetTab}"]`);
+                if (tabButton) {
+                    switchPanelTab(targetTab);
+                }
+                break;
+            }
+
+            case 'quick-combo-picker':
+                if (state.comboPickerOpen) closeQuickComboPicker();
+                else openQuickComboPicker();
+                break;
+
+            case 'toggle-conditional-highlight-quick': {
+                const storageKey = 'att_v3_conditionalHighlightEnabled';
+                const nextEnabled = !Boolean(GM_getValue(storageKey, false));
+                GM_setValue(storageKey, nextEnabled);
+                window.dispatchEvent(new CustomEvent('att:conditional-highlight:set', {
+                    detail: { enabled: nextEnabled, source: 'floating-menu' }
+                }));
+                renderFeaturesSection();
+                showToast(`字段条件高亮：已${nextEnabled ? '开启' : '关闭'}`);
+                break;
+            }
+
+            case 'open-conditional-highlight-manager': {
+                let manage = document.querySelector('#att-cond-highlight-card-v770 [data-cond-act="manage"]');
+                if (!manage) {
+                    state.activeTab = 'settings';
+                    renderPanel();
+                    manage = document.querySelector('#att-cond-highlight-card-v770 [data-cond-act="manage"]');
+                }
+                if (manage) manage.click();
+                else showToast('条件高亮规则中心尚未初始化，请稍后再试');
+                break;
+            }
+
+            case 'settings-jump': {
+                const target = document.querySelector(`[data-settings-anchor="${action.dataset.target || ''}"]`);
+                const content = document.querySelector(`#${APP.panelId} .att-content`);
+                if (target && content) {
+                    const top = target.getBoundingClientRect().top - content.getBoundingClientRect().top + content.scrollTop - 8;
+                    content.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+                }
+                break;
+            }
+
             case 'close-panel':
                 setPanelOpen(false);
                 break;
@@ -11991,6 +12078,7 @@
             persistCore();
             setBodyModes();
             showToast(`单击复制：已${state.clickCopyEnabled ? '开启' : '关闭'}`);
+            if (state.activeTab === 'features') renderFeaturesSection();
         }
 
         if (setting === 'darkModeOptimized') {
@@ -12016,6 +12104,7 @@
             setBodyModes();
             if (state.focusEnabled && getActiveRowCell()) applyFocus(getActiveRowCell());
             showToast(`聚焦模式：已${state.focusEnabled ? '开启' : '关闭'}`);
+            if (state.activeTab === 'features') renderFeaturesSection();
         }
 
         if (setting === 'rowHighlightEnabled') {
@@ -12023,6 +12112,7 @@
             persistCore();
             if (state.focusEnabled && getActiveRowCell()) applyFocus(getActiveRowCell());
             showToast(`行高亮：已${state.rowHighlightEnabled ? '开启' : '关闭'}`);
+            if (state.activeTab === 'features') renderFeaturesSection();
         }
 
         if (setting === 'columnHighlightEnabled') {
@@ -12030,6 +12120,7 @@
             persistCore();
             if (state.focusEnabled && getActiveRowCell()) applyFocus(getActiveRowCell());
             showToast(`列高亮：已${state.columnHighlightEnabled ? '开启' : '关闭'}`);
+            if (state.activeTab === 'features') renderFeaturesSection();
         }
 
 
@@ -12041,6 +12132,7 @@
                     ? '表格滚轮反转已开启：滚轮=横向，Shift+滚轮=纵向'
                     : '表格滚轮反转已关闭'
             );
+            if (state.activeTab === 'features') renderFeaturesSection();
         }
 
         if (setting === 'silkMotionEnabled') {
@@ -12537,23 +12629,31 @@
 
         if (direction === 'auto') {
             const fab = document.getElementById(APP.fabId);
+            const panel = document.getElementById(APP.panelId);
             const rect = fab?.getBoundingClientRect() || root.getBoundingClientRect();
-            const panelWidth = Math.min(360, window.innerWidth - 24);
+            // V7.9：不再沿用早期 360px 假定，直接读取当前 polish 后的真实菜单尺寸。
+            const panelRect = panel?.getBoundingClientRect();
+            const panelWidth = Math.min(panelRect?.width || 448, window.innerWidth - 24);
+            const panelHeight = Math.min(panelRect?.height || 520, window.innerHeight - 24);
             const gap = 12;
 
             const rightSpace = window.innerWidth - rect.right;
             const leftSpace = rect.left;
             const upSpace = rect.top;
+            const downSpace = window.innerHeight - rect.bottom;
 
-            // 先保证水平方向能完整放下；否则优先向上。
             if (rightSpace >= panelWidth + gap) {
                 direction = 'right';
             } else if (leftSpace >= panelWidth + gap) {
                 direction = 'left';
-            } else if (upSpace >= 220) {
+            } else if (upSpace >= panelHeight + gap) {
+                direction = 'up';
+            } else if (downSpace >= panelHeight + gap) {
+                direction = 'down';
+            } else if (upSpace >= downSpace) {
                 direction = 'up';
             } else {
-                direction = leftSpace >= rightSpace ? 'left' : 'right';
+                direction = 'down';
             }
         }
 
@@ -12608,6 +12708,9 @@
         } else if (direction === 'up') {
             left = fabRect.left + fabRect.width / 2 - panelWidth / 2;
             top = fabRect.top - gap - panelHeight;
+        } else if (direction === 'down') {
+            left = fabRect.left + fabRect.width / 2 - panelWidth / 2;
+            top = fabRect.bottom + gap;
         } else {
             left = fabRect.left - gap - panelWidth;
             top = fabRect.top + fabRect.height / 2 - panelHeight / 2;
@@ -17027,7 +17130,7 @@
     const DOC_TOOLS = {
         version: 'V5',
         tabId: 'document-tools',
-        tabLabel: '文档工具',
+        tabLabel: '文档',
         sectionId: 'att-document-tools-section',
         outlineId: 'att-document-outline',
         outlineListId: 'att-document-outline-list',
@@ -17433,7 +17536,9 @@
             tab.className = 'att-tab';
             tab.dataset.tab = DOC_TOOLS.tabId;
             tab.textContent = DOC_TOOLS.tabLabel;
-            tabs.appendChild(tab);
+            const settingsTab = tabs.querySelector('[data-tab="settings"]');
+            if (settingsTab) tabs.insertBefore(tab, settingsTab);
+            else tabs.appendChild(tab);
         }
 
         let section = content.querySelector(`[data-section="${DOC_TOOLS.tabId}"]`);
@@ -22992,24 +23097,24 @@
 
     const TAB_META = {
         features: {
-            title: '常用功能',
-            desc: '复制、聚焦、主题与当前单元格操作'
+            title: '快捷操作',
+            desc: '当前单元格、复制与高频状态开关'
         },
         combos: {
             title: '字段组合',
-            desc: '通用模板与当前表专用字段映射'
+            desc: '字段模板、当前表映射与组合切换'
         },
         pinning: {
             title: '列置顶',
-            desc: '当前表左右固定、快捷表头置顶与字段配置'
+            desc: '左右固定、快捷表头置顶与列宽记忆'
         },
         settings: {
             title: '设置',
-            desc: '悬浮窗、分页、文本编辑、快捷短语与快捷键'
+            desc: '悬浮球、表格交互、外观、编辑、备份与快捷键'
         },
         'document-tools': {
-            title: '文档工具',
-            desc: '文档大纲、跟随、查找、替换、正则与高亮'
+            title: '文档',
+            desc: '大纲、跟随、查找、替换、正则与高亮'
         }
     };
 
@@ -23155,11 +23260,11 @@
                 font-size: 10.5px;
                 line-height: 1.4;
             }
-            #${UI.panelId} [data-section="features"].att-active::before { content: '常用功能 · 复制、聚焦、主题和当前操作'; }
-            #${UI.panelId} [data-section="combos"].att-active::before { content: '字段组合 · 通用模板与当前表字段映射'; }
-            #${UI.panelId} [data-section="pinning"].att-active::before { content: '列置顶 · 当前表左右固定与快捷表头配置'; }
-            #${UI.panelId} [data-section="settings"].att-active::before { content: '设置 · 悬浮窗、分页、文本编辑、快捷短语和快捷键'; }
-            #${UI.panelId} [data-section="document-tools"].att-active::before { content: '文档工具 · 大纲、查找、替换、正则和定位'; }
+            #${UI.panelId} [data-section="features"].att-active::before { content: '快捷操作 · 当前上下文、复制与高频状态开关'; }
+            #${UI.panelId} [data-section="combos"].att-active::before { content: '字段组合 · 模板、当前表映射与快速切换'; }
+            #${UI.panelId} [data-section="pinning"].att-active::before { content: '列置顶 · 左右固定、快捷表头与列宽记忆'; }
+            #${UI.panelId} [data-section="settings"].att-active::before { content: '设置 · 分区管理悬浮球、表格、外观、编辑、备份和快捷键'; }
+            #${UI.panelId} [data-section="document-tools"].att-active::before { content: '文档 · 大纲、查找、替换、正则和定位'; }
 
             /* ---------- 内容滚动区 ---------- */
             #${UI.panelId} .att-content {
@@ -26989,4 +27094,93 @@
 
     if (document.body) init();
     else window.addEventListener('DOMContentLoaded', init, { once:true });
+})();
+
+
+/* ============================================================================
+ * AutoTable 悬浮菜单信息架构与体验优化 V7.9.0
+ * --------------------------------------------------------------------------
+ * - 快捷页：当前上下文 -> 四个高频操作 -> 常用状态 -> 智能复制；
+ * - 设置页：六个分区 + sticky 快速导航；
+ * - 文档 Tab 在文档视图中自动位于“设置”之前；
+ * - 仅调整工具面板 UI / 信息架构，不改变 AutoTable 业务数据与原功能实现。
+ * ========================================================================== */
+(function () {
+    'use strict';
+    const STYLE_ID = 'att-floating-menu-ux-v790';
+    if (document.getElementById(STYLE_ID)) return;
+    const style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = `
+        #att-toolbox-panel .att-quick-context-v790 {
+            padding:11px 12px; margin-bottom:8px; border:1px solid var(--att-ui-border,#e4e7ec); border-radius:11px;
+            background:linear-gradient(135deg,var(--att-ui-surface,#fff),var(--att-ui-surface-2,#f2f4f7));
+        }
+        #att-toolbox-panel .att-quick-context-head-v790 { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+        #att-toolbox-panel .att-quick-context-label-v790 { color:var(--att-ui-muted,#667085); font-size:10px; font-weight:700; }
+        #att-toolbox-panel .att-quick-context-table-v790 { margin-top:2px; color:var(--att-ui-text,#101828); font-size:12px; font-weight:800; max-width:270px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        #att-toolbox-panel .att-quick-combo-badge-v790 { flex:0 0 auto; max-width:150px; padding:3px 7px; border:1px solid rgba(37,99,235,.15); border-radius:999px; background:var(--att-ui-blue-soft,#eff6ff); color:var(--att-ui-blue,#2563eb); font-size:9.5px; font-weight:750; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        #att-toolbox-panel .att-quick-cell-v790 { display:grid; grid-template-columns:minmax(82px,120px) minmax(0,1fr); gap:8px; align-items:center; margin-top:9px; padding-top:8px; border-top:1px solid var(--att-ui-border-soft,#edf0f3); }
+        #att-toolbox-panel .att-quick-cell-field-v790 { color:var(--att-ui-text-2,#344054); font-size:10.5px; font-weight:750; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        #att-toolbox-panel .att-quick-cell-value-v790 { color:var(--att-ui-muted,#667085); font-size:10.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+        #att-toolbox-panel .att-quick-action-grid-v790 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-bottom:8px; }
+        #att-toolbox-panel .att-quick-action-v790 { min-width:0; min-height:54px; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:3px; padding:8px 10px; border:1px solid var(--att-ui-border,#e4e7ec); border-radius:10px; background:var(--att-ui-surface,#fff); color:var(--att-ui-text-2,#344054); text-align:left; cursor:pointer; transition:background-color .14s ease,border-color .14s ease,transform .14s ease; }
+        #att-toolbox-panel .att-quick-action-v790:hover:not(:disabled) { border-color:rgba(37,99,235,.28); background:var(--att-ui-blue-soft,#eff6ff); transform:translateY(-1px); }
+        #att-toolbox-panel .att-quick-action-v790:disabled { opacity:.42; cursor:not-allowed; }
+        #att-toolbox-panel .att-quick-action-v790 b { width:100%; font-size:11.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        #att-toolbox-panel .att-quick-action-v790 span { width:100%; color:var(--att-ui-muted,#667085); font-size:9.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+        #att-toolbox-panel .att-quick-toggle-grid-v790 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-top:9px; }
+        #att-toolbox-panel .att-quick-toggle-v790 { min-width:0; min-height:50px; box-sizing:border-box; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:7px 9px; border:1px solid var(--att-ui-border,#e4e7ec); border-radius:9px; background:var(--att-ui-surface-2,#f2f4f7); color:var(--att-ui-text-2,#344054); text-align:left; cursor:pointer; }
+        #att-toolbox-panel button.att-quick-toggle-v790 { width:100%; font:inherit; }
+        #att-toolbox-panel .att-quick-toggle-v790.is-on { border-color:rgba(37,99,235,.22); background:var(--att-ui-blue-soft,#eff6ff); }
+        #att-toolbox-panel .att-quick-toggle-v790 > span:first-child { min-width:0; display:flex; flex-direction:column; gap:2px; }
+        #att-toolbox-panel .att-quick-toggle-v790 b { font-size:10.5px; line-height:1.2; }
+        #att-toolbox-panel .att-quick-toggle-v790 small { max-width:120px; color:var(--att-ui-muted,#667085); font-size:9px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        #att-toolbox-panel .att-quick-toggle-v790 .att-switch { transform:scale(.83); transform-origin:right center; margin-right:-4px; }
+        #att-toolbox-panel .att-quick-state-dot-v790 { width:8px; height:8px; flex:0 0 auto; border-radius:50%; background:#9ca3af; box-shadow:0 0 0 3px rgba(156,163,175,.10); }
+        #att-toolbox-panel .att-quick-toggle-v790.is-on .att-quick-state-dot-v790 { background:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,.14); }
+        #att-toolbox-panel .att-quick-focus-sub-v790 { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:8px; padding-top:8px; border-top:1px solid var(--att-ui-border-soft,#edf0f3); }
+        #att-toolbox-panel .att-quick-focus-sub-v790.is-disabled { opacity:.55; }
+        #att-toolbox-panel .att-quick-focus-sub-v790 label,
+        #att-toolbox-panel .att-quick-focus-sub-v790 button { min-height:27px; box-sizing:border-box; display:inline-flex; align-items:center; gap:5px; padding:0 8px; border:1px solid var(--att-ui-border,#e4e7ec); border-radius:7px; background:var(--att-ui-surface,#fff); color:var(--att-ui-text-2,#344054); font-size:9.5px; cursor:pointer; }
+        #att-toolbox-panel .att-quick-focus-sub-v790 button:disabled { opacity:.45; cursor:not-allowed; }
+
+        #att-toolbox-panel .att-quick-copy-row-v790 { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:7px; margin-top:9px; align-items:center; }
+        #att-toolbox-panel .att-quick-copy-row-v790 .att-select { margin:0 !important; }
+        #att-toolbox-panel .att-quick-hotkeys-v790 { display:flex; flex-wrap:wrap; gap:5px 8px; margin-top:8px; color:var(--att-ui-muted,#667085); font-size:9px; }
+        #att-toolbox-panel .att-quick-hotkeys-v790 b { color:var(--att-ui-text-2,#344054); }
+        #att-toolbox-panel .att-quick-footer-v790 { display:flex; justify-content:flex-end; gap:6px; margin-top:8px; }
+        #att-toolbox-panel .att-quick-footer-v790 button { height:27px; padding:0 9px; border:0; border-radius:7px; background:transparent; color:var(--att-ui-blue,#2563eb); font-size:9.5px; cursor:pointer; }
+        #att-toolbox-panel .att-quick-footer-v790 button:hover { background:var(--att-ui-blue-soft,#eff6ff); }
+
+        #att-toolbox-panel .att-settings-nav-v790 { position:sticky; top:-9px; z-index:12; display:flex; gap:4px; margin:-1px -2px 10px; padding:5px 2px 7px; overflow-x:auto; scrollbar-width:none; background:linear-gradient(to bottom,var(--att-ui-panel,#f7f8fa) 72%,transparent); }
+        #att-toolbox-panel .att-settings-nav-v790::-webkit-scrollbar { display:none; }
+        #att-toolbox-panel .att-settings-nav-v790 button { flex:0 0 auto; height:26px; padding:0 8px; border:1px solid var(--att-ui-border,#e4e7ec); border-radius:999px; background:var(--att-ui-surface,#fff); color:var(--att-ui-muted,#667085); font-size:9.5px; font-weight:700; cursor:pointer; }
+        #att-toolbox-panel .att-settings-nav-v790 button:hover { color:var(--att-ui-blue,#2563eb); border-color:rgba(37,99,235,.22); background:var(--att-ui-blue-soft,#eff6ff); }
+        #att-toolbox-panel .att-settings-category-v790 { display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin:13px 1px 6px; padding-top:3px; scroll-margin-top:38px; }
+        #att-toolbox-panel .att-settings-nav-v790 + .att-settings-category-v790 { margin-top:2px; }
+        #att-toolbox-panel .att-settings-category-v790 b { color:var(--att-ui-text,#101828); font-size:11px; }
+        #att-toolbox-panel .att-settings-category-v790 span { color:var(--att-ui-subtle,#98a2b3); font-size:9px; text-align:right; }
+        #att-toolbox-panel .att-settings-category-v790::after { content:''; flex:1 1 auto; order:1; height:1px; min-width:14px; margin-left:2px; background:var(--att-ui-border-soft,#edf0f3); }
+        #att-toolbox-panel .att-settings-category-v790 b { order:0; flex:0 0 auto; }
+        #att-toolbox-panel .att-settings-category-v790 span { order:2; flex:0 1 auto; }
+
+        /* V7.9 导航短标签统一，更适合 4~5 个 Tab 的窄面板。 */
+        #att-toolbox-panel .att-tab { min-width:58px !important; }
+
+        body.att-native-dark #att-toolbox-panel .att-quick-action-v790,
+        body.att-native-dark #att-toolbox-panel .att-quick-focus-sub-v790 label,
+        body.att-native-dark #att-toolbox-panel .att-quick-focus-sub-v790 button,
+        body.att-native-dark #att-toolbox-panel .att-settings-nav-v790 button { background:var(--att-ui-surface,#27282a); }
+
+        @media (max-width:560px) {
+            #att-toolbox-panel .att-quick-toggle-grid-v790 { grid-template-columns:1fr; }
+            #att-toolbox-panel .att-quick-action-grid-v790 { gap:5px; }
+            #att-toolbox-panel .att-quick-context-table-v790 { max-width:190px; }
+        }
+    `;
+    document.documentElement.appendChild(style);
+    console.log('[AutoTable 工具集 V7.9.0] 悬浮菜单布局优化已加载：快捷操作聚合 / 设置分区导航 / 文档 Tab 顺序优化');
 })();
