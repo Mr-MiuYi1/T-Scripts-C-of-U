@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.10.0
-// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、全视图模糊搜索记录、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.10.1
+// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、高性能全视图模糊搜索记录、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -44,7 +44,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.10.0',
+        version: 'V7.10.1',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -27761,12 +27761,12 @@
         }
     `;
     document.documentElement.appendChild(style);
-    console.log('[AutoTable 工具集 V7.10.0] 悬浮菜单布局优化已加载：快捷操作聚合 / 设置分区导航 / 文档 Tab 顺序优化');
+    console.log('[AutoTable 工具集 V7.10.1] 悬浮菜单布局优化已加载：快捷操作聚合 / 设置分区导航 / 文档 Tab 顺序优化');
 })();
 
 
 /* ============================================================================
- * AutoTable 全视图模糊搜索记录 V7.10.0
+ * AutoTable 全视图模糊搜索记录 V7.10.1
  * --------------------------------------------------------------------------
  * 1) 聚焦 AutoTable 原生“全视图模糊搜索”时，在输入框下方显示搜索记录；
  * 2) 默认按 viewId 独立保存；设置可切换成跨视图混合显示；
@@ -27775,13 +27775,15 @@
  * 5) 点击历史项通过原生 input/change 事件回填，继续走 AutoTable 原搜索流程；
  * 6) 提供全部视图搜索记录中心，可查看、使用、删除单条、清空视图或全部清空；
  * 7) 使用独立 GM 设置，自动进入 V7.6+ “全部设置导入 / 导出 / 重置”；
- * 8) 兼容 SPA 视图切换，不依赖固定搜索框 DOM。
+ * 8) 兼容 SPA 视图切换，不依赖固定搜索框 DOM；
+ * 9) V7.10.1：修复设置卡 MutationObserver 自触发重绘循环；搜索输入/滚动定位使用 RAF 合并；
+ * 10) V7.10.1：当前视图上下文短时缓存，Enter/focusout/pointerdown 连续写历史自动去重。
  * ========================================================================== */
 (function () {
     'use strict';
 
     const SH = {
-        version: 'V7.10.0',
+        version: 'V7.10.1',
         enabledKey: 'att_v3_viewSearchHistoryEnabled',
         maxKey: 'att_v3_viewSearchHistoryMaxPerView',
         perViewKey: 'att_v3_viewSearchHistoryPerViewMode',
@@ -27802,6 +27804,16 @@
     let managerFilter = '';
     let toolboxObserver = null;
     let settingsAttachObserver = null;
+
+    // V7.10.1 性能状态：把输入/滚动高频事件合并到每帧最多一次，
+    // 并缓存当前视图上下文，避免每输入一个字符都扫描页面 Tab/链接 DOM。
+    let dropdownRenderRaf = 0;
+    let dropdownPositionRaf = 0;
+    let pendingDropdownInput = null;
+    let settingsEnsureRaf = 0;
+    let lastRecordSignature = '';
+    let lastRecordAt = 0;
+    let viewContextCache = { href: '', at: 0, value: null };
 
     function normalizeMax(value) {
         const n = Number(value);
@@ -27888,6 +27900,11 @@
     }
 
     function getCurrentViewContext() {
+        const hrefKey = `${location.pathname || ''}${location.search || ''}`;
+        const now = performance.now();
+        if (viewContextCache.value && viewContextCache.href === hrefKey && (now - viewContextCache.at) < 1200) {
+            return viewContextCache.value;
+        }
         const path = location.pathname || '';
         const baseId = path.match(/\/b\/([^/]+)/i)?.[1] || 'base';
         const tableId = path.match(/\/t\/(tbl_[^/]+)/i)?.[1] || '';
@@ -27918,7 +27935,9 @@
 
         const fallbackViewKey = path.replace(/\/+$/, '') || '/';
         const key = `${baseId}::${tableId || 'table'}::${viewId || fallbackViewKey}`;
-        return { key, baseId, tableId, viewId, tableName, viewName, path: location.pathname + location.search };
+        const value = { key, baseId, tableId, viewId, tableName, viewName, path: location.pathname + location.search };
+        viewContextCache = { href: hrefKey, at: now, value };
+        return value;
     }
 
     function cssEscape(value) {
@@ -27957,13 +27976,28 @@
         if (!q) return;
         const profile = ensureProfile(context);
         const now = Date.now();
+        const signature = `${context.key}\n${q}`;
+
+        // Enter -> focusout -> 外部 pointerdown 可能在几百毫秒内连续走 2~3 次。
+        // V7.10.0 每次都会 GM_setValue + 重绘 dropdown；这里直接去重。
+        if (signature === lastRecordSignature && (now - lastRecordAt) < 1200) return;
+        if (profile.items?.[0]?.query === q && (now - Number(profile.items[0].ts || 0)) < 1200) {
+            lastRecordSignature = signature;
+            lastRecordAt = now;
+            return;
+        }
+
+        lastRecordSignature = signature;
+        lastRecordAt = now;
         profile.items = [
             { query: q, ts: now },
             ...profile.items.filter(item => cleanText(item.query) !== q)
         ].slice(0, maxPerView);
         profile.updatedAt = now;
         saveHistoryData();
-        if (activeSearchInput?.isConnected) renderDropdown(activeSearchInput);
+        if (activeSearchInput?.isConnected && document.getElementById(SH.dropdownId)?.classList.contains('is-open')) {
+            scheduleDropdownRender(activeSearchInput);
+        }
     }
 
     function removeHistoryItem(viewKey, query) {
@@ -27972,7 +28006,7 @@
         profile.items = profile.items.filter(item => item.query !== query);
         profile.updatedAt = profile.items[0]?.ts || profile.updatedAt;
         saveHistoryData();
-        if (activeSearchInput?.isConnected) renderDropdown(activeSearchInput);
+        if (activeSearchInput?.isConnected) scheduleDropdownRender(activeSearchInput);
         if (document.getElementById(SH.managerId)?.classList.contains('is-open')) renderManager();
     }
 
@@ -27982,14 +28016,14 @@
         profile.items = [];
         profile.updatedAt = Date.now();
         saveHistoryData();
-        if (activeSearchInput?.isConnected) renderDropdown(activeSearchInput);
+        if (activeSearchInput?.isConnected) scheduleDropdownRender(activeSearchInput);
         renderManager();
     }
 
     function clearAllHistory() {
         for (const profile of Object.values(historyData)) profile.items = [];
         saveHistoryData();
-        if (activeSearchInput?.isConnected) renderDropdown(activeSearchInput);
+        if (activeSearchInput?.isConnected) scheduleDropdownRender(activeSearchInput);
         renderManager();
     }
 
@@ -28045,6 +28079,31 @@
         dropdown.addEventListener('click', onDropdownClick);
         document.body.appendChild(dropdown);
         return dropdown;
+    }
+
+    function scheduleDropdownRender(input = activeSearchInput) {
+        if (!enabled || !input?.isConnected) return;
+        pendingDropdownInput = input;
+        if (dropdownRenderRaf) return;
+        dropdownRenderRaf = requestAnimationFrame(() => {
+            dropdownRenderRaf = 0;
+            const target = pendingDropdownInput;
+            pendingDropdownInput = null;
+            if (target?.isConnected) renderDropdown(target);
+        });
+    }
+
+    function scheduleDropdownPosition() {
+        const dropdown = document.getElementById(SH.dropdownId);
+        if (!dropdown?.classList.contains('is-open') || !activeSearchInput?.isConnected) return;
+        if (dropdownPositionRaf) return;
+        dropdownPositionRaf = requestAnimationFrame(() => {
+            dropdownPositionRaf = 0;
+            const current = document.getElementById(SH.dropdownId);
+            if (current?.classList.contains('is-open') && activeSearchInput?.isConnected) {
+                positionDropdown(activeSearchInput, current);
+            }
+        });
     }
 
     function positionDropdown(input, dropdown = ensureDropdown()) {
@@ -28213,14 +28272,16 @@
         const section = document.querySelector('[data-section="settings"]');
         if (!section) return;
         let card = document.getElementById(SH.settingsCardId);
-        if (!card) {
-            card = document.createElement('div');
-            card.id = SH.settingsCardId;
-            card.className = 'att-card';
-            const visualAnchor = section.querySelector('[data-settings-anchor="visual"]');
-            if (visualAnchor) section.insertBefore(card, visualAnchor);
-            else section.appendChild(card);
+        if (card?.isConnected) {
+            updateSettingsCard();
+            return;
         }
+        card = document.createElement('div');
+        card.id = SH.settingsCardId;
+        card.className = 'att-card';
+        const visualAnchor = section.querySelector('[data-settings-anchor="visual"]');
+        if (visualAnchor) section.insertBefore(card, visualAnchor);
+        else section.appendChild(card);
         card.innerHTML = `
             <div class="att-card-title">全视图搜索记录</div>
             <div class="att-card-desc">增强 AutoTable 原生“全视图模糊搜索”。聚焦搜索框时在下方显示最近搜索，不改变原搜索逻辑。</div>
@@ -28248,7 +28309,7 @@
             if (!input) return;
             const key=input.dataset.shSetting;
             if (key==='enabled') { enabled=input.checked; GM_setValue(SH.enabledKey,enabled); if(!enabled) hideDropdown(); }
-            if (key==='perViewMode') { perViewMode=input.checked; GM_setValue(SH.perViewKey,perViewMode); if(activeSearchInput?.isConnected) renderDropdown(activeSearchInput); }
+            if (key==='perViewMode') { perViewMode=input.checked; GM_setValue(SH.perViewKey,perViewMode); if(activeSearchInput?.isConnected) scheduleDropdownRender(activeSearchInput); }
             if (key==='maxPerView') { maxPerView=normalizeMax(input.value); GM_setValue(SH.maxKey,maxPerView); trimAllProfiles(); saveHistoryData(); }
             updateSettingsCard();
         }, true);
@@ -28266,14 +28327,43 @@
     }
 
     function attachSettingsObserver() {
+        const scheduleEnsure = () => {
+            // 只有设置页已存在且搜索历史卡不存在时才插入。
+            // 绝不因为卡片内部自身 mutation 再次重建 innerHTML。
+            if (document.getElementById(SH.settingsCardId)?.isConnected) return;
+            if (!document.querySelector('[data-section="settings"]')) return;
+            if (settingsEnsureRaf) return;
+            settingsEnsureRaf = requestAnimationFrame(() => {
+                settingsEnsureRaf = 0;
+                if (!document.getElementById(SH.settingsCardId)?.isConnected) ensureSettingsCard();
+            });
+        };
+
         const attach=()=>{
             const root=document.getElementById('att-toolbox-root');
             if(!root) return false;
-            if(!toolboxObserver){ toolboxObserver=new MutationObserver(()=>requestAnimationFrame(ensureSettingsCard)); toolboxObserver.observe(root,{childList:true,subtree:true}); }
-            ensureSettingsCard(); return true;
+            if(!toolboxObserver){
+                toolboxObserver=new MutationObserver(records=>{
+                    // 忽略搜索记录卡自身产生的 mutation，彻底切断 V7.10.0 的自触发重绘循环。
+                    const relevant = records.some(record => {
+                        const target = record.target instanceof Element ? record.target : record.target.parentElement;
+                        if (target?.closest?.(`#${SH.settingsCardId}`)) return false;
+                        return record.type === 'childList';
+                    });
+                    if (relevant) scheduleEnsure();
+                });
+                toolboxObserver.observe(root,{childList:true,subtree:true});
+            }
+            scheduleEnsure();
+            return true;
         };
         if(attach()) return;
-        settingsAttachObserver=new MutationObserver(()=>{if(attach()){settingsAttachObserver.disconnect();settingsAttachObserver=null;}});
+        settingsAttachObserver=new MutationObserver(()=>{
+            if(attach()){
+                settingsAttachObserver.disconnect();
+                settingsAttachObserver=null;
+            }
+        });
         settingsAttachObserver.observe(document.documentElement,{childList:true,subtree:true});
     }
 
@@ -28281,12 +28371,12 @@
         document.addEventListener('focusin', event => {
             if (!isViewSearchInput(event.target)) return;
             activeSearchInput=event.target;
-            if(enabled) renderDropdown(activeSearchInput);
+            if(enabled) scheduleDropdownRender(activeSearchInput);
         }, true);
         document.addEventListener('input', event => {
             if (!isViewSearchInput(event.target)) return;
             activeSearchInput=event.target;
-            if(enabled) renderDropdown(activeSearchInput);
+            if(enabled) scheduleDropdownRender(activeSearchInput);
         }, true);
         document.addEventListener('keydown', event => {
             if (!isViewSearchInput(event.target)) return;
@@ -28309,8 +28399,8 @@
             if(activeSearchInput?.value) recordSearch(activeSearchInput.value);
             hideDropdown();
         }, true);
-        document.addEventListener('scroll', ()=>{ if(activeSearchInput?.isConnected) positionDropdown(activeSearchInput); }, {capture:true,passive:true});
-        window.addEventListener('resize', ()=>{ if(activeSearchInput?.isConnected) positionDropdown(activeSearchInput); }, {passive:true});
+        document.addEventListener('scroll', scheduleDropdownPosition, {capture:true,passive:true});
+        window.addEventListener('resize', scheduleDropdownPosition, {passive:true});
     }
 
     function ensureStyle() {
@@ -28349,7 +28439,7 @@
         bindSearchEvents();
         bindSettingsEvents();
         attachSettingsObserver();
-        console.log('[AutoTable 工具集 V7.10.0] 已加载：全视图模糊搜索记录 / 按视图历史 / 全部视图记录中心');
+        console.log('[AutoTable 工具集 V7.10.1] 已加载：搜索记录性能优化 / Observer 去自循环 / 输入与定位 RAF 合并 / 历史写入去重');
     }
 
     if(document.body) init();
