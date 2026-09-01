@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.11.0
+// @version      7.11.1
 // @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、紧凑可展开的全视图模糊搜索记录、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.11.0
+ * AutoTable 工具集 V7.11.1
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，整行上下强调边缘可独立配置，支持快捷开关）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -44,7 +44,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.11.0',
+        version: 'V7.11.1',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -27761,12 +27761,12 @@
         }
     `;
     document.documentElement.appendChild(style);
-    console.log('[AutoTable 工具集 V7.11.0] 悬浮菜单布局优化已加载：快捷操作聚合 / 设置分区导航 / 文档 Tab 顺序优化');
+    console.log('[AutoTable 工具集 V7.11.1] 悬浮菜单布局优化已加载：快捷操作聚合 / 设置分区导航 / 文档 Tab 顺序优化');
 })();
 
 
 /* ============================================================================
- * AutoTable 全视图模糊搜索记录 V7.11.0
+ * AutoTable 全视图模糊搜索记录 V7.11.1
  * --------------------------------------------------------------------------
  * 1) 搜索框下方默认使用更紧凑的历史层，支持列表 / 胶囊自动填充两种展示；
  * 2) 可调历史文字大小；每个视图最大保存条数继续独立控制；
@@ -27774,14 +27774,15 @@
  * 4) “查看全部视图搜索记录”不再直接打开大弹窗，而是在原历史层下方丝滑展开；
  * 5) 展开区可滚动查看全部视图记录，并提供“搜索记录管理”入口；
  * 6) 原“全部视图搜索记录”大弹窗改为更紧凑的“搜索记录管理”面板，只负责维护；
- * 7) 继续沿用 V7.10.1 的性能优化：Observer 去自循环、输入/定位 RAF 合并、写入去重；
- * 8) 所有新增设置均使用 GM 存储，自动进入“全部设置导出 / 导入 / 重置”。
+ * 7) V7.11.1 二阶段性能优化：历史索引缓存、下拉固定 DOM 骨架、展开/管理分块渲染；
+ * 8) 搜索记录 GM 写入改为短延迟批处理，pagehide / 切后台时强制落盘，减少关键路径同步写入；
+ * 9) Observer 去自循环、输入/定位 RAF 合并继续保留；所有新增设置自动进入“全部设置导出 / 导入 / 重置”。
  * ========================================================================== */
 (function () {
     'use strict';
 
     const SH = {
-        version: 'V7.11.0',
+        version: 'V7.11.1',
         enabledKey: 'att_v3_viewSearchHistoryEnabled',
         maxKey: 'att_v3_viewSearchHistoryMaxPerView',
         perViewKey: 'att_v3_viewSearchHistoryPerViewMode',
@@ -27819,6 +27820,19 @@
     let lastRecordAt = 0;
     let viewContextCache = { href:'', at:0, value:null };
 
+    // V7.11.1：搜索记录性能二阶段。
+    let historyRevision = 1;
+    let historyIndexCache = { revision:0, allRows:[], profiles:[] };
+    let scopeRowsCache = { revision:0, key:'', rows:[] };
+    let persistTimer = 0;
+    let persistDirty = false;
+    let expandedFilterTimer = 0;
+    let managerFilterTimer = 0;
+    let expandedRenderLimit = 80;
+    let managerRenderLimit = 120;
+    const EXPANDED_CHUNK = 80;
+    const MANAGER_CHUNK = 120;
+
     function normalizeMax(value) {
         const n=Number(value); return Number.isFinite(n) ? Math.min(100,Math.max(3,Math.round(n))) : 20;
     }
@@ -27854,7 +27868,45 @@
         return out;
     }
     function trimAllProfiles(){ for(const p of Object.values(historyData)) if(p&&Array.isArray(p.items)) p.items=p.items.slice(0,maxPerView); }
-    function saveHistoryData(){ trimAllProfiles(); GM_setValue(SH.dataKey,historyData); updateSettingsCard(); }
+    function invalidateHistoryIndex(){
+        historyRevision += 1;
+        historyIndexCache={revision:0,allRows:[],profiles:[]};
+        scopeRowsCache={revision:0,key:'',rows:[]};
+    }
+    function flushHistoryPersist(){
+        if(persistTimer){clearTimeout(persistTimer);persistTimer=0;}
+        if(!persistDirty)return;
+        persistDirty=false;
+        try{GM_setValue(SH.dataKey,historyData);}catch(err){console.warn('[AutoTable 搜索记录] 保存历史失败：',err);}
+    }
+    function saveHistoryData({immediate=false}={}){
+        trimAllProfiles();
+        invalidateHistoryIndex();
+        persistDirty=true;
+        if(immediate)return flushHistoryPersist();
+        if(persistTimer)clearTimeout(persistTimer);
+        // 合并连续的 Enter / focusout / 删除等操作，退出关键交互路径后再写 GM。
+        persistTimer=setTimeout(flushHistoryPersist,260);
+    }
+    function buildHistoryIndex(){
+        if(historyIndexCache.revision===historyRevision)return historyIndexCache;
+        const allRows=[],profiles=[];
+        for(const p of Object.values(historyData)){
+            if(!p||!Array.isArray(p.items))continue;
+            const profileSearch=cleanText(`${p.tableName||''} ${p.viewName||''}`).toLocaleLowerCase();
+            let count=0;
+            for(const item of p.items){
+                const query=cleanText(item?.query);if(!query)continue;
+                const row={query,ts:Number(item?.ts||0),viewKey:p.key,viewName:p.viewName||p.viewId||'视图',tableName:p.tableName||'',path:p.path||'',baseId:p.baseId||'',tableId:p.tableId||'',searchText:`${query} ${p.viewName||''} ${p.tableName||''}`.toLocaleLowerCase()};
+                allRows.push(row);count++;
+            }
+            if(count)profiles.push({profile:p,count,searchText:profileSearch,updatedAt:Number(p.updatedAt||0)});
+        }
+        allRows.sort((a,b)=>b.ts-a.ts);
+        profiles.sort((a,b)=>b.updatedAt-a.updatedAt);
+        historyIndexCache={revision:historyRevision,allRows,profiles};
+        return historyIndexCache;
+    }
 
     function isViewSearchInput(el){
         if(!(el instanceof HTMLInputElement))return false;
@@ -27894,9 +27946,9 @@
         if(activeSearchInput?.isConnected&&document.getElementById(SH.dropdownId)?.classList.contains('is-open'))scheduleDropdownRender(activeSearchInput);
     }
 
-    function removeHistoryItem(viewKey,query){const p=historyData[viewKey];if(!p)return;p.items=p.items.filter(i=>i.query!==query);p.updatedAt=p.items[0]?.ts||p.updatedAt;saveHistoryData();if(activeSearchInput?.isConnected)scheduleDropdownRender(activeSearchInput);if(document.getElementById(SH.managerId)?.classList.contains('is-open'))renderManager();}
-    function clearViewHistory(viewKey){const p=historyData[viewKey];if(!p)return;p.items=[];p.updatedAt=Date.now();saveHistoryData();if(activeSearchInput?.isConnected)scheduleDropdownRender(activeSearchInput);if(document.getElementById(SH.managerId)?.classList.contains('is-open'))renderManager();}
-    function clearAllHistory(){for(const p of Object.values(historyData))p.items=[];saveHistoryData();if(activeSearchInput?.isConnected)scheduleDropdownRender(activeSearchInput);if(document.getElementById(SH.managerId)?.classList.contains('is-open'))renderManager();}
+    function removeHistoryItem(viewKey,query){const p=historyData[viewKey];if(!p)return;p.items=p.items.filter(i=>i.query!==query);p.updatedAt=p.items[0]?.ts||p.updatedAt;saveHistoryData();if(activeSearchInput?.isConnected)scheduleDropdownRender(activeSearchInput);if(document.getElementById(SH.managerId)?.classList.contains('is-open'))renderManager(true);}
+    function clearViewHistory(viewKey){const p=historyData[viewKey];if(!p)return;p.items=[];p.updatedAt=Date.now();saveHistoryData();if(activeSearchInput?.isConnected)scheduleDropdownRender(activeSearchInput);if(document.getElementById(SH.managerId)?.classList.contains('is-open'))renderManager(true);}
+    function clearAllHistory(){for(const p of Object.values(historyData))p.items=[];saveHistoryData({immediate:true});if(activeSearchInput?.isConnected)scheduleDropdownRender(activeSearchInput);if(document.getElementById(SH.managerId)?.classList.contains('is-open'))renderManager(true);}
 
     function getScopeProfiles(){
         const current=getCurrentViewContext(),all=Object.values(historyData);
@@ -27905,27 +27957,61 @@
         return [historyData[current.key]].filter(Boolean);
     }
     function scopeLabel(){ if(!perViewMode)return '全部视图'; if(sameTableShare)return '当前表互通'; return '当前视图'; }
-    function flattenProfiles(profiles,{filter='',dedupe=false,limit=Infinity}={}){
-        const q=cleanText(filter).toLocaleLowerCase(),rows=[];
-        for(const p of profiles){for(const item of p.items||[]){if(q&&!`${item.query} ${p.viewName} ${p.tableName}`.toLocaleLowerCase().includes(q))continue;rows.push({...item,viewKey:p.key,viewName:p.viewName||p.viewId||'视图',tableName:p.tableName||'',path:p.path||''});}}
-        rows.sort((a,b)=>b.ts-a.ts);
-        if(!dedupe)return rows.slice(0,limit);
-        const seen=new Set(),unique=[];
-        for(const row of rows){if(seen.has(row.query))continue;seen.add(row.query);unique.push(row);if(unique.length>=limit)break;}
-        return unique;
+    function getScopeRows(){
+        const current=getCurrentViewContext();
+        const modeKey=!perViewMode?'all':sameTableShare?`table:${current.baseId}:${current.tableId||current.tableName}`:`view:${current.key}`;
+        if(scopeRowsCache.revision===historyRevision&&scopeRowsCache.key===modeKey)return scopeRowsCache.rows;
+        const all=buildHistoryIndex().allRows;
+        let rows;
+        if(!perViewMode)rows=all;
+        else if(sameTableShare)rows=all.filter(r=>r.baseId===current.baseId&&((current.tableId&&r.tableId===current.tableId)||(!current.tableId&&r.tableName===current.tableName)));
+        else rows=all.filter(r=>r.viewKey===current.key);
+        scopeRowsCache={revision:historyRevision,key:modeKey,rows};
+        return rows;
     }
-    function getDisplayItems(inputValue=''){ return flattenProfiles(getScopeProfiles(),{filter:inputValue,dedupe:true,limit:layoutMode==='capsule'?14:8}); }
-    function getAllItems(filter=''){ return flattenProfiles(Object.values(historyData),{filter,dedupe:false}); }
+    function queryIndexedRows(rows,{filter='',dedupe=false,limit=Infinity}={}){
+        const q=cleanText(filter).toLocaleLowerCase();
+        const out=[],seen=dedupe?new Set():null;
+        for(const row of rows){
+            if(q&&!row.searchText.includes(q))continue;
+            if(seen){if(seen.has(row.query))continue;seen.add(row.query);}
+            out.push(row);if(out.length>=limit)break;
+        }
+        return out;
+    }
+    function getDisplayItems(inputValue=''){return queryIndexedRows(getScopeRows(),{filter:inputValue,dedupe:true,limit:layoutMode==='capsule'?14:8});}
+    function getAllItems(filter=''){return queryIndexedRows(buildHistoryIndex().allRows,{filter,dedupe:false});}
 
     function setNativeInputValue(input,value){const d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value');if(d?.set)d.set.call(input,value);else input.value=value;input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}));}
     function findCurrentSearchInput(){return Array.from(document.querySelectorAll('input')).find(isViewSearchInput)||null;}
     function useHistoryQuery(query){const input=activeSearchInput?.isConnected?activeSearchInput:findCurrentSearchInput();if(!input)return;setNativeInputValue(input,query);recordSearch(query);input.focus({preventScroll:true});dropdownExpanded=false;expandedFilter='';hideDropdown();}
 
     function ensureDropdown(){
-        let d=document.getElementById(SH.dropdownId);if(d)return d;d=document.createElement('div');d.id=SH.dropdownId;d.setAttribute('role','dialog');
+        let d=document.getElementById(SH.dropdownId);if(d)return d;
+        d=document.createElement('div');d.id=SH.dropdownId;d.setAttribute('role','dialog');
+        d.innerHTML=`<div class="shd-head" data-shd-head></div>
+        <div class="shd-list" data-shd-list></div>
+        <button type="button" class="shd-all" data-sh-act="expand-all"><span>查看全部视图搜索记录</span><b data-shd-expand-icon>›</b></button>
+        <div class="shd-expanded" data-sh-expanded-box>
+            <div class="shd-expanded-head"><div><b>全部视图搜索记录</b><span data-sh-expanded-count>0 条</span></div><div class="shd-expanded-actions"><button type="button" data-sh-act="open-manager">管理记录</button><button type="button" data-sh-act="collapse">收起</button></div></div>
+            <div class="shd-expanded-search"><input type="search" data-sh-expanded-filter placeholder="筛选全部搜索记录…"></div>
+            <div class="shd-expanded-list" data-sh-expanded-list></div>
+        </div>`;
         d.addEventListener('pointerdown',e=>{dropdownPointerDown=true;if(e.target.closest('button,[data-sh-query]'))e.preventDefault();});
-        d.addEventListener('pointerup',()=>{setTimeout(()=>dropdownPointerDown=false,0);});d.addEventListener('click',onDropdownClick);
-        d.addEventListener('input',e=>{if(e.target.matches('[data-sh-expanded-filter]')){expandedFilter=e.target.value||'';renderExpandedOnly(d);}});
+        d.addEventListener('pointerup',()=>{setTimeout(()=>dropdownPointerDown=false,0);});
+        d.addEventListener('click',onDropdownClick);
+        d.addEventListener('input',e=>{
+            if(!e.target.matches('[data-sh-expanded-filter]'))return;
+            expandedFilter=e.target.value||'';
+            clearTimeout(expandedFilterTimer);
+            expandedFilterTimer=setTimeout(()=>{expandedRenderLimit=EXPANDED_CHUNK;renderExpandedList(true);},80);
+        });
+        d.addEventListener('scroll',e=>{
+            const list=e.target;if(!(list instanceof Element)||!list.matches('[data-sh-expanded-list]'))return;
+            if(list.scrollTop+list.clientHeight<list.scrollHeight-80)return;
+            const items=getAllItems(expandedFilter);if(expandedRenderLimit>=items.length)return;
+            const old=expandedRenderLimit;expandedRenderLimit=Math.min(items.length,expandedRenderLimit+EXPANDED_CHUNK);appendExpandedRows(items.slice(old,expandedRenderLimit),list);updateExpandedCount(items.length);
+        },true);
         document.body.appendChild(d);return d;
     }
     function scheduleDropdownRender(input=activeSearchInput){if(!enabled||!input?.isConnected)return;pendingDropdownInput=input;if(dropdownRenderRaf)return;dropdownRenderRaf=requestAnimationFrame(()=>{dropdownRenderRaf=0;const target=pendingDropdownInput;pendingDropdownInput=null;if(target?.isConnected)renderDropdown(target);});}
@@ -27945,30 +28031,30 @@
         if(layoutMode==='capsule')return `<div class="shd-capsules">${items.map(i=>`<span class="shd-chip"><button type="button" class="shd-chip-main" data-sh-query="${escAttr(i.query)}" title="${escAttr(i.query)}">${escHtml(i.query)}</button><button type="button" class="shd-chip-del" data-sh-act="delete" data-sh-query-delete="${escAttr(i.query)}" data-sh-view-key="${escAttr(i.viewKey)}" title="删除">×</button></span>`).join('')}</div>`;
         return items.map(i=>`<div class="shd-item" data-sh-query="${escAttr(i.query)}"><span class="shd-clock">↺</span><div class="shd-main"><div class="shd-query">${escHtml(i.query)}</div>${(sameTableShare||!perViewMode)?`<div class="shd-source">${escHtml(i.tableName)} · ${escHtml(i.viewName)}</div>`:''}</div><span class="shd-time">${escHtml(formatTime(i.ts,true))}</span><button type="button" class="shd-del" data-sh-act="delete" data-sh-query-delete="${escAttr(i.query)}" data-sh-view-key="${escAttr(i.viewKey)}" title="删除">×</button></div>`).join('');
     }
-    function renderExpandedRecords(){
-        const all=getAllItems(''),items=expandedFilter?all.filter(i=>`${i.query} ${i.viewName} ${i.tableName}`.toLocaleLowerCase().includes(cleanText(expandedFilter).toLocaleLowerCase())):all,total=all.length;
-        return `<div class="shd-expanded-head"><div><b>全部视图搜索记录</b><span>${items.length}${expandedFilter?` / ${total}`:''} 条</span></div><div class="shd-expanded-actions"><button type="button" data-sh-act="open-manager">管理记录</button><button type="button" data-sh-act="collapse">收起</button></div></div>
-        <div class="shd-expanded-search"><input type="search" data-sh-expanded-filter placeholder="筛选全部搜索记录…" value="${escAttr(expandedFilter)}"></div>
-        <div class="shd-expanded-list">${items.length?items.map(i=>`<div class="shd-expanded-item"><button type="button" class="shd-expanded-use" data-sh-query="${escAttr(i.query)}"><b>${escHtml(i.query)}</b><span>${escHtml(i.tableName)} · ${escHtml(i.viewName)} · ${escHtml(formatTime(i.ts))}</span></button><button type="button" class="shd-del" data-sh-act="delete" data-sh-query-delete="${escAttr(i.query)}" data-sh-view-key="${escAttr(i.viewKey)}">×</button></div>`).join(''):'<div class="shd-empty">没有符合条件的记录</div>'}</div>`;
-    }
-    function renderExpandedOnly(d=ensureDropdown()){
-        const box=d.querySelector('[data-sh-expanded-box]');if(!box)return;box.innerHTML=renderExpandedRecords();const f=box.querySelector('[data-sh-expanded-filter]');if(f){f.focus({preventScroll:true});const n=f.value.length;f.setSelectionRange(n,n);}scheduleDropdownPosition();
+    function expandedRowHtml(i){return `<div class="shd-expanded-item"><button type="button" class="shd-expanded-use" data-sh-query="${escAttr(i.query)}"><b>${escHtml(i.query)}</b><span>${escHtml(i.tableName)} · ${escHtml(i.viewName)} · ${escHtml(formatTime(i.ts))}</span></button><button type="button" class="shd-del" data-sh-act="delete" data-sh-query-delete="${escAttr(i.query)}" data-sh-view-key="${escAttr(i.viewKey)}">×</button></div>`;}
+    function updateExpandedCount(total){const el=document.querySelector(`#${SH.dropdownId} [data-sh-expanded-count]`);if(el)el.textContent=`${Math.min(expandedRenderLimit,total)} / ${total} 条`;}
+    function appendExpandedRows(rows,list=document.querySelector(`#${SH.dropdownId} [data-sh-expanded-list]`)){if(!list||!rows.length)return;list.insertAdjacentHTML('beforeend',rows.map(expandedRowHtml).join(''));}
+    function renderExpandedList(reset=true){
+        const d=ensureDropdown(),list=d.querySelector('[data-sh-expanded-list]');if(!list)return;
+        const items=getAllItems(expandedFilter);if(reset){expandedRenderLimit=Math.min(EXPANDED_CHUNK,items.length);list.innerHTML=items.length?items.slice(0,expandedRenderLimit).map(expandedRowHtml).join(''):'<div class="shd-empty">没有符合条件的记录</div>';list.scrollTop=0;}
+        updateExpandedCount(items.length);scheduleDropdownPosition();
     }
 
     function renderDropdown(input=activeSearchInput){
         const d=ensureDropdown();if(!enabled||!input?.isConnected||!isViewSearchInput(input)){hideDropdown();return;}activeSearchInput=input;
-        const ctx=getCurrentViewContext(),items=getDisplayItems(input.value||''),profiles=getScopeProfiles(),total=profiles.reduce((n,p)=>n+(p.items?.length||0),0);
+        const ctx=getCurrentViewContext(),items=getDisplayItems(input.value||''),scopeRows=getScopeRows(),total=scopeRows.length;
         d.style.setProperty('--att-sh-font-size',`${historyFontSize}px`);d.classList.toggle('is-expanded',dropdownExpanded);d.classList.toggle('is-capsule',layoutMode==='capsule');
-        d.innerHTML=`<div class="shd-head"><div><b>${escHtml(scopeLabel()==='当前视图'?ctx.viewName:scopeLabel())}</b><span>${total} 条 · ${layoutMode==='capsule'?'胶囊':'列表'}</span></div>${perViewMode&&!sameTableShare&&historyData[ctx.key]?.items?.length?'<button type="button" data-sh-act="clear-current">清空</button>':''}</div>
-        <div class="shd-list">${renderCompactItems(items,input)}</div>
-        <button type="button" class="shd-all" data-sh-act="expand-all"><span>查看全部视图搜索记录</span><b>${dropdownExpanded?'⌄':'›'}</b></button>
-        <div class="shd-expanded" data-sh-expanded-box>${dropdownExpanded?renderExpandedRecords():''}</div>`;
+        const head=d.querySelector('[data-shd-head]');if(head)head.innerHTML=`<div><b>${escHtml(scopeLabel()==='当前视图'?ctx.viewName:scopeLabel())}</b><span>${total} 条 · ${layoutMode==='capsule'?'胶囊':'列表'}</span></div>${perViewMode&&!sameTableShare&&historyData[ctx.key]?.items?.length?'<button type="button" data-sh-act="clear-current">清空</button>':''}`;
+        const list=d.querySelector('[data-shd-list]');if(list)list.innerHTML=renderCompactItems(items,input);
+        const icon=d.querySelector('[data-shd-expand-icon]');if(icon)icon.textContent=dropdownExpanded?'⌄':'›';
+        const filter=d.querySelector('[data-sh-expanded-filter]');if(filter&&filter.value!==expandedFilter)filter.value=expandedFilter;
+        if(dropdownExpanded)renderExpandedList(true);
         d.classList.add('is-open');requestAnimationFrame(()=>positionDropdown(input,d));
     }
-    function hideDropdown(){const d=document.getElementById(SH.dropdownId);d?.classList.remove('is-open','is-expanded');dropdownExpanded=false;expandedFilter='';}
+    function hideDropdown(){const d=document.getElementById(SH.dropdownId);d?.classList.remove('is-open','is-expanded');dropdownExpanded=false;expandedFilter='';expandedRenderLimit=EXPANDED_CHUNK;clearTimeout(expandedFilterTimer);}
     function onDropdownClick(event){
         const action=event.target.closest('[data-sh-act]')?.dataset.shAct;
-        if(action==='expand-all'){dropdownExpanded=true;renderDropdown(activeSearchInput);return;}
+        if(action==='expand-all'){dropdownExpanded=true;expandedFilter='';expandedRenderLimit=EXPANDED_CHUNK;renderDropdown(activeSearchInput);const f=ensureDropdown().querySelector('[data-sh-expanded-filter]');if(f)f.value='';return;}
         if(action==='collapse'){dropdownExpanded=false;expandedFilter='';renderDropdown(activeSearchInput);return;}
         if(action==='open-manager'){openManager();return;}
         if(action==='clear-current'){const c=getCurrentViewContext();if(historyData[c.key]&&confirm(`清空“${c.viewName}”的搜索记录吗？`))clearViewHistory(c.key);return;}
@@ -27976,23 +28062,36 @@
         const row=event.target.closest('[data-sh-query]');if(row)useHistoryQuery(row.dataset.shQuery||'');
     }
 
-    function getManagerProfiles(){return Object.values(historyData).filter(p=>(p.items||[]).length).sort((a,b)=>b.updatedAt-a.updatedAt);}
+    function getManagerProfiles(){return buildHistoryIndex().profiles;}
     function ensureManager(){
         let m=document.getElementById(SH.managerId);if(m)return m;m=document.createElement('div');m.id=SH.managerId;
         m.innerHTML=`<div class="shm-shell" role="dialog" aria-modal="true"><header class="shm-head"><div><b>搜索记录管理</b><span>跨视图维护搜索历史：查看、使用、删除与清空</span></div><button type="button" data-shm-act="close">×</button></header><div class="shm-body"><aside class="shm-side"><div class="shm-side-search"><input type="search" data-shm-filter placeholder="搜索视图 / 表 / 内容…"></div><div class="shm-views" data-shm-views></div></aside><main class="shm-main" data-shm-main></main></div><footer class="shm-foot"><span></span><div><button type="button" data-shm-act="clear-all" class="danger">清空全部记录</button><button type="button" data-shm-act="close" class="primary">完成</button></div></footer></div>`;
-        m.addEventListener('click',onManagerClick);m.addEventListener('input',e=>{if(e.target.matches('[data-shm-filter]')){managerFilter=e.target.value||'';renderManager();}});m.style.setProperty('--att-sh-font-size',`${historyFontSize}px`);document.body.appendChild(m);return m;
+        m.addEventListener('click',onManagerClick);
+        m.addEventListener('input',e=>{if(!e.target.matches('[data-shm-filter]'))return;managerFilter=e.target.value||'';clearTimeout(managerFilterTimer);managerFilterTimer=setTimeout(()=>renderManager(true),100);});
+        m.addEventListener('scroll',e=>{const list=e.target;if(!(list instanceof Element)||!list.matches('.shm-records'))return;if(list.scrollTop+list.clientHeight<list.scrollHeight-100)return;const items=getManagerItems();if(managerRenderLimit>=items.length)return;const old=managerRenderLimit;managerRenderLimit=Math.min(items.length,managerRenderLimit+MANAGER_CHUNK);appendManagerRows(items.slice(old,managerRenderLimit),list);updateManagerRecordCount(items.length);},true);
+        m.style.setProperty('--att-sh-font-size',`${historyFontSize}px`);document.body.appendChild(m);return m;
     }
-    function openManager(selectedKey=''){const ps=getManagerProfiles(),current=getCurrentViewContext().key;managerSelectedView=selectedKey||(historyData[current]?.items?.length?current:(ps[0]?.key||'all'));managerFilter='';const m=ensureManager(),f=m.querySelector('[data-shm-filter]');m.style.setProperty('--att-sh-font-size',`${historyFontSize}px`);if(f)f.value='';m.classList.add('is-open');renderManager();hideDropdown();}
-    function closeManager(){document.getElementById(SH.managerId)?.classList.remove('is-open');}
-    function renderManager(){
-        const m=ensureManager(),profiles=getManagerProfiles();if(managerSelectedView!=='all'&&!profiles.some(p=>p.key===managerSelectedView))managerSelectedView='all';const q=cleanText(managerFilter).toLocaleLowerCase();
-        const filtered=profiles.filter(p=>!q||`${p.tableName} ${p.viewName} ${(p.items||[]).map(i=>i.query).join(' ')}`.toLocaleLowerCase().includes(q));
-        m.querySelector('[data-shm-views]').innerHTML=`<button type="button" class="shm-view ${managerSelectedView==='all'?'active':''}" data-shm-view="all"><span><b>全部记录</b><small>${profiles.reduce((n,p)=>n+p.items.length,0)} 条</small></span></button>${filtered.map(p=>`<button type="button" class="shm-view ${managerSelectedView===p.key?'active':''}" data-shm-view="${escAttr(p.key)}"><span><b>${escHtml(p.viewName||p.viewId||'视图')}</b><small>${escHtml(p.tableName||'')} · ${p.items.length} 条</small></span><em>${escHtml(formatTime(p.updatedAt,true))}</em></button>`).join('')||'<div class="shm-none">暂无记录</div>'}`;
-        const selected=managerSelectedView==='all'?null:historyData[managerSelectedView];let items=selected?selected.items.map(i=>({...i,viewKey:selected.key,viewName:selected.viewName,tableName:selected.tableName,path:selected.path})):flattenProfiles(profiles);if(q)items=items.filter(i=>`${i.query} ${i.viewName} ${i.tableName}`.toLocaleLowerCase().includes(q));
-        const title=selected?`${selected.tableName} · ${selected.viewName}`:'全部记录';m.querySelector('[data-shm-main]').innerHTML=`<div class="shm-main-head"><div><b>${escHtml(title)}</b><span>${items.length} 条</span></div>${selected?`<button type="button" data-shm-act="clear-view" data-shm-view-key="${escAttr(selected.key)}">清空此视图</button>`:''}</div><div class="shm-records">${items.length?items.map(i=>`<div class="shm-record"><div class="shm-record-text"><b>${escHtml(i.query)}</b><span>${managerSelectedView==='all'?`${escHtml(i.tableName)} · ${escHtml(i.viewName)} · `:''}${escHtml(formatTime(i.ts))}</span></div><div class="shm-record-actions"><button type="button" data-shm-act="use" data-shm-query="${escAttr(i.query)}">使用</button>${i.path&&i.path!==location.pathname+location.search?`<button type="button" data-shm-act="open-view" data-shm-path="${escAttr(i.path)}">打开视图</button>`:''}<button type="button" class="danger" data-shm-act="delete" data-shm-view-key="${escAttr(i.viewKey)}" data-shm-query="${escAttr(i.query)}">删除</button></div></div>`).join(''):'<div class="shm-empty">没有符合条件的记录</div>'}</div>`;
-        const foot=m.querySelector('.shm-foot > span');if(foot)foot.textContent=`每视图最多 ${maxPerView} 条 · ${profiles.length} 个视图有记录`;
+    function openManager(selectedKey=''){const ps=getManagerProfiles(),current=getCurrentViewContext().key;managerSelectedView=selectedKey||(historyData[current]?.items?.length?current:(ps[0]?.profile?.key||'all'));managerFilter='';managerRenderLimit=MANAGER_CHUNK;const m=ensureManager(),f=m.querySelector('[data-shm-filter]');m.style.setProperty('--att-sh-font-size',`${historyFontSize}px`);if(f)f.value='';m.classList.add('is-open');renderManager(true);hideDropdown();}
+    function closeManager(){clearTimeout(managerFilterTimer);document.getElementById(SH.managerId)?.classList.remove('is-open');}
+    function managerQuery(){return cleanText(managerFilter).toLocaleLowerCase();}
+    function getManagerItems(){
+        const q=managerQuery(),all=buildHistoryIndex().allRows;
+        let rows=managerSelectedView==='all'?all:all.filter(r=>r.viewKey===managerSelectedView);
+        if(q)rows=rows.filter(r=>r.searchText.includes(q));
+        return rows;
     }
-    function onManagerClick(event){const vb=event.target.closest('[data-shm-view]');if(vb){managerSelectedView=vb.dataset.shmView||'all';renderManager();return;}const b=event.target.closest('[data-shm-act]');if(!b)return;const a=b.dataset.shmAct;if(a==='close')return closeManager();if(a==='use'){closeManager();useHistoryQuery(b.dataset.shmQuery||'');return;}if(a==='open-view'){const p=b.dataset.shmPath;if(p)location.href=p;return;}if(a==='delete'){removeHistoryItem(b.dataset.shmViewKey||'',b.dataset.shmQuery||'');return;}if(a==='clear-view'){const k=b.dataset.shmViewKey||'',p=historyData[k];if(p&&confirm(`清空“${p.viewName||'此视图'}”的全部搜索记录吗？`))clearViewHistory(k);return;}if(a==='clear-all'&&confirm('清空所有搜索记录吗？此操作不会影响 AutoTable 业务数据。'))clearAllHistory();}
+    function managerRowHtml(i){return `<div class="shm-record"><div class="shm-record-text"><b>${escHtml(i.query)}</b><span>${managerSelectedView==='all'?`${escHtml(i.tableName)} · ${escHtml(i.viewName)} · `:''}${escHtml(formatTime(i.ts))}</span></div><div class="shm-record-actions"><button type="button" data-shm-act="use" data-shm-query="${escAttr(i.query)}">使用</button>${i.path&&i.path!==location.pathname+location.search?`<button type="button" data-shm-act="open-view" data-shm-path="${escAttr(i.path)}">打开视图</button>`:''}<button type="button" class="danger" data-shm-act="delete" data-shm-view-key="${escAttr(i.viewKey)}" data-shm-query="${escAttr(i.query)}">删除</button></div></div>`;}
+    function appendManagerRows(rows,list){if(rows.length)list.insertAdjacentHTML('beforeend',rows.map(managerRowHtml).join(''));}
+    function updateManagerRecordCount(total){const el=document.querySelector(`#${SH.managerId} [data-shm-record-count]`);if(el)el.textContent=`${Math.min(managerRenderLimit,total)} / ${total} 条`;}
+    function renderManager(reset=true){
+        const m=ensureManager(),profileEntries=getManagerProfiles(),profiles=profileEntries.map(x=>x.profile);if(managerSelectedView!=='all'&&!profiles.some(p=>p.key===managerSelectedView))managerSelectedView='all';const q=managerQuery();
+        const filtered=profileEntries.filter(x=>!q||x.searchText.includes(q)||x.profile.items?.some(i=>cleanText(i.query).toLocaleLowerCase().includes(q)));
+        const views=m.querySelector('[data-shm-views]');if(views)views.innerHTML=`<button type="button" class="shm-view ${managerSelectedView==='all'?'active':''}" data-shm-view="all"><span><b>全部记录</b><small>${buildHistoryIndex().allRows.length} 条</small></span></button>${filtered.map(x=>{const p=x.profile;return `<button type="button" class="shm-view ${managerSelectedView===p.key?'active':''}" data-shm-view="${escAttr(p.key)}"><span><b>${escHtml(p.viewName||p.viewId||'视图')}</b><small>${escHtml(p.tableName||'')} · ${x.count} 条</small></span><em>${escHtml(formatTime(p.updatedAt,true))}</em></button>`;}).join('')||'<div class="shm-none">暂无记录</div>'}`;
+        const selected=managerSelectedView==='all'?null:historyData[managerSelectedView],items=getManagerItems();if(reset)managerRenderLimit=Math.min(MANAGER_CHUNK,items.length);
+        const title=selected?`${selected.tableName} · ${selected.viewName}`:'全部记录';const main=m.querySelector('[data-shm-main]');if(main)main.innerHTML=`<div class="shm-main-head"><div><b>${escHtml(title)}</b><span data-shm-record-count>${Math.min(managerRenderLimit,items.length)} / ${items.length} 条</span></div>${selected?`<button type="button" data-shm-act="clear-view" data-shm-view-key="${escAttr(selected.key)}">清空此视图</button>`:''}</div><div class="shm-records">${items.length?items.slice(0,managerRenderLimit).map(managerRowHtml).join(''):'<div class="shm-empty">没有符合条件的记录</div>'}</div>`;
+        const foot=m.querySelector('.shm-foot > span');if(foot)foot.textContent=`每视图最多 ${maxPerView} 条 · ${profiles.length} 个视图有记录 · 分批渲染`;
+    }
+    function onManagerClick(event){const vb=event.target.closest('[data-shm-view]');if(vb){managerSelectedView=vb.dataset.shmView||'all';managerRenderLimit=MANAGER_CHUNK;renderManager(true);return;}const b=event.target.closest('[data-shm-act]');if(!b)return;const a=b.dataset.shmAct;if(a==='close')return closeManager();if(a==='use'){closeManager();useHistoryQuery(b.dataset.shmQuery||'');return;}if(a==='open-view'){const p=b.dataset.shmPath;if(p)location.href=p;return;}if(a==='delete'){removeHistoryItem(b.dataset.shmViewKey||'',b.dataset.shmQuery||'');return;}if(a==='clear-view'){const k=b.dataset.shmViewKey||'',p=historyData[k];if(p&&confirm(`清空“${p.viewName||'此视图'}”的全部搜索记录吗？`))clearViewHistory(k);return;}if(a==='clear-all'&&confirm('清空所有搜索记录吗？此操作不会影响 AutoTable 业务数据。'))clearAllHistory();}
 
     function ensureSettingsCard(){
         const section=document.querySelector('[data-section="settings"]');if(!section)return;let card=document.getElementById(SH.settingsCardId);if(card?.isConnected){updateSettingsCard();return;}card=document.createElement('div');card.id=SH.settingsCardId;card.className='att-card';const anchor=section.querySelector('[data-settings-anchor="visual"]');if(anchor)section.insertBefore(card,anchor);else section.appendChild(card);
@@ -28008,7 +28107,7 @@
     }
     function updateSettingsCard(){const c=document.getElementById(SH.settingsCardId);if(!c)return;const set=(q,v)=>{const e=c.querySelector(q);if(e)e.checked=v;};set('[data-sh-setting="enabled"]',enabled);set('[data-sh-setting="perViewMode"]',perViewMode);set('[data-sh-setting="sameTableShare"]',sameTableShare);const max=c.querySelector('[data-sh-setting="maxPerView"]');if(max)max.value=maxPerView;const mv=c.querySelector('[data-sh-max-value]');if(mv)mv.textContent=`${maxPerView} 条`;const fs=c.querySelector('[data-sh-setting="fontSize"]');if(fs)fs.value=historyFontSize;const fv=c.querySelector('[data-sh-font-value]');if(fv)fv.textContent=`${historyFontSize}px`;c.querySelectorAll('[data-sh-layout]').forEach(b=>b.classList.toggle('active',b.dataset.shLayout===layoutMode));}
     function bindSettingsEvents(){
-        document.addEventListener('change',e=>{const i=e.target.closest?.(`#${SH.settingsCardId} [data-sh-setting]`);if(!i)return;const k=i.dataset.shSetting;if(k==='enabled'){enabled=i.checked;GM_setValue(SH.enabledKey,enabled);if(!enabled)hideDropdown();}if(k==='perViewMode'){perViewMode=i.checked;GM_setValue(SH.perViewKey,perViewMode);}if(k==='sameTableShare'){sameTableShare=i.checked;GM_setValue(SH.sameTableShareKey,sameTableShare);}if(k==='maxPerView'){maxPerView=normalizeMax(i.value);GM_setValue(SH.maxKey,maxPerView);trimAllProfiles();saveHistoryData();}if(k==='fontSize'){historyFontSize=normalizeFontSize(i.value);GM_setValue(SH.fontSizeKey,historyFontSize);}updateSettingsCard();if(activeSearchInput?.isConnected&&enabled)scheduleDropdownRender(activeSearchInput);},true);
+        document.addEventListener('change',e=>{const i=e.target.closest?.(`#${SH.settingsCardId} [data-sh-setting]`);if(!i)return;const k=i.dataset.shSetting;if(k==='enabled'){enabled=i.checked;GM_setValue(SH.enabledKey,enabled);if(!enabled)hideDropdown();}if(k==='perViewMode'){perViewMode=i.checked;GM_setValue(SH.perViewKey,perViewMode);scopeRowsCache={revision:0,key:'',rows:[]};}if(k==='sameTableShare'){sameTableShare=i.checked;GM_setValue(SH.sameTableShareKey,sameTableShare);scopeRowsCache={revision:0,key:'',rows:[]};}if(k==='maxPerView'){maxPerView=normalizeMax(i.value);GM_setValue(SH.maxKey,maxPerView);trimAllProfiles();saveHistoryData();}if(k==='fontSize'){historyFontSize=normalizeFontSize(i.value);GM_setValue(SH.fontSizeKey,historyFontSize);}updateSettingsCard();if(activeSearchInput?.isConnected&&enabled)scheduleDropdownRender(activeSearchInput);},true);
         document.addEventListener('input',e=>{const i=e.target.closest?.(`#${SH.settingsCardId} input[data-sh-setting]`);if(!i)return;if(i.dataset.shSetting==='maxPerView'){const v=document.querySelector(`#${SH.settingsCardId} [data-sh-max-value]`);if(v)v.textContent=`${normalizeMax(i.value)} 条`;}if(i.dataset.shSetting==='fontSize'){const size=normalizeFontSize(i.value),v=document.querySelector(`#${SH.settingsCardId} [data-sh-font-value]`);if(v)v.textContent=`${size}px`;const d=document.getElementById(SH.dropdownId);if(d)d.style.setProperty('--att-sh-font-size',`${size}px`);const m=document.getElementById(SH.managerId);if(m)m.style.setProperty('--att-sh-font-size',`${size}px`);}},true);
         document.addEventListener('click',e=>{const lb=e.target.closest?.(`#${SH.settingsCardId} [data-sh-layout]`);if(lb){layoutMode=normalizeLayout(lb.dataset.shLayout);GM_setValue(SH.layoutKey,layoutMode);updateSettingsCard();if(activeSearchInput?.isConnected)scheduleDropdownRender(activeSearchInput);return;}const a=e.target.closest?.(`#${SH.settingsCardId} [data-sh-settings-act]`)?.dataset.shSettingsAct;if(a==='open-manager')openManager();if(a==='clear-current'){const c=getCurrentViewContext(),p=historyData[c.key];if(p?.items?.length&&confirm(`清空“${c.viewName}”的搜索记录吗？`))clearViewHistory(c.key);}},true);
     }
@@ -28037,16 +28136,20 @@
         #${SH.dropdownId} .shd-capsules{display:flex;flex-wrap:wrap;align-content:flex-start;gap:5px;} #${SH.dropdownId} .shd-chip{display:inline-flex;align-items:center;max-width:100%;height:25px;background:#292d32;border:1px solid #3a4047;border-radius:999px;overflow:hidden;} #${SH.dropdownId} .shd-chip:hover{border-color:#4a6f9d;background:#283446;} #${SH.dropdownId} .shd-chip-main{max-width:190px;height:100%;padding:0 8px;border:0;background:transparent;color:#dfe7f1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;} #${SH.dropdownId} .shd-chip-del{width:22px;height:100%;border:0;border-left:1px solid rgba(255,255,255,.05);background:transparent;color:#7d858e;cursor:pointer;} #${SH.dropdownId} .shd-chip-del:hover{color:#ff8a80;background:#3b2929;}
         #${SH.dropdownId} .shd-empty{padding:15px 9px;text-align:center;color:#a7adb4;} #${SH.dropdownId} .shd-empty span{display:block;margin-top:3px;color:#747a81;font-size:.8em;} #${SH.dropdownId} .shd-all{height:30px;display:flex;align-items:center;justify-content:space-between;padding:0 9px;border:0;border-top:1px solid #34363a;background:#232427;color:#9ecbff;cursor:pointer;} #${SH.dropdownId} .shd-all:hover{background:#292c31;} #${SH.dropdownId} .shd-all b{font-size:1.3em;font-weight:400;}
         #${SH.dropdownId} .shd-expanded{max-height:0;opacity:0;overflow:hidden;background:#1e1f22;transition:max-height .25s cubic-bezier(.22,.61,.36,1),opacity .18s ease;} #${SH.dropdownId}.is-expanded .shd-expanded{max-height:365px;opacity:1;border-top:1px solid #34363a;display:grid;grid-template-rows:auto auto minmax(0,1fr);} #${SH.dropdownId} .shd-expanded-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 9px 5px;} #${SH.dropdownId} .shd-expanded-head>div{display:flex;align-items:baseline;gap:7px;min-width:0;} #${SH.dropdownId} .shd-expanded-head b{font-size:1.03em;} #${SH.dropdownId} .shd-expanded-head span{font-size:.8em;color:#7f858c;} #${SH.dropdownId} .shd-expanded-actions{display:flex;gap:5px;} #${SH.dropdownId} .shd-expanded-actions button{height:25px;padding:0 7px;border:1px solid #41454a;border-radius:5px;background:#292b2f;color:#cfd4da;cursor:pointer;} #${SH.dropdownId} .shd-expanded-actions button:first-child{color:#9ecbff;}
-        #${SH.dropdownId} .shd-expanded-search{padding:3px 8px 6px;} #${SH.dropdownId} .shd-expanded-search input{width:100%;height:28px;box-sizing:border-box;padding:0 8px;border:1px solid #3c4045;border-radius:6px;background:#27282b;color:#e8eaed;outline:none;} #${SH.dropdownId} .shd-expanded-search input:focus{border-color:#4b77ad;} #${SH.dropdownId} .shd-expanded-list{min-height:0;overflow:auto;padding:0 5px 7px;scrollbar-gutter:stable;} #${SH.dropdownId} .shd-expanded-item{display:grid;grid-template-columns:minmax(0,1fr) 22px;align-items:center;gap:5px;min-height:34px;padding:3px 3px;border-bottom:1px solid #2d2f33;content-visibility:auto;contain-intrinsic-size:36px;} #${SH.dropdownId} .shd-expanded-item:hover{background:#25272a;} #${SH.dropdownId} .shd-expanded-use{min-width:0;text-align:left;border:0;background:transparent;color:#e8eaed;padding:2px 4px;cursor:pointer;} #${SH.dropdownId} .shd-expanded-use b,#${SH.dropdownId} .shd-expanded-use span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-expanded-use b{font-size:1em;} #${SH.dropdownId} .shd-expanded-use span{margin-top:2px;color:#80868d;font-size:.78em;}
+        #${SH.dropdownId} .shd-expanded-search{padding:3px 8px 6px;} #${SH.dropdownId} .shd-expanded-search input{width:100%;height:28px;box-sizing:border-box;padding:0 8px;border:1px solid #3c4045;border-radius:6px;background:#27282b;color:#e8eaed;outline:none;} #${SH.dropdownId} .shd-expanded-search input:focus{border-color:#4b77ad;} #${SH.dropdownId} .shd-expanded-list{min-height:0;overflow:auto;padding:0 5px 7px;scrollbar-gutter:stable;contain:layout paint;} #${SH.dropdownId} .shd-expanded-item{display:grid;grid-template-columns:minmax(0,1fr) 22px;align-items:center;gap:5px;min-height:34px;padding:3px 3px;border-bottom:1px solid #2d2f33;content-visibility:auto;contain-intrinsic-size:36px;} #${SH.dropdownId} .shd-expanded-item:hover{background:#25272a;} #${SH.dropdownId} .shd-expanded-use{min-width:0;text-align:left;border:0;background:transparent;color:#e8eaed;padding:2px 4px;cursor:pointer;} #${SH.dropdownId} .shd-expanded-use b,#${SH.dropdownId} .shd-expanded-use span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-expanded-use b{font-size:1em;} #${SH.dropdownId} .shd-expanded-use span{margin-top:2px;color:#80868d;font-size:.78em;}
 
         #${SH.managerId}{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.56);backdrop-filter:blur(3px);color:#e8eaed;font-family:inherit;} #${SH.managerId}.is-open{display:flex;} #${SH.managerId}{--att-sh-font-size:12px;} #${SH.managerId} .shm-shell{width:min(820px,calc(100vw - 32px));height:min(560px,calc(100vh - 32px));min-height:430px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:#202124;border:1px solid #3c3f43;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.46);overflow:hidden;font-size:var(--att-sh-font-size);} #${SH.managerId} .shm-head,#${SH.managerId} .shm-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;} #${SH.managerId} .shm-head{border-bottom:1px solid #34363a;} #${SH.managerId} .shm-foot{border-top:1px solid #34363a;color:#858b92;font-size:.82em;} #${SH.managerId} .shm-head>div{display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-head b{font-size:1.15em;} #${SH.managerId} .shm-head span{color:#8f949b;font-size:.82em;} #${SH.managerId} button{height:28px;padding:0 8px;border:1px solid #45484d;border-radius:6px;background:#303134;color:#e8eaed;cursor:pointer;font:inherit;} #${SH.managerId} button:hover{background:#3a3c40;} #${SH.managerId} button.primary{background:#1a73e8;border-color:#1a73e8;color:#fff;} #${SH.managerId} button.danger{color:#ff8a80;border-color:#67413f;}
         #${SH.managerId} .shm-body{min-height:0;display:grid;grid-template-columns:235px minmax(0,1fr);} #${SH.managerId} .shm-side{min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);border-right:1px solid #34363a;} #${SH.managerId} .shm-side-search{padding:8px;} #${SH.managerId} input[type="search"]{width:100%;height:30px;box-sizing:border-box;padding:0 8px;border:1px solid #424448;border-radius:6px;background:#292a2d;color:#e8eaed;outline:none;} #${SH.managerId} .shm-views{min-height:0;overflow:auto;padding:0 5px 8px;} #${SH.managerId} .shm-view{width:100%;height:auto;min-height:39px;margin:1px 0;padding:5px 6px;display:flex;align-items:center;justify-content:space-between;gap:6px;text-align:left;border-color:transparent;background:transparent;} #${SH.managerId} .shm-view.active{background:#26364d;border-color:#345d90;} #${SH.managerId} .shm-view span{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-view b,#${SH.managerId} .shm-view small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-view small,#${SH.managerId} .shm-view em{color:#7f858c;font-size:.78em;font-style:normal;} #${SH.managerId} .shm-none{padding:18px 8px;text-align:center;color:#858b92;}
-        #${SH.managerId} .shm-main{min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);} #${SH.managerId} .shm-main-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid #34363a;} #${SH.managerId} .shm-main-head>div{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-main-head b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-main-head span{color:#7f858c;font-size:.78em;} #${SH.managerId} .shm-records{min-height:0;overflow:auto;padding:4px 7px 9px;scrollbar-gutter:stable;} #${SH.managerId} .shm-record{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:34px;padding:4px 5px;border-bottom:1px solid #303236;content-visibility:auto;contain-intrinsic-size:36px;} #${SH.managerId} .shm-record:hover{background:#25272a;} #${SH.managerId} .shm-record-text{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-record-text b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-record-text span{color:#7f858c;font-size:.78em;} #${SH.managerId} .shm-record-actions{display:flex;gap:4px;flex:0 0 auto;} #${SH.managerId} .shm-record-actions button{height:24px;padding:0 6px;font-size:.78em;} #${SH.managerId} .shm-empty{padding:35px 12px;text-align:center;color:#858b92;} #${SH.managerId} .shm-foot>div{display:flex;gap:5px;}
+        #${SH.managerId} .shm-main{min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);} #${SH.managerId} .shm-main-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid #34363a;} #${SH.managerId} .shm-main-head>div{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-main-head b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-main-head span{color:#7f858c;font-size:.78em;} #${SH.managerId} .shm-records{min-height:0;overflow:auto;padding:4px 7px 9px;scrollbar-gutter:stable;contain:layout paint;} #${SH.managerId} .shm-record{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:34px;padding:4px 5px;border-bottom:1px solid #303236;content-visibility:auto;contain-intrinsic-size:36px;} #${SH.managerId} .shm-record:hover{background:#25272a;} #${SH.managerId} .shm-record-text{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-record-text b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-record-text span{color:#7f858c;font-size:.78em;} #${SH.managerId} .shm-record-actions{display:flex;gap:4px;flex:0 0 auto;} #${SH.managerId} .shm-record-actions button{height:24px;padding:0 6px;font-size:.78em;} #${SH.managerId} .shm-empty{padding:35px 12px;text-align:center;color:#858b92;} #${SH.managerId} .shm-foot>div{display:flex;gap:5px;}
         #${SH.settingsCardId} .att-sh-range-row-v7110{display:grid;grid-template-columns:minmax(0,1fr) 52px;align-items:center;gap:8px;margin-top:5px;} #${SH.settingsCardId} .att-sh-range-row-v7110 input{width:100%;} #${SH.settingsCardId} .att-sh-range-row-v7110 b{text-align:right;font-size:11px;color:inherit;opacity:.78;} #${SH.settingsCardId} .att-sh-layout-row-v7110{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:5px;} #${SH.settingsCardId} .att-sh-layout-row-v7110 button{height:30px;border:1px solid #40444a;border-radius:6px;background:#292b2f;color:inherit;cursor:pointer;} #${SH.settingsCardId} .att-sh-layout-row-v7110 button.active{background:#21466f;border-color:#3978b9;color:#dbeeff;box-shadow:inset 0 0 0 1px rgba(94,173,255,.12);}
         @media(max-width:720px){#${SH.managerId} .shm-body{grid-template-columns:190px minmax(0,1fr);}#${SH.managerId} .shm-record-actions button[data-shm-act="open-view"]{display:none;}}
         `;document.documentElement.appendChild(st);
     }
 
-    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();console.log('[AutoTable 工具集 V7.11.0] 已加载：紧凑搜索历史 / 列表与胶囊 / 字体大小 / 同表互通 / 原位展开全部 / 搜索记录管理');}
+    function bindPersistLifecycle(){
+        window.addEventListener('pagehide',flushHistoryPersist,{capture:true});
+        document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushHistoryPersist();},{passive:true});
+    }
+    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();bindPersistLifecycle();buildHistoryIndex();console.log('[AutoTable 工具集 V7.11.1] 已加载：历史索引缓存 / 固定 DOM 局部更新 / 展开与管理分块渲染 / GM 写入批处理');}
     if(document.body)init();else window.addEventListener('DOMContentLoaded',init,{once:true});
 })();
