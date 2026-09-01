@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.11.1
+// @version      7.11.2
 // @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、紧凑可展开的全视图模糊搜索记录、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.11.1
+ * AutoTable 工具集 V7.11.2
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，整行上下强调边缘可独立配置，支持快捷开关）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -44,7 +44,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.11.1',
+        version: 'V7.11.2',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -27761,12 +27761,12 @@
         }
     `;
     document.documentElement.appendChild(style);
-    console.log('[AutoTable 工具集 V7.11.1] 悬浮菜单布局优化已加载：快捷操作聚合 / 设置分区导航 / 文档 Tab 顺序优化');
+    console.log('[AutoTable 工具集 V7.11.2] 悬浮菜单布局优化已加载：快捷操作聚合 / 设置分区导航 / 文档 Tab 顺序优化');
 })();
 
 
 /* ============================================================================
- * AutoTable 全视图模糊搜索记录 V7.11.1
+ * AutoTable 全视图模糊搜索记录 V7.11.2
  * --------------------------------------------------------------------------
  * 1) 搜索框下方默认使用更紧凑的历史层，支持列表 / 胶囊自动填充两种展示；
  * 2) 可调历史文字大小；每个视图最大保存条数继续独立控制；
@@ -27776,13 +27776,14 @@
  * 6) 原“全部视图搜索记录”大弹窗改为更紧凑的“搜索记录管理”面板，只负责维护；
  * 7) V7.11.1 二阶段性能优化：历史索引缓存、下拉固定 DOM 骨架、展开/管理分块渲染；
  * 8) 搜索记录 GM 写入改为短延迟批处理，pagehide / 切后台时强制落盘，减少关键路径同步写入；
- * 9) Observer 去自循环、输入/定位 RAF 合并继续保留；所有新增设置自动进入“全部设置导出 / 导入 / 重置”。
+ * 9) Observer 去自循环、输入/定位 RAF 合并继续保留；所有新增设置自动进入“全部设置导出 / 导入 / 重置”；
+ * 10) V7.11.2 首次打开采用“隐藏测量 → 一次定位 → 可见”，并对 React 重复 focusin 做渲染签名去重，消除搜索历史层双闪。
  * ========================================================================== */
 (function () {
     'use strict';
 
     const SH = {
-        version: 'V7.11.1',
+        version: 'V7.11.2',
         enabledKey: 'att_v3_viewSearchHistoryEnabled',
         maxKey: 'att_v3_viewSearchHistoryMaxPerView',
         perViewKey: 'att_v3_viewSearchHistoryPerViewMode',
@@ -27815,6 +27816,8 @@
     let dropdownRenderRaf = 0;
     let dropdownPositionRaf = 0;
     let pendingDropdownInput = null;
+    // V7.11.2：避免首次显示未定位的一帧，以及 React 重挂载 input 时重复重绘。
+    let dropdownRenderSignature = '';
     let settingsEnsureRaf = 0;
     let lastRecordSignature = '';
     let lastRecordAt = 0;
@@ -28016,14 +28019,26 @@
     }
     function scheduleDropdownRender(input=activeSearchInput){if(!enabled||!input?.isConnected)return;pendingDropdownInput=input;if(dropdownRenderRaf)return;dropdownRenderRaf=requestAnimationFrame(()=>{dropdownRenderRaf=0;const target=pendingDropdownInput;pendingDropdownInput=null;if(target?.isConnected)renderDropdown(target);});}
     function scheduleDropdownPosition(){const d=document.getElementById(SH.dropdownId);if(!d?.classList.contains('is-open')||!activeSearchInput?.isConnected)return;if(dropdownPositionRaf)return;dropdownPositionRaf=requestAnimationFrame(()=>{dropdownPositionRaf=0;const cur=document.getElementById(SH.dropdownId);if(cur?.classList.contains('is-open')&&activeSearchInput?.isConnected)positionDropdown(activeSearchInput,cur);});}
-    function positionDropdown(input,d=ensureDropdown()){
-        if(!input?.isConnected||!d.classList.contains('is-open'))return;const r=input.getBoundingClientRect(),margin=10,gap=5;
+    function positionDropdown(input,d=ensureDropdown(),allowMeasure=false){
+        if(!input?.isConnected)return false;
+        if(!allowMeasure&&!d.classList.contains('is-open'))return false;
+        const r=input.getBoundingClientRect(),margin=10,gap=5;
         const desired=dropdownExpanded?Math.min(580,Math.max(460,r.width*1.55)):Math.min(420,Math.max(300,r.width));
         const width=Math.min(desired,window.innerWidth-margin*2);d.style.width=`${Math.round(width)}px`;
         let left=r.right-width;left=Math.max(margin,Math.min(left,window.innerWidth-width-margin));
         const cap=dropdownExpanded?Math.min(600,window.innerHeight-margin*2):280,measured=Math.min(d.scrollHeight||cap,cap),below=window.innerHeight-r.bottom-margin,above=r.top-margin;
         let top;if(below>=Math.min(dropdownExpanded?390:170,measured)||below>=above)top=r.bottom+gap;else top=Math.max(margin,r.top-measured-gap);
         d.style.left=`${Math.round(left)}px`;d.style.top=`${Math.round(top)}px`;
+        return true;
+    }
+    function openDropdownStable(input,d=ensureDropdown()){
+        if(d.classList.contains('is-open')){scheduleDropdownPosition();return;}
+        // 先用不可见但参与布局的 measuring 状态得到最终宽高/坐标。
+        // 整个过程发生在同一 JS task 内，浏览器第一次 paint 时已经是最终位置。
+        d.classList.add('is-measuring');
+        positionDropdown(input,d,true);
+        d.classList.add('is-open');
+        d.classList.remove('is-measuring');
     }
 
     function renderCompactItems(items,input){
@@ -28042,16 +28057,22 @@
 
     function renderDropdown(input=activeSearchInput){
         const d=ensureDropdown();if(!enabled||!input?.isConnected||!isViewSearchInput(input)){hideDropdown();return;}activeSearchInput=input;
-        const ctx=getCurrentViewContext(),items=getDisplayItems(input.value||''),scopeRows=getScopeRows(),total=scopeRows.length;
-        d.style.setProperty('--att-sh-font-size',`${historyFontSize}px`);d.classList.toggle('is-expanded',dropdownExpanded);d.classList.toggle('is-capsule',layoutMode==='capsule');
-        const head=d.querySelector('[data-shd-head]');if(head)head.innerHTML=`<div><b>${escHtml(scopeLabel()==='当前视图'?ctx.viewName:scopeLabel())}</b><span>${total} 条 · ${layoutMode==='capsule'?'胶囊':'列表'}</span></div>${perViewMode&&!sameTableShare&&historyData[ctx.key]?.items?.length?'<button type="button" data-sh-act="clear-current">清空</button>':''}`;
-        const list=d.querySelector('[data-shd-list]');if(list)list.innerHTML=renderCompactItems(items,input);
-        const icon=d.querySelector('[data-shd-expand-icon]');if(icon)icon.textContent=dropdownExpanded?'⌄':'›';
-        const filter=d.querySelector('[data-sh-expanded-filter]');if(filter&&filter.value!==expandedFilter)filter.value=expandedFilter;
-        if(dropdownExpanded)renderExpandedList(true);
-        d.classList.add('is-open');requestAnimationFrame(()=>positionDropdown(input,d));
+        const ctx=getCurrentViewContext(),scopeRows=getScopeRows(),total=scopeRows.length;
+        const signature=[ctx.key,cleanText(input.value||''),historyRevision,perViewMode?1:0,sameTableShare?1:0,layoutMode,historyFontSize,dropdownExpanded?1:0,expandedFilter].join('\u001f');
+        const sameRender=signature===dropdownRenderSignature;
+        if(!sameRender){
+            const items=getDisplayItems(input.value||'');
+            d.style.setProperty('--att-sh-font-size',`${historyFontSize}px`);d.classList.toggle('is-expanded',dropdownExpanded);d.classList.toggle('is-capsule',layoutMode==='capsule');
+            const head=d.querySelector('[data-shd-head]');if(head)head.innerHTML=`<div><b>${escHtml(scopeLabel()==='当前视图'?ctx.viewName:scopeLabel())}</b><span>${total} 条 · ${layoutMode==='capsule'?'胶囊':'列表'}</span></div>${perViewMode&&!sameTableShare&&historyData[ctx.key]?.items?.length?'<button type="button" data-sh-act="clear-current">清空</button>':''}`;
+            const list=d.querySelector('[data-shd-list]');if(list)list.innerHTML=renderCompactItems(items,input);
+            const icon=d.querySelector('[data-shd-expand-icon]');if(icon)icon.textContent=dropdownExpanded?'⌄':'›';
+            const filter=d.querySelector('[data-sh-expanded-filter]');if(filter&&filter.value!==expandedFilter)filter.value=expandedFilter;
+            if(dropdownExpanded)renderExpandedList(true);
+            dropdownRenderSignature=signature;
+        }
+        openDropdownStable(input,d);
     }
-    function hideDropdown(){const d=document.getElementById(SH.dropdownId);d?.classList.remove('is-open','is-expanded');dropdownExpanded=false;expandedFilter='';expandedRenderLimit=EXPANDED_CHUNK;clearTimeout(expandedFilterTimer);}
+    function hideDropdown(){const d=document.getElementById(SH.dropdownId);d?.classList.remove('is-open','is-expanded','is-measuring');dropdownExpanded=false;expandedFilter='';expandedRenderLimit=EXPANDED_CHUNK;clearTimeout(expandedFilterTimer);}
     function onDropdownClick(event){
         const action=event.target.closest('[data-sh-act]')?.dataset.shAct;
         if(action==='expand-all'){dropdownExpanded=true;expandedFilter='';expandedRenderLimit=EXPANDED_CHUNK;renderDropdown(activeSearchInput);const f=ensureDropdown().querySelector('[data-sh-expanded-filter]');if(f)f.value='';return;}
@@ -28129,7 +28150,7 @@
     function ensureStyle(){
         if(document.getElementById(SH.styleId))return;const st=document.createElement('style');st.id=SH.styleId;st.textContent=`
         #${SH.dropdownId}{--att-sh-font-size:12px;position:fixed;z-index:2147482600;display:none;max-height:280px;overflow:hidden;background:#202124;color:#e8eaed;border:1px solid #414348;border-radius:9px;box-shadow:0 12px 34px rgba(0,0,0,.38);font-family:inherit;font-size:var(--att-sh-font-size);line-height:1.35;transition:width .22s cubic-bezier(.22,.61,.36,1),max-height .24s cubic-bezier(.22,.61,.36,1),box-shadow .2s ease;transform-origin:top right;}
-        #${SH.dropdownId}.is-open{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;} #${SH.dropdownId}.is-expanded{max-height:min(600px,calc(100vh - 22px));box-shadow:0 18px 48px rgba(0,0,0,.46);}
+        #${SH.dropdownId}.is-measuring{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;visibility:hidden!important;pointer-events:none!important;transition:none!important;} #${SH.dropdownId}.is-open{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;} #${SH.dropdownId}.is-expanded{max-height:min(600px,calc(100vh - 22px));box-shadow:0 18px 48px rgba(0,0,0,.46);}
         #${SH.dropdownId} button,#${SH.dropdownId} input{font:inherit;} #${SH.dropdownId} .shd-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px 6px;border-bottom:1px solid #34363a;} #${SH.dropdownId} .shd-head>div{min-width:0;display:flex;align-items:center;gap:6px;} #${SH.dropdownId} .shd-head b{font-size:1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-head span{color:#868b92;font-size:.82em;white-space:nowrap;} #${SH.dropdownId} .shd-head button{border:0;background:transparent;color:#8ab4f8;padding:2px 4px;cursor:pointer;border-radius:4px;}
         #${SH.dropdownId} .shd-list{min-height:0;max-height:166px;overflow:auto;padding:3px 4px;scrollbar-gutter:stable;} #${SH.dropdownId}.is-capsule .shd-list{max-height:148px;padding:6px;}
         #${SH.dropdownId} .shd-item{display:grid;grid-template-columns:17px minmax(0,1fr) auto 20px;align-items:center;gap:4px;min-height:29px;padding:2px 3px;border-radius:5px;cursor:pointer;} #${SH.dropdownId} .shd-item:hover{background:#2b2d31;} #${SH.dropdownId} .shd-clock{font-size:1em;color:#7e848b;text-align:center;} #${SH.dropdownId} .shd-main{min-width:0;} #${SH.dropdownId} .shd-query{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-source{margin-top:1px;color:#7d838a;font-size:.78em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-time{font-size:.78em;color:#747a81;} #${SH.dropdownId} .shd-del{width:19px;height:19px;padding:0;border:0;border-radius:4px;background:transparent;color:#7f858c;cursor:pointer;} #${SH.dropdownId} .shd-del:hover{background:#3b2929;color:#ff8a80;}
@@ -28150,6 +28171,6 @@
         window.addEventListener('pagehide',flushHistoryPersist,{capture:true});
         document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushHistoryPersist();},{passive:true});
     }
-    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();bindPersistLifecycle();buildHistoryIndex();console.log('[AutoTable 工具集 V7.11.1] 已加载：历史索引缓存 / 固定 DOM 局部更新 / 展开与管理分块渲染 / GM 写入批处理');}
+    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();bindPersistLifecycle();buildHistoryIndex();console.log('[AutoTable 工具集 V7.11.2] 已加载：历史索引缓存 / 首次隐藏测量定位 / 重复 focus 渲染去重 / 分块渲染 / GM 写入批处理');}
     if(document.body)init();else window.addEventListener('DOMContentLoaded',init,{once:true});
 })();
