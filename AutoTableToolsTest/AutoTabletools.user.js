@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.9.0
-// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.9.1
+// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部置顶表集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.9.0
+ * AutoTable 工具集 V7.9.1
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，整行上下强调边缘可独立配置，支持快捷开关）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -43,7 +43,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.9.0',
+        version: 'V7.9.1',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -11139,6 +11139,398 @@
         `;
     }
 
+    // =====================================================================
+    // V7.9.1：全部置顶表管理中心
+    // =====================================================================
+    const pinTableManagerState = {
+        search: '',
+        filter: 'pinned',
+        selectedKey: ''
+    };
+
+    function getPinnedProfileStats(profile) {
+        const left = Array.isArray(profile?.left) ? profile.left.length : 0;
+        const right = Array.isArray(profile?.right) ? profile.right.length : 0;
+        const widths = Object.values(profile?.widths || {})
+            .map(normalizePinnedColumnWidth)
+            .filter(Boolean).length;
+        return { left, right, pinned: left + right, widths };
+    }
+
+    function getPinnedProfileBaseId(profileKey) {
+        const key = String(profileKey || '');
+        if (key.includes('::') && !key.startsWith('path::')) return key.split('::')[0] || '';
+        return '';
+    }
+
+    function getPinnedProfileDisplayName(profileKey, profile) {
+        return sanitizeText(profile?.tableName || profile?.tableId || profileKey || '未知表格');
+    }
+
+    function formatPinnedProfileTime(value) {
+        const ts = Number(value || 0);
+        if (!ts) return '未知时间';
+        try {
+            const d = new Date(ts);
+            const pad = n => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        } catch (_) {
+            return '未知时间';
+        }
+    }
+
+    function getManagedPinnedProfiles() {
+        const currentKey = getCurrentTableContext()?.key || '';
+        const q = sanitizeText(pinTableManagerState.search || '').toLowerCase();
+        const filter = pinTableManagerState.filter || 'pinned';
+
+        return Object.entries(state.pinnedTableProfiles || {})
+            .map(([key, profile]) => {
+                const stats = getPinnedProfileStats(profile);
+                return { key, profile, stats, current: key === currentKey };
+            })
+            .filter(item => {
+                if (filter === 'pinned' && item.stats.pinned <= 0) return false;
+                if (filter === 'widths' && !(item.stats.pinned <= 0 && item.stats.widths > 0)) return false;
+                if (filter === 'current' && !item.current) return false;
+                if (!q) return true;
+                const names = Object.values(item.profile?.fieldNames || {}).join(' ');
+                const haystack = `${getPinnedProfileDisplayName(item.key, item.profile)} ${item.profile?.tableId || ''} ${item.key} ${names}`.toLowerCase();
+                return haystack.includes(q);
+            })
+            .sort((a, b) => {
+                if (a.current !== b.current) return a.current ? -1 : 1;
+                const at = Number(a.profile?.updatedAt || 0);
+                const bt = Number(b.profile?.updatedAt || 0);
+                if (at !== bt) return bt - at;
+                return getPinnedProfileDisplayName(a.key, a.profile).localeCompare(getPinnedProfileDisplayName(b.key, b.profile), 'zh-CN');
+            });
+    }
+
+    function getAllPinnedProfileSummary() {
+        let tables = 0, pinnedTables = 0, pinnedColumns = 0, widthOnlyTables = 0, widthEntries = 0;
+        for (const profile of Object.values(state.pinnedTableProfiles || {})) {
+            const stats = getPinnedProfileStats(profile);
+            if (stats.pinned <= 0 && stats.widths <= 0) continue;
+            tables += 1;
+            pinnedColumns += stats.pinned;
+            widthEntries += stats.widths;
+            if (stats.pinned > 0) pinnedTables += 1;
+            else if (stats.widths > 0) widthOnlyTables += 1;
+        }
+        return { tables, pinnedTables, pinnedColumns, widthOnlyTables, widthEntries };
+    }
+
+    function ensurePinTableManagerStyles() {
+        if (document.getElementById('att-pin-table-manager-style-v791')) return;
+        const style = document.createElement('style');
+        style.id = 'att-pin-table-manager-style-v791';
+        style.textContent = `
+            #att-pin-table-manager-v791 { position:fixed;inset:0;z-index:2147483200;display:none;align-items:center;justify-content:center;padding:22px;background:rgba(0,0,0,.58);backdrop-filter:blur(4px); }
+            #att-pin-table-manager-v791.att-show { display:flex; }
+            #att-pin-table-manager-v791 .att-ptm-shell { width:min(1040px,calc(100vw - 36px));height:min(720px,calc(100vh - 36px));min-height:520px;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;background:#fff;border:1px solid #d7dee8;border-radius:15px;box-shadow:0 28px 80px rgba(15,23,42,.28);overflow:hidden;color:#1f2937; }
+            #att-pin-table-manager-v791 .att-ptm-head,#att-pin-table-manager-v791 .att-ptm-foot { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px; }
+            #att-pin-table-manager-v791 .att-ptm-head { border-bottom:1px solid #e2e8f0; }
+            #att-pin-table-manager-v791 .att-ptm-foot { border-top:1px solid #e2e8f0; }
+            #att-pin-table-manager-v791 .att-ptm-title { font-size:16px;font-weight:750; }
+            #att-pin-table-manager-v791 .att-ptm-sub { margin-top:3px;color:#64748b;font-size:11px; }
+            #att-pin-table-manager-v791 .att-ptm-toolbar { display:grid;grid-template-columns:minmax(220px,1fr) 180px auto;gap:8px;padding:10px 16px;border-bottom:1px solid #eef2f7;background:#f8fafc; }
+            #att-pin-table-manager-v791 .att-ptm-toolbar input,#att-pin-table-manager-v791 .att-ptm-toolbar select { width:100%;box-sizing:border-box;height:34px;border:1px solid #d4dce7;border-radius:8px;background:#fff;color:#1f2937;padding:0 10px;outline:none; }
+            #att-pin-table-manager-v791 .att-ptm-summary { display:flex;align-items:center;justify-content:flex-end;gap:5px;flex-wrap:wrap; }
+            #att-pin-table-manager-v791 .att-ptm-badge { display:inline-flex;align-items:center;min-height:23px;padding:2px 7px;border-radius:999px;border:1px solid #dbe4ef;background:#f8fafc;color:#475569;font-size:10px;white-space:nowrap; }
+            #att-pin-table-manager-v791 .att-ptm-badge.blue { border-color:#bfdbfe;background:#eff6ff;color:#1d4ed8; }
+            #att-pin-table-manager-v791 .att-ptm-main { min-height:0;display:grid;grid-template-columns:330px minmax(0,1fr); }
+            #att-pin-table-manager-v791 .att-ptm-list { min-height:0;overflow:auto;padding:9px;border-right:1px solid #e2e8f0;background:#fbfcfe;scrollbar-gutter:stable; }
+            #att-pin-table-manager-v791 .att-ptm-item { display:block;width:100%;box-sizing:border-box;text-align:left;padding:10px;margin:0 0 6px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:inherit;cursor:pointer; }
+            #att-pin-table-manager-v791 .att-ptm-item:hover { border-color:#bfdbfe;background:#f8fbff; }
+            #att-pin-table-manager-v791 .att-ptm-item.att-active { border-color:#60a5fa;background:#eff6ff;box-shadow:0 0 0 1px rgba(59,130,246,.08); }
+            #att-pin-table-manager-v791 .att-ptm-item-name { display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;min-width:0; }
+            #att-pin-table-manager-v791 .att-ptm-item-name span:first-child { min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+            #att-pin-table-manager-v791 .att-ptm-item-id { margin-top:3px;color:#94a3b8;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+            #att-pin-table-manager-v791 .att-ptm-item-meta { display:flex;gap:5px;flex-wrap:wrap;margin-top:7px; }
+            #att-pin-table-manager-v791 .att-ptm-detail { min-width:0;min-height:0;overflow:auto;padding:16px 18px 24px;scrollbar-gutter:stable; }
+            #att-pin-table-manager-v791 .att-ptm-empty { min-height:260px;display:grid;place-items:center;text-align:center;color:#94a3b8;padding:24px; }
+            #att-pin-table-manager-v791 .att-ptm-detail-head { display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px; }
+            #att-pin-table-manager-v791 .att-ptm-detail-title { font-size:16px;font-weight:750; }
+            #att-pin-table-manager-v791 .att-ptm-card { padding:12px;margin-bottom:10px;border:1px solid #e2e8f0;border-radius:10px;background:#fff; }
+            #att-pin-table-manager-v791 .att-ptm-card-title { display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;font-size:12px;font-weight:700; }
+            #att-pin-table-manager-v791 .att-ptm-fields { display:grid;gap:6px; }
+            #att-pin-table-manager-v791 .att-ptm-field { display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;padding:7px 8px;border:1px solid #edf1f5;border-radius:8px;background:#fafbfc; }
+            #att-pin-table-manager-v791 .att-ptm-field-main { min-width:0; }
+            #att-pin-table-manager-v791 .att-ptm-field-name { font-size:11px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+            #att-pin-table-manager-v791 .att-ptm-field-id { margin-top:2px;color:#94a3b8;font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+            #att-pin-table-manager-v791 .att-ptm-side { display:flex;border:1px solid #d8e0ea;border-radius:7px;overflow:hidden; }
+            #att-pin-table-manager-v791 .att-ptm-side button { width:30px;height:27px;border:0;border-right:1px solid #e2e8f0;background:#fff;color:#64748b;cursor:pointer; }
+            #att-pin-table-manager-v791 .att-ptm-side button:last-child { border-right:0; }
+            #att-pin-table-manager-v791 .att-ptm-side button.att-active { background:#0f6cbd;color:#fff; }
+            #att-pin-table-manager-v791 .att-ptm-actions { display:flex;flex-wrap:wrap;gap:7px; }
+            #att-pin-table-manager-v791 button.att-ptm-btn { height:32px;padding:0 11px;border:1px solid #d7dee8;border-radius:8px;background:#fff;color:#334155;cursor:pointer; }
+            #att-pin-table-manager-v791 button.att-ptm-btn:hover { background:#f8fafc;border-color:#b9c7d8; }
+            #att-pin-table-manager-v791 button.att-ptm-btn.primary { background:#0f6cbd;border-color:#0f6cbd;color:#fff; }
+            #att-pin-table-manager-v791 button.att-ptm-btn.danger { color:#dc2626;border-color:#fecaca;background:#fff7f7; }
+            body.att-native-dark #att-pin-table-manager-v791 .att-ptm-shell { background:#202124;border-color:#3b3d40;color:#e8eaed; }
+            body.att-native-dark #att-pin-table-manager-v791 .att-ptm-head,body.att-native-dark #att-pin-table-manager-v791 .att-ptm-foot,body.att-native-dark #att-pin-table-manager-v791 .att-ptm-toolbar,body.att-native-dark #att-pin-table-manager-v791 .att-ptm-list { border-color:#34363a;background:#202124; }
+            body.att-native-dark #att-pin-table-manager-v791 .att-ptm-item,body.att-native-dark #att-pin-table-manager-v791 .att-ptm-card,body.att-native-dark #att-pin-table-manager-v791 .att-ptm-field,body.att-native-dark #att-pin-table-manager-v791 .att-ptm-toolbar input,body.att-native-dark #att-pin-table-manager-v791 .att-ptm-toolbar select,body.att-native-dark #att-pin-table-manager-v791 button.att-ptm-btn,body.att-native-dark #att-pin-table-manager-v791 .att-ptm-side button { background:#292a2d;border-color:#414348;color:#e8eaed; }
+            body.att-native-dark #att-pin-table-manager-v791 .att-ptm-item.att-active { background:#26354a;border-color:#315b91; }
+            body.att-native-dark #att-pin-table-manager-v791 .att-ptm-badge { background:#2c2d30;border-color:#45474c;color:#c7cbd0; }
+            body.att-native-dark #att-pin-table-manager-v791 .att-ptm-badge.blue { background:#173759;border-color:#315d88;color:#d9ecff; }
+            body.att-native-dark #att-pin-table-manager-v791 .att-ptm-side button.att-active { background:#0f6cbd;color:#fff; }
+            @media(max-width:760px){#att-pin-table-manager-v791 .att-ptm-main{grid-template-columns:260px minmax(0,1fr)}#att-pin-table-manager-v791 .att-ptm-toolbar{grid-template-columns:1fr 150px}.att-ptm-summary{grid-column:1/-1!important;justify-content:flex-start!important;}}
+        `;
+        document.documentElement.appendChild(style);
+    }
+
+    function ensurePinTableManager() {
+        let overlay = document.getElementById('att-pin-table-manager-v791');
+        if (overlay) return overlay;
+        ensurePinTableManagerStyles();
+        overlay = document.createElement('div');
+        overlay.id = 'att-pin-table-manager-v791';
+        overlay.innerHTML = `
+            <div class="att-ptm-shell" role="dialog" aria-modal="true" aria-label="置顶表管理">
+                <div class="att-ptm-head">
+                    <div><div class="att-ptm-title">置顶表管理</div><div class="att-ptm-sub">集中查看和管理所有按表保存的左右置顶列与列宽记忆</div></div>
+                    <button type="button" class="att-ptm-btn" data-ptm-act="close">×</button>
+                </div>
+                <div class="att-ptm-toolbar">
+                    <input type="search" data-ptm-search placeholder="搜索表名 / 表ID / 置顶字段…">
+                    <select data-ptm-filter>
+                        <option value="pinned">有置顶列的表</option>
+                        <option value="all">全部保存配置</option>
+                        <option value="widths">仅有列宽记忆</option>
+                        <option value="current">当前表</option>
+                    </select>
+                    <div class="att-ptm-summary" data-ptm-summary></div>
+                </div>
+                <div class="att-ptm-main">
+                    <div class="att-ptm-list" data-ptm-list></div>
+                    <div class="att-ptm-detail" data-ptm-detail></div>
+                </div>
+                <div class="att-ptm-foot">
+                    <div class="att-ptm-actions">
+                        <button type="button" class="att-ptm-btn" data-ptm-act="clear-all-pins">清除所有表置顶方向</button>
+                        <button type="button" class="att-ptm-btn danger" data-ptm-act="delete-all-profiles">删除全部置顶配置</button>
+                    </div>
+                    <button type="button" class="att-ptm-btn primary" data-ptm-act="close">完成</button>
+                </div>
+            </div>`;
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', onPinTableManagerClick);
+        overlay.addEventListener('input', onPinTableManagerInput);
+        overlay.addEventListener('change', onPinTableManagerChange);
+        return overlay;
+    }
+
+    function renderPinTableManager() {
+        const overlay = ensurePinTableManager();
+        const profiles = getManagedPinnedProfiles();
+        const summary = getAllPinnedProfileSummary();
+        const currentKey = getCurrentTableContext()?.key || '';
+        if (!profiles.some(item => item.key === pinTableManagerState.selectedKey)) {
+            pinTableManagerState.selectedKey = profiles[0]?.key || '';
+        }
+
+        const search = overlay.querySelector('[data-ptm-search]');
+        const filter = overlay.querySelector('[data-ptm-filter]');
+        if (search && document.activeElement !== search) search.value = pinTableManagerState.search;
+        if (filter) filter.value = pinTableManagerState.filter;
+
+        const sumEl = overlay.querySelector('[data-ptm-summary]');
+        if (sumEl) sumEl.innerHTML = `
+            <span class="att-ptm-badge blue">置顶表 ${summary.pinnedTables}</span>
+            <span class="att-ptm-badge">置顶列 ${summary.pinnedColumns}</span>
+            ${summary.widthOnlyTables ? `<span class="att-ptm-badge">仅列宽 ${summary.widthOnlyTables}</span>` : ''}`;
+
+        const list = overlay.querySelector('[data-ptm-list]');
+        if (list) {
+            list.innerHTML = profiles.length ? profiles.map(item => {
+                const name = getPinnedProfileDisplayName(item.key, item.profile);
+                return `<button type="button" class="att-ptm-item ${item.key === pinTableManagerState.selectedKey ? 'att-active' : ''}" data-ptm-key="${escapeAttr(item.key)}">
+                    <div class="att-ptm-item-name"><span>${escapeHtml(name)}</span>${item.current ? '<span class="att-ptm-badge blue">当前</span>' : ''}</div>
+                    <div class="att-ptm-item-id">${escapeHtml(item.profile?.tableId || item.key)}</div>
+                    <div class="att-ptm-item-meta">
+                        <span class="att-ptm-badge">左 ${item.stats.left}</span><span class="att-ptm-badge">右 ${item.stats.right}</span>
+                        ${item.stats.widths ? `<span class="att-ptm-badge">列宽 ${item.stats.widths}</span>` : ''}
+                    </div>
+                </button>`;
+            }).join('') : '<div class="att-ptm-empty">当前筛选条件下没有保存的置顶表。</div>';
+        }
+
+        const detail = overlay.querySelector('[data-ptm-detail]');
+        if (!detail) return;
+        const selected = profiles.find(item => item.key === pinTableManagerState.selectedKey);
+        if (!selected) {
+            detail.innerHTML = '<div class="att-ptm-empty"><div><b>没有可管理的置顶配置</b><br><span>在任意表中设置左 / 右置顶后，这里会自动出现。</span></div></div>';
+            return;
+        }
+
+        const { key, profile, stats } = selected;
+        const name = getPinnedProfileDisplayName(key, profile);
+        const fieldRows = side => (profile[side] || []).map(fieldId => {
+            const fieldName = profile.fieldNames?.[fieldId] || fieldId;
+            const width = normalizePinnedColumnWidth(profile.widths?.[fieldId]);
+            return `<div class="att-ptm-field">
+                <div class="att-ptm-field-main"><div class="att-ptm-field-name">${escapeHtml(fieldName)}</div><div class="att-ptm-field-id">${escapeHtml(fieldId)}${width ? ` · 记忆宽度 ${width}px` : ''}</div></div>
+                <div class="att-ptm-side">
+                    <button type="button" class="${side === 'left' ? 'att-active' : ''}" data-ptm-act="field-side" data-ptm-key="${escapeAttr(key)}" data-field-id="${escapeAttr(fieldId)}" data-side="left" title="左置顶">左</button>
+                    <button type="button" data-ptm-act="field-side" data-ptm-key="${escapeAttr(key)}" data-field-id="${escapeAttr(fieldId)}" data-side="none" title="取消置顶">—</button>
+                    <button type="button" class="${side === 'right' ? 'att-active' : ''}" data-ptm-act="field-side" data-ptm-key="${escapeAttr(key)}" data-field-id="${escapeAttr(fieldId)}" data-side="right" title="右置顶">右</button>
+                </div>
+            </div>`;
+        }).join('');
+
+        const widthOnlyIds = Object.keys(profile.widths || {}).filter(id => !(profile.left || []).includes(id) && !(profile.right || []).includes(id));
+        const widthOnlyRows = widthOnlyIds.map(fieldId => {
+            const width = normalizePinnedColumnWidth(profile.widths?.[fieldId]);
+            const fieldName = profile.fieldNames?.[fieldId] || fieldId;
+            return `<div class="att-ptm-field"><div class="att-ptm-field-main"><div class="att-ptm-field-name">${escapeHtml(fieldName)}</div><div class="att-ptm-field-id">${escapeHtml(fieldId)} · ${width || '-'}px</div></div><button type="button" class="att-ptm-btn" data-ptm-act="clear-field-width" data-ptm-key="${escapeAttr(key)}" data-field-id="${escapeAttr(fieldId)}">清除宽度</button></div>`;
+        }).join('');
+
+        detail.innerHTML = `
+            <div class="att-ptm-detail-head">
+                <div><div class="att-ptm-detail-title">${escapeHtml(name)} ${key === currentKey ? '<span class="att-ptm-badge blue">当前表</span>' : ''}</div><div class="att-ptm-sub">${escapeHtml(profile.tableId || key)} · 更新 ${escapeHtml(formatPinnedProfileTime(profile.updatedAt))}</div></div>
+                <div class="att-ptm-summary"><span class="att-ptm-badge">左 ${stats.left}</span><span class="att-ptm-badge">右 ${stats.right}</span><span class="att-ptm-badge">列宽 ${stats.widths}</span></div>
+            </div>
+            <div class="att-ptm-card"><div class="att-ptm-card-title"><span>左侧置顶</span><span class="att-ptm-badge">${stats.left}</span></div><div class="att-ptm-fields">${fieldRows('left') || '<div class="att-ptm-sub">没有左侧置顶字段。</div>'}</div></div>
+            <div class="att-ptm-card"><div class="att-ptm-card-title"><span>右侧置顶</span><span class="att-ptm-badge">${stats.right}</span></div><div class="att-ptm-fields">${fieldRows('right') || '<div class="att-ptm-sub">没有右侧置顶字段。</div>'}</div></div>
+            ${widthOnlyRows ? `<div class="att-ptm-card"><div class="att-ptm-card-title"><span>仅保留的列宽记忆</span><span class="att-ptm-badge">${widthOnlyIds.length}</span></div><div class="att-ptm-fields">${widthOnlyRows}</div></div>` : ''}
+            <div class="att-ptm-card"><div class="att-ptm-card-title"><span>管理此表</span></div><div class="att-ptm-actions">
+                ${key === currentKey ? '<button type="button" class="att-ptm-btn primary" data-ptm-act="reapply-current">重新应用当前表</button>' : ''}
+                <button type="button" class="att-ptm-btn" data-ptm-act="clear-profile-pins" data-ptm-key="${escapeAttr(key)}">清除置顶方向</button>
+                <button type="button" class="att-ptm-btn" data-ptm-act="clear-profile-widths" data-ptm-key="${escapeAttr(key)}">清除列宽记忆</button>
+                <button type="button" class="att-ptm-btn danger" data-ptm-act="delete-profile" data-ptm-key="${escapeAttr(key)}">删除整份配置</button>
+            </div></div>`;
+    }
+
+    function refreshPinnedManagerCurrentTable(profileKey) {
+        const context = getCurrentTableContext();
+        if (!context || context.key !== profileKey) return;
+        clearPinnedColumns(context.root);
+        scheduleApplyPinnedColumns(0);
+        if (state.panelOpen && state.activeTab === 'pinning') renderPinningSection();
+    }
+
+    function mutateManagedPinnedProfile(profileKey, mutator) {
+        const profile = state.pinnedTableProfiles?.[profileKey];
+        if (!profile) return false;
+        mutator(profile);
+        profile.updatedAt = Date.now();
+        const stats = getPinnedProfileStats(profile);
+        if (stats.pinned <= 0 && stats.widths <= 0) delete state.pinnedTableProfiles[profileKey];
+        persistCore();
+        refreshPinnedManagerCurrentTable(profileKey);
+        renderPinTableManager();
+        return true;
+    }
+
+    function onPinTableManagerInput(event) {
+        if (event.target?.matches?.('[data-ptm-search]')) {
+            pinTableManagerState.search = event.target.value || '';
+            renderPinTableManager();
+            requestAnimationFrame(() => {
+                const input = document.querySelector('#att-pin-table-manager-v791 [data-ptm-search]');
+                if (input) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); }
+            });
+        }
+    }
+
+    function onPinTableManagerChange(event) {
+        if (event.target?.matches?.('[data-ptm-filter]')) {
+            pinTableManagerState.filter = event.target.value || 'pinned';
+            renderPinTableManager();
+        }
+    }
+
+    function onPinTableManagerClick(event) {
+        const overlay = event.currentTarget;
+        if (event.target === overlay) { overlay.classList.remove('att-show'); return; }
+        const item = event.target.closest?.('[data-ptm-key].att-ptm-item');
+        if (item) {
+            pinTableManagerState.selectedKey = item.dataset.ptmKey || '';
+            renderPinTableManager();
+            return;
+        }
+        const btn = event.target.closest?.('[data-ptm-act]');
+        if (!btn) return;
+        const action = btn.dataset.ptmAct || '';
+        const key = btn.dataset.ptmKey || pinTableManagerState.selectedKey || '';
+        if (action === 'close') { overlay.classList.remove('att-show'); return; }
+        if (action === 'reapply-current') { scheduleApplyPinnedColumns(0); showToast('已重新应用当前表置顶设置'); return; }
+        if (action === 'field-side') {
+            const fieldId = btn.dataset.fieldId || '';
+            const side = btn.dataset.side || 'none';
+            if (!fieldId || !['left','right','none'].includes(side)) return;
+            mutateManagedPinnedProfile(key, profile => {
+                profile.left = (profile.left || []).filter(id => id !== fieldId);
+                profile.right = (profile.right || []).filter(id => id !== fieldId);
+                if (side === 'left') profile.left.push(fieldId);
+                if (side === 'right') profile.right.push(fieldId);
+            });
+            return;
+        }
+        if (action === 'clear-field-width') {
+            const fieldId = btn.dataset.fieldId || '';
+            if (!fieldId) return;
+            mutateManagedPinnedProfile(key, profile => { if (profile.widths) delete profile.widths[fieldId]; });
+            return;
+        }
+        if (action === 'clear-profile-pins') {
+            if (!confirm('清除这张表保存的全部左 / 右置顶方向吗？\n列宽记忆会保留。')) return;
+            mutateManagedPinnedProfile(key, profile => { profile.left = []; profile.right = []; });
+            showToast('已清除该表置顶方向');
+            return;
+        }
+        if (action === 'clear-profile-widths') {
+            if (!confirm('清除这张表全部置顶列列宽记忆吗？\n置顶方向会保留。')) return;
+            mutateManagedPinnedProfile(key, profile => { profile.widths = {}; });
+            showToast('已清除该表列宽记忆');
+            return;
+        }
+        if (action === 'delete-profile') {
+            if (!confirm('删除这张表整份置顶配置吗？\n左右置顶方向和列宽记忆都会删除。')) return;
+            delete state.pinnedTableProfiles[key];
+            persistCore();
+            refreshPinnedManagerCurrentTable(key);
+            renderPinTableManager();
+            showToast('该表置顶配置已删除');
+            return;
+        }
+        if (action === 'clear-all-pins') {
+            const count = Object.values(state.pinnedTableProfiles || {}).filter(p => getPinnedProfileStats(p).pinned > 0).length;
+            if (!count) { showToast('当前没有保存的置顶方向'); return; }
+            if (!confirm(`确定清除 ${count} 张表的全部左 / 右置顶方向吗？\n所有列宽记忆将保留。`)) return;
+            Object.values(state.pinnedTableProfiles || {}).forEach(profile => { profile.left = []; profile.right = []; profile.updatedAt = Date.now(); });
+            for (const [profileKey, profile] of Object.entries(state.pinnedTableProfiles || {})) {
+                const stats = getPinnedProfileStats(profile); if (stats.pinned <= 0 && stats.widths <= 0) delete state.pinnedTableProfiles[profileKey];
+            }
+            persistCore();
+            const context = getCurrentTableContext(); if (context) { clearPinnedColumns(context.root); scheduleApplyPinnedColumns(0); }
+            renderPinTableManager(); if (state.panelOpen && state.activeTab === 'pinning') renderPinningSection();
+            showToast('已清除所有表的置顶方向');
+            return;
+        }
+        if (action === 'delete-all-profiles') {
+            const count = Object.keys(state.pinnedTableProfiles || {}).length;
+            if (!count) { showToast('当前没有保存的置顶配置'); return; }
+            if (!confirm(`确定删除全部 ${count} 张表的置顶配置吗？\n左右置顶方向和列宽记忆都会删除。`)) return;
+            if (!confirm('最后确认：删除后只能通过之前导出的全部设置备份恢复。继续吗？')) return;
+            state.pinnedTableProfiles = {};
+            persistCore();
+            const context = getCurrentTableContext(); if (context) clearPinnedColumns(context.root);
+            renderPinTableManager(); if (state.panelOpen && state.activeTab === 'pinning') renderPinningSection();
+            showToast('已删除全部置顶表配置');
+        }
+    }
+
+    function openPinTableManager() {
+        const overlay = ensurePinTableManager();
+        const currentKey = getCurrentTableContext()?.key || '';
+        const currentProfile = currentKey ? state.pinnedTableProfiles?.[currentKey] : null;
+        if (currentProfile && getPinnedProfileStats(currentProfile).pinned > 0) pinTableManagerState.selectedKey = currentKey;
+        renderPinTableManager();
+        overlay.classList.add('att-show');
+    }
+
     function renderPinningSection() {
         const section = document.querySelector('[data-section="pinning"]');
         if (!section) return;
@@ -11161,6 +11553,7 @@
                         <div class="att-actions" style="margin-top:7px;">
                             <span class="att-kbd">开关：${escapeHtml(state.hotkeys.toggleColumnPin || '未设置')}</span>
                             <span class="att-kbd">打开设置：${escapeHtml(state.hotkeys.openPinSettings || '未设置')}</span>
+                            <button type="button" class="att-btn" data-act="open-pin-table-manager">管理全部置顶表</button>
                         </div>
                         </div>
                         <label class="att-switch">
@@ -11303,6 +11696,8 @@
                     <button type="button" class="att-btn" data-act="reapply-pins">重新应用</button>
                     <button type="button" class="att-btn" data-act="clear-pin-width-memory">清除列宽记忆</button>
                     <button type="button" class="att-btn" data-act="clear-table-pins">清空当前表</button>
+                    <button type="button" class="att-btn att-primary" data-act="open-pin-table-manager">管理全部置顶表</button>
+                    <span class="att-kbd">已置顶 ${getAllPinnedProfileSummary().pinnedTables} 表</span>
                 </div>
             </div>
 
@@ -12003,6 +12398,10 @@
                 }
                 break;
             }
+
+            case 'open-pin-table-manager':
+                openPinTableManager();
+                break;
 
             case 'reapply-pins':
                 scheduleApplyPinnedColumns(0);
@@ -27098,7 +27497,7 @@
 
 
 /* ============================================================================
- * AutoTable 悬浮菜单信息架构与体验优化 V7.9.0
+ * AutoTable 悬浮菜单信息架构与体验优化 V7.9.1
  * --------------------------------------------------------------------------
  * - 快捷页：当前上下文 -> 四个高频操作 -> 常用状态 -> 智能复制；
  * - 设置页：六个分区 + sticky 快速导航；
@@ -27182,5 +27581,5 @@
         }
     `;
     document.documentElement.appendChild(style);
-    console.log('[AutoTable 工具集 V7.9.0] 悬浮菜单布局优化已加载：快捷操作聚合 / 设置分区导航 / 文档 Tab 顺序优化');
+    console.log('[AutoTable 工具集 V7.9.1] 悬浮菜单布局优化已加载：快捷操作聚合 / 设置分区导航 / 文档 Tab 顺序优化');
 })();
