@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.11.2
+// @version      7.11.3
 // @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、紧凑可展开的全视图模糊搜索记录、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.11.2
+ * AutoTable 工具集 V7.11.3
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，整行上下强调边缘可独立配置，支持快捷开关）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -44,7 +44,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.11.2',
+        version: 'V7.11.3',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -27761,12 +27761,12 @@
         }
     `;
     document.documentElement.appendChild(style);
-    console.log('[AutoTable 工具集 V7.11.2] 悬浮菜单布局优化已加载：快捷操作聚合 / 设置分区导航 / 文档 Tab 顺序优化');
+    console.log('[AutoTable 工具集 V7.11.3] 悬浮菜单布局优化已加载：快捷操作聚合 / 设置分区导航 / 文档 Tab 顺序优化');
 })();
 
 
 /* ============================================================================
- * AutoTable 全视图模糊搜索记录 V7.11.2
+ * AutoTable 全视图模糊搜索记录 V7.11.3
  * --------------------------------------------------------------------------
  * 1) 搜索框下方默认使用更紧凑的历史层，支持列表 / 胶囊自动填充两种展示；
  * 2) 可调历史文字大小；每个视图最大保存条数继续独立控制；
@@ -27777,13 +27777,14 @@
  * 7) V7.11.1 二阶段性能优化：历史索引缓存、下拉固定 DOM 骨架、展开/管理分块渲染；
  * 8) 搜索记录 GM 写入改为短延迟批处理，pagehide / 切后台时强制落盘，减少关键路径同步写入；
  * 9) Observer 去自循环、输入/定位 RAF 合并继续保留；所有新增设置自动进入“全部设置导出 / 导入 / 重置”；
- * 10) V7.11.2 首次打开采用“隐藏测量 → 一次定位 → 可见”，并对 React 重复 focusin 做渲染签名去重，消除搜索历史层双闪。
+ * 10) V7.11.2 首次打开采用隐藏测量定位；
+ * 11) V7.11.3 紧凑历史层改为零尺寸动画 + 双 RAF 等待原生焦点布局稳定 + 重复 focus 不再二次定位。
  * ========================================================================== */
 (function () {
     'use strict';
 
     const SH = {
-        version: 'V7.11.2',
+        version: 'V7.11.3',
         enabledKey: 'att_v3_viewSearchHistoryEnabled',
         maxKey: 'att_v3_viewSearchHistoryMaxPerView',
         perViewKey: 'att_v3_viewSearchHistoryPerViewMode',
@@ -27818,6 +27819,12 @@
     let pendingDropdownInput = null;
     // V7.11.2：避免首次显示未定位的一帧，以及 React 重挂载 input 时重复重绘。
     let dropdownRenderSignature = '';
+    // V7.11.3：首次打开与重复 focus 的稳定状态。
+    let dropdownOpenedAt = 0;
+    let dropdownLastViewKey = '';
+    let dropdownLastInputValue = '';
+    let dropdownLastGeometry = { width:NaN, left:NaN, top:NaN };
+    let dropdownResizeMotionTimer = 0;
     let settingsEnsureRaf = 0;
     let lastRecordSignature = '';
     let lastRecordAt = 0;
@@ -28017,29 +28024,81 @@
         },true);
         document.body.appendChild(d);return d;
     }
-    function scheduleDropdownRender(input=activeSearchInput){if(!enabled||!input?.isConnected)return;pendingDropdownInput=input;if(dropdownRenderRaf)return;dropdownRenderRaf=requestAnimationFrame(()=>{dropdownRenderRaf=0;const target=pendingDropdownInput;pendingDropdownInput=null;if(target?.isConnected)renderDropdown(target);});}
-    function scheduleDropdownPosition(){const d=document.getElementById(SH.dropdownId);if(!d?.classList.contains('is-open')||!activeSearchInput?.isConnected)return;if(dropdownPositionRaf)return;dropdownPositionRaf=requestAnimationFrame(()=>{dropdownPositionRaf=0;const cur=document.getElementById(SH.dropdownId);if(cur?.classList.contains('is-open')&&activeSearchInput?.isConnected)positionDropdown(activeSearchInput,cur);});}
-    function positionDropdown(input,d=ensureDropdown(),allowMeasure=false){
+    function scheduleDropdownRender(input=activeSearchInput){
+        if(!enabled||!input?.isConnected)return;
+        pendingDropdownInput=input;
+        if(dropdownRenderRaf)return;
+        const run=()=>{
+            dropdownRenderRaf=0;
+            const target=pendingDropdownInput;pendingDropdownInput=null;
+            if(target?.isConnected&&enabled)renderDropdown(target);
+        };
+        // 搜索框刚获得焦点时，AutoTable/React 可能还在同一帧修改 focus 样式或重挂载 input。
+        // 首次打开多等一帧，只影响约 16ms，却避免历史层锚在“中间态”坐标后再跳一次。
+        dropdownRenderRaf=requestAnimationFrame(()=>{
+            dropdownRenderRaf=0;
+            const d=document.getElementById(SH.dropdownId);
+            if(!d?.classList.contains('is-open')){
+                dropdownRenderRaf=requestAnimationFrame(run);
+            }else run();
+        });
+    }
+    function scheduleDropdownPosition(){
+        const d=document.getElementById(SH.dropdownId);
+        if(!d?.classList.contains('is-open')||!activeSearchInput?.isConnected)return;
+        // focus 后浏览器/React 可能产生一次内部 scroll。紧凑层刚出现的 180ms 内忽略这类二次定位，
+        // 避免已经稳定显示后又因 1~2px 的原生焦点布局变化产生肉眼可见的“抖一下”。
+        if(!dropdownExpanded&&performance.now()-dropdownOpenedAt<180)return;
+        if(dropdownPositionRaf)return;
+        dropdownPositionRaf=requestAnimationFrame(()=>{
+            dropdownPositionRaf=0;
+            const cur=document.getElementById(SH.dropdownId);
+            if(cur?.classList.contains('is-open')&&activeSearchInput?.isConnected)positionDropdown(activeSearchInput,cur);
+        });
+    }
+    function positionDropdown(input,d=ensureDropdown(),allowMeasure=false,force=false){
         if(!input?.isConnected)return false;
         if(!allowMeasure&&!d.classList.contains('is-open'))return false;
         const r=input.getBoundingClientRect(),margin=10,gap=5;
         const desired=dropdownExpanded?Math.min(580,Math.max(460,r.width*1.55)):Math.min(420,Math.max(300,r.width));
-        const width=Math.min(desired,window.innerWidth-margin*2);d.style.width=`${Math.round(width)}px`;
+        const width=Math.min(desired,window.innerWidth-margin*2);
         let left=r.right-width;left=Math.max(margin,Math.min(left,window.innerWidth-width-margin));
-        const cap=dropdownExpanded?Math.min(600,window.innerHeight-margin*2):280,measured=Math.min(d.scrollHeight||cap,cap),below=window.innerHeight-r.bottom-margin,above=r.top-margin;
+        // measuring 状态的 scrollHeight 是唯一一次用于决定上下方向的高度。
+        const cap=dropdownExpanded?Math.min(600,window.innerHeight-margin*2):280;
+        const measured=Math.min(d.scrollHeight||cap,cap),below=window.innerHeight-r.bottom-margin,above=r.top-margin;
         let top;if(below>=Math.min(dropdownExpanded?390:170,measured)||below>=above)top=r.bottom+gap;else top=Math.max(margin,r.top-measured-gap);
-        d.style.left=`${Math.round(left)}px`;d.style.top=`${Math.round(top)}px`;
+        const next={width:Math.round(width),left:Math.round(left),top:Math.round(top)};
+        const changed=force || !Number.isFinite(dropdownLastGeometry.width)
+            || Math.abs(next.width-dropdownLastGeometry.width)>=1
+            || Math.abs(next.left-dropdownLastGeometry.left)>=1
+            || Math.abs(next.top-dropdownLastGeometry.top)>=1;
+        if(changed){
+            d.style.width=`${next.width}px`;
+            d.style.left=`${next.left}px`;
+            d.style.top=`${next.top}px`;
+            dropdownLastGeometry=next;
+        }
         return true;
     }
+
     function openDropdownStable(input,d=ensureDropdown()){
-        if(d.classList.contains('is-open')){scheduleDropdownPosition();return;}
-        // 先用不可见但参与布局的 measuring 状态得到最终宽高/坐标。
-        // 整个过程发生在同一 JS task 内，浏览器第一次 paint 时已经是最终位置。
-        d.classList.add('is-measuring');
-        positionDropdown(input,d,true);
+        if(d.classList.contains('is-open'))return;
+        // 紧凑历史层首次出现绝不做尺寸过渡：隐藏测量 → 最终坐标 → 直接显示。
+        d.classList.add('is-measuring','is-opening-stable');
+        positionDropdown(input,d,true,true);
         d.classList.add('is-open');
         d.classList.remove('is-measuring');
+        dropdownOpenedAt=performance.now();
+        // 跨过两个 paint 后再解除稳定类；此时 width/left/top 已经完全固定。
+        requestAnimationFrame(()=>requestAnimationFrame(()=>d.classList.remove('is-opening-stable')));
     }
+
+    function enableDropdownResizeMotion(d=ensureDropdown()){
+        clearTimeout(dropdownResizeMotionTimer);
+        d.classList.add('allow-resize-motion');
+        dropdownResizeMotionTimer=setTimeout(()=>d.classList.remove('allow-resize-motion'),320);
+    }
+
 
     function renderCompactItems(items,input){
         if(!items.length)return `<div class="shd-empty">${cleanText(input.value)?'历史记录中没有匹配项':'暂无搜索记录'}<span>${scopeLabel()}的搜索会显示在这里</span></div>`;
@@ -28070,13 +28129,27 @@
             if(dropdownExpanded)renderExpandedList(true);
             dropdownRenderSignature=signature;
         }
+        dropdownLastViewKey=ctx.key;
+        dropdownLastInputValue=cleanText(input.value||'');
         openDropdownStable(input,d);
     }
-    function hideDropdown(){const d=document.getElementById(SH.dropdownId);d?.classList.remove('is-open','is-expanded','is-measuring');dropdownExpanded=false;expandedFilter='';expandedRenderLimit=EXPANDED_CHUNK;clearTimeout(expandedFilterTimer);}
+    function hideDropdown(){
+        const d=document.getElementById(SH.dropdownId);
+        if(dropdownRenderRaf){cancelAnimationFrame(dropdownRenderRaf);dropdownRenderRaf=0;}
+        pendingDropdownInput=null;
+        clearTimeout(dropdownResizeMotionTimer);dropdownResizeMotionTimer=0;
+        d?.classList.remove('is-open','is-expanded','is-measuring','is-opening-stable','allow-resize-motion');
+        dropdownExpanded=false;expandedFilter='';expandedRenderLimit=EXPANDED_CHUNK;clearTimeout(expandedFilterTimer);
+        dropdownLastGeometry={width:NaN,left:NaN,top:NaN};
+    }
     function onDropdownClick(event){
         const action=event.target.closest('[data-sh-act]')?.dataset.shAct;
-        if(action==='expand-all'){dropdownExpanded=true;expandedFilter='';expandedRenderLimit=EXPANDED_CHUNK;renderDropdown(activeSearchInput);const f=ensureDropdown().querySelector('[data-sh-expanded-filter]');if(f)f.value='';return;}
-        if(action==='collapse'){dropdownExpanded=false;expandedFilter='';renderDropdown(activeSearchInput);return;}
+        if(action==='expand-all'){
+            const d=ensureDropdown();enableDropdownResizeMotion(d);dropdownExpanded=true;expandedFilter='';expandedRenderLimit=EXPANDED_CHUNK;renderDropdown(activeSearchInput);positionDropdown(activeSearchInput,d,false,true);const f=d.querySelector('[data-sh-expanded-filter]');if(f)f.value='';return;
+        }
+        if(action==='collapse'){
+            const d=ensureDropdown();enableDropdownResizeMotion(d);dropdownExpanded=false;expandedFilter='';renderDropdown(activeSearchInput);positionDropdown(activeSearchInput,d,false,true);return;
+        }
         if(action==='open-manager'){openManager();return;}
         if(action==='clear-current'){const c=getCurrentViewContext();if(historyData[c.key]&&confirm(`清空“${c.viewName}”的搜索记录吗？`))clearViewHistory(c.key);return;}
         if(action==='delete'){const b=event.target.closest('[data-sh-act="delete"]');removeHistoryItem(b?.dataset.shViewKey||'',b?.dataset.shQueryDelete||'');return;}
@@ -28139,7 +28212,16 @@
     }
 
     function bindSearchEvents(){
-        document.addEventListener('focusin',e=>{if(!isViewSearchInput(e.target))return;activeSearchInput=e.target;if(enabled)scheduleDropdownRender(activeSearchInput);},true);
+        document.addEventListener('focusin',e=>{
+            if(!isViewSearchInput(e.target))return;
+            activeSearchInput=e.target;
+            if(!enabled)return;
+            const d=document.getElementById(SH.dropdownId),ctx=getCurrentViewContext(),value=cleanText(e.target.value||'');
+            // React 在一次点击中重挂载 input 时，只更新 activeSearchInput 引用。
+            // 200ms 内同一视图+同一搜索词不做第二次 render/position。
+            if(d?.classList.contains('is-open')&&performance.now()-dropdownOpenedAt<200&&ctx.key===dropdownLastViewKey&&value===dropdownLastInputValue)return;
+            scheduleDropdownRender(activeSearchInput);
+        },true);
         document.addEventListener('input',e=>{if(!isViewSearchInput(e.target))return;activeSearchInput=e.target;if(enabled){dropdownExpanded=false;expandedFilter='';scheduleDropdownRender(activeSearchInput);}},true);
         document.addEventListener('keydown',e=>{if(!isViewSearchInput(e.target))return;if(e.key==='Enter'){recordSearch(e.target.value);hideDropdown();}if(e.key==='Escape')hideDropdown();},true);
         document.addEventListener('focusout',e=>{if(!isViewSearchInput(e.target))return;const input=e.target;setTimeout(()=>{const d=document.getElementById(SH.dropdownId);if(dropdownPointerDown||d?.contains(document.activeElement))return;recordSearch(input.value);if(document.activeElement!==input)hideDropdown();},120);},true);
@@ -28149,7 +28231,7 @@
 
     function ensureStyle(){
         if(document.getElementById(SH.styleId))return;const st=document.createElement('style');st.id=SH.styleId;st.textContent=`
-        #${SH.dropdownId}{--att-sh-font-size:12px;position:fixed;z-index:2147482600;display:none;max-height:280px;overflow:hidden;background:#202124;color:#e8eaed;border:1px solid #414348;border-radius:9px;box-shadow:0 12px 34px rgba(0,0,0,.38);font-family:inherit;font-size:var(--att-sh-font-size);line-height:1.35;transition:width .22s cubic-bezier(.22,.61,.36,1),max-height .24s cubic-bezier(.22,.61,.36,1),box-shadow .2s ease;transform-origin:top right;}
+        #${SH.dropdownId}{--att-sh-font-size:12px;position:fixed;z-index:2147482600;display:none;max-height:280px;overflow:hidden;background:#202124;color:#e8eaed;border:1px solid #414348;border-radius:9px;box-shadow:0 12px 34px rgba(0,0,0,.38);font-family:inherit;font-size:var(--att-sh-font-size);line-height:1.35;transition:none;transform-origin:top right;will-change:auto;} #${SH.dropdownId}.is-opening-stable{transition:none!important;} #${SH.dropdownId}.allow-resize-motion{transition:width .22s cubic-bezier(.22,.61,.36,1),max-height .24s cubic-bezier(.22,.61,.36,1),box-shadow .2s ease;}
         #${SH.dropdownId}.is-measuring{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;visibility:hidden!important;pointer-events:none!important;transition:none!important;} #${SH.dropdownId}.is-open{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;} #${SH.dropdownId}.is-expanded{max-height:min(600px,calc(100vh - 22px));box-shadow:0 18px 48px rgba(0,0,0,.46);}
         #${SH.dropdownId} button,#${SH.dropdownId} input{font:inherit;} #${SH.dropdownId} .shd-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px 6px;border-bottom:1px solid #34363a;} #${SH.dropdownId} .shd-head>div{min-width:0;display:flex;align-items:center;gap:6px;} #${SH.dropdownId} .shd-head b{font-size:1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-head span{color:#868b92;font-size:.82em;white-space:nowrap;} #${SH.dropdownId} .shd-head button{border:0;background:transparent;color:#8ab4f8;padding:2px 4px;cursor:pointer;border-radius:4px;}
         #${SH.dropdownId} .shd-list{min-height:0;max-height:166px;overflow:auto;padding:3px 4px;scrollbar-gutter:stable;} #${SH.dropdownId}.is-capsule .shd-list{max-height:148px;padding:6px;}
@@ -28171,6 +28253,6 @@
         window.addEventListener('pagehide',flushHistoryPersist,{capture:true});
         document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushHistoryPersist();},{passive:true});
     }
-    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();bindPersistLifecycle();buildHistoryIndex();console.log('[AutoTable 工具集 V7.11.2] 已加载：历史索引缓存 / 首次隐藏测量定位 / 重复 focus 渲染去重 / 分块渲染 / GM 写入批处理');}
+    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();bindPersistLifecycle();buildHistoryIndex();console.log('[AutoTable 工具集 V7.11.3] 已加载：零尺寸动画打开 / 双 RAF 焦点稳定 / React 重复 focus 去重 / 几何差异写入 / 分块渲染 / GM 批处理');}
     if(document.body)init();else window.addEventListener('DOMContentLoaded',init,{once:true});
 })();
