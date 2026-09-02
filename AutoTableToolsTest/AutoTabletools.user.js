@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.13.0
+// @version      7.13.1
 // @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、可配置正式记录条件、胶囊智能补位的紧凑可展开全视图搜索记录与搜索栏内置清空、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.13.0
+ * AutoTable 工具集 V7.13.1
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，整行上下强调边缘可独立配置，支持快捷开关）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -33,7 +33,7 @@
  * - 文档：原生风格大纲、滚动跟随、查找/替换/定位、正则表达式与高亮
  * - 界面：可隐藏关联字段复制按钮，并释放按钮原先占用的文字空间
  * - 悬浮菜单：V7.9 重整为“快捷 / 字段 / 置顶 / 文档 / 设置”，快捷页聚合高频操作，设置页提供分区导航与合理功能归类
- * - 搜索：全视图模糊搜索支持可配置正式记录条件、紧凑历史层、列表/胶囊智能补位、字体大小、同表视图互通、原位丝滑展开全部记录、独立搜索记录管理面板及搜索栏内置 X 清空优化
+ * - 搜索：全视图模糊搜索支持可配置正式记录条件、紧凑历史层、列表/胶囊智能补位、胶囊删除按钮显示开关、字体大小、同表视图互通、原位丝滑展开全部记录、独立搜索记录管理面板及搜索栏内置 X 清空优化
  * - 设置：支持字段条件高亮规则中心；全部工具配置 JSON 备份、跨版本导入恢复与全部重置；导入/重置后统一刷新确保各独立模块同步生效
  * - 渲染：按真实行号稳定斑马纹；虚拟滚动增量渲染；聚焦行/字段分别保存稳定身份；横向虚拟化时绝不回退到其它字段；编辑与置顶表头保持稳定层级；置顶表头高亮使用不透明底层防止滚动表头穿透
  * - 置顶：右置顶严格镜像；“+ 添加列”保持 AutoTable 原生末端位置，不参与置顶 sticky/offset
@@ -44,7 +44,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.13.0',
+        version: 'V7.13.1',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -27761,12 +27761,12 @@
         }
     `;
     document.documentElement.appendChild(style);
-    console.log('[AutoTable 工具集 V7.13.0] 悬浮菜单布局优化已加载：快捷操作聚合 / 设置分区导航 / 文档 Tab 顺序优化');
+    console.log('[AutoTable 工具集 V7.13.1] 悬浮菜单布局优化已加载：快捷操作聚合 / 设置分区导航 / 文档 Tab 顺序优化');
 })();
 
 
 /* ============================================================================
- * AutoTable 全视图模糊搜索记录与搜索栏清空优化 V7.13.0
+ * AutoTable 全视图模糊搜索记录与搜索栏清空优化 V7.13.1
  * --------------------------------------------------------------------------
  * 1) 搜索框下方默认使用更紧凑的历史层，支持列表 / 胶囊自动填充两种展示；
  * 2) 可调历史文字大小；每个视图最大保存条数继续独立控制；
@@ -27783,18 +27783,20 @@
  * 13) V7.12.1 基于最新组件抓取改为精准 toolbar / 搜索状态驱动：缓存搜索输入与状态 chip、减少全页扫描、按原生搜索状态落历史，并避免表格内部滚动触发无意义定位。
  * 14) V7.13.0 正式历史记录条件可配置：原生搜索生效 / Enter / 失焦 / 停止输入可独立组合；停止输入延迟可调。
  * 15) V7.13.0 胶囊模式改为“按行智能补位”：保持时间顺序，不重排历史；每行多个胶囊自动分配剩余宽度，删除 / 字号 / 窗口尺寸变化后自动重算。
+ * 16) V7.13.1 新增胶囊删除按钮显示开关：关闭后不生成胶囊内 × 节点，并按真实胶囊宽度重新补位；列表 / 展开 / 管理器删除能力不受影响。
  * ========================================================================== */
 (function () {
     'use strict';
 
     const SH = {
-        version: 'V7.13.0',
+        version: 'V7.13.1',
         enabledKey: 'att_v3_viewSearchHistoryEnabled',
         maxKey: 'att_v3_viewSearchHistoryMaxPerView',
         perViewKey: 'att_v3_viewSearchHistoryPerViewMode',
         dataKey: 'att_v3_viewSearchHistoryData',
         fontSizeKey: 'att_v3_viewSearchHistoryFontSize',
         layoutKey: 'att_v3_viewSearchHistoryLayoutMode',
+        capsuleDeleteKey: 'att_v3_viewSearchHistoryCapsuleDeleteVisible',
         sameTableShareKey: 'att_v3_viewSearchHistorySameTableShare',
         clearOptimizeKey: 'att_v3_viewSearchClearOptimizeEnabled',
         commitPolicyKey: 'att_v3_viewSearchHistoryCommitPolicy',
@@ -27817,6 +27819,7 @@
     let clearOptimizeEnabled = Boolean(GM_getValue(SH.clearOptimizeKey, false));
     let historyFontSize = normalizeFontSize(GM_getValue(SH.fontSizeKey, 12));
     let layoutMode = normalizeLayout(GM_getValue(SH.layoutKey, 'list'));
+    let capsuleDeleteVisible = GM_getValue(SH.capsuleDeleteKey, true) !== false;
     let commitPolicy = normalizeCommitPolicy(GM_getValue(SH.commitPolicyKey, null));
     let idleCommitDelay = normalizeIdleCommitDelay(GM_getValue(SH.idleCommitDelayKey, 900));
     let historyData = normalizeHistoryData(GM_getValue(SH.dataKey, {}));
@@ -28441,7 +28444,7 @@
 
     function renderCompactItems(items,input){
         if(!items.length)return `<div class="shd-empty">${cleanText(input.value)?'历史记录中没有匹配项':'暂无搜索记录'}<span>${scopeLabel()}的搜索会显示在这里</span></div>`;
-        if(layoutMode==='capsule')return `<div class="shd-capsules">${items.map(i=>`<span class="shd-chip"><button type="button" class="shd-chip-main" data-sh-query="${escAttr(i.query)}" title="${escAttr(i.query)}">${escHtml(i.query)}</button><button type="button" class="shd-chip-del" data-sh-act="delete" data-sh-query-delete="${escAttr(i.query)}" data-sh-view-key="${escAttr(i.viewKey)}" title="删除">×</button></span>`).join('')}</div>`;
+        if(layoutMode==='capsule')return `<div class="shd-capsules">${items.map(i=>`<span class="shd-chip"><button type="button" class="shd-chip-main" data-sh-query="${escAttr(i.query)}" title="${escAttr(i.query)}">${escHtml(i.query)}</button>${capsuleDeleteVisible?`<button type="button" class="shd-chip-del" data-sh-act="delete" data-sh-query-delete="${escAttr(i.query)}" data-sh-view-key="${escAttr(i.viewKey)}" title="删除">×</button>`:''}</span>`).join('')}</div>`;
         return items.map(i=>`<div class="shd-item" data-sh-query="${escAttr(i.query)}"><span class="shd-clock">↺</span><div class="shd-main"><div class="shd-query">${escHtml(i.query)}</div>${(sameTableShare||!perViewMode)?`<div class="shd-source">${escHtml(i.tableName)} · ${escHtml(i.viewName)}</div>`:''}</div><span class="shd-time">${escHtml(formatTime(i.ts,true))}</span><button type="button" class="shd-del" data-sh-act="delete" data-sh-query-delete="${escAttr(i.query)}" data-sh-view-key="${escAttr(i.viewKey)}" title="删除">×</button></div>`).join('');
     }
     function expandedRowHtml(i){return `<div class="shd-expanded-item"><button type="button" class="shd-expanded-use" data-sh-query="${escAttr(i.query)}"><b>${escHtml(i.query)}</b><span>${escHtml(i.tableName)} · ${escHtml(i.viewName)} · ${escHtml(formatTime(i.ts))}</span></button><button type="button" class="shd-del" data-sh-act="delete" data-sh-query-delete="${escAttr(i.query)}" data-sh-view-key="${escAttr(i.viewKey)}">×</button></div>`;}
@@ -28456,7 +28459,7 @@
     function renderDropdown(input=activeSearchInput){
         const d=ensureDropdown();if(!enabled||!input?.isConnected||!isViewSearchInput(input)){hideDropdown();return;}activeSearchInput=input;
         const ctx=getCurrentViewContext(),scopeRows=getScopeRows(),total=scopeRows.length;
-        const signature=[ctx.key,cleanText(input.value||''),historyRevision,perViewMode?1:0,sameTableShare?1:0,layoutMode,historyFontSize,dropdownExpanded?1:0,expandedFilter].join('\u001f');
+        const signature=[ctx.key,cleanText(input.value||''),historyRevision,perViewMode?1:0,sameTableShare?1:0,layoutMode,capsuleDeleteVisible?1:0,historyFontSize,dropdownExpanded?1:0,expandedFilter].join('\u001f');
         const sameRender=signature===dropdownRenderSignature;
         if(!sameRender){
             dropdownMeasuredHeight=0;
@@ -28545,6 +28548,7 @@
         <div class="att-label" style="margin-top:9px;">停止输入判定时间</div><div class="att-sh-range-row-v7110"><input type="range" min="300" max="3000" step="100" value="${idleCommitDelay}" data-sh-setting="idleCommitDelay" ${commitPolicy.idle?'':'disabled'}><b data-sh-idle-delay-value>${idleCommitDelay}ms</b></div>
         <div class="att-divider"></div>
         <div class="att-label" style="margin-top:9px;">搜索记录展示</div><div class="att-sh-layout-row-v7110"><button type="button" data-sh-layout="list">列表</button><button type="button" data-sh-layout="capsule">胶囊自动填充</button></div>
+        <div class="att-row" style="margin-top:8px;"><div><div class="att-label">胶囊显示删除按钮</div><div class="att-sub-label">仅控制胶囊右侧 ×；关闭后胶囊更紧凑，列表、展开全部和管理面板仍可删除记录。</div></div><label class="att-switch"><input type="checkbox" data-sh-setting="capsuleDeleteVisible" ${capsuleDeleteVisible?'checked':''}><span class="att-slider"></span></label></div>
         <div class="att-label" style="margin-top:10px;">搜索记录字体大小</div><div class="att-sh-range-row-v7110"><input type="range" min="10" max="16" step="1" value="${historyFontSize}" data-sh-setting="fontSize"><b data-sh-font-value>${historyFontSize}px</b></div>
         <div class="att-label" style="margin-top:10px;">每个视图最多保存</div><div class="att-sh-range-row-v7110"><input type="range" min="3" max="100" step="1" value="${maxPerView}" data-sh-setting="maxPerView"><b data-sh-max-value>${maxPerView} 条</b></div>
         <div class="att-sub-label">条数只限制每个视图自己的存储；同表互通不会额外复制记录。</div>
@@ -28553,7 +28557,7 @@
     function updateSettingsCard(){
         const c=document.getElementById(SH.settingsCardId);if(!c)return;
         const set=(q,v)=>{const e=c.querySelector(q);if(e)e.checked=v;};
-        set('[data-sh-setting="clearOptimize"]',clearOptimizeEnabled);set('[data-sh-setting="enabled"]',enabled);set('[data-sh-setting="perViewMode"]',perViewMode);set('[data-sh-setting="sameTableShare"]',sameTableShare);
+        set('[data-sh-setting="clearOptimize"]',clearOptimizeEnabled);set('[data-sh-setting="enabled"]',enabled);set('[data-sh-setting="perViewMode"]',perViewMode);set('[data-sh-setting="sameTableShare"]',sameTableShare);set('[data-sh-setting="capsuleDeleteVisible"]',capsuleDeleteVisible);
         c.querySelectorAll('[data-sh-commit-source]').forEach(i=>{i.checked=Boolean(commitPolicy[i.dataset.shCommitSource]);});
         const idle=c.querySelector('[data-sh-setting="idleCommitDelay"]');if(idle){idle.value=idleCommitDelay;idle.disabled=!commitPolicy.idle;}
         const idv=c.querySelector('[data-sh-idle-delay-value]');if(idv)idv.textContent=`${idleCommitDelay}ms`;
@@ -28570,6 +28574,7 @@
             if(k==='enabled'){enabled=i.checked;GM_setValue(SH.enabledKey,enabled);if(!enabled){clearIdleCommitTimer();hideDropdown();}}
             if(k==='perViewMode'){perViewMode=i.checked;GM_setValue(SH.perViewKey,perViewMode);scopeRowsCache={revision:0,key:'',rows:[]};}
             if(k==='sameTableShare'){sameTableShare=i.checked;GM_setValue(SH.sameTableShareKey,sameTableShare);scopeRowsCache={revision:0,key:'',rows:[]};}
+            if(k==='capsuleDeleteVisible'){capsuleDeleteVisible=i.checked;GM_setValue(SH.capsuleDeleteKey,capsuleDeleteVisible);dropdownRenderSignature='';}
             if(k==='idleCommitDelay'){idleCommitDelay=normalizeIdleCommitDelay(i.value);GM_setValue(SH.idleCommitDelayKey,idleCommitDelay);if(activeSearchInput?.isConnected&&commitPolicy.idle)scheduleIdleSearchCommit(activeSearchInput);}
             if(k==='maxPerView'){maxPerView=normalizeMax(i.value);GM_setValue(SH.maxKey,maxPerView);trimAllProfiles();saveHistoryData();}
             if(k==='fontSize'){historyFontSize=normalizeFontSize(i.value);GM_setValue(SH.fontSizeKey,historyFontSize);}
@@ -28747,6 +28752,6 @@
         window.addEventListener('pagehide',()=>{clearIdleCommitTimer();flushHistoryPersist();},{capture:true});
         document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){clearIdleCommitTimer();flushHistoryPersist();}},{passive:true});
     }
-    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();attachSearchClearToolbarObserver();bindPersistLifecycle();buildHistoryIndex();applySearchClearOptimizeState();console.log('[AutoTable 工具集 V7.13.0] 已加载：正式历史提交策略 / 胶囊智能补位 / 精准 toolbar 状态 / 内置 X / 零跳动历史层 / 分块渲染 / GM 批处理');}
+    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();attachSearchClearToolbarObserver();bindPersistLifecycle();buildHistoryIndex();applySearchClearOptimizeState();console.log('[AutoTable 工具集 V7.13.1] 已加载：正式历史提交策略 / 胶囊智能补位 / 胶囊删除按钮开关 / 精准 toolbar 状态 / 内置 X / 零跳动历史层 / 分块渲染 / GM 批处理');}
     if(document.body)init();else window.addEventListener('DOMContentLoaded',init,{once:true});
 })();
