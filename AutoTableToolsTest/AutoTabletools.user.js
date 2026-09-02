@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.13.1
+// @version      7.13.2
 // @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、可配置正式记录条件、胶囊智能补位的紧凑可展开全视图搜索记录与搜索栏内置清空、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.13.1
+ * AutoTable 工具集 V7.13.2
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，整行上下强调边缘可独立配置，支持快捷开关）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -44,7 +44,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.13.1',
+        version: 'V7.13.2',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -27784,6 +27784,7 @@
  * 14) V7.13.0 正式历史记录条件可配置：原生搜索生效 / Enter / 失焦 / 停止输入可独立组合；停止输入延迟可调。
  * 15) V7.13.0 胶囊模式改为“按行智能补位”：保持时间顺序，不重排历史；每行多个胶囊自动分配剩余宽度，删除 / 字号 / 窗口尺寸变化后自动重算。
  * 16) V7.13.1 新增胶囊删除按钮显示开关：关闭后不生成胶囊内 × 节点，并按真实胶囊宽度重新补位；列表 / 展开 / 管理器删除能力不受影响。
+ * 17) V7.13.2 新增“紧凑搜索记录显示全部”开关：列表与胶囊均可取消前 8 / 14 条限制，剩余记录在原历史区域内部滚动查看。
  * ========================================================================== */
 (function () {
     'use strict';
@@ -27797,6 +27798,7 @@
         fontSizeKey: 'att_v3_viewSearchHistoryFontSize',
         layoutKey: 'att_v3_viewSearchHistoryLayoutMode',
         capsuleDeleteKey: 'att_v3_viewSearchHistoryCapsuleDeleteVisible',
+        compactShowAllKey: 'att_v3_viewSearchHistoryCompactShowAll',
         sameTableShareKey: 'att_v3_viewSearchHistorySameTableShare',
         clearOptimizeKey: 'att_v3_viewSearchClearOptimizeEnabled',
         commitPolicyKey: 'att_v3_viewSearchHistoryCommitPolicy',
@@ -27820,6 +27822,7 @@
     let historyFontSize = normalizeFontSize(GM_getValue(SH.fontSizeKey, 12));
     let layoutMode = normalizeLayout(GM_getValue(SH.layoutKey, 'list'));
     let capsuleDeleteVisible = GM_getValue(SH.capsuleDeleteKey, true) !== false;
+    let compactShowAll = GM_getValue(SH.compactShowAllKey, false) === true;
     let commitPolicy = normalizeCommitPolicy(GM_getValue(SH.commitPolicyKey, null));
     let idleCommitDelay = normalizeIdleCommitDelay(GM_getValue(SH.idleCommitDelayKey, 900));
     let historyData = normalizeHistoryData(GM_getValue(SH.dataKey, {}));
@@ -28280,7 +28283,9 @@
         }
         return out;
     }
-    function getDisplayItems(inputValue=''){return queryIndexedRows(getScopeRows(),{filter:inputValue,dedupe:true,limit:layoutMode==='capsule'?14:8});}
+    function compactDisplayLimit(){ return compactShowAll ? Infinity : (layoutMode==='capsule' ? 14 : 8); }
+    function compactDisplayStatus(){ return compactShowAll ? '全部' : `显示前${layoutMode==='capsule'?14:8}`; }
+    function getDisplayItems(inputValue=''){return queryIndexedRows(getScopeRows(),{filter:inputValue,dedupe:true,limit:compactDisplayLimit()});}
     function getAllItems(filter=''){return queryIndexedRows(buildHistoryIndex().allRows,{filter,dedupe:false});}
 
     function setNativeInputValue(input,value){const d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value');if(d?.set)d.set.call(input,value);else input.value=value;input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}));}
@@ -28459,13 +28464,13 @@
     function renderDropdown(input=activeSearchInput){
         const d=ensureDropdown();if(!enabled||!input?.isConnected||!isViewSearchInput(input)){hideDropdown();return;}activeSearchInput=input;
         const ctx=getCurrentViewContext(),scopeRows=getScopeRows(),total=scopeRows.length;
-        const signature=[ctx.key,cleanText(input.value||''),historyRevision,perViewMode?1:0,sameTableShare?1:0,layoutMode,capsuleDeleteVisible?1:0,historyFontSize,dropdownExpanded?1:0,expandedFilter].join('\u001f');
+        const signature=[ctx.key,cleanText(input.value||''),historyRevision,perViewMode?1:0,sameTableShare?1:0,layoutMode,capsuleDeleteVisible?1:0,compactShowAll?1:0,historyFontSize,dropdownExpanded?1:0,expandedFilter].join('\u001f');
         const sameRender=signature===dropdownRenderSignature;
         if(!sameRender){
             dropdownMeasuredHeight=0;
             const items=getDisplayItems(input.value||'');
             d.style.setProperty('--att-sh-font-size',`${historyFontSize}px`);d.classList.toggle('is-expanded',dropdownExpanded);d.classList.toggle('is-capsule',layoutMode==='capsule');
-            const head=d.querySelector('[data-shd-head]');if(head)head.innerHTML=`<div><b>${escHtml(scopeLabel()==='当前视图'?ctx.viewName:scopeLabel())}</b><span>${total} 条 · ${layoutMode==='capsule'?'胶囊':'列表'}</span></div>${perViewMode&&!sameTableShare&&historyData[ctx.key]?.items?.length?'<button type="button" data-sh-act="clear-current">清空</button>':''}`;
+            const head=d.querySelector('[data-shd-head]');if(head)head.innerHTML=`<div><b>${escHtml(scopeLabel()==='当前视图'?ctx.viewName:scopeLabel())}</b><span>${total} 条 · ${layoutMode==='capsule'?'胶囊':'列表'} · ${compactDisplayStatus()}</span></div>${perViewMode&&!sameTableShare&&historyData[ctx.key]?.items?.length?'<button type="button" data-sh-act="clear-current">清空</button>':''}`;
             const list=d.querySelector('[data-shd-list]');if(list){list.innerHTML=renderCompactItems(items,input);if(layoutMode==='capsule')scheduleCapsuleAutoFill(list);}
             const icon=d.querySelector('[data-shd-expand-icon]');if(icon)icon.textContent=dropdownExpanded?'⌄':'›';
             const filter=d.querySelector('[data-sh-expanded-filter]');if(filter&&filter.value!==expandedFilter)filter.value=expandedFilter;
@@ -28549,6 +28554,7 @@
         <div class="att-divider"></div>
         <div class="att-label" style="margin-top:9px;">搜索记录展示</div><div class="att-sh-layout-row-v7110"><button type="button" data-sh-layout="list">列表</button><button type="button" data-sh-layout="capsule">胶囊自动填充</button></div>
         <div class="att-row" style="margin-top:8px;"><div><div class="att-label">胶囊显示删除按钮</div><div class="att-sub-label">仅控制胶囊右侧 ×；关闭后胶囊更紧凑，列表、展开全部和管理面板仍可删除记录。</div></div><label class="att-switch"><input type="checkbox" data-sh-setting="capsuleDeleteVisible" ${capsuleDeleteVisible?'checked':''}><span class="att-slider"></span></label></div>
+        <div class="att-row" style="margin-top:8px;"><div><div class="att-label">紧凑搜索记录显示全部</div><div class="att-sub-label">同时作用于列表和胶囊。关闭时列表显示前 8 条、胶囊显示前 14 条；开启后全部记录在当前历史区域内滚动查看。</div></div><label class="att-switch"><input type="checkbox" data-sh-setting="compactShowAll" ${compactShowAll?'checked':''}><span class="att-slider"></span></label></div>
         <div class="att-label" style="margin-top:10px;">搜索记录字体大小</div><div class="att-sh-range-row-v7110"><input type="range" min="10" max="16" step="1" value="${historyFontSize}" data-sh-setting="fontSize"><b data-sh-font-value>${historyFontSize}px</b></div>
         <div class="att-label" style="margin-top:10px;">每个视图最多保存</div><div class="att-sh-range-row-v7110"><input type="range" min="3" max="100" step="1" value="${maxPerView}" data-sh-setting="maxPerView"><b data-sh-max-value>${maxPerView} 条</b></div>
         <div class="att-sub-label">条数只限制每个视图自己的存储；同表互通不会额外复制记录。</div>
@@ -28557,7 +28563,7 @@
     function updateSettingsCard(){
         const c=document.getElementById(SH.settingsCardId);if(!c)return;
         const set=(q,v)=>{const e=c.querySelector(q);if(e)e.checked=v;};
-        set('[data-sh-setting="clearOptimize"]',clearOptimizeEnabled);set('[data-sh-setting="enabled"]',enabled);set('[data-sh-setting="perViewMode"]',perViewMode);set('[data-sh-setting="sameTableShare"]',sameTableShare);set('[data-sh-setting="capsuleDeleteVisible"]',capsuleDeleteVisible);
+        set('[data-sh-setting="clearOptimize"]',clearOptimizeEnabled);set('[data-sh-setting="enabled"]',enabled);set('[data-sh-setting="perViewMode"]',perViewMode);set('[data-sh-setting="sameTableShare"]',sameTableShare);set('[data-sh-setting="capsuleDeleteVisible"]',capsuleDeleteVisible);set('[data-sh-setting="compactShowAll"]',compactShowAll);
         c.querySelectorAll('[data-sh-commit-source]').forEach(i=>{i.checked=Boolean(commitPolicy[i.dataset.shCommitSource]);});
         const idle=c.querySelector('[data-sh-setting="idleCommitDelay"]');if(idle){idle.value=idleCommitDelay;idle.disabled=!commitPolicy.idle;}
         const idv=c.querySelector('[data-sh-idle-delay-value]');if(idv)idv.textContent=`${idleCommitDelay}ms`;
@@ -28575,6 +28581,7 @@
             if(k==='perViewMode'){perViewMode=i.checked;GM_setValue(SH.perViewKey,perViewMode);scopeRowsCache={revision:0,key:'',rows:[]};}
             if(k==='sameTableShare'){sameTableShare=i.checked;GM_setValue(SH.sameTableShareKey,sameTableShare);scopeRowsCache={revision:0,key:'',rows:[]};}
             if(k==='capsuleDeleteVisible'){capsuleDeleteVisible=i.checked;GM_setValue(SH.capsuleDeleteKey,capsuleDeleteVisible);dropdownRenderSignature='';}
+            if(k==='compactShowAll'){compactShowAll=i.checked;GM_setValue(SH.compactShowAllKey,compactShowAll);dropdownRenderSignature='';}
             if(k==='idleCommitDelay'){idleCommitDelay=normalizeIdleCommitDelay(i.value);GM_setValue(SH.idleCommitDelayKey,idleCommitDelay);if(activeSearchInput?.isConnected&&commitPolicy.idle)scheduleIdleSearchCommit(activeSearchInput);}
             if(k==='maxPerView'){maxPerView=normalizeMax(i.value);GM_setValue(SH.maxKey,maxPerView);trimAllProfiles();saveHistoryData();}
             if(k==='fontSize'){historyFontSize=normalizeFontSize(i.value);GM_setValue(SH.fontSizeKey,historyFontSize);}
@@ -28752,6 +28759,6 @@
         window.addEventListener('pagehide',()=>{clearIdleCommitTimer();flushHistoryPersist();},{capture:true});
         document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){clearIdleCommitTimer();flushHistoryPersist();}},{passive:true});
     }
-    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();attachSearchClearToolbarObserver();bindPersistLifecycle();buildHistoryIndex();applySearchClearOptimizeState();console.log('[AutoTable 工具集 V7.13.1] 已加载：正式历史提交策略 / 胶囊智能补位 / 胶囊删除按钮开关 / 精准 toolbar 状态 / 内置 X / 零跳动历史层 / 分块渲染 / GM 批处理');}
+    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();attachSearchClearToolbarObserver();bindPersistLifecycle();buildHistoryIndex();applySearchClearOptimizeState();console.log('[AutoTable 工具集 V7.13.2] 已加载：正式历史提交策略 / 紧凑记录全部显示开关 / 胶囊智能补位 / 胶囊删除按钮开关 / 精准 toolbar 状态 / 内置 X / 零跳动历史层 / 分块渲染 / GM 批处理');}
     if(document.body)init();else window.addEventListener('DOMContentLoaded',init,{once:true});
 })();
