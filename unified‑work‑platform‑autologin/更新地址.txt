@@ -1,0 +1,4 @@
+//
+// @updateURL    https://raw.githubusercontent.com/Mr-MiuYi1/T-Scripts-C-of-U/main/unified‑work‑platform‑autologin/工作平台统一自动登录.meta.js
+// @downloadURL  https://raw.githubusercontent.com/Mr-MiuYi1/T-Scripts-C-of-U/main/unified‑work‑platform‑autologin/工作平台统一自动登录.user.js
+//

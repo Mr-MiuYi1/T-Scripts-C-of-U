@@ -1,0 +1,4 @@
+//
+// @updateURL    https://raw.githubusercontent.com/Mr-MiuYi1/T-Scripts-C-of-U/main/AutoTableTools/AutoTabletools.meta.js
+// @downloadURL  https://raw.githubusercontent.com/Mr-MiuYi1/T-Scripts-C-of-U/main/AutoTableTools/AutoTabletools.user.js
+//
