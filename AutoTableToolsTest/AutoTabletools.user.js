@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.12.1
-// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、精准原生状态驱动的紧凑可展开全视图搜索记录与搜索栏内置清空、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.13.0
+// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、可配置正式记录条件、胶囊智能补位的紧凑可展开全视图搜索记录与搜索栏内置清空、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.12.1
+ * AutoTable 工具集 V7.13.0
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，整行上下强调边缘可独立配置，支持快捷开关）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -33,7 +33,7 @@
  * - 文档：原生风格大纲、滚动跟随、查找/替换/定位、正则表达式与高亮
  * - 界面：可隐藏关联字段复制按钮，并释放按钮原先占用的文字空间
  * - 悬浮菜单：V7.9 重整为“快捷 / 字段 / 置顶 / 文档 / 设置”，快捷页聚合高频操作，设置页提供分区导航与合理功能归类
- * - 搜索：全视图模糊搜索支持紧凑历史层、列表/胶囊展示、字体大小、同表视图互通、原位丝滑展开全部记录、独立搜索记录管理面板及搜索栏内置 X 清空优化
+ * - 搜索：全视图模糊搜索支持可配置正式记录条件、紧凑历史层、列表/胶囊智能补位、字体大小、同表视图互通、原位丝滑展开全部记录、独立搜索记录管理面板及搜索栏内置 X 清空优化
  * - 设置：支持字段条件高亮规则中心；全部工具配置 JSON 备份、跨版本导入恢复与全部重置；导入/重置后统一刷新确保各独立模块同步生效
  * - 渲染：按真实行号稳定斑马纹；虚拟滚动增量渲染；聚焦行/字段分别保存稳定身份；横向虚拟化时绝不回退到其它字段；编辑与置顶表头保持稳定层级；置顶表头高亮使用不透明底层防止滚动表头穿透
  * - 置顶：右置顶严格镜像；“+ 添加列”保持 AutoTable 原生末端位置，不参与置顶 sticky/offset
@@ -44,7 +44,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.12.1',
+        version: 'V7.13.0',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -27761,12 +27761,12 @@
         }
     `;
     document.documentElement.appendChild(style);
-    console.log('[AutoTable 工具集 V7.12.1] 悬浮菜单布局优化已加载：快捷操作聚合 / 设置分区导航 / 文档 Tab 顺序优化');
+    console.log('[AutoTable 工具集 V7.13.0] 悬浮菜单布局优化已加载：快捷操作聚合 / 设置分区导航 / 文档 Tab 顺序优化');
 })();
 
 
 /* ============================================================================
- * AutoTable 全视图模糊搜索记录与搜索栏清空优化 V7.12.1
+ * AutoTable 全视图模糊搜索记录与搜索栏清空优化 V7.13.0
  * --------------------------------------------------------------------------
  * 1) 搜索框下方默认使用更紧凑的历史层，支持列表 / 胶囊自动填充两种展示；
  * 2) 可调历史文字大小；每个视图最大保存条数继续独立控制；
@@ -27781,12 +27781,14 @@
  * 11) V7.11.3 紧凑历史层改为零尺寸动画 + 双 RAF 等待原生焦点布局稳定 + 重复 focus 不再二次定位；
  * 12) V7.12.1 搜索栏清空优化继续保留：隐藏原生搜索状态块，在搜索输入框内部提供 X，并优先复用 AutoTable 原生清除搜索动作。
  * 13) V7.12.1 基于最新组件抓取改为精准 toolbar / 搜索状态驱动：缓存搜索输入与状态 chip、减少全页扫描、按原生搜索状态落历史，并避免表格内部滚动触发无意义定位。
+ * 14) V7.13.0 正式历史记录条件可配置：原生搜索生效 / Enter / 失焦 / 停止输入可独立组合；停止输入延迟可调。
+ * 15) V7.13.0 胶囊模式改为“按行智能补位”：保持时间顺序，不重排历史；每行多个胶囊自动分配剩余宽度，删除 / 字号 / 窗口尺寸变化后自动重算。
  * ========================================================================== */
 (function () {
     'use strict';
 
     const SH = {
-        version: 'V7.12.1',
+        version: 'V7.13.0',
         enabledKey: 'att_v3_viewSearchHistoryEnabled',
         maxKey: 'att_v3_viewSearchHistoryMaxPerView',
         perViewKey: 'att_v3_viewSearchHistoryPerViewMode',
@@ -27795,6 +27797,8 @@
         layoutKey: 'att_v3_viewSearchHistoryLayoutMode',
         sameTableShareKey: 'att_v3_viewSearchHistorySameTableShare',
         clearOptimizeKey: 'att_v3_viewSearchClearOptimizeEnabled',
+        commitPolicyKey: 'att_v3_viewSearchHistoryCommitPolicy',
+        idleCommitDelayKey: 'att_v3_viewSearchHistoryIdleCommitDelay',
         clearButtonClass: 'att-view-search-clear-inline-v7120',
         clearHostClass: 'att-view-search-clear-host-v7120',
         clearInputClass: 'att-view-search-clear-input-v7120',
@@ -27813,6 +27817,8 @@
     let clearOptimizeEnabled = Boolean(GM_getValue(SH.clearOptimizeKey, false));
     let historyFontSize = normalizeFontSize(GM_getValue(SH.fontSizeKey, 12));
     let layoutMode = normalizeLayout(GM_getValue(SH.layoutKey, 'list'));
+    let commitPolicy = normalizeCommitPolicy(GM_getValue(SH.commitPolicyKey, null));
+    let idleCommitDelay = normalizeIdleCommitDelay(GM_getValue(SH.idleCommitDelayKey, 900));
     let historyData = normalizeHistoryData(GM_getValue(SH.dataKey, {}));
 
     let activeSearchInput = null;
@@ -27858,6 +27864,10 @@
     let searchToolbarObserver = null;
     let toolbarStateSyncRaf = 0;
     let lastNativeCommittedSignature = '';
+    let idleCommitTimer = 0;
+    let idleCommitToken = 0;
+    let capsuleLayoutRaf = 0;
+    let capsuleResizeObserver = null;
     let dropdownMeasuredHeight = 0;
     let anchorScrollCleanups = [];
     const EXPANDED_CHUNK = 80;
@@ -27870,6 +27880,19 @@
         const n=Number(value); return Number.isFinite(n) ? Math.min(16,Math.max(10,Math.round(n))) : 12;
     }
     function normalizeLayout(value) { return value === 'capsule' ? 'capsule' : 'list'; }
+    function normalizeIdleCommitDelay(value) {
+        const n=Number(value); return Number.isFinite(n) ? Math.min(3000,Math.max(300,Math.round(n/100)*100)) : 900;
+    }
+    function normalizeCommitPolicy(raw) {
+        const defaults={native:true,enter:true,blur:false,idle:false};
+        if(!raw||typeof raw!=='object'||Array.isArray(raw))return {...defaults};
+        return {
+            native: raw.native !== false,
+            enter: raw.enter !== false,
+            blur: Boolean(raw.blur),
+            idle: Boolean(raw.idle)
+        };
+    }
     function cleanText(value) { return String(value??'').replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim(); }
     function escHtml(value) { return String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
     function escAttr(value) { return escHtml(value).replace(/`/g,'&#96;'); }
@@ -28016,6 +28039,35 @@
         return main.startsWith('搜索：') ? cleanText(main.slice(3)) : '';
     }
 
+    function canCommitFrom(source) {
+        return Boolean(enabled && commitPolicy && commitPolicy[source]);
+    }
+
+    function commitSearchFrom(source, query, context=getCurrentViewContext()) {
+        if(!canCommitFrom(source))return false;
+        recordSearch(query, context);
+        return true;
+    }
+
+    function clearIdleCommitTimer() {
+        idleCommitToken += 1;
+        if(idleCommitTimer){clearTimeout(idleCommitTimer);idleCommitTimer=0;}
+    }
+
+    function scheduleIdleSearchCommit(input) {
+        clearIdleCommitTimer();
+        if(!canCommitFrom('idle')||!(input instanceof HTMLInputElement)||!input.isConnected)return;
+        const query=cleanText(input.value||'');
+        if(!query)return;
+        const token=idleCommitToken;
+        const context=getCurrentViewContext();
+        idleCommitTimer=setTimeout(()=>{
+            idleCommitTimer=0;
+            if(token!==idleCommitToken||!input.isConnected||cleanText(input.value||'')!==query)return;
+            commitSearchFrom('idle',query,context);
+        },idleCommitDelay);
+    }
+
     function scheduleNativeToolbarStateSync(input = null) {
         if (input instanceof HTMLInputElement && isViewSearchInput(input)) cachedSearchInput = input;
         if (toolbarStateSyncRaf) return;
@@ -28028,7 +28080,7 @@
                 const sig = `${ctx.key}\n${query}`;
                 if (sig !== lastNativeCommittedSignature) {
                     lastNativeCommittedSignature = sig;
-                    recordSearch(query, ctx);
+                    commitSearchFrom('native',query,ctx);
                 }
             } else if (!query) {
                 lastNativeCommittedSignature = '';
@@ -28230,7 +28282,7 @@
 
     function setNativeInputValue(input,value){const d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value');if(d?.set)d.set.call(input,value);else input.value=value;input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}));}
     function findCurrentSearchInput(){return findVisibleViewSearchInput();}
-    function useHistoryQuery(query){const input=activeSearchInput?.isConnected?activeSearchInput:findCurrentSearchInput();if(!input)return;setNativeInputValue(input,query);recordSearch(query);input.focus({preventScroll:true});dropdownExpanded=false;expandedFilter='';hideDropdown();}
+    function useHistoryQuery(query){const input=activeSearchInput?.isConnected?activeSearchInput:findCurrentSearchInput();if(!input)return;setNativeInputValue(input,query);input.focus({preventScroll:true});dropdownExpanded=false;expandedFilter='';hideDropdown();setTimeout(()=>scheduleNativeToolbarStateSync(input),0);}
 
     function ensureDropdown(){
         let d=document.getElementById(SH.dropdownId);if(d)return d;
@@ -28243,6 +28295,11 @@
             <div class="shd-expanded-search"><input type="search" data-sh-expanded-filter placeholder="筛选全部搜索记录…"></div>
             <div class="shd-expanded-list" data-sh-expanded-list></div>
         </div>`;
+        const compactList=d.querySelector('[data-shd-list]');
+        if(window.ResizeObserver&&compactList){
+            capsuleResizeObserver=new ResizeObserver(()=>{if(layoutMode==='capsule'&&d.classList.contains('is-open'))scheduleCapsuleAutoFill(compactList);});
+            capsuleResizeObserver.observe(compactList);
+        }
         d.addEventListener('pointerdown',e=>{dropdownPointerDown=true;if(e.target.closest('button,[data-sh-query]'))e.preventDefault();});
         d.addEventListener('pointerup',()=>{setTimeout(()=>dropdownPointerDown=false,0);});
         d.addEventListener('click',onDropdownClick);
@@ -28338,6 +28395,50 @@
     }
 
 
+    function applyCapsuleAutoFill(list=document.querySelector(`#${SH.dropdownId} [data-shd-list]`)) {
+        capsuleLayoutRaf=0;
+        if(layoutMode!=='capsule'||!(list instanceof HTMLElement)||!list.isConnected)return;
+        const box=list.querySelector('.shd-capsules');
+        if(!(box instanceof HTMLElement))return;
+        const chips=Array.from(box.querySelectorAll('.shd-chip')).filter(el=>el instanceof HTMLElement);
+        if(!chips.length)return;
+
+        // 每次都先回到自然宽度再测量，避免上一次窗口宽度留下的固定宽度污染新布局。
+        for(const chip of chips){chip.style.removeProperty('width');chip.style.removeProperty('flex-basis');}
+        const available=Math.floor(box.clientWidth);
+        if(available<=40)return;
+        const cs=getComputedStyle(box),gap=parseFloat(cs.columnGap||cs.gap)||5;
+        const measured=chips.map(chip=>Math.min(available,Math.max(44,Math.ceil(chip.getBoundingClientRect().width))));
+        const rows=[];let row=[],used=0;
+        measured.forEach((width,index)=>{
+            const need=(row.length?gap:0)+width;
+            if(row.length&&used+need>available){rows.push(row);row=[];used=0;}
+            row.push({chip:chips[index],width});used+=(row.length>1?gap:0)+width;
+        });
+        if(row.length)rows.push(row);
+
+        // “自动补位”保持时间顺序，只把一行中原本空着的尾部空间分配给该行胶囊。
+        // 单独一枚的最后行不强行拉满，避免一个很短的词变成整行大按钮。
+        rows.forEach((items,rowIndex)=>{
+            if(items.length<2)return;
+            const natural=items.reduce((sum,x)=>sum+x.width,0)+gap*(items.length-1);
+            let extra=Math.max(0,available-natural);
+            if(extra<2)return;
+            const base=Math.floor(extra/items.length);let remain=Math.round(extra-base*items.length);
+            items.forEach((item,index)=>{
+                const add=base+(remain>0?1:0);if(remain>0)remain--;
+                const target=Math.max(44,Math.floor(item.width+add));
+                item.chip.style.width=`${target}px`;
+                item.chip.style.flexBasis=`${target}px`;
+            });
+        });
+    }
+
+    function scheduleCapsuleAutoFill(list=document.querySelector(`#${SH.dropdownId} [data-shd-list]`)) {
+        if(capsuleLayoutRaf)cancelAnimationFrame(capsuleLayoutRaf);
+        capsuleLayoutRaf=requestAnimationFrame(()=>applyCapsuleAutoFill(list));
+    }
+
     function renderCompactItems(items,input){
         if(!items.length)return `<div class="shd-empty">${cleanText(input.value)?'历史记录中没有匹配项':'暂无搜索记录'}<span>${scopeLabel()}的搜索会显示在这里</span></div>`;
         if(layoutMode==='capsule')return `<div class="shd-capsules">${items.map(i=>`<span class="shd-chip"><button type="button" class="shd-chip-main" data-sh-query="${escAttr(i.query)}" title="${escAttr(i.query)}">${escHtml(i.query)}</button><button type="button" class="shd-chip-del" data-sh-act="delete" data-sh-query-delete="${escAttr(i.query)}" data-sh-view-key="${escAttr(i.viewKey)}" title="删除">×</button></span>`).join('')}</div>`;
@@ -28362,7 +28463,7 @@
             const items=getDisplayItems(input.value||'');
             d.style.setProperty('--att-sh-font-size',`${historyFontSize}px`);d.classList.toggle('is-expanded',dropdownExpanded);d.classList.toggle('is-capsule',layoutMode==='capsule');
             const head=d.querySelector('[data-shd-head]');if(head)head.innerHTML=`<div><b>${escHtml(scopeLabel()==='当前视图'?ctx.viewName:scopeLabel())}</b><span>${total} 条 · ${layoutMode==='capsule'?'胶囊':'列表'}</span></div>${perViewMode&&!sameTableShare&&historyData[ctx.key]?.items?.length?'<button type="button" data-sh-act="clear-current">清空</button>':''}`;
-            const list=d.querySelector('[data-shd-list]');if(list)list.innerHTML=renderCompactItems(items,input);
+            const list=d.querySelector('[data-shd-list]');if(list){list.innerHTML=renderCompactItems(items,input);if(layoutMode==='capsule')scheduleCapsuleAutoFill(list);}
             const icon=d.querySelector('[data-shd-expand-icon]');if(icon)icon.textContent=dropdownExpanded?'⌄':'›';
             const filter=d.querySelector('[data-sh-expanded-filter]');if(filter&&filter.value!==expandedFilter)filter.value=expandedFilter;
             if(dropdownExpanded)renderExpandedList(true);
@@ -28428,22 +28529,54 @@
 
     function ensureSettingsCard(){
         const section=document.querySelector('[data-section="settings"]');if(!section)return;let card=document.getElementById(SH.settingsCardId);if(card?.isConnected){updateSettingsCard();return;}card=document.createElement('div');card.id=SH.settingsCardId;card.className='att-card';const anchor=section.querySelector('[data-settings-anchor="visual"]');if(anchor)section.insertBefore(card,anchor);else section.appendChild(card);
-        card.innerHTML=`<div class="att-card-title">全视图搜索增强</div><div class="att-card-desc">集中管理搜索记录与搜索栏交互：支持紧凑历史层、列表/胶囊展示，以及搜索框内部一键清空。</div><div class="att-divider"></div>
+        card.innerHTML=`<div class="att-card-title">全视图搜索增强</div><div class="att-card-desc">集中管理搜索记录与搜索栏交互：可自定义哪些行为才算正式历史，支持列表/胶囊智能补位，以及搜索框内部一键清空。</div><div class="att-divider"></div>
         <div class="att-row"><div><div class="att-label">搜索栏清空优化</div><div class="att-sub-label">开启后隐藏右侧“搜索：…”状态块，并在全视图搜索框内部显示 X；筛选/排序等其它状态标签不受影响。</div></div><label class="att-switch"><input type="checkbox" data-sh-setting="clearOptimize" ${clearOptimizeEnabled?'checked':''}><span class="att-slider"></span></label></div>
         <div class="att-row"><div><div class="att-label">启用搜索记录</div><div class="att-sub-label">关闭后停止记录并隐藏搜索历史层。</div></div><label class="att-switch"><input type="checkbox" data-sh-setting="enabled" ${enabled?'checked':''}><span class="att-slider"></span></label></div>
         <div class="att-row"><div><div class="att-label">按视图显示搜索记录</div><div class="att-sub-label">开启后以当前视图为基础；关闭后直接混合全部视图记录。</div></div><label class="att-switch"><input type="checkbox" data-sh-setting="perViewMode" ${perViewMode?'checked':''}><span class="att-slider"></span></label></div>
         <div class="att-row"><div><div class="att-label">同一个表中搜索记录互通</div><div class="att-sub-label">开启后，当前视图会同时显示同一张表其它视图的历史；仅在“按视图显示”开启时生效。</div></div><label class="att-switch"><input type="checkbox" data-sh-setting="sameTableShare" ${sameTableShare?'checked':''}><span class="att-slider"></span></label></div>
+        <div class="att-divider"></div>
+        <div class="att-label">哪些情况算正式搜索记录</div><div class="att-sub-label">下面条件为“或”关系，可自由组合；同一搜索词在短时间重复触发会自动去重。</div>
+        <div class="att-sh-commit-grid-v7130">
+            <label><input type="checkbox" data-sh-commit-source="native" ${commitPolicy.native?'checked':''}><span><b>搜索实际生效</b><small>检测原生“搜索：…”条件，推荐</small></span></label>
+            <label><input type="checkbox" data-sh-commit-source="enter" ${commitPolicy.enter?'checked':''}><span><b>按下 Enter</b><small>回车时立即记入历史</small></span></label>
+            <label><input type="checkbox" data-sh-commit-source="blur" ${commitPolicy.blur?'checked':''}><span><b>离开搜索框</b><small>即使只是输入草稿也会记录</small></span></label>
+            <label><input type="checkbox" data-sh-commit-source="idle" ${commitPolicy.idle?'checked':''}><span><b>停止输入</b><small>停顿达到设定时间后记录</small></span></label>
+        </div>
+        <div class="att-label" style="margin-top:9px;">停止输入判定时间</div><div class="att-sh-range-row-v7110"><input type="range" min="300" max="3000" step="100" value="${idleCommitDelay}" data-sh-setting="idleCommitDelay" ${commitPolicy.idle?'':'disabled'}><b data-sh-idle-delay-value>${idleCommitDelay}ms</b></div>
+        <div class="att-divider"></div>
         <div class="att-label" style="margin-top:9px;">搜索记录展示</div><div class="att-sh-layout-row-v7110"><button type="button" data-sh-layout="list">列表</button><button type="button" data-sh-layout="capsule">胶囊自动填充</button></div>
         <div class="att-label" style="margin-top:10px;">搜索记录字体大小</div><div class="att-sh-range-row-v7110"><input type="range" min="10" max="16" step="1" value="${historyFontSize}" data-sh-setting="fontSize"><b data-sh-font-value>${historyFontSize}px</b></div>
         <div class="att-label" style="margin-top:10px;">每个视图最多保存</div><div class="att-sh-range-row-v7110"><input type="range" min="3" max="100" step="1" value="${maxPerView}" data-sh-setting="maxPerView"><b data-sh-max-value>${maxPerView} 条</b></div>
         <div class="att-sub-label">条数只限制每个视图自己的存储；同表互通不会额外复制记录。</div>
         <div class="att-actions" style="margin-top:9px;"><button type="button" class="att-btn att-primary" data-sh-settings-act="open-manager">搜索记录管理</button><button type="button" class="att-btn" data-sh-settings-act="clear-current">清空当前视图</button></div>`;updateSettingsCard();
     }
-    function updateSettingsCard(){const c=document.getElementById(SH.settingsCardId);if(!c)return;const set=(q,v)=>{const e=c.querySelector(q);if(e)e.checked=v;};set('[data-sh-setting="clearOptimize"]',clearOptimizeEnabled);set('[data-sh-setting="enabled"]',enabled);set('[data-sh-setting="perViewMode"]',perViewMode);set('[data-sh-setting="sameTableShare"]',sameTableShare);const max=c.querySelector('[data-sh-setting="maxPerView"]');if(max)max.value=maxPerView;const mv=c.querySelector('[data-sh-max-value]');if(mv)mv.textContent=`${maxPerView} 条`;const fs=c.querySelector('[data-sh-setting="fontSize"]');if(fs)fs.value=historyFontSize;const fv=c.querySelector('[data-sh-font-value]');if(fv)fv.textContent=`${historyFontSize}px`;c.querySelectorAll('[data-sh-layout]').forEach(b=>b.classList.toggle('active',b.dataset.shLayout===layoutMode));}
+    function updateSettingsCard(){
+        const c=document.getElementById(SH.settingsCardId);if(!c)return;
+        const set=(q,v)=>{const e=c.querySelector(q);if(e)e.checked=v;};
+        set('[data-sh-setting="clearOptimize"]',clearOptimizeEnabled);set('[data-sh-setting="enabled"]',enabled);set('[data-sh-setting="perViewMode"]',perViewMode);set('[data-sh-setting="sameTableShare"]',sameTableShare);
+        c.querySelectorAll('[data-sh-commit-source]').forEach(i=>{i.checked=Boolean(commitPolicy[i.dataset.shCommitSource]);});
+        const idle=c.querySelector('[data-sh-setting="idleCommitDelay"]');if(idle){idle.value=idleCommitDelay;idle.disabled=!commitPolicy.idle;}
+        const idv=c.querySelector('[data-sh-idle-delay-value]');if(idv)idv.textContent=`${idleCommitDelay}ms`;
+        const max=c.querySelector('[data-sh-setting="maxPerView"]');if(max)max.value=maxPerView;const mv=c.querySelector('[data-sh-max-value]');if(mv)mv.textContent=`${maxPerView} 条`;
+        const fs=c.querySelector('[data-sh-setting="fontSize"]');if(fs)fs.value=historyFontSize;const fv=c.querySelector('[data-sh-font-value]');if(fv)fv.textContent=`${historyFontSize}px`;
+        c.querySelectorAll('[data-sh-layout]').forEach(b=>b.classList.toggle('active',b.dataset.shLayout===layoutMode));
+    }
     function bindSettingsEvents(){
-        document.addEventListener('change',e=>{const i=e.target.closest?.(`#${SH.settingsCardId} [data-sh-setting]`);if(!i)return;const k=i.dataset.shSetting;if(k==='clearOptimize'){clearOptimizeEnabled=i.checked;GM_setValue(SH.clearOptimizeKey,clearOptimizeEnabled);applySearchClearOptimizeState();}if(k==='enabled'){enabled=i.checked;GM_setValue(SH.enabledKey,enabled);if(!enabled)hideDropdown();}if(k==='perViewMode'){perViewMode=i.checked;GM_setValue(SH.perViewKey,perViewMode);scopeRowsCache={revision:0,key:'',rows:[]};}if(k==='sameTableShare'){sameTableShare=i.checked;GM_setValue(SH.sameTableShareKey,sameTableShare);scopeRowsCache={revision:0,key:'',rows:[]};}if(k==='maxPerView'){maxPerView=normalizeMax(i.value);GM_setValue(SH.maxKey,maxPerView);trimAllProfiles();saveHistoryData();}if(k==='fontSize'){historyFontSize=normalizeFontSize(i.value);GM_setValue(SH.fontSizeKey,historyFontSize);}updateSettingsCard();if(activeSearchInput?.isConnected&&enabled)scheduleDropdownRender(activeSearchInput);},true);
-        document.addEventListener('input',e=>{const i=e.target.closest?.(`#${SH.settingsCardId} input[data-sh-setting]`);if(!i)return;if(i.dataset.shSetting==='maxPerView'){const v=document.querySelector(`#${SH.settingsCardId} [data-sh-max-value]`);if(v)v.textContent=`${normalizeMax(i.value)} 条`;}if(i.dataset.shSetting==='fontSize'){const size=normalizeFontSize(i.value),v=document.querySelector(`#${SH.settingsCardId} [data-sh-font-value]`);if(v)v.textContent=`${size}px`;const d=document.getElementById(SH.dropdownId);if(d)d.style.setProperty('--att-sh-font-size',`${size}px`);const m=document.getElementById(SH.managerId);if(m)m.style.setProperty('--att-sh-font-size',`${size}px`);}},true);
-        document.addEventListener('click',e=>{const lb=e.target.closest?.(`#${SH.settingsCardId} [data-sh-layout]`);if(lb){layoutMode=normalizeLayout(lb.dataset.shLayout);GM_setValue(SH.layoutKey,layoutMode);updateSettingsCard();if(activeSearchInput?.isConnected)scheduleDropdownRender(activeSearchInput);return;}const a=e.target.closest?.(`#${SH.settingsCardId} [data-sh-settings-act]`)?.dataset.shSettingsAct;if(a==='open-manager')openManager();if(a==='clear-current'){const c=getCurrentViewContext(),p=historyData[c.key];if(p?.items?.length&&confirm(`清空“${c.viewName}”的搜索记录吗？`))clearViewHistory(c.key);}},true);
+        document.addEventListener('change',e=>{
+            const source=e.target.closest?.(`#${SH.settingsCardId} [data-sh-commit-source]`);
+            if(source){const key=source.dataset.shCommitSource;if(Object.prototype.hasOwnProperty.call(commitPolicy,key)){commitPolicy={...commitPolicy,[key]:Boolean(source.checked)};GM_setValue(SH.commitPolicyKey,commitPolicy);if(key==='idle'&&!commitPolicy.idle)clearIdleCommitTimer();updateSettingsCard();}return;}
+            const i=e.target.closest?.(`#${SH.settingsCardId} [data-sh-setting]`);if(!i)return;const k=i.dataset.shSetting;
+            if(k==='clearOptimize'){clearOptimizeEnabled=i.checked;GM_setValue(SH.clearOptimizeKey,clearOptimizeEnabled);applySearchClearOptimizeState();}
+            if(k==='enabled'){enabled=i.checked;GM_setValue(SH.enabledKey,enabled);if(!enabled){clearIdleCommitTimer();hideDropdown();}}
+            if(k==='perViewMode'){perViewMode=i.checked;GM_setValue(SH.perViewKey,perViewMode);scopeRowsCache={revision:0,key:'',rows:[]};}
+            if(k==='sameTableShare'){sameTableShare=i.checked;GM_setValue(SH.sameTableShareKey,sameTableShare);scopeRowsCache={revision:0,key:'',rows:[]};}
+            if(k==='idleCommitDelay'){idleCommitDelay=normalizeIdleCommitDelay(i.value);GM_setValue(SH.idleCommitDelayKey,idleCommitDelay);if(activeSearchInput?.isConnected&&commitPolicy.idle)scheduleIdleSearchCommit(activeSearchInput);}
+            if(k==='maxPerView'){maxPerView=normalizeMax(i.value);GM_setValue(SH.maxKey,maxPerView);trimAllProfiles();saveHistoryData();}
+            if(k==='fontSize'){historyFontSize=normalizeFontSize(i.value);GM_setValue(SH.fontSizeKey,historyFontSize);}
+            updateSettingsCard();if(activeSearchInput?.isConnected&&enabled)scheduleDropdownRender(activeSearchInput);
+        },true);
+        document.addEventListener('input',e=>{const i=e.target.closest?.(`#${SH.settingsCardId} input[data-sh-setting]`);if(!i)return;if(i.dataset.shSetting==='maxPerView'){const v=document.querySelector(`#${SH.settingsCardId} [data-sh-max-value]`);if(v)v.textContent=`${normalizeMax(i.value)} 条`;}if(i.dataset.shSetting==='idleCommitDelay'){const v=document.querySelector(`#${SH.settingsCardId} [data-sh-idle-delay-value]`);if(v)v.textContent=`${normalizeIdleCommitDelay(i.value)}ms`;}if(i.dataset.shSetting==='fontSize'){const size=normalizeFontSize(i.value),v=document.querySelector(`#${SH.settingsCardId} [data-sh-font-value]`);if(v)v.textContent=`${size}px`;const d=document.getElementById(SH.dropdownId);if(d)d.style.setProperty('--att-sh-font-size',`${size}px`);const m=document.getElementById(SH.managerId);if(m)m.style.setProperty('--att-sh-font-size',`${size}px`);if(layoutMode==='capsule')scheduleCapsuleAutoFill();}},true);
+        document.addEventListener('click',e=>{const lb=e.target.closest?.(`#${SH.settingsCardId} [data-sh-layout]`);if(lb){layoutMode=normalizeLayout(lb.dataset.shLayout);GM_setValue(SH.layoutKey,layoutMode);dropdownRenderSignature='';updateSettingsCard();if(activeSearchInput?.isConnected)scheduleDropdownRender(activeSearchInput);return;}const a=e.target.closest?.(`#${SH.settingsCardId} [data-sh-settings-act]`)?.dataset.shSettingsAct;if(a==='open-manager')openManager();if(a==='clear-current'){const c=getCurrentViewContext(),p=historyData[c.key];if(p?.items?.length&&confirm(`清空“${c.viewName}”的搜索记录吗？`))clearViewHistory(c.key);}},true);
     }
     function attachSettingsObserver(){
         const schedule=()=>{if(document.getElementById(SH.settingsCardId)?.isConnected)return;if(!document.querySelector('[data-section="settings"]'))return;if(settingsEnsureRaf)return;settingsEnsureRaf=requestAnimationFrame(()=>{settingsEnsureRaf=0;if(!document.getElementById(SH.settingsCardId)?.isConnected)ensureSettingsCard();});};
@@ -28491,13 +28624,14 @@
             if(!isViewSearchInput(e.target))return;
             activeSearchInput=e.target;cachedSearchInput=e.target;
             if(clearOptimizeEnabled)scheduleSearchClearSync(activeSearchInput);
-            if(enabled){dropdownExpanded=false;expandedFilter='';scheduleDropdownRender(activeSearchInput);}
+            if(enabled){dropdownExpanded=false;expandedFilter='';scheduleDropdownRender(activeSearchInput);scheduleIdleSearchCommit(activeSearchInput);}
         },true);
         document.addEventListener('keydown',e=>{
             if(!isViewSearchInput(e.target))return;
             if(e.key==='Enter'){
-                // Enter 仍作为兜底立即记录；原生 toolbar 状态稍后同步时会被 recordSearch 的 1.2s 去重挡住。
-                recordSearch(e.target.value);
+                clearIdleCommitTimer();
+                // 是否把 Enter 作为正式历史由用户设置决定；原生搜索状态仍可作为另一条独立判定来源。
+                commitSearchFrom('enter',e.target.value);
                 setTimeout(()=>scheduleNativeToolbarStateSync(e.target),0);
                 hideDropdown();
             }
@@ -28509,8 +28643,11 @@
             setTimeout(()=>{
                 const d=document.getElementById(SH.dropdownId);
                 if(dropdownPointerDown||d?.contains(document.activeElement))return;
-                // V7.12.1 不再把“失焦”当成一次搜索提交，避免草稿被误记和多余 GM 写入。
-                if(document.activeElement!==input)hideDropdown();
+                if(document.activeElement!==input){
+                    clearIdleCommitTimer();
+                    commitSearchFrom('blur',input.value);
+                    hideDropdown();
+                }
             },120);
         },true);
         document.addEventListener('pointerdown',e=>{
@@ -28593,7 +28730,7 @@
         #${SH.dropdownId} button,#${SH.dropdownId} input{font:inherit;} #${SH.dropdownId} .shd-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px 6px;border-bottom:1px solid #34363a;} #${SH.dropdownId} .shd-head>div{min-width:0;display:flex;align-items:center;gap:6px;} #${SH.dropdownId} .shd-head b{font-size:1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-head span{color:#868b92;font-size:.82em;white-space:nowrap;} #${SH.dropdownId} .shd-head button{border:0;background:transparent;color:#8ab4f8;padding:2px 4px;cursor:pointer;border-radius:4px;}
         #${SH.dropdownId} .shd-list{min-height:0;max-height:166px;overflow:auto;padding:3px 4px;scrollbar-gutter:stable;overscroll-behavior:contain;} #${SH.dropdownId}.is-capsule .shd-list{max-height:148px;padding:6px;}
         #${SH.dropdownId} .shd-item{display:grid;grid-template-columns:17px minmax(0,1fr) auto 20px;align-items:center;gap:4px;min-height:29px;padding:2px 3px;border-radius:5px;cursor:pointer;} #${SH.dropdownId} .shd-item:hover{background:#2b2d31;} #${SH.dropdownId} .shd-clock{font-size:1em;color:#7e848b;text-align:center;} #${SH.dropdownId} .shd-main{min-width:0;} #${SH.dropdownId} .shd-query{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-source{margin-top:1px;color:#7d838a;font-size:.78em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-time{font-size:.78em;color:#747a81;} #${SH.dropdownId} .shd-del{width:19px;height:19px;padding:0;border:0;border-radius:4px;background:transparent;color:#7f858c;cursor:pointer;} #${SH.dropdownId} .shd-del:hover{background:#3b2929;color:#ff8a80;}
-        #${SH.dropdownId} .shd-capsules{display:flex;flex-wrap:wrap;align-content:flex-start;gap:5px;} #${SH.dropdownId} .shd-chip{display:inline-flex;align-items:center;max-width:100%;height:25px;background:#292d32;border:1px solid #3a4047;border-radius:999px;overflow:hidden;} #${SH.dropdownId} .shd-chip:hover{border-color:#4a6f9d;background:#283446;} #${SH.dropdownId} .shd-chip-main{max-width:190px;height:100%;padding:0 8px;border:0;background:transparent;color:#dfe7f1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;} #${SH.dropdownId} .shd-chip-del{width:22px;height:100%;border:0;border-left:1px solid rgba(255,255,255,.05);background:transparent;color:#7d858e;cursor:pointer;} #${SH.dropdownId} .shd-chip-del:hover{color:#ff8a80;background:#3b2929;}
+        #${SH.dropdownId} .shd-capsules{display:flex;flex-wrap:wrap;align-content:flex-start;align-items:flex-start;width:100%;gap:5px;} #${SH.dropdownId} .shd-chip{display:inline-flex;align-items:center;box-sizing:border-box;flex:0 0 auto;min-width:44px;max-width:100%;height:25px;background:#292d32;border:1px solid #3a4047;border-radius:999px;overflow:hidden;transition:border-color .13s ease,background-color .13s ease;} #${SH.dropdownId} .shd-chip:hover{border-color:#4a6f9d;background:#283446;} #${SH.dropdownId} .shd-chip-main{flex:1 1 auto;min-width:0;max-width:190px;height:100%;padding:0 8px;border:0;background:transparent;color:#dfe7f1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;} #${SH.dropdownId} .shd-chip-del{flex:0 0 22px;width:22px;height:100%;border:0;border-left:1px solid rgba(255,255,255,.05);background:transparent;color:#7d858e;cursor:pointer;} #${SH.dropdownId} .shd-chip-del:hover{color:#ff8a80;background:#3b2929;}
         #${SH.dropdownId} .shd-empty{padding:15px 9px;text-align:center;color:#a7adb4;} #${SH.dropdownId} .shd-empty span{display:block;margin-top:3px;color:#747a81;font-size:.8em;} #${SH.dropdownId} .shd-all{height:30px;display:flex;align-items:center;justify-content:space-between;padding:0 9px;border:0;border-top:1px solid #34363a;background:#232427;color:#9ecbff;cursor:pointer;} #${SH.dropdownId} .shd-all:hover{background:#292c31;} #${SH.dropdownId} .shd-all b{font-size:1.3em;font-weight:400;}
         #${SH.dropdownId} .shd-expanded{max-height:0;opacity:0;overflow:hidden;background:#1e1f22;transition:max-height .25s cubic-bezier(.22,.61,.36,1),opacity .18s ease;} #${SH.dropdownId}.is-expanded .shd-expanded{max-height:365px;opacity:1;border-top:1px solid #34363a;display:grid;grid-template-rows:auto auto minmax(0,1fr);} #${SH.dropdownId} .shd-expanded-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 9px 5px;} #${SH.dropdownId} .shd-expanded-head>div{display:flex;align-items:baseline;gap:7px;min-width:0;} #${SH.dropdownId} .shd-expanded-head b{font-size:1.03em;} #${SH.dropdownId} .shd-expanded-head span{font-size:.8em;color:#7f858c;} #${SH.dropdownId} .shd-expanded-actions{display:flex;gap:5px;} #${SH.dropdownId} .shd-expanded-actions button{height:25px;padding:0 7px;border:1px solid #41454a;border-radius:5px;background:#292b2f;color:#cfd4da;cursor:pointer;} #${SH.dropdownId} .shd-expanded-actions button:first-child{color:#9ecbff;}
         #${SH.dropdownId} .shd-expanded-search{padding:3px 8px 6px;} #${SH.dropdownId} .shd-expanded-search input{width:100%;height:28px;box-sizing:border-box;padding:0 8px;border:1px solid #3c4045;border-radius:6px;background:#27282b;color:#e8eaed;outline:none;} #${SH.dropdownId} .shd-expanded-search input:focus{border-color:#4b77ad;} #${SH.dropdownId} .shd-expanded-list{min-height:0;overflow:auto;padding:0 5px 7px;scrollbar-gutter:stable;contain:layout paint;overscroll-behavior:contain;} #${SH.dropdownId} .shd-expanded-item{display:grid;grid-template-columns:minmax(0,1fr) 22px;align-items:center;gap:5px;min-height:34px;padding:3px 3px;border-bottom:1px solid #2d2f33;content-visibility:auto;contain-intrinsic-size:36px;} #${SH.dropdownId} .shd-expanded-item:hover{background:#25272a;} #${SH.dropdownId} .shd-expanded-use{min-width:0;text-align:left;border:0;background:transparent;color:#e8eaed;padding:2px 4px;cursor:pointer;} #${SH.dropdownId} .shd-expanded-use b,#${SH.dropdownId} .shd-expanded-use span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-expanded-use b{font-size:1em;} #${SH.dropdownId} .shd-expanded-use span{margin-top:2px;color:#80868d;font-size:.78em;}
@@ -28601,15 +28738,15 @@
         #${SH.managerId}{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.56);backdrop-filter:blur(3px);color:#e8eaed;font-family:inherit;} #${SH.managerId}.is-open{display:flex;} #${SH.managerId}{--att-sh-font-size:12px;} #${SH.managerId} .shm-shell{width:min(820px,calc(100vw - 32px));height:min(560px,calc(100vh - 32px));min-height:430px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:#202124;border:1px solid #3c3f43;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.46);overflow:hidden;font-size:var(--att-sh-font-size);} #${SH.managerId} .shm-head,#${SH.managerId} .shm-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;} #${SH.managerId} .shm-head{border-bottom:1px solid #34363a;} #${SH.managerId} .shm-foot{border-top:1px solid #34363a;color:#858b92;font-size:.82em;} #${SH.managerId} .shm-head>div{display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-head b{font-size:1.15em;} #${SH.managerId} .shm-head span{color:#8f949b;font-size:.82em;} #${SH.managerId} button{height:28px;padding:0 8px;border:1px solid #45484d;border-radius:6px;background:#303134;color:#e8eaed;cursor:pointer;font:inherit;} #${SH.managerId} button:hover{background:#3a3c40;} #${SH.managerId} button.primary{background:#1a73e8;border-color:#1a73e8;color:#fff;} #${SH.managerId} button.danger{color:#ff8a80;border-color:#67413f;}
         #${SH.managerId} .shm-body{min-height:0;display:grid;grid-template-columns:235px minmax(0,1fr);} #${SH.managerId} .shm-side{min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);border-right:1px solid #34363a;} #${SH.managerId} .shm-side-search{padding:8px;} #${SH.managerId} input[type="search"]{width:100%;height:30px;box-sizing:border-box;padding:0 8px;border:1px solid #424448;border-radius:6px;background:#292a2d;color:#e8eaed;outline:none;} #${SH.managerId} .shm-views{min-height:0;overflow:auto;padding:0 5px 8px;} #${SH.managerId} .shm-view{width:100%;height:auto;min-height:39px;margin:1px 0;padding:5px 6px;display:flex;align-items:center;justify-content:space-between;gap:6px;text-align:left;border-color:transparent;background:transparent;} #${SH.managerId} .shm-view.active{background:#26364d;border-color:#345d90;} #${SH.managerId} .shm-view span{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-view b,#${SH.managerId} .shm-view small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-view small,#${SH.managerId} .shm-view em{color:#7f858c;font-size:.78em;font-style:normal;} #${SH.managerId} .shm-none{padding:18px 8px;text-align:center;color:#858b92;}
         #${SH.managerId} .shm-main{min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);} #${SH.managerId} .shm-main-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid #34363a;} #${SH.managerId} .shm-main-head>div{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-main-head b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-main-head span{color:#7f858c;font-size:.78em;} #${SH.managerId} .shm-records{min-height:0;overflow:auto;padding:4px 7px 9px;scrollbar-gutter:stable;contain:layout paint;overscroll-behavior:contain;} #${SH.managerId} .shm-record{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:34px;padding:4px 5px;border-bottom:1px solid #303236;content-visibility:auto;contain-intrinsic-size:36px;} #${SH.managerId} .shm-record:hover{background:#25272a;} #${SH.managerId} .shm-record-text{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-record-text b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-record-text span{color:#7f858c;font-size:.78em;} #${SH.managerId} .shm-record-actions{display:flex;gap:4px;flex:0 0 auto;} #${SH.managerId} .shm-record-actions button{height:24px;padding:0 6px;font-size:.78em;} #${SH.managerId} .shm-empty{padding:35px 12px;text-align:center;color:#858b92;} #${SH.managerId} .shm-foot>div{display:flex;gap:5px;}
-        #${SH.settingsCardId} .att-sh-range-row-v7110{display:grid;grid-template-columns:minmax(0,1fr) 52px;align-items:center;gap:8px;margin-top:5px;} #${SH.settingsCardId} .att-sh-range-row-v7110 input{width:100%;} #${SH.settingsCardId} .att-sh-range-row-v7110 b{text-align:right;font-size:11px;color:inherit;opacity:.78;} #${SH.settingsCardId} .att-sh-layout-row-v7110{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:5px;} #${SH.settingsCardId} .att-sh-layout-row-v7110 button{height:30px;border:1px solid #40444a;border-radius:6px;background:#292b2f;color:inherit;cursor:pointer;} #${SH.settingsCardId} .att-sh-layout-row-v7110 button.active{background:#21466f;border-color:#3978b9;color:#dbeeff;box-shadow:inset 0 0 0 1px rgba(94,173,255,.12);}
-        @media(max-width:720px){#${SH.managerId} .shm-body{grid-template-columns:190px minmax(0,1fr);}#${SH.managerId} .shm-record-actions button[data-shm-act="open-view"]{display:none;}}
+        #${SH.settingsCardId} .att-sh-range-row-v7110{display:grid;grid-template-columns:minmax(0,1fr) 58px;align-items:center;gap:8px;margin-top:5px;} #${SH.settingsCardId} .att-sh-range-row-v7110 input{width:100%;} #${SH.settingsCardId} .att-sh-range-row-v7110 input:disabled{opacity:.42;cursor:not-allowed;} #${SH.settingsCardId} .att-sh-range-row-v7110 b{text-align:right;font-size:11px;color:inherit;opacity:.78;} #${SH.settingsCardId} .att-sh-commit-grid-v7130{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:7px;} #${SH.settingsCardId} .att-sh-commit-grid-v7130 label{min-width:0;display:flex;align-items:flex-start;gap:7px;padding:7px 8px;border:1px solid #3a3e43;border-radius:7px;background:#292b2e;cursor:pointer;} #${SH.settingsCardId} .att-sh-commit-grid-v7130 label:has(input:checked){border-color:#3c6b9d;background:#26384d;} #${SH.settingsCardId} .att-sh-commit-grid-v7130 input{margin:2px 0 0;accent-color:#4b8dd8;} #${SH.settingsCardId} .att-sh-commit-grid-v7130 span{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.settingsCardId} .att-sh-commit-grid-v7130 b{font-size:11px;} #${SH.settingsCardId} .att-sh-commit-grid-v7130 small{color:#8c939b;font-size:10px;line-height:1.35;} #${SH.settingsCardId} .att-sh-layout-row-v7110{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:5px;} #${SH.settingsCardId} .att-sh-layout-row-v7110 button{height:30px;border:1px solid #40444a;border-radius:6px;background:#292b2f;color:inherit;cursor:pointer;} #${SH.settingsCardId} .att-sh-layout-row-v7110 button.active{background:#21466f;border-color:#3978b9;color:#dbeeff;box-shadow:inset 0 0 0 1px rgba(94,173,255,.12);}
+        @media(max-width:720px){#${SH.settingsCardId} .att-sh-commit-grid-v7130{grid-template-columns:1fr;}#${SH.managerId} .shm-body{grid-template-columns:190px minmax(0,1fr);}#${SH.managerId} .shm-record-actions button[data-shm-act="open-view"]{display:none;}}
         `;document.documentElement.appendChild(st);
     }
 
     function bindPersistLifecycle(){
-        window.addEventListener('pagehide',flushHistoryPersist,{capture:true});
-        document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushHistoryPersist();},{passive:true});
+        window.addEventListener('pagehide',()=>{clearIdleCommitTimer();flushHistoryPersist();},{capture:true});
+        document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){clearIdleCommitTimer();flushHistoryPersist();}},{passive:true});
     }
-    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();attachSearchClearToolbarObserver();bindPersistLifecycle();buildHistoryIndex();applySearchClearOptimizeState();console.log('[AutoTable 工具集 V7.12.1] 已加载：精准 toolbar 搜索状态驱动 / 输入与 chip 缓存 / 内置 X / 零跳动历史层 / 分块渲染 / GM 批处理 / 内部表格滚动免定位');}
+    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();attachSearchClearToolbarObserver();bindPersistLifecycle();buildHistoryIndex();applySearchClearOptimizeState();console.log('[AutoTable 工具集 V7.13.0] 已加载：正式历史提交策略 / 胶囊智能补位 / 精准 toolbar 状态 / 内置 X / 零跳动历史层 / 分块渲染 / GM 批处理');}
     if(document.body)init();else window.addEventListener('DOMContentLoaded',init,{once:true});
 })();
