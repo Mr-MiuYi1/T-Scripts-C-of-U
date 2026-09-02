@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.12.0
-// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、紧凑可展开的全视图模糊搜索记录与搜索栏内置清空、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.12.1
+// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、精准原生状态驱动的紧凑可展开全视图搜索记录与搜索栏内置清空、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.12.0
+ * AutoTable 工具集 V7.12.1
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，整行上下强调边缘可独立配置，支持快捷开关）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -44,7 +44,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.12.0',
+        version: 'V7.12.1',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -27761,12 +27761,12 @@
         }
     `;
     document.documentElement.appendChild(style);
-    console.log('[AutoTable 工具集 V7.12.0] 悬浮菜单布局优化已加载：快捷操作聚合 / 设置分区导航 / 文档 Tab 顺序优化');
+    console.log('[AutoTable 工具集 V7.12.1] 悬浮菜单布局优化已加载：快捷操作聚合 / 设置分区导航 / 文档 Tab 顺序优化');
 })();
 
 
 /* ============================================================================
- * AutoTable 全视图模糊搜索记录与搜索栏清空优化 V7.12.0
+ * AutoTable 全视图模糊搜索记录与搜索栏清空优化 V7.12.1
  * --------------------------------------------------------------------------
  * 1) 搜索框下方默认使用更紧凑的历史层，支持列表 / 胶囊自动填充两种展示；
  * 2) 可调历史文字大小；每个视图最大保存条数继续独立控制；
@@ -27779,13 +27779,14 @@
  * 9) Observer 去自循环、输入/定位 RAF 合并继续保留；所有新增设置自动进入“全部设置导出 / 导入 / 重置”；
  * 10) V7.11.2 首次打开采用隐藏测量定位；
  * 11) V7.11.3 紧凑历史层改为零尺寸动画 + 双 RAF 等待原生焦点布局稳定 + 重复 focus 不再二次定位；
- * 12) V7.12.0 新增“搜索栏清空优化”：隐藏原生搜索状态块，在搜索输入框内部提供 X，并优先复用 AutoTable 原生清除搜索动作。
+ * 12) V7.12.1 搜索栏清空优化继续保留：隐藏原生搜索状态块，在搜索输入框内部提供 X，并优先复用 AutoTable 原生清除搜索动作。
+ * 13) V7.12.1 基于最新组件抓取改为精准 toolbar / 搜索状态驱动：缓存搜索输入与状态 chip、减少全页扫描、按原生搜索状态落历史，并避免表格内部滚动触发无意义定位。
  * ========================================================================== */
 (function () {
     'use strict';
 
     const SH = {
-        version: 'V7.12.0',
+        version: 'V7.12.1',
         enabledKey: 'att_v3_viewSearchHistoryEnabled',
         maxKey: 'att_v3_viewSearchHistoryMaxPerView',
         perViewKey: 'att_v3_viewSearchHistoryPerViewMode',
@@ -27850,6 +27851,15 @@
     let managerRenderLimit = 120;
     let searchClearSyncRaf = 0;
     let searchClearInitTimer = 0;
+    // V7.12.1：基于真实 toolbar 结构缓存搜索锚点 / 搜索状态，避免高频全页 querySelectorAll。
+    let cachedSearchInput = null;
+    let cachedSearchStateChip = null;
+    let observedSearchToolbar = null;
+    let searchToolbarObserver = null;
+    let toolbarStateSyncRaf = 0;
+    let lastNativeCommittedSignature = '';
+    let dropdownMeasuredHeight = 0;
+    let anchorScrollCleanups = [];
     const EXPANDED_CHUNK = 80;
     const MANAGER_CHUNK = 120;
 
@@ -27934,23 +27944,97 @@
         return (ph.includes('全视图')&&ph.includes('搜索'))||(ar.includes('全视图')&&ar.includes('搜索'));
     }
 
+    function isElementVisible(el) {
+        if (!(el instanceof HTMLElement) || !el.isConnected) return false;
+        const rect = el.getBoundingClientRect();
+        return rect.width > 40 && rect.height > 18 && el.getClientRects().length > 0;
+    }
+
     function findVisibleViewSearchInput() {
-        const inputs = Array.from(document.querySelectorAll('input')).filter(isViewSearchInput);
-        return inputs.find(input => {
-            if (!input.isConnected) return false;
-            const rect = input.getBoundingClientRect();
-            const style = getComputedStyle(input);
-            return rect.width > 40 && rect.height > 18 && style.display !== 'none' && style.visibility !== 'hidden';
-        }) || inputs[0] || null;
+        // 优先复用刚刚已经确认过的真实搜索框，React 没有重挂载时 O(1)。
+        if (cachedSearchInput instanceof HTMLInputElement && isViewSearchInput(cachedSearchInput) && isElementVisible(cachedSearchInput)) return cachedSearchInput;
+        if (activeSearchInput instanceof HTMLInputElement && isViewSearchInput(activeSearchInput) && isElementVisible(activeSearchInput)) {
+            cachedSearchInput = activeSearchInput;
+            return activeSearchInput;
+        }
+
+        // 最新抓取表明搜索控件位于 view-filter-toolbar-slot；先只扫描这个小区域。
+        const toolbar = document.querySelector('.view-filter-toolbar-slot');
+        if (toolbar) {
+            const candidates = toolbar.querySelectorAll('input[placeholder*="搜索"],input[aria-label*="搜索"],input[type="search"]');
+            for (const input of candidates) {
+                if (isViewSearchInput(input) && isElementVisible(input)) {
+                    cachedSearchInput = input;
+                    return input;
+                }
+            }
+        }
+
+        // 兼容旧页面结构的低频兜底。只有缓存失效且 toolbar 中没找到时才扫描全页。
+        for (const input of document.querySelectorAll('input[placeholder*="全视图"],input[aria-label*="全视图"]')) {
+            if (isViewSearchInput(input) && isElementVisible(input)) {
+                cachedSearchInput = input;
+                return input;
+            }
+        }
+        cachedSearchInput = null;
+        return null;
+    }
+
+    function isNativeSearchStateChip(chip) {
+        if (!(chip instanceof Element) || !chip.isConnected || !chip.classList.contains('toolbar-state-chip')) return false;
+        const title = cleanText(chip.getAttribute('title') || '');
+        return title.startsWith('搜索：') || Boolean(chip.querySelector('.anticon-search,[data-icon="search"]'));
     }
 
     function findNativeSearchStateChip() {
-        const chips = document.querySelectorAll('.view-filter-toolbar-slot .toolbar-state-chips .toolbar-state-chip, .toolbar-state-chips .toolbar-state-chip');
-        for (const chip of chips) {
-            const title = cleanText(chip.getAttribute('title') || '');
-            if (chip.querySelector('.anticon-search,[data-icon="search"]') || title.startsWith('搜索：')) return chip;
+        if (isNativeSearchStateChip(cachedSearchStateChip)) return cachedSearchStateChip;
+        // 最新抓取到的精确结构优先。
+        const exact = document.querySelector('.view-filter-toolbar-slot > .toolbar-inline-buttons > .toolbar-state-chips > .toolbar-state-chip[title^="搜索："]')
+            || document.querySelector('.view-filter-toolbar-slot > .toolbar-inline-buttons > .toolbar-state-chips > .toolbar-state-chip .anticon-search')?.closest('.toolbar-state-chip');
+        if (isNativeSearchStateChip(exact)) {
+            cachedSearchStateChip = exact;
+            return exact;
         }
+        // 旧结构兜底。
+        const chips = document.querySelectorAll('.view-filter-toolbar-slot .toolbar-state-chips .toolbar-state-chip');
+        for (const chip of chips) {
+            if (isNativeSearchStateChip(chip)) {
+                cachedSearchStateChip = chip;
+                return chip;
+            }
+        }
+        cachedSearchStateChip = null;
         return null;
+    }
+
+    function extractNativeSearchQuery(chip = findNativeSearchStateChip()) {
+        if (!(chip instanceof Element)) return '';
+        const title = cleanText(chip.getAttribute('title') || '');
+        if (title.startsWith('搜索：')) return cleanText(title.slice(3));
+        const main = cleanText(chip.querySelector('.toolbar-state-chip__main')?.textContent || chip.textContent || '');
+        return main.startsWith('搜索：') ? cleanText(main.slice(3)) : '';
+    }
+
+    function scheduleNativeToolbarStateSync(input = null) {
+        if (input instanceof HTMLInputElement && isViewSearchInput(input)) cachedSearchInput = input;
+        if (toolbarStateSyncRaf) return;
+        toolbarStateSyncRaf = requestAnimationFrame(() => {
+            toolbarStateSyncRaf = 0;
+            const chip = findNativeSearchStateChip();
+            const query = extractNativeSearchQuery(chip);
+            if (enabled && query) {
+                const ctx = getCurrentViewContext();
+                const sig = `${ctx.key}\n${query}`;
+                if (sig !== lastNativeCommittedSignature) {
+                    lastNativeCommittedSignature = sig;
+                    recordSearch(query, ctx);
+                }
+            } else if (!query) {
+                lastNativeCommittedSignature = '';
+            }
+            if (clearOptimizeEnabled) scheduleSearchClearSync(cachedSearchInput || activeSearchInput);
+        });
     }
 
     function cleanupInlineSearchClear() {
@@ -27964,7 +28048,7 @@
     function getSearchInputClearHost(input) {
         if (!(input instanceof HTMLInputElement)) return null;
         // 优先使用 Ant Design / 常见搜索输入包装器；找不到时才退回直接父节点。
-        const host = input.closest('.ant-input-affix-wrapper,.ant-input-group-wrapper,.view-search-input-wrap,.view-filter-search,.toolbar-search') || input.parentElement;
+        const host = input.closest('.ant-input-affix-wrapper,.ant-input-group-wrapper,.view-filter-toolbar-slot .ant-input-affix-wrapper,.view-search-input-wrap,.view-filter-search,.toolbar-search') || input.parentElement;
         return host instanceof HTMLElement ? host : null;
     }
 
@@ -27982,6 +28066,7 @@
             ? input
             : findVisibleViewSearchInput();
         if (!target) return;
+        cachedSearchInput = target;
 
         // React 重挂载搜索框后，移除已失效/非当前输入上的增强节点。
         document.querySelectorAll(`.${SH.clearButtonClass}`).forEach(btn => {
@@ -28060,7 +28145,9 @@
             cleanupInlineSearchClear();
             return;
         }
-        scheduleSearchClearSync(findVisibleViewSearchInput());
+        const firstInput = findVisibleViewSearchInput();
+        scheduleSearchClearSync(firstInput);
+        ensureSearchToolbarObserver(firstInput);
         // 页面初次进入时 React 可能尚未挂载原生搜索框；短暂有限重试，不常驻轮询。
         clearTimeout(searchClearInitTimer);
         let tries = 0;
@@ -28214,7 +28301,9 @@
         let left=r.right-width;left=Math.max(margin,Math.min(left,window.innerWidth-width-margin));
         // measuring 状态的 scrollHeight 是唯一一次用于决定上下方向的高度。
         const cap=dropdownExpanded?Math.min(600,window.innerHeight-margin*2):280;
-        const measured=Math.min(d.scrollHeight||cap,cap),below=window.innerHeight-r.bottom-margin,above=r.top-margin;
+        // scroll / resize 重定位时不再反复读取 scrollHeight；仅首次测量或强制尺寸变化时读取。
+        if (allowMeasure || force || !dropdownMeasuredHeight) dropdownMeasuredHeight = Math.min(d.scrollHeight || cap, cap);
+        const measured=Math.min(dropdownMeasuredHeight||cap,cap),below=window.innerHeight-r.bottom-margin,above=r.top-margin;
         let top;if(below>=Math.min(dropdownExpanded?390:170,measured)||below>=above)top=r.bottom+gap;else top=Math.max(margin,r.top-measured-gap);
         const next={width:Math.round(width),left:Math.round(left),top:Math.round(top)};
         const changed=force || !Number.isFinite(dropdownLastGeometry.width)
@@ -28269,6 +28358,7 @@
         const signature=[ctx.key,cleanText(input.value||''),historyRevision,perViewMode?1:0,sameTableShare?1:0,layoutMode,historyFontSize,dropdownExpanded?1:0,expandedFilter].join('\u001f');
         const sameRender=signature===dropdownRenderSignature;
         if(!sameRender){
+            dropdownMeasuredHeight=0;
             const items=getDisplayItems(input.value||'');
             d.style.setProperty('--att-sh-font-size',`${historyFontSize}px`);d.classList.toggle('is-expanded',dropdownExpanded);d.classList.toggle('is-capsule',layoutMode==='capsule');
             const head=d.querySelector('[data-shd-head]');if(head)head.innerHTML=`<div><b>${escHtml(scopeLabel()==='当前视图'?ctx.viewName:scopeLabel())}</b><span>${total} 条 · ${layoutMode==='capsule'?'胶囊':'列表'}</span></div>${perViewMode&&!sameTableShare&&historyData[ctx.key]?.items?.length?'<button type="button" data-sh-act="clear-current">清空</button>':''}`;
@@ -28289,7 +28379,7 @@
         clearTimeout(dropdownResizeMotionTimer);dropdownResizeMotionTimer=0;
         d?.classList.remove('is-open','is-expanded','is-measuring','is-opening-stable','allow-resize-motion');
         dropdownExpanded=false;expandedFilter='';expandedRenderLimit=EXPANDED_CHUNK;clearTimeout(expandedFilterTimer);
-        dropdownLastGeometry={width:NaN,left:NaN,top:NaN};
+        dropdownLastGeometry={width:NaN,left:NaN,top:NaN};dropdownMeasuredHeight=0;
     }
     function onDropdownClick(event){
         const action=event.target.closest('[data-sh-act]')?.dataset.shAct;
@@ -28361,53 +28451,132 @@
         if(attach())return;settingsAttachObserver=new MutationObserver(()=>{if(attach()){settingsAttachObserver.disconnect();settingsAttachObserver=null;}});settingsAttachObserver.observe(document.documentElement,{childList:true,subtree:true});
     }
 
+    function clearAnchorScrollListeners() {
+        for (const fn of anchorScrollCleanups) { try { fn(); } catch {} }
+        anchorScrollCleanups = [];
+    }
+
+    function bindAnchorScrollListeners(input) {
+        clearAnchorScrollListeners();
+        if (!(input instanceof HTMLElement)) return;
+        // 只监听搜索框真正的可滚动祖先；不再 capture 全页面所有内部滚动。
+        let node = input.parentElement;
+        const seen = new Set();
+        while (node && node !== document.body && node !== document.documentElement) {
+            const cs = getComputedStyle(node);
+            const oy = `${cs.overflowY} ${cs.overflowX}`;
+            if (/(auto|scroll|overlay)/.test(oy) && !seen.has(node)) {
+                node.addEventListener('scroll', scheduleDropdownPosition, { passive:true });
+                anchorScrollCleanups.push(() => node.removeEventListener('scroll', scheduleDropdownPosition));
+                seen.add(node);
+            }
+            node = node.parentElement;
+        }
+    }
+
     function bindSearchEvents(){
         document.addEventListener('focusin',e=>{
             if(!isViewSearchInput(e.target))return;
             activeSearchInput=e.target;
+            cachedSearchInput=e.target;
+            ensureSearchToolbarObserver(activeSearchInput);
+            bindAnchorScrollListeners(activeSearchInput);
             if(clearOptimizeEnabled)scheduleSearchClearSync(activeSearchInput);
             if(!enabled)return;
             const d=document.getElementById(SH.dropdownId),ctx=getCurrentViewContext(),value=cleanText(e.target.value||'');
-            // React 在一次点击中重挂载 input 时，只更新 activeSearchInput 引用。
-            // 200ms 内同一视图+同一搜索词不做第二次 render/position。
             if(d?.classList.contains('is-open')&&performance.now()-dropdownOpenedAt<200&&ctx.key===dropdownLastViewKey&&value===dropdownLastInputValue)return;
             scheduleDropdownRender(activeSearchInput);
         },true);
-        document.addEventListener('input',e=>{if(!isViewSearchInput(e.target))return;activeSearchInput=e.target;if(clearOptimizeEnabled)scheduleSearchClearSync(activeSearchInput);if(enabled){dropdownExpanded=false;expandedFilter='';scheduleDropdownRender(activeSearchInput);}},true);
-        document.addEventListener('keydown',e=>{if(!isViewSearchInput(e.target))return;if(e.key==='Enter'){recordSearch(e.target.value);hideDropdown();}if(e.key==='Escape')hideDropdown();},true);
-        document.addEventListener('focusout',e=>{if(!isViewSearchInput(e.target))return;const input=e.target;setTimeout(()=>{const d=document.getElementById(SH.dropdownId);if(dropdownPointerDown||d?.contains(document.activeElement))return;recordSearch(input.value);if(document.activeElement!==input)hideDropdown();},120);},true);
-        document.addEventListener('pointerdown',e=>{const d=document.getElementById(SH.dropdownId);if(!d?.classList.contains('is-open'))return;if(e.target===activeSearchInput||d.contains(e.target))return;if(activeSearchInput?.value)recordSearch(activeSearchInput.value);hideDropdown();},true);
-        document.addEventListener('scroll',scheduleDropdownPosition,{capture:true,passive:true});window.addEventListener('resize',scheduleDropdownPosition,{passive:true});
+        document.addEventListener('input',e=>{
+            if(!isViewSearchInput(e.target))return;
+            activeSearchInput=e.target;cachedSearchInput=e.target;
+            if(clearOptimizeEnabled)scheduleSearchClearSync(activeSearchInput);
+            if(enabled){dropdownExpanded=false;expandedFilter='';scheduleDropdownRender(activeSearchInput);}
+        },true);
+        document.addEventListener('keydown',e=>{
+            if(!isViewSearchInput(e.target))return;
+            if(e.key==='Enter'){
+                // Enter 仍作为兜底立即记录；原生 toolbar 状态稍后同步时会被 recordSearch 的 1.2s 去重挡住。
+                recordSearch(e.target.value);
+                setTimeout(()=>scheduleNativeToolbarStateSync(e.target),0);
+                hideDropdown();
+            }
+            if(e.key==='Escape')hideDropdown();
+        },true);
+        document.addEventListener('focusout',e=>{
+            if(!isViewSearchInput(e.target))return;
+            const input=e.target;
+            setTimeout(()=>{
+                const d=document.getElementById(SH.dropdownId);
+                if(dropdownPointerDown||d?.contains(document.activeElement))return;
+                // V7.12.1 不再把“失焦”当成一次搜索提交，避免草稿被误记和多余 GM 写入。
+                if(document.activeElement!==input)hideDropdown();
+            },120);
+        },true);
+        document.addEventListener('pointerdown',e=>{
+            const d=document.getElementById(SH.dropdownId);
+            if(!d?.classList.contains('is-open'))return;
+            if(e.target===activeSearchInput||d.contains(e.target))return;
+            // 点击外部只负责关闭，不再猜测并保存搜索词；真实搜索以原生 toolbar 状态为准。
+            hideDropdown();
+        },true);
+        // 关键性能修复：不再 capture 所有表格内部 scroll。搜索栏位于 toolbar 外层，表格横纵滚动不会移动它。
+        window.addEventListener('scroll',scheduleDropdownPosition,{passive:true});
+        window.addEventListener('resize',scheduleDropdownPosition,{passive:true});
+    }
+
+    function ensureSearchToolbarObserver(input = cachedSearchInput || activeSearchInput || findVisibleViewSearchInput()) {
+        const host = input?.closest?.('.view-filter-toolbar-slot') || document.querySelector('.view-filter-toolbar-slot');
+        if (!(host instanceof Element)) return false;
+        if (host === observedSearchToolbar && searchToolbarObserver) return true;
+        try { searchToolbarObserver?.disconnect(); } catch {}
+        observedSearchToolbar = host;
+        cachedSearchStateChip = null;
+        searchToolbarObserver = new MutationObserver(records => {
+            let relevant = false;
+            for (const r of records) {
+                const target = r.target instanceof Element ? r.target : r.target.parentElement;
+                // 忽略我们自己给搜索输入追加 X 所产生的 DOM 变化。
+                if (target?.closest?.(`.${SH.clearButtonClass}`)) continue;
+                if (r.type === 'attributes' && target?.matches?.('.toolbar-state-chip')) { relevant = true; break; }
+                if (r.type === 'characterData' && target?.closest?.('.toolbar-state-chip')) { relevant = true; break; }
+                if (r.type === 'childList') {
+                    const nodes=[...r.addedNodes,...r.removedNodes];
+                    if(nodes.some(n=>{
+                        if(!(n instanceof Element))return false;
+                        if(n.matches?.(`.${SH.clearButtonClass}`))return false;
+                        return n.matches?.('.toolbar-state-chip,.toolbar-state-chips,input') || n.querySelector?.('.toolbar-state-chip,.toolbar-state-chips,input');
+                    })) { relevant=true; break; }
+                }
+            }
+            if (!relevant) return;
+            cachedSearchStateChip = null;
+            scheduleNativeToolbarStateSync(cachedSearchInput || activeSearchInput);
+        });
+        // title 是搜索词最稳定的原生来源；characterData 兼容站点只更新文本的情况。
+        searchToolbarObserver.observe(host,{childList:true,subtree:true,attributes:true,attributeFilter:['title'],characterData:true});
+        scheduleNativeToolbarStateSync(input);
+        return true;
     }
 
     function attachSearchClearToolbarObserver() {
-        let observedHost = null;
-        let observer = null;
-        const attach = () => {
-            if (!clearOptimizeEnabled) return;
-            const host = document.querySelector('.view-filter-toolbar-slot') || document.querySelector('.view-filter-tabs-row');
-            if (!host || host === observedHost) return;
-            try { observer?.disconnect(); } catch {}
-            observedHost = host;
-            observer = new MutationObserver(records => {
-                if (!clearOptimizeEnabled) return;
-                // 只关心原生 toolbar 子节点增删；不监听 class/style/value，避免搜索输入高频触发。
-                if (records.some(r => r.type === 'childList')) scheduleSearchClearSync(findVisibleViewSearchInput());
-            });
-            observer.observe(host, { childList: true, subtree: true });
-        };
-        attach();
-        // 路由切换后 toolbar 可能被 React 整体替换；focus/input 会即时补齐，下面只做低频重挂载检查。
-        window.addEventListener('popstate', () => setTimeout(attach, 80), { passive: true });
-        document.addEventListener('focusin', event => {
-            if (clearOptimizeEnabled && isViewSearchInput(event.target)) attach();
-        }, true);
-        window.__attSearchClearToolbarAttachV7120 = attach;
+        // 保留旧函数名以避免其它补丁引用，但内部已升级为搜索历史 + 清空按钮共用的精准 toolbar observer。
+        ensureSearchToolbarObserver();
+        window.addEventListener('popstate',()=>{
+            cachedSearchInput=null;cachedSearchStateChip=null;viewContextCache={href:'',at:0,value:null};
+            setTimeout(()=>ensureSearchToolbarObserver(findVisibleViewSearchInput()),80);
+        },{passive:true});
+        document.addEventListener('focusin',event=>{
+            if(!isViewSearchInput(event.target))return;
+            cachedSearchInput=event.target;
+            ensureSearchToolbarObserver(event.target);
+        },true);
+        window.__attSearchClearToolbarAttachV7121=ensureSearchToolbarObserver;
     }
 
     function ensureStyle(){
         if(document.getElementById(SH.styleId))return;const st=document.createElement('style');st.id=SH.styleId;st.textContent=`
-        /* V7.12.0 搜索栏清空优化：只隐藏搜索状态 chip，不影响筛选/排序等其它状态。 */
+        /* V7.12.1 搜索增强：基于真实 toolbar 搜索状态精准联动，只隐藏搜索 chip，不影响筛选/排序。 */
         html.${SH.clearBodyClass} .view-filter-toolbar-slot .toolbar-state-chip:has(.anticon-search),
         body.${SH.clearBodyClass} .view-filter-toolbar-slot .toolbar-state-chip:has(.anticon-search){display:none!important;}
         .${SH.clearHostClass}{position:relative!important;}
@@ -28419,19 +28588,19 @@
         .${SH.clearButtonClass}:active{background:rgba(127,127,127,.24)!important;}
         body:not(.att-native-dark) .${SH.clearButtonClass}{color:#7c838b!important;}
         body:not(.att-native-dark) .${SH.clearButtonClass}:hover{background:rgba(15,23,42,.08)!important;color:#374151!important;}
-        #${SH.dropdownId}{--att-sh-font-size:12px;position:fixed;z-index:2147482600;display:none;max-height:280px;overflow:hidden;background:#202124;color:#e8eaed;border:1px solid #414348;border-radius:9px;box-shadow:0 12px 34px rgba(0,0,0,.38);font-family:inherit;font-size:var(--att-sh-font-size);line-height:1.35;transition:none;transform-origin:top right;will-change:auto;} #${SH.dropdownId}.is-opening-stable{transition:none!important;} #${SH.dropdownId}.allow-resize-motion{transition:width .22s cubic-bezier(.22,.61,.36,1),max-height .24s cubic-bezier(.22,.61,.36,1),box-shadow .2s ease;}
+        #${SH.dropdownId}{--att-sh-font-size:12px;position:fixed;z-index:2147482600;display:none;max-height:280px;overflow:hidden;background:#202124;color:#e8eaed;border:1px solid #414348;border-radius:9px;box-shadow:0 12px 34px rgba(0,0,0,.38);font-family:inherit;font-size:var(--att-sh-font-size);line-height:1.35;transition:none;transform-origin:top right;will-change:auto;contain:layout paint style;} #${SH.dropdownId}.is-opening-stable{transition:none!important;} #${SH.dropdownId}.allow-resize-motion{transition:width .22s cubic-bezier(.22,.61,.36,1),max-height .24s cubic-bezier(.22,.61,.36,1),box-shadow .2s ease;}
         #${SH.dropdownId}.is-measuring{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;visibility:hidden!important;pointer-events:none!important;transition:none!important;} #${SH.dropdownId}.is-open{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;} #${SH.dropdownId}.is-expanded{max-height:min(600px,calc(100vh - 22px));box-shadow:0 18px 48px rgba(0,0,0,.46);}
         #${SH.dropdownId} button,#${SH.dropdownId} input{font:inherit;} #${SH.dropdownId} .shd-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px 6px;border-bottom:1px solid #34363a;} #${SH.dropdownId} .shd-head>div{min-width:0;display:flex;align-items:center;gap:6px;} #${SH.dropdownId} .shd-head b{font-size:1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-head span{color:#868b92;font-size:.82em;white-space:nowrap;} #${SH.dropdownId} .shd-head button{border:0;background:transparent;color:#8ab4f8;padding:2px 4px;cursor:pointer;border-radius:4px;}
-        #${SH.dropdownId} .shd-list{min-height:0;max-height:166px;overflow:auto;padding:3px 4px;scrollbar-gutter:stable;} #${SH.dropdownId}.is-capsule .shd-list{max-height:148px;padding:6px;}
+        #${SH.dropdownId} .shd-list{min-height:0;max-height:166px;overflow:auto;padding:3px 4px;scrollbar-gutter:stable;overscroll-behavior:contain;} #${SH.dropdownId}.is-capsule .shd-list{max-height:148px;padding:6px;}
         #${SH.dropdownId} .shd-item{display:grid;grid-template-columns:17px minmax(0,1fr) auto 20px;align-items:center;gap:4px;min-height:29px;padding:2px 3px;border-radius:5px;cursor:pointer;} #${SH.dropdownId} .shd-item:hover{background:#2b2d31;} #${SH.dropdownId} .shd-clock{font-size:1em;color:#7e848b;text-align:center;} #${SH.dropdownId} .shd-main{min-width:0;} #${SH.dropdownId} .shd-query{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-source{margin-top:1px;color:#7d838a;font-size:.78em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-time{font-size:.78em;color:#747a81;} #${SH.dropdownId} .shd-del{width:19px;height:19px;padding:0;border:0;border-radius:4px;background:transparent;color:#7f858c;cursor:pointer;} #${SH.dropdownId} .shd-del:hover{background:#3b2929;color:#ff8a80;}
         #${SH.dropdownId} .shd-capsules{display:flex;flex-wrap:wrap;align-content:flex-start;gap:5px;} #${SH.dropdownId} .shd-chip{display:inline-flex;align-items:center;max-width:100%;height:25px;background:#292d32;border:1px solid #3a4047;border-radius:999px;overflow:hidden;} #${SH.dropdownId} .shd-chip:hover{border-color:#4a6f9d;background:#283446;} #${SH.dropdownId} .shd-chip-main{max-width:190px;height:100%;padding:0 8px;border:0;background:transparent;color:#dfe7f1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;} #${SH.dropdownId} .shd-chip-del{width:22px;height:100%;border:0;border-left:1px solid rgba(255,255,255,.05);background:transparent;color:#7d858e;cursor:pointer;} #${SH.dropdownId} .shd-chip-del:hover{color:#ff8a80;background:#3b2929;}
         #${SH.dropdownId} .shd-empty{padding:15px 9px;text-align:center;color:#a7adb4;} #${SH.dropdownId} .shd-empty span{display:block;margin-top:3px;color:#747a81;font-size:.8em;} #${SH.dropdownId} .shd-all{height:30px;display:flex;align-items:center;justify-content:space-between;padding:0 9px;border:0;border-top:1px solid #34363a;background:#232427;color:#9ecbff;cursor:pointer;} #${SH.dropdownId} .shd-all:hover{background:#292c31;} #${SH.dropdownId} .shd-all b{font-size:1.3em;font-weight:400;}
         #${SH.dropdownId} .shd-expanded{max-height:0;opacity:0;overflow:hidden;background:#1e1f22;transition:max-height .25s cubic-bezier(.22,.61,.36,1),opacity .18s ease;} #${SH.dropdownId}.is-expanded .shd-expanded{max-height:365px;opacity:1;border-top:1px solid #34363a;display:grid;grid-template-rows:auto auto minmax(0,1fr);} #${SH.dropdownId} .shd-expanded-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 9px 5px;} #${SH.dropdownId} .shd-expanded-head>div{display:flex;align-items:baseline;gap:7px;min-width:0;} #${SH.dropdownId} .shd-expanded-head b{font-size:1.03em;} #${SH.dropdownId} .shd-expanded-head span{font-size:.8em;color:#7f858c;} #${SH.dropdownId} .shd-expanded-actions{display:flex;gap:5px;} #${SH.dropdownId} .shd-expanded-actions button{height:25px;padding:0 7px;border:1px solid #41454a;border-radius:5px;background:#292b2f;color:#cfd4da;cursor:pointer;} #${SH.dropdownId} .shd-expanded-actions button:first-child{color:#9ecbff;}
-        #${SH.dropdownId} .shd-expanded-search{padding:3px 8px 6px;} #${SH.dropdownId} .shd-expanded-search input{width:100%;height:28px;box-sizing:border-box;padding:0 8px;border:1px solid #3c4045;border-radius:6px;background:#27282b;color:#e8eaed;outline:none;} #${SH.dropdownId} .shd-expanded-search input:focus{border-color:#4b77ad;} #${SH.dropdownId} .shd-expanded-list{min-height:0;overflow:auto;padding:0 5px 7px;scrollbar-gutter:stable;contain:layout paint;} #${SH.dropdownId} .shd-expanded-item{display:grid;grid-template-columns:minmax(0,1fr) 22px;align-items:center;gap:5px;min-height:34px;padding:3px 3px;border-bottom:1px solid #2d2f33;content-visibility:auto;contain-intrinsic-size:36px;} #${SH.dropdownId} .shd-expanded-item:hover{background:#25272a;} #${SH.dropdownId} .shd-expanded-use{min-width:0;text-align:left;border:0;background:transparent;color:#e8eaed;padding:2px 4px;cursor:pointer;} #${SH.dropdownId} .shd-expanded-use b,#${SH.dropdownId} .shd-expanded-use span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-expanded-use b{font-size:1em;} #${SH.dropdownId} .shd-expanded-use span{margin-top:2px;color:#80868d;font-size:.78em;}
+        #${SH.dropdownId} .shd-expanded-search{padding:3px 8px 6px;} #${SH.dropdownId} .shd-expanded-search input{width:100%;height:28px;box-sizing:border-box;padding:0 8px;border:1px solid #3c4045;border-radius:6px;background:#27282b;color:#e8eaed;outline:none;} #${SH.dropdownId} .shd-expanded-search input:focus{border-color:#4b77ad;} #${SH.dropdownId} .shd-expanded-list{min-height:0;overflow:auto;padding:0 5px 7px;scrollbar-gutter:stable;contain:layout paint;overscroll-behavior:contain;} #${SH.dropdownId} .shd-expanded-item{display:grid;grid-template-columns:minmax(0,1fr) 22px;align-items:center;gap:5px;min-height:34px;padding:3px 3px;border-bottom:1px solid #2d2f33;content-visibility:auto;contain-intrinsic-size:36px;} #${SH.dropdownId} .shd-expanded-item:hover{background:#25272a;} #${SH.dropdownId} .shd-expanded-use{min-width:0;text-align:left;border:0;background:transparent;color:#e8eaed;padding:2px 4px;cursor:pointer;} #${SH.dropdownId} .shd-expanded-use b,#${SH.dropdownId} .shd-expanded-use span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-expanded-use b{font-size:1em;} #${SH.dropdownId} .shd-expanded-use span{margin-top:2px;color:#80868d;font-size:.78em;}
 
         #${SH.managerId}{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.56);backdrop-filter:blur(3px);color:#e8eaed;font-family:inherit;} #${SH.managerId}.is-open{display:flex;} #${SH.managerId}{--att-sh-font-size:12px;} #${SH.managerId} .shm-shell{width:min(820px,calc(100vw - 32px));height:min(560px,calc(100vh - 32px));min-height:430px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:#202124;border:1px solid #3c3f43;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.46);overflow:hidden;font-size:var(--att-sh-font-size);} #${SH.managerId} .shm-head,#${SH.managerId} .shm-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;} #${SH.managerId} .shm-head{border-bottom:1px solid #34363a;} #${SH.managerId} .shm-foot{border-top:1px solid #34363a;color:#858b92;font-size:.82em;} #${SH.managerId} .shm-head>div{display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-head b{font-size:1.15em;} #${SH.managerId} .shm-head span{color:#8f949b;font-size:.82em;} #${SH.managerId} button{height:28px;padding:0 8px;border:1px solid #45484d;border-radius:6px;background:#303134;color:#e8eaed;cursor:pointer;font:inherit;} #${SH.managerId} button:hover{background:#3a3c40;} #${SH.managerId} button.primary{background:#1a73e8;border-color:#1a73e8;color:#fff;} #${SH.managerId} button.danger{color:#ff8a80;border-color:#67413f;}
         #${SH.managerId} .shm-body{min-height:0;display:grid;grid-template-columns:235px minmax(0,1fr);} #${SH.managerId} .shm-side{min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);border-right:1px solid #34363a;} #${SH.managerId} .shm-side-search{padding:8px;} #${SH.managerId} input[type="search"]{width:100%;height:30px;box-sizing:border-box;padding:0 8px;border:1px solid #424448;border-radius:6px;background:#292a2d;color:#e8eaed;outline:none;} #${SH.managerId} .shm-views{min-height:0;overflow:auto;padding:0 5px 8px;} #${SH.managerId} .shm-view{width:100%;height:auto;min-height:39px;margin:1px 0;padding:5px 6px;display:flex;align-items:center;justify-content:space-between;gap:6px;text-align:left;border-color:transparent;background:transparent;} #${SH.managerId} .shm-view.active{background:#26364d;border-color:#345d90;} #${SH.managerId} .shm-view span{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-view b,#${SH.managerId} .shm-view small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-view small,#${SH.managerId} .shm-view em{color:#7f858c;font-size:.78em;font-style:normal;} #${SH.managerId} .shm-none{padding:18px 8px;text-align:center;color:#858b92;}
-        #${SH.managerId} .shm-main{min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);} #${SH.managerId} .shm-main-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid #34363a;} #${SH.managerId} .shm-main-head>div{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-main-head b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-main-head span{color:#7f858c;font-size:.78em;} #${SH.managerId} .shm-records{min-height:0;overflow:auto;padding:4px 7px 9px;scrollbar-gutter:stable;contain:layout paint;} #${SH.managerId} .shm-record{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:34px;padding:4px 5px;border-bottom:1px solid #303236;content-visibility:auto;contain-intrinsic-size:36px;} #${SH.managerId} .shm-record:hover{background:#25272a;} #${SH.managerId} .shm-record-text{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-record-text b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-record-text span{color:#7f858c;font-size:.78em;} #${SH.managerId} .shm-record-actions{display:flex;gap:4px;flex:0 0 auto;} #${SH.managerId} .shm-record-actions button{height:24px;padding:0 6px;font-size:.78em;} #${SH.managerId} .shm-empty{padding:35px 12px;text-align:center;color:#858b92;} #${SH.managerId} .shm-foot>div{display:flex;gap:5px;}
+        #${SH.managerId} .shm-main{min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);} #${SH.managerId} .shm-main-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid #34363a;} #${SH.managerId} .shm-main-head>div{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-main-head b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-main-head span{color:#7f858c;font-size:.78em;} #${SH.managerId} .shm-records{min-height:0;overflow:auto;padding:4px 7px 9px;scrollbar-gutter:stable;contain:layout paint;overscroll-behavior:contain;} #${SH.managerId} .shm-record{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:34px;padding:4px 5px;border-bottom:1px solid #303236;content-visibility:auto;contain-intrinsic-size:36px;} #${SH.managerId} .shm-record:hover{background:#25272a;} #${SH.managerId} .shm-record-text{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-record-text b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-record-text span{color:#7f858c;font-size:.78em;} #${SH.managerId} .shm-record-actions{display:flex;gap:4px;flex:0 0 auto;} #${SH.managerId} .shm-record-actions button{height:24px;padding:0 6px;font-size:.78em;} #${SH.managerId} .shm-empty{padding:35px 12px;text-align:center;color:#858b92;} #${SH.managerId} .shm-foot>div{display:flex;gap:5px;}
         #${SH.settingsCardId} .att-sh-range-row-v7110{display:grid;grid-template-columns:minmax(0,1fr) 52px;align-items:center;gap:8px;margin-top:5px;} #${SH.settingsCardId} .att-sh-range-row-v7110 input{width:100%;} #${SH.settingsCardId} .att-sh-range-row-v7110 b{text-align:right;font-size:11px;color:inherit;opacity:.78;} #${SH.settingsCardId} .att-sh-layout-row-v7110{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:5px;} #${SH.settingsCardId} .att-sh-layout-row-v7110 button{height:30px;border:1px solid #40444a;border-radius:6px;background:#292b2f;color:inherit;cursor:pointer;} #${SH.settingsCardId} .att-sh-layout-row-v7110 button.active{background:#21466f;border-color:#3978b9;color:#dbeeff;box-shadow:inset 0 0 0 1px rgba(94,173,255,.12);}
         @media(max-width:720px){#${SH.managerId} .shm-body{grid-template-columns:190px minmax(0,1fr);}#${SH.managerId} .shm-record-actions button[data-shm-act="open-view"]{display:none;}}
         `;document.documentElement.appendChild(st);
@@ -28441,6 +28610,6 @@
         window.addEventListener('pagehide',flushHistoryPersist,{capture:true});
         document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushHistoryPersist();},{passive:true});
     }
-    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();attachSearchClearToolbarObserver();bindPersistLifecycle();buildHistoryIndex();applySearchClearOptimizeState();console.log('[AutoTable 工具集 V7.12.0] 已加载：搜索栏内置 X 清空 / 搜索状态块隐藏 / 零跳动历史层 / 分块渲染 / GM 批处理');}
+    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();attachSearchClearToolbarObserver();bindPersistLifecycle();buildHistoryIndex();applySearchClearOptimizeState();console.log('[AutoTable 工具集 V7.12.1] 已加载：精准 toolbar 搜索状态驱动 / 输入与 chip 缓存 / 内置 X / 零跳动历史层 / 分块渲染 / GM 批处理 / 内部表格滚动免定位');}
     if(document.body)init();else window.addEventListener('DOMContentLoaded',init,{once:true});
 })();
