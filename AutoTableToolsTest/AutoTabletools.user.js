@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.13.2
-// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、可配置正式记录条件、胶囊智能补位的紧凑可展开全视图搜索记录与搜索栏内置清空、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.13.3
+// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁的紧凑可展开全视图搜索记录与搜索栏内置清空、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.13.2
+ * AutoTable 工具集 V7.13.3
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，整行上下强调边缘可独立配置，支持快捷开关）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -44,7 +44,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.13.2',
+        version: 'V7.13.3',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -24947,6 +24947,7 @@
 
         return Array.from(document.querySelectorAll(selectors)).some(el => {
             if (!(el instanceof HTMLElement) || !visible(el)) return false;
+            if (el.matches('[data-att-motion-skip="true"]')) return false;
             // 工具集自身的小型浮窗不作为“阻止页面动画”的业务覆盖层。
             if (el.closest('#att-toolbox-root,#att-editor-phrase-manager,.apc-shell,#att-bulk-progress-panel')) return false;
             return true;
@@ -24954,6 +24955,8 @@
     }
 
     function animatePopup(el, force = false) {
+        // 某些工具层（例如搜索历史）要求鼠标按下/松开期间绝对稳定，不能被全局 popup 入场动画二次接管。
+        if (el instanceof Element && el.matches('[data-att-motion-skip="true"]')) return;
         if (!enabled() || reduced() || !(el instanceof HTMLElement) || !visible(el)) return;
         if (!force && animatedPopups.has(el)) return;
         animatedPopups.add(el);
@@ -24987,6 +24990,10 @@
     function scanVisiblePopups() {
         if (!enabled() || reduced()) return;
         document.querySelectorAll(MOTION.popupSelector).forEach(el => {
+            if (el.matches?.('[data-att-motion-skip="true"]')) {
+                popupVisibleState.set(el, false);
+                return;
+            }
             const nowVisible = visible(el);
             const wasVisible = popupVisibleState.get(el) === true;
             popupVisibleState.set(el, nowVisible);
@@ -27785,12 +27792,13 @@
  * 15) V7.13.0 胶囊模式改为“按行智能补位”：保持时间顺序，不重排历史；每行多个胶囊自动分配剩余宽度，删除 / 字号 / 窗口尺寸变化后自动重算。
  * 16) V7.13.1 新增胶囊删除按钮显示开关：关闭后不生成胶囊内 × 节点，并按真实胶囊宽度重新补位；列表 / 展开 / 管理器删除能力不受影响。
  * 17) V7.13.2 新增“紧凑搜索记录显示全部”开关：列表与胶囊均可取消前 8 / 14 条限制，剩余记录在原历史区域内部滚动查看。
+ * 18) V7.13.3 修复鼠标松开闪烁：搜索历史层不再使用 dialog 角色，并显式跳过全局丝滑弹窗入场动画，避免 click 阶段二次 opacity / translate / scale。
  * ========================================================================== */
 (function () {
     'use strict';
 
     const SH = {
-        version: 'V7.13.1',
+        version: 'V7.13.3',
         enabledKey: 'att_v3_viewSearchHistoryEnabled',
         maxKey: 'att_v3_viewSearchHistoryMaxPerView',
         perViewKey: 'att_v3_viewSearchHistoryPerViewMode',
@@ -28294,7 +28302,12 @@
 
     function ensureDropdown(){
         let d=document.getElementById(SH.dropdownId);if(d)return d;
-        d=document.createElement('div');d.id=SH.dropdownId;d.setAttribute('role','dialog');
+        d=document.createElement('div');d.id=SH.dropdownId;
+        // 这是依附搜索框的非模态历史区域，不是 dialog。使用 region 也避免全局丝滑动效把它当作新弹窗，
+        // 在 mouseup/click 阶段再次播放 opacity/translate/scale 入场动画造成闪烁。
+        d.setAttribute('role','region');
+        d.setAttribute('aria-label','搜索记录');
+        d.setAttribute('data-att-motion-skip','true');
         d.innerHTML=`<div class="shd-head" data-shd-head></div>
         <div class="shd-list" data-shd-list></div>
         <button type="button" class="shd-all" data-sh-act="expand-all"><span>查看全部视图搜索记录</span><b data-shd-expand-icon>›</b></button>
@@ -28737,7 +28750,7 @@
         .${SH.clearButtonClass}:active{background:rgba(127,127,127,.24)!important;}
         body:not(.att-native-dark) .${SH.clearButtonClass}{color:#7c838b!important;}
         body:not(.att-native-dark) .${SH.clearButtonClass}:hover{background:rgba(15,23,42,.08)!important;color:#374151!important;}
-        #${SH.dropdownId}{--att-sh-font-size:12px;position:fixed;z-index:2147482600;display:none;max-height:280px;overflow:hidden;background:#202124;color:#e8eaed;border:1px solid #414348;border-radius:9px;box-shadow:0 12px 34px rgba(0,0,0,.38);font-family:inherit;font-size:var(--att-sh-font-size);line-height:1.35;transition:none;transform-origin:top right;will-change:auto;contain:layout paint style;} #${SH.dropdownId}.is-opening-stable{transition:none!important;} #${SH.dropdownId}.allow-resize-motion{transition:width .22s cubic-bezier(.22,.61,.36,1),max-height .24s cubic-bezier(.22,.61,.36,1),box-shadow .2s ease;}
+        #${SH.dropdownId}{--att-sh-font-size:12px;position:fixed;z-index:2147482600;display:none;max-height:280px;overflow:hidden;background:#202124;color:#e8eaed;border:1px solid #414348;border-radius:9px;box-shadow:0 12px 34px rgba(0,0,0,.38);font-family:inherit;font-size:var(--att-sh-font-size);line-height:1.35;transition:none;transform-origin:top right;will-change:auto;contain:layout paint style;animation:none!important;translate:none!important;scale:none!important;} #${SH.dropdownId}.is-opening-stable{transition:none!important;animation:none!important;} #${SH.dropdownId}.allow-resize-motion{transition:width .22s cubic-bezier(.22,.61,.36,1),max-height .24s cubic-bezier(.22,.61,.36,1),box-shadow .2s ease;}
         #${SH.dropdownId}.is-measuring{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;visibility:hidden!important;pointer-events:none!important;transition:none!important;} #${SH.dropdownId}.is-open{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;} #${SH.dropdownId}.is-expanded{max-height:min(600px,calc(100vh - 22px));box-shadow:0 18px 48px rgba(0,0,0,.46);}
         #${SH.dropdownId} button,#${SH.dropdownId} input{font:inherit;} #${SH.dropdownId} .shd-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px 6px;border-bottom:1px solid #34363a;} #${SH.dropdownId} .shd-head>div{min-width:0;display:flex;align-items:center;gap:6px;} #${SH.dropdownId} .shd-head b{font-size:1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-head span{color:#868b92;font-size:.82em;white-space:nowrap;} #${SH.dropdownId} .shd-head button{border:0;background:transparent;color:#8ab4f8;padding:2px 4px;cursor:pointer;border-radius:4px;}
         #${SH.dropdownId} .shd-list{min-height:0;max-height:166px;overflow:auto;padding:3px 4px;scrollbar-gutter:stable;overscroll-behavior:contain;} #${SH.dropdownId}.is-capsule .shd-list{max-height:148px;padding:6px;}
