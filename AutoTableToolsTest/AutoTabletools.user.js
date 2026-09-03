@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.13.3
-// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁的紧凑可展开全视图搜索记录与搜索栏内置清空、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.13.4
+// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.13.3
+ * AutoTable 工具集 V7.13.4
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，整行上下强调边缘可独立配置，支持快捷开关）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -44,7 +44,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.13.3',
+        version: 'V7.13.4',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -27773,7 +27773,7 @@
 
 
 /* ============================================================================
- * AutoTable 全视图模糊搜索记录与搜索栏清空优化 V7.13.1
+ * AutoTable 全视图模糊搜索记录与搜索栏清空优化 V7.13.4
  * --------------------------------------------------------------------------
  * 1) 搜索框下方默认使用更紧凑的历史层，支持列表 / 胶囊自动填充两种展示；
  * 2) 可调历史文字大小；每个视图最大保存条数继续独立控制；
@@ -27793,12 +27793,13 @@
  * 16) V7.13.1 新增胶囊删除按钮显示开关：关闭后不生成胶囊内 × 节点，并按真实胶囊宽度重新补位；列表 / 展开 / 管理器删除能力不受影响。
  * 17) V7.13.2 新增“紧凑搜索记录显示全部”开关：列表与胶囊均可取消前 8 / 14 条限制，剩余记录在原历史区域内部滚动查看。
  * 18) V7.13.3 修复鼠标松开闪烁：搜索历史层不再使用 dialog 角色，并显式跳过全局丝滑弹窗入场动画，避免 click 阶段二次 opacity / translate / scale。
+ * 19) V7.13.4 “查看全部视图搜索记录”改为真正的展开/收起双态入口；展开区改用单一 height + opacity + translate 动画链，并移除重复定位，避免先撑开再跳动。
  * ========================================================================== */
 (function () {
     'use strict';
 
     const SH = {
-        version: 'V7.13.3',
+        version: 'V7.13.4',
         enabledKey: 'att_v3_viewSearchHistoryEnabled',
         maxKey: 'att_v3_viewSearchHistoryMaxPerView',
         perViewKey: 'att_v3_viewSearchHistoryPerViewMode',
@@ -28310,7 +28311,7 @@
         d.setAttribute('data-att-motion-skip','true');
         d.innerHTML=`<div class="shd-head" data-shd-head></div>
         <div class="shd-list" data-shd-list></div>
-        <button type="button" class="shd-all" data-sh-act="expand-all"><span>查看全部视图搜索记录</span><b data-shd-expand-icon>›</b></button>
+        <button type="button" class="shd-all" data-sh-act="expand-all" aria-expanded="false"><span data-shd-expand-label>查看全部视图搜索记录</span><b data-shd-expand-icon>›</b></button>
         <div class="shd-expanded" data-sh-expanded-box>
             <div class="shd-expanded-head"><div><b>全部视图搜索记录</b><span data-sh-expanded-count>0 条</span></div><div class="shd-expanded-actions"><button type="button" data-sh-act="open-manager">管理记录</button><button type="button" data-sh-act="collapse">收起</button></div></div>
             <div class="shd-expanded-search"><input type="search" data-sh-expanded-filter placeholder="筛选全部搜索记录…"></div>
@@ -28468,10 +28469,33 @@
     function expandedRowHtml(i){return `<div class="shd-expanded-item"><button type="button" class="shd-expanded-use" data-sh-query="${escAttr(i.query)}"><b>${escHtml(i.query)}</b><span>${escHtml(i.tableName)} · ${escHtml(i.viewName)} · ${escHtml(formatTime(i.ts))}</span></button><button type="button" class="shd-del" data-sh-act="delete" data-sh-query-delete="${escAttr(i.query)}" data-sh-view-key="${escAttr(i.viewKey)}">×</button></div>`;}
     function updateExpandedCount(total){const el=document.querySelector(`#${SH.dropdownId} [data-sh-expanded-count]`);if(el)el.textContent=`${Math.min(expandedRenderLimit,total)} / ${total} 条`;}
     function appendExpandedRows(rows,list=document.querySelector(`#${SH.dropdownId} [data-sh-expanded-list]`)){if(!list||!rows.length)return;list.insertAdjacentHTML('beforeend',rows.map(expandedRowHtml).join(''));}
+    function updateExpandedMotionTarget(d=ensureDropdown(), totalOverride=null){
+        const total=Number.isFinite(totalOverride)?totalOverride:getAllItems(expandedFilter).length;
+        // 头部 + 筛选栏约 72px；列表最多按 7 行参与外层高度，更多记录在内部滚动。
+        // 这样少量记录不会突然撑出大片空白，大量记录也不会无限增高。
+        const rows=Math.max(1,Math.min(total,7));
+        const target=Math.max(118,Math.min(365,76+rows*36));
+        d.style.setProperty('--att-sh-expanded-height',`${target}px`);
+        return target;
+    }
+
+    function syncExpandedToggleUi(d=ensureDropdown()){
+        const btn=d.querySelector('[data-sh-act="expand-all"]');
+        if(btn){
+            btn.setAttribute('aria-expanded',dropdownExpanded?'true':'false');
+            btn.title=dropdownExpanded?'收起全部视图搜索记录':'查看全部视图搜索记录';
+        }
+        const label=d.querySelector('[data-shd-expand-label]');
+        if(label)label.textContent=dropdownExpanded?'收起全部视图搜索记录':'查看全部视图搜索记录';
+    }
+
     function renderExpandedList(reset=true){
         const d=ensureDropdown(),list=d.querySelector('[data-sh-expanded-list]');if(!list)return;
         const items=getAllItems(expandedFilter);if(reset){expandedRenderLimit=Math.min(EXPANDED_CHUNK,items.length);list.innerHTML=items.length?items.slice(0,expandedRenderLimit).map(expandedRowHtml).join(''):'<div class="shd-empty">没有符合条件的记录</div>';list.scrollTop=0;}
-        updateExpandedCount(items.length);scheduleDropdownPosition();
+        updateExpandedCount(items.length);
+        updateExpandedMotionTarget(d,items.length);
+        // V7.13.4：列表自身不再安排第二次 positionDropdown。
+        // 展开/收起由 toggleExpandedPanel() 统一完成一次尺寸 + 定位动画，筛选只更新内部列表。
     }
 
     function renderDropdown(input=activeSearchInput){
@@ -28482,12 +28506,14 @@
         if(!sameRender){
             dropdownMeasuredHeight=0;
             const items=getDisplayItems(input.value||'');
-            d.style.setProperty('--att-sh-font-size',`${historyFontSize}px`);d.classList.toggle('is-expanded',dropdownExpanded);d.classList.toggle('is-capsule',layoutMode==='capsule');
+            d.style.setProperty('--att-sh-font-size',`${historyFontSize}px`);d.classList.toggle('is-capsule',layoutMode==='capsule');
             const head=d.querySelector('[data-shd-head]');if(head)head.innerHTML=`<div><b>${escHtml(scopeLabel()==='当前视图'?ctx.viewName:scopeLabel())}</b><span>${total} 条 · ${layoutMode==='capsule'?'胶囊':'列表'} · ${compactDisplayStatus()}</span></div>${perViewMode&&!sameTableShare&&historyData[ctx.key]?.items?.length?'<button type="button" data-sh-act="clear-current">清空</button>':''}`;
             const list=d.querySelector('[data-shd-list]');if(list){list.innerHTML=renderCompactItems(items,input);if(layoutMode==='capsule')scheduleCapsuleAutoFill(list);}
-            const icon=d.querySelector('[data-shd-expand-icon]');if(icon)icon.textContent=dropdownExpanded?'⌄':'›';
             const filter=d.querySelector('[data-sh-expanded-filter]');if(filter&&filter.value!==expandedFilter)filter.value=expandedFilter;
-            if(dropdownExpanded)renderExpandedList(true);
+            if(dropdownExpanded)renderExpandedList(true);else updateExpandedMotionTarget(d,0);
+            syncExpandedToggleUi(d);
+            // 所有内容和目标高度准备好后只切一次 class，避免中途状态被浏览器绘制出来。
+            d.classList.toggle('is-expanded',dropdownExpanded);
             dropdownRenderSignature=signature;
         }
         dropdownLastViewKey=ctx.key;
@@ -28503,13 +28529,31 @@
         dropdownExpanded=false;expandedFilter='';expandedRenderLimit=EXPANDED_CHUNK;clearTimeout(expandedFilterTimer);
         dropdownLastGeometry={width:NaN,left:NaN,top:NaN};dropdownMeasuredHeight=0;
     }
+    function toggleExpandedPanel(nextExpanded=!dropdownExpanded){
+        const d=ensureDropdown();
+        const next=Boolean(nextExpanded);
+        if(next===dropdownExpanded)return;
+        enableDropdownResizeMotion(d);
+        dropdownExpanded=next;
+        expandedFilter='';
+        expandedRenderLimit=EXPANDED_CHUNK;
+        // 强制本次切换进入新的渲染签名；内容准备和 class 切换都在 renderDropdown 内一次完成。
+        renderDropdown(activeSearchInput);
+        positionDropdown(activeSearchInput,d,false,true);
+        if(next){
+            const f=d.querySelector('[data-sh-expanded-filter]');
+            if(f)f.value='';
+        }
+    }
+
     function onDropdownClick(event){
         const action=event.target.closest('[data-sh-act]')?.dataset.shAct;
         if(action==='expand-all'){
-            const d=ensureDropdown();enableDropdownResizeMotion(d);dropdownExpanded=true;expandedFilter='';expandedRenderLimit=EXPANDED_CHUNK;renderDropdown(activeSearchInput);positionDropdown(activeSearchInput,d,false,true);const f=d.querySelector('[data-sh-expanded-filter]');if(f)f.value='';return;
+            // 同一个“查看全部”入口就是双态开关：展开后再次点击同一行即可收起。
+            toggleExpandedPanel(!dropdownExpanded);return;
         }
         if(action==='collapse'){
-            const d=ensureDropdown();enableDropdownResizeMotion(d);dropdownExpanded=false;expandedFilter='';renderDropdown(activeSearchInput);positionDropdown(activeSearchInput,d,false,true);return;
+            toggleExpandedPanel(false);return;
         }
         if(action==='open-manager'){openManager();return;}
         if(action==='clear-current'){const c=getCurrentViewContext();if(historyData[c.key]&&confirm(`清空“${c.viewName}”的搜索记录吗？`))clearViewHistory(c.key);return;}
@@ -28750,14 +28794,14 @@
         .${SH.clearButtonClass}:active{background:rgba(127,127,127,.24)!important;}
         body:not(.att-native-dark) .${SH.clearButtonClass}{color:#7c838b!important;}
         body:not(.att-native-dark) .${SH.clearButtonClass}:hover{background:rgba(15,23,42,.08)!important;color:#374151!important;}
-        #${SH.dropdownId}{--att-sh-font-size:12px;position:fixed;z-index:2147482600;display:none;max-height:280px;overflow:hidden;background:#202124;color:#e8eaed;border:1px solid #414348;border-radius:9px;box-shadow:0 12px 34px rgba(0,0,0,.38);font-family:inherit;font-size:var(--att-sh-font-size);line-height:1.35;transition:none;transform-origin:top right;will-change:auto;contain:layout paint style;animation:none!important;translate:none!important;scale:none!important;} #${SH.dropdownId}.is-opening-stable{transition:none!important;animation:none!important;} #${SH.dropdownId}.allow-resize-motion{transition:width .22s cubic-bezier(.22,.61,.36,1),max-height .24s cubic-bezier(.22,.61,.36,1),box-shadow .2s ease;}
-        #${SH.dropdownId}.is-measuring{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;visibility:hidden!important;pointer-events:none!important;transition:none!important;} #${SH.dropdownId}.is-open{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;} #${SH.dropdownId}.is-expanded{max-height:min(600px,calc(100vh - 22px));box-shadow:0 18px 48px rgba(0,0,0,.46);}
+        #${SH.dropdownId}{--att-sh-font-size:12px;--att-sh-expanded-height:118px;position:fixed;z-index:2147482600;display:none;max-height:min(600px,calc(100vh - 22px));overflow:hidden;background:#202124;color:#e8eaed;border:1px solid #414348;border-radius:9px;box-shadow:0 12px 34px rgba(0,0,0,.38);font-family:inherit;font-size:var(--att-sh-font-size);line-height:1.35;transition:none;transform-origin:top right;will-change:auto;contain:layout paint style;animation:none!important;translate:none!important;scale:none!important;} #${SH.dropdownId}.is-opening-stable{transition:none!important;animation:none!important;} #${SH.dropdownId}.allow-resize-motion{transition:width .30s cubic-bezier(.22,1,.36,1),left .30s cubic-bezier(.22,1,.36,1),top .30s cubic-bezier(.22,1,.36,1),box-shadow .24s ease;}
+        #${SH.dropdownId}.is-measuring{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;visibility:hidden!important;pointer-events:none!important;transition:none!important;} #${SH.dropdownId}.is-open{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;} #${SH.dropdownId}.is-expanded{box-shadow:0 18px 48px rgba(0,0,0,.46);}
         #${SH.dropdownId} button,#${SH.dropdownId} input{font:inherit;} #${SH.dropdownId} .shd-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px 6px;border-bottom:1px solid #34363a;} #${SH.dropdownId} .shd-head>div{min-width:0;display:flex;align-items:center;gap:6px;} #${SH.dropdownId} .shd-head b{font-size:1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-head span{color:#868b92;font-size:.82em;white-space:nowrap;} #${SH.dropdownId} .shd-head button{border:0;background:transparent;color:#8ab4f8;padding:2px 4px;cursor:pointer;border-radius:4px;}
         #${SH.dropdownId} .shd-list{min-height:0;max-height:166px;overflow:auto;padding:3px 4px;scrollbar-gutter:stable;overscroll-behavior:contain;} #${SH.dropdownId}.is-capsule .shd-list{max-height:148px;padding:6px;}
         #${SH.dropdownId} .shd-item{display:grid;grid-template-columns:17px minmax(0,1fr) auto 20px;align-items:center;gap:4px;min-height:29px;padding:2px 3px;border-radius:5px;cursor:pointer;} #${SH.dropdownId} .shd-item:hover{background:#2b2d31;} #${SH.dropdownId} .shd-clock{font-size:1em;color:#7e848b;text-align:center;} #${SH.dropdownId} .shd-main{min-width:0;} #${SH.dropdownId} .shd-query{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-source{margin-top:1px;color:#7d838a;font-size:.78em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-time{font-size:.78em;color:#747a81;} #${SH.dropdownId} .shd-del{width:19px;height:19px;padding:0;border:0;border-radius:4px;background:transparent;color:#7f858c;cursor:pointer;} #${SH.dropdownId} .shd-del:hover{background:#3b2929;color:#ff8a80;}
         #${SH.dropdownId} .shd-capsules{display:flex;flex-wrap:wrap;align-content:flex-start;align-items:flex-start;width:100%;gap:5px;} #${SH.dropdownId} .shd-chip{display:inline-flex;align-items:center;box-sizing:border-box;flex:0 0 auto;min-width:44px;max-width:100%;height:25px;background:#292d32;border:1px solid #3a4047;border-radius:999px;overflow:hidden;transition:border-color .13s ease,background-color .13s ease;} #${SH.dropdownId} .shd-chip:hover{border-color:#4a6f9d;background:#283446;} #${SH.dropdownId} .shd-chip-main{flex:1 1 auto;min-width:0;max-width:190px;height:100%;padding:0 8px;border:0;background:transparent;color:#dfe7f1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;} #${SH.dropdownId} .shd-chip-del{flex:0 0 22px;width:22px;height:100%;border:0;border-left:1px solid rgba(255,255,255,.05);background:transparent;color:#7d858e;cursor:pointer;} #${SH.dropdownId} .shd-chip-del:hover{color:#ff8a80;background:#3b2929;}
-        #${SH.dropdownId} .shd-empty{padding:15px 9px;text-align:center;color:#a7adb4;} #${SH.dropdownId} .shd-empty span{display:block;margin-top:3px;color:#747a81;font-size:.8em;} #${SH.dropdownId} .shd-all{height:30px;display:flex;align-items:center;justify-content:space-between;padding:0 9px;border:0;border-top:1px solid #34363a;background:#232427;color:#9ecbff;cursor:pointer;} #${SH.dropdownId} .shd-all:hover{background:#292c31;} #${SH.dropdownId} .shd-all b{font-size:1.3em;font-weight:400;}
-        #${SH.dropdownId} .shd-expanded{max-height:0;opacity:0;overflow:hidden;background:#1e1f22;transition:max-height .25s cubic-bezier(.22,.61,.36,1),opacity .18s ease;} #${SH.dropdownId}.is-expanded .shd-expanded{max-height:365px;opacity:1;border-top:1px solid #34363a;display:grid;grid-template-rows:auto auto minmax(0,1fr);} #${SH.dropdownId} .shd-expanded-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 9px 5px;} #${SH.dropdownId} .shd-expanded-head>div{display:flex;align-items:baseline;gap:7px;min-width:0;} #${SH.dropdownId} .shd-expanded-head b{font-size:1.03em;} #${SH.dropdownId} .shd-expanded-head span{font-size:.8em;color:#7f858c;} #${SH.dropdownId} .shd-expanded-actions{display:flex;gap:5px;} #${SH.dropdownId} .shd-expanded-actions button{height:25px;padding:0 7px;border:1px solid #41454a;border-radius:5px;background:#292b2f;color:#cfd4da;cursor:pointer;} #${SH.dropdownId} .shd-expanded-actions button:first-child{color:#9ecbff;}
+        #${SH.dropdownId} .shd-empty{padding:15px 9px;text-align:center;color:#a7adb4;} #${SH.dropdownId} .shd-empty span{display:block;margin-top:3px;color:#747a81;font-size:.8em;} #${SH.dropdownId} .shd-all{height:30px;display:flex;align-items:center;justify-content:space-between;padding:0 9px;border:0;border-top:1px solid #34363a;background:#232427;color:#9ecbff;cursor:pointer;transition:background-color .14s ease,color .14s ease;} #${SH.dropdownId} .shd-all:hover{background:#292c31;} #${SH.dropdownId} .shd-all b{font-size:1.3em;font-weight:400;transform:rotate(0deg);transition:transform .28s cubic-bezier(.22,1,.36,1);} #${SH.dropdownId}.is-expanded .shd-all b{transform:rotate(90deg);}
+        #${SH.dropdownId} .shd-expanded{height:0;min-height:0;opacity:0;overflow:hidden;visibility:hidden;pointer-events:none;transform:translateY(-5px);background:#1e1f22;border-top:1px solid transparent;display:grid;grid-template-rows:auto auto minmax(0,1fr);transition:height .30s cubic-bezier(.22,1,.36,1),opacity .18s ease,transform .30s cubic-bezier(.22,1,.36,1),border-color .18s ease,visibility 0s linear .30s;} #${SH.dropdownId}.is-expanded .shd-expanded{height:var(--att-sh-expanded-height);opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0);border-top-color:#34363a;transition-delay:0s;} #${SH.dropdownId} .shd-expanded-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 9px 5px;} #${SH.dropdownId} .shd-expanded-head>div{display:flex;align-items:baseline;gap:7px;min-width:0;} #${SH.dropdownId} .shd-expanded-head b{font-size:1.03em;} #${SH.dropdownId} .shd-expanded-head span{font-size:.8em;color:#7f858c;} #${SH.dropdownId} .shd-expanded-actions{display:flex;gap:5px;} #${SH.dropdownId} .shd-expanded-actions button{height:25px;padding:0 7px;border:1px solid #41454a;border-radius:5px;background:#292b2f;color:#cfd4da;cursor:pointer;} #${SH.dropdownId} .shd-expanded-actions button:first-child{color:#9ecbff;}
         #${SH.dropdownId} .shd-expanded-search{padding:3px 8px 6px;} #${SH.dropdownId} .shd-expanded-search input{width:100%;height:28px;box-sizing:border-box;padding:0 8px;border:1px solid #3c4045;border-radius:6px;background:#27282b;color:#e8eaed;outline:none;} #${SH.dropdownId} .shd-expanded-search input:focus{border-color:#4b77ad;} #${SH.dropdownId} .shd-expanded-list{min-height:0;overflow:auto;padding:0 5px 7px;scrollbar-gutter:stable;contain:layout paint;overscroll-behavior:contain;} #${SH.dropdownId} .shd-expanded-item{display:grid;grid-template-columns:minmax(0,1fr) 22px;align-items:center;gap:5px;min-height:34px;padding:3px 3px;border-bottom:1px solid #2d2f33;content-visibility:auto;contain-intrinsic-size:36px;} #${SH.dropdownId} .shd-expanded-item:hover{background:#25272a;} #${SH.dropdownId} .shd-expanded-use{min-width:0;text-align:left;border:0;background:transparent;color:#e8eaed;padding:2px 4px;cursor:pointer;} #${SH.dropdownId} .shd-expanded-use b,#${SH.dropdownId} .shd-expanded-use span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-expanded-use b{font-size:1em;} #${SH.dropdownId} .shd-expanded-use span{margin-top:2px;color:#80868d;font-size:.78em;}
 
         #${SH.managerId}{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.56);backdrop-filter:blur(3px);color:#e8eaed;font-family:inherit;} #${SH.managerId}.is-open{display:flex;} #${SH.managerId}{--att-sh-font-size:12px;} #${SH.managerId} .shm-shell{width:min(820px,calc(100vw - 32px));height:min(560px,calc(100vh - 32px));min-height:430px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:#202124;border:1px solid #3c3f43;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.46);overflow:hidden;font-size:var(--att-sh-font-size);} #${SH.managerId} .shm-head,#${SH.managerId} .shm-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;} #${SH.managerId} .shm-head{border-bottom:1px solid #34363a;} #${SH.managerId} .shm-foot{border-top:1px solid #34363a;color:#858b92;font-size:.82em;} #${SH.managerId} .shm-head>div{display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-head b{font-size:1.15em;} #${SH.managerId} .shm-head span{color:#8f949b;font-size:.82em;} #${SH.managerId} button{height:28px;padding:0 8px;border:1px solid #45484d;border-radius:6px;background:#303134;color:#e8eaed;cursor:pointer;font:inherit;} #${SH.managerId} button:hover{background:#3a3c40;} #${SH.managerId} button.primary{background:#1a73e8;border-color:#1a73e8;color:#fff;} #${SH.managerId} button.danger{color:#ff8a80;border-color:#67413f;}
@@ -28772,6 +28816,6 @@
         window.addEventListener('pagehide',()=>{clearIdleCommitTimer();flushHistoryPersist();},{capture:true});
         document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){clearIdleCommitTimer();flushHistoryPersist();}},{passive:true});
     }
-    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();attachSearchClearToolbarObserver();bindPersistLifecycle();buildHistoryIndex();applySearchClearOptimizeState();console.log('[AutoTable 工具集 V7.13.2] 已加载：正式历史提交策略 / 紧凑记录全部显示开关 / 胶囊智能补位 / 胶囊删除按钮开关 / 精准 toolbar 状态 / 内置 X / 零跳动历史层 / 分块渲染 / GM 批处理');}
+    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();attachSearchClearToolbarObserver();bindPersistLifecycle();buildHistoryIndex();applySearchClearOptimizeState();console.log('[AutoTable 工具集 V7.13.4] 已加载：正式历史提交策略 / 紧凑记录全部显示 / 胶囊智能补位 / 精准 toolbar / 内置 X / 零闪烁历史层 / 查看全部双态收展 / 单链路丝滑展开 / 分块渲染 / GM 批处理');}
     if(document.body)init();else window.addEventListener('DOMContentLoaded',init,{once:true});
 })();
