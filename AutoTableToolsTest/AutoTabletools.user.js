@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.13.4
-// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.14.1
+// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,15 +23,15 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.13.4
+ * AutoTable 工具集 V7.14.1
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，整行上下强调边缘可独立配置，支持快捷开关）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
- * - 编辑：统一快捷短语中心；双栏独立滚动、固定页头/页脚、批量选择、批量启停、批量编辑与安全高级模板表达式
+ * - 编辑：统一快捷短语中心；表格多行单元格与记录详情多行字段共用快捷面板；双栏独立滚动、固定页头/页脚、批量选择、批量启停、批量编辑与安全高级模板表达式
  * - 规则：支持可视化条件 + 代码式 {{=表达式}} / {{#if}} 条件内容；系统规则可恢复默认；旧配置自动迁移
  * - 主题：可回退 Edge / Fluent 深色优化；可选丝滑高级全局交互动效；记录详情只动画抽屉、不扰动底层页面，并可选择是否忽略系统 Reduce Motion
  * - 文档：原生风格大纲、滚动跟随、查找/替换/定位、正则表达式与高亮
- * - 界面：可隐藏关联字段复制按钮，并释放按钮原先占用的文字空间
+ * - 界面：可隐藏关联字段复制按钮，并释放按钮原先占用的文字空间；收起侧边栏可显示智能微标签，快速区分大量重复业务图标
  * - 悬浮菜单：V7.9 重整为“快捷 / 字段 / 置顶 / 文档 / 设置”，快捷页聚合高频操作，设置页提供分区导航与合理功能归类
  * - 搜索：全视图模糊搜索支持可配置正式记录条件、紧凑历史层、列表/胶囊智能补位、胶囊删除按钮显示开关、字体大小、同表视图互通、原位丝滑展开全部记录、独立搜索记录管理面板及搜索栏内置 X 清空优化
  * - 设置：支持字段条件高亮规则中心；全部工具配置 JSON 备份、跨版本导入恢复与全部重置；导入/重置后统一刷新确保各独立模块同步生效
@@ -44,7 +44,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.13.4',
+        version: 'V7.14.1',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -67,6 +67,8 @@
         silkMotionEnabled: false,
         // V7.4.1：默认仍遵循系统 Reduce Motion；用户可显式选择忽略。
         silkMotionIgnoreReducedMotionEnabled: false,
+        // V7.14：收起侧边栏识别增强。仅在原生侧栏收起到约 64px 时显示智能微标签。
+        sidebarCollapsedEnhanceEnabled: true,
         // V7.5：表格视觉样式中心。每组默认关闭自定义，保证升级后视觉完全沿用原样式。
         visualStyleConfig: {
             pin: {
@@ -174,6 +176,7 @@
         tableWheelReverseEnabled: false,
         silkMotionEnabled: false,
         silkMotionIgnoreReducedMotionEnabled: false,
+        sidebarCollapsedEnhanceEnabled: true,
         visualStyleConfig: null,
         paginationEnhancedEnabled: true,
         editorQuickPhraseEnabled: true,
@@ -511,6 +514,84 @@
             user-select: none;
         }
 
+
+        /* ==========================================================
+           V7.14 收起侧边栏识别增强
+           ----------------------------------------------------------
+           只在脚本确认 AutoTable 原生侧栏已收起时生效。
+           不替换原图标，不删除 title；只给大量同图标业务入口补充
+           1~3 字智能微标签，展开后完全恢复 AutoTable 原样。
+           ========================================================== */
+        body.att-sidebar-collapsed-enhanced .app-shell-sidebar.att-sidebar-is-collapsed .sidebar-menu-item[data-att-sidebar-mini] {
+            width: 52px !important;
+            min-width: 52px !important;
+            min-height: 42px !important;
+            height: 42px !important;
+            box-sizing: border-box !important;
+            padding: 5px 4px 4px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 1px !important;
+            overflow: visible !important;
+        }
+
+        body.att-sidebar-collapsed-enhanced .app-shell-sidebar.att-sidebar-is-collapsed .sidebar-menu-item[data-att-sidebar-mini]::after {
+            content: attr(data-att-sidebar-mini);
+            display: block;
+            max-width: 46px;
+            height: 11px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            color: #8f98a3;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+            font-size: 9px;
+            font-weight: 600;
+            line-height: 11px;
+            letter-spacing: -.15px;
+            text-align: center;
+            pointer-events: none;
+            opacity: .92;
+            transition: color .14s ease, opacity .14s ease;
+        }
+
+        body.att-sidebar-collapsed-enhanced .app-shell-sidebar.att-sidebar-is-collapsed .sidebar-menu-item[data-att-sidebar-mini] > .sidebar-menu-icon {
+            flex: 0 0 auto !important;
+            margin: 0 !important;
+            line-height: 14px !important;
+        }
+
+        body.att-sidebar-collapsed-enhanced .app-shell-sidebar.att-sidebar-is-collapsed .sidebar-menu-item[data-att-sidebar-mini]:hover::after {
+            color: #d9e6f5;
+            opacity: 1;
+        }
+
+        body.att-sidebar-collapsed-enhanced .app-shell-sidebar.att-sidebar-is-collapsed .sidebar-menu-item[data-att-sidebar-mini].is-active::after,
+        body.att-sidebar-collapsed-enhanced .app-shell-sidebar.att-sidebar-is-collapsed .sidebar-menu-entry.is-active > .sidebar-menu-item[data-att-sidebar-mini]::after {
+            color: #69adf2;
+            font-weight: 750;
+            opacity: 1;
+        }
+
+        /* Edge 深色模式下沿用 Fluent 层级，不额外制造彩色块。 */
+        body.att-native-dark.att-dark-optimized.att-sidebar-collapsed-enhanced
+        .app-shell-sidebar.att-sidebar-is-collapsed .sidebar-menu-item[data-att-sidebar-mini]::after {
+            color: #929aa3 !important;
+        }
+        body.att-native-dark.att-dark-optimized.att-sidebar-collapsed-enhanced
+        .app-shell-sidebar.att-sidebar-is-collapsed .sidebar-menu-item[data-att-sidebar-mini]:hover::after {
+            color: #d7e8f8 !important;
+        }
+        body.att-native-dark.att-dark-optimized.att-sidebar-collapsed-enhanced
+        .app-shell-sidebar.att-sidebar-is-collapsed .sidebar-menu-item[data-att-sidebar-mini].is-active::after,
+        body.att-native-dark.att-dark-optimized.att-sidebar-collapsed-enhanced
+        .app-shell-sidebar.att-sidebar-is-collapsed .sidebar-menu-entry.is-active > .sidebar-menu-item[data-att-sidebar-mini]::after {
+            color: #60cdff !important;
+        }
 
         .att-page-size-extra {
             padding: 5px 4px 4px;
@@ -7958,6 +8039,7 @@
         state.tableWheelReverseEnabled = store.get('tableWheelReverseEnabled', DEFAULTS.tableWheelReverseEnabled);
         state.silkMotionEnabled = store.get('silkMotionEnabled', DEFAULTS.silkMotionEnabled);
         state.silkMotionIgnoreReducedMotionEnabled = store.get('silkMotionIgnoreReducedMotionEnabled', DEFAULTS.silkMotionIgnoreReducedMotionEnabled);
+        state.sidebarCollapsedEnhanceEnabled = store.get('sidebarCollapsedEnhanceEnabled', DEFAULTS.sidebarCollapsedEnhanceEnabled);
         state.visualStyleConfig = normalizeVisualStyleConfig(
             store.get('visualStyleConfig', DEFAULTS.visualStyleConfig)
         );
@@ -8072,6 +8154,7 @@
         store.set('tableWheelReverseEnabled', state.tableWheelReverseEnabled);
         store.set('silkMotionEnabled', state.silkMotionEnabled);
         store.set('silkMotionIgnoreReducedMotionEnabled', state.silkMotionIgnoreReducedMotionEnabled);
+        store.set('sidebarCollapsedEnhanceEnabled', state.sidebarCollapsedEnhanceEnabled);
         state.visualStyleConfig = normalizeVisualStyleConfig(state.visualStyleConfig);
         store.set('visualStyleConfig', state.visualStyleConfig);
         store.set('paginationEnhancedEnabled', state.paginationEnhancedEnabled);
@@ -12134,6 +12217,25 @@
                 </div>
             </div>
 
+            <div class="att-card">
+                <div class="att-row">
+                    <div style="min-width:0;">
+                        <div class="att-card-title">收起侧边栏识别增强</div>
+                        <div class="att-card-desc">
+                            当 AutoTable 左侧栏收起为窄图标栏时，在大量重复业务图标下自动补充 1–3 字智能微标签，例如“项目 / 商务 / 产品 / 文档 / 经销 / DDI / 运维”。当前页面标签会加强显示；侧栏展开后完全恢复原生布局。
+                        </div>
+                    </div>
+                    <label class="att-switch" title="收起侧边栏识别增强">
+                        <input type="checkbox" data-setting="sidebarCollapsedEnhanceEnabled"
+                               ${state.sidebarCollapsedEnhanceEnabled ? 'checked' : ''}>
+                        <span class="att-slider"></span>
+                    </label>
+                </div>
+                <div class="att-sub-label" style="margin-top:8px;">
+                    只增强收起状态，不改变原菜单点击、原生 title 悬浮提示、分组结构和展开侧栏。
+                </div>
+            </div>
+
             <div class="att-card att-visual-style-card-v750">
                 <div class="att-card-title">表格视觉样式</div>
                 <div class="att-card-desc">
@@ -12232,13 +12334,13 @@
             <div class="att-card">
                 <div class="att-card-title">文本编辑快捷语句</div>
                 <div class="att-card-desc">
-                    多行文本进入编辑状态时显示快捷面板。V7 统一规则中心中，系统与自定义短语均可配置内容模板、显示条件、插入位置、使用场景和日期时间变量。
+                    多行文本进入编辑状态时显示快捷面板。表格单元格与记录详情中的多行字段共用 V7 统一规则中心；系统与自定义短语均可配置内容模板、显示条件、插入位置、使用场景和日期时间变量。
                 </div>
                 <div class="att-divider"></div>
                 <div class="att-row">
                     <div>
                         <div class="att-label">启用快捷语句面板</div>
-                        <div class="att-sub-label">仅在 AutoTable 多行文本编辑器中显示。</div>
+                        <div class="att-sub-label">在表格多行单元格和记录详情多行字段编辑器中显示。</div>
                     </div>
                     <label class="att-switch">
                         <input type="checkbox" data-setting="editorQuickPhraseEnabled"
@@ -12735,6 +12837,13 @@
                     ? '已忽略系统 Reduce Motion：始终保持完整动画'
                     : '已恢复遵循系统 Reduce Motion'
             );
+        }
+
+        if (setting === 'sidebarCollapsedEnhanceEnabled') {
+            state.sidebarCollapsedEnhanceEnabled = event.target.checked;
+            persistCore();
+            applySidebarCollapsedEnhanceState(true);
+            showToast(`收起侧边栏识别增强：已${state.sidebarCollapsedEnhanceEnabled ? '开启' : '关闭'}`);
         }
 
         const visualToggleMap = {
@@ -14777,7 +14886,11 @@
             case 'field': return context?.fieldName || '';
             case 'row_field': {
                 const targetName = sanitizeText(condition.target || '');
-                if (!targetName || !context?.root || !context?.cell) return '';
+                if (!targetName) return '';
+                if (context?.isRecordDetail) {
+                    return getRecordDetailQuickPhraseFieldValue(context, targetName);
+                }
+                if (!context?.root || !context?.cell) return '';
                 const defs = getGridFieldDefs(context.root);
                 const def = defs.find(item => sanitizeText(item.name).toLowerCase() === targetName.toLowerCase()) ||
                     defs.find(item => sanitizeText(item.name).toLowerCase().includes(targetName.toLowerCase()));
@@ -15381,7 +15494,8 @@
             textarea: null, cell: null, root: getVisibleGridRoot(), fieldId:'',
             fieldName: phraseCenterV7PreferredContext === 'bulk' ? '进展描述' : '',
             tableName: tableContext?.tableName || '',
-            isProgress: phraseCenterV7PreferredContext === 'bulk', bulkMode: phraseCenterV7PreferredContext === 'bulk'
+            isProgress: phraseCenterV7PreferredContext === 'bulk', bulkMode: phraseCenterV7PreferredContext === 'bulk',
+            isRecordDetail: false, drawer: null, detailField: null, anchor: null
         };
     }
 
@@ -15734,8 +15848,100 @@
         });
     }
 
+    // V7.14.1：统一识别表格多行编辑器与记录详情抽屉多行编辑器。
+    // 记录详情真实 DOM（诊断抓取）：aside.record-drawer.is-open 内 textarea.drawer-input.cm-textarea。
+    function isEditorQuickPhraseTextarea(textarea) {
+        return textarea instanceof HTMLTextAreaElement && textarea.matches(
+            'textarea.cell-input.cell-input-textarea, aside.record-drawer.is-open textarea.drawer-input.cm-textarea'
+        );
+    }
+
+    function getRecordDetailQuickPhraseFieldValue(context, targetName) {
+        const drawer = context?.drawer || context?.textarea?.closest('aside.record-drawer.is-open');
+        const wanted = sanitizeText(targetName || '').toLowerCase();
+        if (!drawer || !wanted) return '';
+
+        const fields = Array.from(drawer.querySelectorAll('.drawer-field.record-detail-form-field'));
+        let targetField = fields.find(field =>
+            sanitizeText(field.querySelector(':scope > .drawer-label')?.textContent || '').toLowerCase() === wanted
+        );
+        if (!targetField) {
+            targetField = fields.find(field =>
+                sanitizeText(field.querySelector(':scope > .drawer-label')?.textContent || '').toLowerCase().includes(wanted)
+            );
+        }
+        if (!targetField) return '';
+
+        // 当前正在编辑的字段优先取真实编辑器 value；这样显示规则能即时响应尚未保存的内容。
+        const textarea = targetField.querySelector('textarea.drawer-input.cm-textarea');
+        if (textarea instanceof HTMLTextAreaElement) return String(textarea.value ?? '');
+
+        const input = targetField.querySelector('input.drawer-input:not([type="file"]), input.cm-input:not([type="file"])');
+        if (input instanceof HTMLInputElement) return String(input.value ?? '');
+
+        // 非编辑状态只读取值容器，排除“编辑 / 管理附件”等动作文字。
+        const content = targetField.querySelector('.drawer-value-shell__content');
+        if (content) {
+            const value = sanitizeText(content.textContent || '');
+            return value === '—' ? '' : value;
+        }
+
+        const valueShell = targetField.querySelector('.drawer-value-shell');
+        if (valueShell) {
+            const clone = valueShell.cloneNode(true);
+            clone.querySelectorAll('.drawer-value-shell__edit,.drawer-value-shell__action').forEach(node => node.remove());
+            const value = sanitizeText(clone.textContent || '');
+            return value === '—' ? '' : value;
+        }
+        return '';
+    }
+
+    function getRecordDetailQuickPhraseFieldContext(textarea) {
+        if (!(textarea instanceof HTMLTextAreaElement)) return null;
+        const drawer = textarea.closest('aside.record-drawer.is-open');
+        const detailField = textarea.closest('.drawer-field.record-detail-form-field');
+        if (!drawer || !detailField) return null;
+
+        let fieldName = sanitizeText(detailField.querySelector(':scope > .drawer-label')?.textContent || '');
+        if (!fieldName) {
+            fieldName = sanitizeText(String(textarea.getAttribute('placeholder') || '').replace(/^请输入/, '')) || '多行文本';
+        }
+
+        const normalized = String(fieldName).replace(/\s+/g, '');
+        const isProgress = normalized.includes('进展描述');
+        const tableContext = getCurrentTableContext();
+        const tableName = tableContext?.tableName || '';
+        const gridRoot = drawer.closest('.grid-root') || getVisibleGridRoot();
+        let fieldId = '';
+        if (gridRoot) {
+            const wanted = sanitizeText(fieldName).toLowerCase();
+            const def = getGridFieldDefs(gridRoot).find(item => sanitizeText(item.name).toLowerCase() === wanted)
+                || getGridFieldDefs(gridRoot).find(item => sanitizeText(item.name).toLowerCase().includes(wanted));
+            fieldId = def?.fieldId || '';
+        }
+
+        return {
+            textarea,
+            cell: null,
+            root: gridRoot,
+            fieldId,
+            fieldName,
+            tableName,
+            isProgress,
+            isRecordDetail: true,
+            drawer,
+            detailField,
+            anchor: detailField
+        };
+    }
+
     function getEditorQuickPhraseFieldContext(textarea) {
         if (!(textarea instanceof HTMLTextAreaElement)) return null;
+
+        // 记录详情优先：抽屉编辑器没有 grid-cell，需要从 drawer-field / drawer-label 建立字段上下文。
+        if (textarea.matches('aside.record-drawer.is-open textarea.drawer-input.cm-textarea')) {
+            return getRecordDetailQuickPhraseFieldContext(textarea);
+        }
 
         const cell = textarea.closest('.grid-cell[data-grid-field-id]');
         if (!cell) return null;
@@ -15754,7 +15960,13 @@
         const tableContext = getCurrentTableContext();
         const tableName = tableContext?.tableName || '';
 
-        return { textarea, cell, root, fieldId, fieldName, tableName, isProgress };
+        return {
+            textarea, cell, root, fieldId, fieldName, tableName, isProgress,
+            isRecordDetail: false,
+            drawer: null,
+            detailField: null,
+            anchor: cell
+        };
     }
 
     function getEditorQuickPhrasePanel() {
@@ -15839,11 +16051,19 @@
         const hint = panel.querySelector('#att-editor-phrase-hint');
         const list = panel.querySelector('#att-editor-phrase-list');
 
-        if (title) title.textContent = `${context.fieldName} · 快捷语句`;
+        if (title) title.textContent = context.isRecordDetail
+            ? `记录详情 · ${context.fieldName} · 快捷语句`
+            : `${context.fieldName} · 快捷语句`;
         if (hint) {
-            hint.textContent = context.isProgress
-                ? '快捷短语按统一规则执行：模板、显示条件、插入位置均可配置'
-                : '仅显示当前字段 / 表格 / 内容条件满足的快捷短语';
+            if (context.isProgress) {
+                hint.textContent = context.isRecordDetail
+                    ? '记录详情进展描述 · 与表格编辑共用统一规则、日期前缀和插入策略'
+                    : '快捷短语按统一规则执行：模板、显示条件、插入位置均可配置';
+            } else {
+                hint.textContent = context.isRecordDetail
+                    ? '记录详情字段 · 仅显示当前字段 / 表格 / 内容条件满足的快捷短语'
+                    : '仅显示当前字段 / 表格 / 内容条件满足的快捷短语';
+            }
         }
 
         if (!list) return;
@@ -15928,25 +16148,25 @@
         panel.style.top = `${Math.round(Math.max(margin, top))}px`;
     }
 
-    function bindEditorQuickPhraseCellObserver(cell) {
+    function bindEditorQuickPhraseCellObserver(host) {
         editorQuickPhraseCellObserver?.disconnect();
         editorQuickPhraseCellObserver = null;
 
-        if (!(cell instanceof Element)) return;
+        if (!(host instanceof Element)) return;
 
         editorQuickPhraseCellObserver = new MutationObserver(() => {
             if (!editorQuickPhraseTarget?.isConnected ||
-                !cell.contains(editorQuickPhraseTarget)) {
+                !host.contains(editorQuickPhraseTarget)) {
                 hideEditorQuickPhrasePanel(true);
             }
         });
-        editorQuickPhraseCellObserver.observe(cell, { childList: true, subtree: true });
+        editorQuickPhraseCellObserver.observe(host, { childList: true, subtree: true });
     }
 
     function showEditorQuickPhrasePanel(textarea) {
         if (!state.editorQuickPhraseEnabled) return;
         if (!(textarea instanceof HTMLTextAreaElement)) return;
-        if (!textarea.matches('textarea.cell-input.cell-input-textarea')) return;
+        if (!isEditorQuickPhraseTextarea(textarea)) return;
         if (!isElementVisible(textarea)) return;
 
         const context = getEditorQuickPhraseFieldContext(textarea);
@@ -15962,7 +16182,7 @@
 
         renderEditorQuickPhrasePanel();
         panel.hidden = false;
-        bindEditorQuickPhraseCellObserver(context.cell);
+        bindEditorQuickPhraseCellObserver(context.anchor || context.cell || context.detailField);
         scheduleEditorQuickPhrasePosition();
     }
 
@@ -16057,7 +16277,7 @@
         document.addEventListener('focusin', event => {
             const textarea = event.target;
             if (!(textarea instanceof HTMLTextAreaElement)) return;
-            if (!textarea.matches('textarea.cell-input.cell-input-textarea')) return;
+            if (!isEditorQuickPhraseTextarea(textarea)) return;
             prepareEditorQuickPhraseTopLine(textarea);
             showEditorQuickPhrasePanel(textarea);
         }, true);
@@ -16065,7 +16285,7 @@
         document.addEventListener('input', event => {
             const textarea = event.target;
             if (!(textarea instanceof HTMLTextAreaElement)) return;
-            if (!textarea.matches('textarea.cell-input.cell-input-textarea')) return;
+            if (!isEditorQuickPhraseTextarea(textarea)) return;
             if (!editorQuickPhraseInternalWrite) markEditorQuickPhraseSessionTouched(textarea);
             if (textarea === editorQuickPhraseTarget && !editorQuickPhraseInternalWrite) {
                 scheduleEditorQuickPhraseRender();
@@ -16075,7 +16295,7 @@
         document.addEventListener('focusout', event => {
             const textarea = event.target;
             if (!(textarea instanceof HTMLTextAreaElement)) return;
-            if (!textarea.matches('textarea.cell-input.cell-input-textarea')) return;
+            if (!isEditorQuickPhraseTextarea(textarea)) return;
 
             restoreUnusedEditorQuickPhraseTopLine(textarea);
             if (textarea !== editorQuickPhraseTarget) return;
@@ -17429,6 +17649,125 @@
         });
     }
 
+    /* ========================================================================
+     * V7.14：收起侧边栏识别增强
+     * ------------------------------------------------------------------------
+     * AutoTable 收起侧栏后宽度约 64px，大量业务表入口复用同一个 table 图标。
+     * 本模块不篡改 React 菜单结构，只给按钮补 data 属性，再通过 ::after 显示
+     * 智能微标签；ResizeObserver 只观察 aside 尺寸，MutationObserver 只观察
+     * sidebar-scroll-region 的 childList，避免全页面扫描。
+     * ====================================================================== */
+    let sidebarEnhanceAside = null;
+    let sidebarEnhanceResizeObserver = null;
+    let sidebarEnhanceMutationObserver = null;
+    let sidebarEnhanceRaf = 0;
+
+    function makeSidebarMiniLabel(title) {
+        const full = sanitizeText(title || '');
+        if (!full) return '';
+        const leaf = sanitizeText(full.split('/').pop() || full);
+        if (!leaf) return '';
+
+        const exact = [
+            [/^DDI实施工单表$/i, 'DDI'],
+            [/^bug\s*&?\s*功能需求表$/i, 'BUG'],
+            [/^公用文档$/, '文档'],
+            [/^经销商主数据表$/, '经销'],
+            [/^项目表$/, '项目'],
+            [/^商务表$/, '商务'],
+            [/^产品表$/, '产品'],
+            [/^协议邮寄表$/, '协议'],
+            [/^运维工单表$/, '运维'],
+            [/^二次维护名单$/, '二次'],
+            [/^工作交接文档$/, '交接']
+        ];
+        for (const [re, label] of exact) if (re.test(leaf)) return label;
+
+        if (/^[A-Za-z][A-Za-z0-9 _&-]*$/.test(leaf)) {
+            const ascii = leaf.replace(/[^A-Za-z0-9]/g, '');
+            return ascii.slice(0, 3).toUpperCase();
+        }
+
+        let base = leaf
+            .replace(/(?:主数据表|数据表|实施工单表|工单表|功能需求表|文档|名单|中心|表)$/g, '')
+            .replace(/^(基础资料|项目协作|交接文档)[\s·：:-]*/g, '')
+            .trim();
+        if (!base) base = leaf;
+        return Array.from(base).slice(0, 2).join('');
+    }
+
+    function isAutoTableSidebarCollapsed(aside) {
+        if (!(aside instanceof HTMLElement) || !aside.isConnected) return false;
+        const expandBtn = aside.querySelector('.sidebar-top-actions button[aria-label*="展开侧边栏"], .sidebar-top-actions button[title*="展开侧边栏"]');
+        if (expandBtn) return true;
+        const width = aside.getBoundingClientRect().width;
+        return width > 0 && width <= 82;
+    }
+
+    function decorateCollapsedSidebarItems(aside) {
+        if (!(aside instanceof HTMLElement)) return;
+        const buttons = aside.querySelectorAll('.sidebar-menu-item[title]');
+        buttons.forEach(btn => {
+            // 首页 / AI 等原本就有强辨识度的 primary 图标不额外加文字，避免视觉噪声。
+            if (btn.classList.contains('sidebar-menu-item--primary')) {
+                btn.removeAttribute('data-att-sidebar-mini');
+                return;
+            }
+            const title = btn.getAttribute('title') || '';
+            const label = makeSidebarMiniLabel(title);
+            if (label) btn.setAttribute('data-att-sidebar-mini', label);
+            else btn.removeAttribute('data-att-sidebar-mini');
+        });
+    }
+
+    function scheduleSidebarCollapsedEnhance() {
+        if (sidebarEnhanceRaf) return;
+        sidebarEnhanceRaf = requestAnimationFrame(() => {
+            sidebarEnhanceRaf = 0;
+            applySidebarCollapsedEnhanceState(false);
+        });
+    }
+
+    function bindSidebarEnhanceObservers(aside) {
+        if (sidebarEnhanceAside === aside && sidebarEnhanceResizeObserver && sidebarEnhanceMutationObserver) return;
+        sidebarEnhanceResizeObserver?.disconnect();
+        sidebarEnhanceMutationObserver?.disconnect();
+        sidebarEnhanceAside = aside || null;
+        if (!(aside instanceof HTMLElement)) return;
+
+        sidebarEnhanceResizeObserver = new ResizeObserver(() => scheduleSidebarCollapsedEnhance());
+        sidebarEnhanceResizeObserver.observe(aside);
+
+        const scrollRegion = aside.querySelector('.sidebar-scroll-region') || aside;
+        sidebarEnhanceMutationObserver = new MutationObserver(records => {
+            if (!state.sidebarCollapsedEnhanceEnabled) return;
+            // 只要菜单子树发生新增/替换，就在下一帧补齐 data 标签；不监听 style/class 高频属性。
+            if (records.some(r => r.type === 'childList' && (r.addedNodes.length || r.removedNodes.length))) {
+                scheduleSidebarCollapsedEnhance();
+            }
+        });
+        sidebarEnhanceMutationObserver.observe(scrollRegion, { childList: true, subtree: true });
+    }
+
+    function applySidebarCollapsedEnhanceState(force = false) {
+        const aside = document.querySelector('aside.app-shell-sidebar');
+        document.body.classList.toggle('att-sidebar-collapsed-enhanced', Boolean(state.sidebarCollapsedEnhanceEnabled));
+
+        if (!(aside instanceof HTMLElement)) {
+            sidebarEnhanceAside?.classList.remove('att-sidebar-is-collapsed');
+            if (force) bindSidebarEnhanceObservers(null);
+            return;
+        }
+
+        bindSidebarEnhanceObservers(aside);
+        const collapsed = Boolean(state.sidebarCollapsedEnhanceEnabled) && isAutoTableSidebarCollapsed(aside);
+        aside.classList.toggle('att-sidebar-is-collapsed', collapsed);
+        if (collapsed) decorateCollapsedSidebarItems(aside);
+        else if (!state.sidebarCollapsedEnhanceEnabled) {
+            aside.querySelectorAll('[data-att-sidebar-mini]').forEach(el => el.removeAttribute('data-att-sidebar-mini'));
+        }
+    }
+
     function init() {
         loadState();
 
@@ -17438,6 +17777,7 @@
         ensureRoot();
         ensureBulkProgressButton();
         setBodyModes();
+        applySidebarCollapsedEnhanceState(true);
         bindGlobalEvents();
         bindEditorQuickPhraseEvents();
         scheduleApplyPinnedColumns(0);
@@ -17457,6 +17797,7 @@
 
             ensureRoot();
             ensureBulkProgressButton();
+            scheduleSidebarCollapsedEnhance();
 
             clearTimeout(themeRefreshTimer);
             themeRefreshTimer = setTimeout(refreshNativeThemeFromDom, 80);
