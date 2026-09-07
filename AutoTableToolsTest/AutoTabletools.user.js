@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.14.1
-// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.15.1
+// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,9 +23,9 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.14.1
+ * AutoTable 工具集 V7.15.1
  * 当前整合能力：
- * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，整行上下强调边缘可独立配置，支持快捷开关）、快捷表头置顶、分页增强、滚轮横纵轴反转
+ * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
  * - 编辑：统一快捷短语中心；表格多行单元格与记录详情多行字段共用快捷面板；双栏独立滚动、固定页头/页脚、批量选择、批量启停、批量编辑与安全高级模板表达式
  * - 规则：支持可视化条件 + 代码式 {{=表达式}} / {{#if}} 条件内容；系统规则可恢复默认；旧配置自动迁移
@@ -44,7 +44,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.14.1',
+        version: 'V7.15.1',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -130,6 +130,9 @@
             toggleTableWheelReverse: 'Alt+W',
             // V7.8.1：字段条件高亮总开关。H = Highlight，可在功能快捷键中重新录制。
             toggleConditionalHighlight: 'Alt+H',
+            // V7.15：高亮规则组快捷切换。Alt+Shift+H 默认切换到下一组；上一组默认留空。
+            nextConditionalHighlightGroup: 'Alt+Shift+H',
+            prevConditionalHighlightGroup: '',
 
             // 以下功能提供快捷键入口，但默认留空，避免一次占用过多按键。
             copyCurrentCell: '',
@@ -10506,6 +10509,8 @@
             { type: 'action', id: 'openBulkProgress', label: '打开批量追加进展', hotkey: state.hotkeys.openBulkProgress },
             { type: 'action', id: 'toggleTableWheelReverse', label: '开关表格滚轮轴反转', hotkey: state.hotkeys.toggleTableWheelReverse },
             { type: 'action', id: 'toggleConditionalHighlight', label: '开关字段条件高亮', hotkey: state.hotkeys.toggleConditionalHighlight },
+            { type: 'action', id: 'nextConditionalHighlightGroup', label: '切换下一个高亮规则组', hotkey: state.hotkeys.nextConditionalHighlightGroup },
+            { type: 'action', id: 'prevConditionalHighlightGroup', label: '切换上一个高亮规则组', hotkey: state.hotkeys.prevConditionalHighlightGroup },
             { type: 'action', id: 'toggleEdgeTheme', label: '开关 Edge 深色优化', hotkey: state.hotkeys.toggleEdgeTheme },
 
             { type: 'action', id: 'nextCombo', label: '切换下一个字段组合', hotkey: state.hotkeys.nextCombo },
@@ -10673,6 +10678,13 @@
                 showToast(`字段条件高亮：已${nextEnabled ? '开启' : '关闭'}`);
                 break;
             }
+
+            case 'nextConditionalHighlightGroup':
+            case 'prevConditionalHighlightGroup':
+                window.dispatchEvent(new CustomEvent('att:conditional-highlight:cycle-group', {
+                    detail: { direction: entry.id === 'prevConditionalHighlightGroup' ? -1 : 1, source: 'hotkey' }
+                }));
+                break;
 
             case 'toggleEdgeTheme':
                 state.darkModeOptimized = !state.darkModeOptimized;
@@ -10966,7 +10978,15 @@
         const currentValue = currentValueRaw.length > 72 ? currentValueRaw.slice(0, 72) + '…' : currentValueRaw;
         const conditionEnabled = Boolean(GM_getValue('att_v3_conditionalHighlightEnabled', false));
         const conditionRules = GM_getValue('att_v3_conditionalHighlightRules', []);
-        const conditionRuleCount = Array.isArray(conditionRules) ? conditionRules.filter(r => r && r.enabled !== false).length : 0;
+        const rawConditionGroups = GM_getValue('att_v3_conditionalHighlightGroups', []);
+        const conditionGroups = Array.isArray(rawConditionGroups) && rawConditionGroups.length
+            ? rawConditionGroups.filter(g => g && g.id).map(g => ({ id:String(g.id), name:String(g.name || '未命名规则组') }))
+            : [{ id:'group_default', name:'默认规则组' }];
+        const conditionActiveGroupIdRaw = String(GM_getValue('att_v3_conditionalHighlightActiveGroup', '') || '');
+        const conditionActiveGroup = conditionGroups.find(g => g.id === conditionActiveGroupIdRaw) || conditionGroups[0];
+        const conditionRuleCount = Array.isArray(conditionRules)
+            ? conditionRules.filter(r => r && r.enabled !== false && String(r.groupId || 'group_default') === conditionActiveGroup.id).length
+            : 0;
 
         const comboOptions = state.combos.map(combo => {
             const status = getComboCompatibility(combo);
@@ -11019,7 +11039,7 @@
                         <span class="att-switch"><input type="checkbox" data-setting="focusEnabled" ${state.focusEnabled ? 'checked' : ''}><span class="att-slider"></span></span>
                     </label>
                     <button type="button" class="att-quick-toggle-v790 ${conditionEnabled ? 'is-on' : ''}" data-act="toggle-conditional-highlight-quick">
-                        <span><b>条件高亮</b><small>${conditionRuleCount} 条启用规则</small></span><i class="att-quick-state-dot-v790"></i>
+                        <span><b>条件高亮</b><small data-cond-group-summary>${escapeHtml(conditionActiveGroup.name)} · ${conditionRuleCount} 条</small></span><i class="att-quick-state-dot-v790"></i>
                     </button>
                     <label class="att-quick-toggle-v790 ${state.tableWheelReverseEnabled ? 'is-on' : ''}">
                         <span><b>滚轮横向</b><small>${escapeHtml(state.hotkeys.toggleTableWheelReverse || 'Alt+W')}</small></span>
@@ -11034,6 +11054,7 @@
                     <label><input type="checkbox" data-setting="rowHighlightEnabled" ${state.rowHighlightEnabled ? 'checked' : ''} ${state.focusEnabled ? '' : 'disabled'}> 行高亮</label>
                     <label><input type="checkbox" data-setting="columnHighlightEnabled" ${state.columnHighlightEnabled ? 'checked' : ''} ${state.focusEnabled ? '' : 'disabled'}> 列高亮</label>
                     <button type="button" data-act="clear-focus" ${activeCell ? '' : 'disabled'}>清除聚焦</button>
+                    <button type="button" data-act="cycle-conditional-highlight-group" ${conditionGroups.length > 1 ? '' : 'disabled'}>切换高亮组</button>
                     <button type="button" data-act="open-conditional-highlight-manager">管理高亮规则</button>
                 </div>
             </div>
@@ -12055,7 +12076,9 @@
             {
                 title: '条件高亮',
                 rows: [
-                    ['toggleConditionalHighlight', '开关字段条件高亮', '默认 Alt+H；立即显示 / 隐藏全部条件规则高亮']
+                    ['toggleConditionalHighlight', '开关字段条件高亮', '默认 Alt+H；立即显示 / 隐藏当前规则组高亮'],
+                    ['nextConditionalHighlightGroup', '切换下一个高亮规则组', '默认 Alt+Shift+H；循环切换并立即重算'],
+                    ['prevConditionalHighlightGroup', '切换上一个高亮规则组', '默认留空，可自行录制']
                 ]
             },
             {
@@ -12456,6 +12479,12 @@
                 showToast(`字段条件高亮：已${nextEnabled ? '开启' : '关闭'}`);
                 break;
             }
+
+            case 'cycle-conditional-highlight-group':
+                window.dispatchEvent(new CustomEvent('att:conditional-highlight:cycle-group', {
+                    detail: { direction: 1, source: 'floating-menu' }
+                }));
+                break;
 
             case 'open-conditional-highlight-manager': {
                 let manage = document.querySelector('#att-cond-highlight-card-v770 [data-cond-act="manage"]');
@@ -17887,6 +17916,14 @@
             schedule: scheduleFocusedRowRestore,
             restore: restoreFocusedRowIfVisible
         };
+
+        // V7.15：条件高亮规则组切换后，快捷页立即同步当前组名称与命中规则数。
+        window.addEventListener('att:conditional-highlight:group-changed', event => {
+            if (state.panelOpen && state.activeTab === 'features') renderFeaturesSection();
+            const name = String(event?.detail?.name || '高亮规则组');
+            const count = Number(event?.detail?.activeCount || 0);
+            showToast(`高亮规则组：${name}${Number.isFinite(count) ? ` · ${count} 条启用规则` : ''}`);
+        });
 
         console.log(`[AutoTable 工具集] ${APP.version} 已加载`);
         console.log('[AutoTable 工具集] V6.8：基于 V6.6 稳定渲染版升级规则化快捷短语、日期时间模板、条件显示与编辑首行自动预留。');
@@ -26820,7 +26857,7 @@
 
 
 /* ============================================================================
- * AutoTable 字段条件高亮规则中心 V7.8.1
+ * AutoTable 字段条件高亮规则中心 V7.15.1
  * --------------------------------------------------------------------------
  * 设计目标：
  * 1) 指定字段内容符合规则时，支持只高亮该单元格或高亮整行；
@@ -26831,19 +26868,23 @@
  * 6) 整行强调边缘逐单元格连续绘制，左置顶 / 主体 / 右置顶区域保持同一颜色与宽度；高亮不把置顶列改成透明背景；
  * 7) 聚焦模式优先级高于条件高亮，二者不会互相抢当前格 / 行列聚焦状态；
  * 8) 高级模式使用受限表达式解析器（非 eval / new Function），可组合同行字段、日期、正则与逻辑运算；
- * 9) 配置使用 att_v3_ 前缀 GM 存储，自动进入 V7.6+ 的全部设置导入导出 / 重置。
+ * 9) 支持规则组：同一时间只激活一个规则组，可在设置、快捷页或快捷键中瞬时切换；
+ * 10) 旧版未分组规则自动迁移到“默认规则组”，组配置继续使用 att_v3_ 前缀进入统一备份 / 导入 / 重置。
  * ========================================================================== */
 (function () {
     'use strict';
 
     const MOD = {
-        version: 'V7.8.1',
+        version: 'V7.15.1',
         keyEnabled: 'att_v3_conditionalHighlightEnabled',
         keyRules: 'att_v3_conditionalHighlightRules',
+        keyGroups: 'att_v3_conditionalHighlightGroups',
+        keyActiveGroup: 'att_v3_conditionalHighlightActiveGroup',
         cardId: 'att-cond-highlight-card-v770',
         modalId: 'att-cond-highlight-manager-v770',
         styleId: 'att-cond-highlight-style-v770'
     };
+    const DEFAULT_GROUP_ID = 'group_default';
 
     const OP_META = {
         contains: '包含',
@@ -26876,10 +26917,16 @@
     const VALID_RULE_TYPES = new Set(['standard','advanced']);
     const exprTokenCache = new Map();
     let enabled = Boolean(GM_getValue(MOD.keyEnabled, false));
+    let groups = normalizeGroups(GM_getValue(MOD.keyGroups, []));
+    let activeGroupId = String(GM_getValue(MOD.keyActiveGroup, '') || '');
     let rules = normalizeRules(GM_getValue(MOD.keyRules, []));
+    let activeRulesCache = [];
     let managerDraft = [];
+    let managerGroupsDraft = [];
     let managerSelectedId = '';
     let managerFilter = '';
+    let managerGroupId = '';
+    let managerActiveGroupId = '';
 
     const bodyObservers = new Map();
     const dirtyRows = new Set();
@@ -26928,6 +26975,7 @@
         return {
             id: String(r.id || makeId()),
             enabled: r.enabled !== false,
+            groupId: String(r.groupId || DEFAULT_GROUP_ID),
             name: cleanText(r.name) || `高亮规则 ${index + 1}`,
             scope: VALID_SCOPES.has(r.scope) ? r.scope : 'table',
             tableKey: String(r.tableKey || ''),
@@ -26962,9 +27010,106 @@
         });
     }
 
+    function makeGroupId() {
+        return `chrg_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
+    }
+
+    function normalizeGroup(raw, index = 0) {
+        const g = raw && typeof raw === 'object' ? raw : {};
+        return {
+            id: String(g.id || (index === 0 ? DEFAULT_GROUP_ID : makeGroupId())),
+            name: cleanText(g.name) || (index === 0 ? '默认规则组' : `规则组 ${index + 1}`)
+        };
+    }
+
+    function normalizeGroups(value) {
+        const source = Array.isArray(value) && value.length ? value : [{ id: DEFAULT_GROUP_ID, name: '默认规则组' }];
+        const seen = new Set();
+        const result = [];
+        source.forEach((raw, index) => {
+            const group = normalizeGroup(raw, index);
+            if (!group.id || seen.has(group.id)) group.id = makeGroupId();
+            seen.add(group.id);
+            result.push(group);
+        });
+        return result.length ? result : [{ id: DEFAULT_GROUP_ID, name: '默认规则组' }];
+    }
+
+    function repairGroupIntegrity(persist = false) {
+        groups = normalizeGroups(groups);
+        const ids = new Set(groups.map(g => g.id));
+        if (!ids.has(activeGroupId)) activeGroupId = groups[0].id;
+        let changed = false;
+        rules.forEach(rule => {
+            if (!ids.has(rule.groupId)) { rule.groupId = groups[0].id; changed = true; }
+        });
+        if (persist) {
+            GM_setValue(MOD.keyGroups, groups);
+            GM_setValue(MOD.keyActiveGroup, activeGroupId);
+            if (changed) GM_setValue(MOD.keyRules, rules);
+        }
+    }
+
+    function getGroupById(id, source = groups) {
+        return source.find(g => g.id === id) || source[0] || null;
+    }
+
+    function getActiveGroup() {
+        return getGroupById(activeGroupId, groups);
+    }
+
+    function rebuildActiveRulesCache() {
+        const validGroupId = getActiveGroup()?.id || '';
+        activeRulesCache = validGroupId ? rules.filter(r => r.enabled && r.groupId === validGroupId) : [];
+    }
+
+    function getActiveRules() {
+        return activeRulesCache;
+    }
+
+    function emitGroupChanged(source = 'ui') {
+        const group = getActiveGroup();
+        window.dispatchEvent(new CustomEvent('att:conditional-highlight:group-changed', {
+            detail: {
+                id: group?.id || '',
+                name: group?.name || '默认规则组',
+                activeCount: activeRulesCache.length,
+                totalCount: rules.filter(r => r.groupId === group?.id).length,
+                source
+            }
+        }));
+    }
+
+    function setActiveGroup(groupId, source = 'ui') {
+        const group = getGroupById(String(groupId || ''), groups);
+        if (!group) return false;
+        const changed = activeGroupId !== group.id;
+        activeGroupId = group.id;
+        GM_setValue(MOD.keyActiveGroup, activeGroupId);
+        rebuildActiveRulesCache();
+        updateSettingsCard();
+        if (enabled) rescanAllVisibleRows();
+        else clearAllHighlights();
+        emitGroupChanged(source);
+        return changed;
+    }
+
+    function cycleActiveGroup(direction = 1, source = 'shortcut') {
+        if (groups.length < 2) { emitGroupChanged(source); return false; }
+        const current = Math.max(0, groups.findIndex(g => g.id === activeGroupId));
+        const step = Number(direction) < 0 ? -1 : 1;
+        const next = (current + step + groups.length) % groups.length;
+        return setActiveGroup(groups[next].id, source);
+    }
+
+    repairGroupIntegrity(true);
+    rebuildActiveRulesCache();
+
     function saveRules(nextRules = rules) {
         rules = normalizeRules(nextRules);
+        repairGroupIntegrity(false);
         GM_setValue(MOD.keyRules, rules);
+        rebuildActiveRulesCache();
         updateSettingsCard();
         rescanAllVisibleRows();
     }
@@ -26972,6 +27117,7 @@
     function setEnabled(value) {
         enabled = Boolean(value);
         GM_setValue(MOD.keyEnabled, enabled);
+        if (enabled) rebuildActiveRulesCache();
         updateSettingsCard();
         syncEngineState();
     }
@@ -27340,7 +27486,7 @@
         const root = row.closest('.grid-root');
         if (!root) return;
         const map = buildHeaderMap(root);
-        const active = rules.filter(r => r.enabled);
+        const active = getActiveRules();
         if (!active.length) return;
 
         let rowWinner = null;
@@ -27559,8 +27705,15 @@
             #${MOD.modalId} .chr-title { font-size:16px; font-weight:700; }
             #${MOD.modalId} .chr-sub { margin-top:3px; color:#9aa0a6; font-size:12px; }
             #${MOD.modalId} .chr-main { min-height:0; display:grid; grid-template-columns:300px minmax(0,1fr); }
-            #${MOD.modalId} .chr-side { min-height:0; display:grid; grid-template-rows:auto auto minmax(0,1fr); border-right:1px solid #34363a; }
-            #${MOD.modalId} .chr-side-tools { padding:12px; display:flex; gap:8px; }
+            #${MOD.modalId} .chr-side { min-height:0; display:grid; grid-template-rows:auto auto auto minmax(0,1fr); border-right:1px solid #34363a; }
+            #${MOD.modalId} .chr-group-panel { padding:11px 12px 9px; border-bottom:1px solid #34363a; background:#222326; }
+            #${MOD.modalId} .chr-group-top { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:7px; align-items:center; }
+            #${MOD.modalId} .chr-group-top select { height:34px; }
+            #${MOD.modalId} .chr-group-active { height:25px; padding:0 8px; border-radius:999px; color:#9ecbff; background:#203047; border:1px solid #315b91; font-size:10px; font-weight:700; white-space:nowrap; }
+            #${MOD.modalId} .chr-group-active.is-current { color:#b7f7c7; background:#193324; border-color:#2f6a45; }
+            #${MOD.modalId} .chr-group-actions { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:5px; margin-top:7px; }
+            #${MOD.modalId} .chr-group-actions button { height:27px; min-width:0; padding:0 5px; font-size:10px; }
+            #${MOD.modalId} .chr-side-tools { padding:10px 12px; display:flex; gap:8px; }
             #${MOD.modalId} input[type="text"], #${MOD.modalId} input[type="search"], #${MOD.modalId} select {
                 width:100%; min-width:0; box-sizing:border-box; height:34px; padding:0 9px;
                 color:#e8eaed; background:#292a2d; border:1px solid #424448; border-radius:7px; outline:none;
@@ -27620,9 +27773,21 @@
         if (!card) return;
         const toggle = card.querySelector('[data-cond-setting="enabled"]');
         if (toggle) toggle.checked = enabled;
-        const active = rules.filter(r => r.enabled).length;
+        const group = getActiveGroup();
+        const active = getActiveRules().length;
+        const groupTotal = rules.filter(r => r.groupId === group?.id).length;
         const summary = card.querySelector('[data-cond-summary]');
-        if (summary) summary.textContent = `已配置 ${rules.length} 条 · 启用 ${active} 条`;
+        if (summary) summary.textContent = `当前组：${group?.name || '默认规则组'} · ${active}/${groupTotal} 条启用 · 共 ${groups.length} 组`;
+        const select = card.querySelector('[data-cond-setting="group"]');
+        if (select) {
+            const signature = groups.map(g => `${g.id}:${g.name}`).join('|');
+            if (select.dataset.signature !== signature) {
+                select.innerHTML = groups.map(g => `<option value="${escAttr(g.id)}">${escHtml(g.name)}</option>`).join('');
+                select.dataset.signature = signature;
+            }
+            select.value = group?.id || '';
+        }
+        card.querySelectorAll('[data-cond-act="next-group"]').forEach(btn => btn.disabled = groups.length < 2);
     }
 
     function ensureSettingsCard() {
@@ -27633,19 +27798,25 @@
         card.className = 'att-card';
         card.innerHTML = `
             <div class="att-card-title">字段条件高亮</div>
-            <div class="att-card-desc">指定字段内容符合规则时自动高亮。支持文本、数值、日期语义和安全高级表达式；整行模式默认使用上下双强调边缘，并可独立调整边缘颜色、强度和宽度。</div>
+            <div class="att-card-desc">支持把高亮规则整理成多个规则组；同一时间只激活一个组，可快速切换不同工作场景。组内继续支持文本、数值、日期语义、高级表达式、单元格 / 整行高亮与独立视觉样式。</div>
             <div class="att-divider"></div>
             <div class="att-row">
                 <div style="min-width:0;">
                     <div class="att-label">启用字段条件高亮</div>
-                    <div class="att-sub-label" data-cond-summary>已配置 ${rules.length} 条 · 启用 ${rules.filter(r => r.enabled).length} 条</div>
-                    <div class="att-sub-label">快捷开关：默认 <span class="att-kbd">Alt+H</span>，可在下方“功能快捷键 → 条件高亮”修改</div>
+                    <div class="att-sub-label" data-cond-summary></div>
+                    <div class="att-sub-label">总开关 <span class="att-kbd">Alt+H</span> · 下一规则组 <span class="att-kbd">Alt+Shift+H</span>，均可在快捷键设置中修改</div>
                 </div>
                 <label class="att-switch"><input type="checkbox" data-cond-setting="enabled" ${enabled ? 'checked' : ''}><span class="att-slider"></span></label>
             </div>
+            <div class="att-divider"></div>
+            <div class="att-field" style="margin-top:8px;">
+                <div class="att-label">当前高亮规则组</div>
+                <select class="att-select" data-cond-setting="group">${groups.map(g => `<option value="${escAttr(g.id)}" ${g.id===activeGroupId?'selected':''}>${escHtml(g.name)}</option>`).join('')}</select>
+            </div>
             <div class="att-actions" style="margin-top:8px;">
-                <button type="button" class="att-btn att-primary" data-cond-act="manage">管理高亮规则</button>
-                <button type="button" class="att-btn" data-cond-act="refresh">重新扫描当前表</button>
+                <button type="button" class="att-btn att-primary" data-cond-act="manage">管理规则组 / 规则</button>
+                <button type="button" class="att-btn" data-cond-act="next-group" ${groups.length < 2 ? 'disabled' : ''}>切换下一组</button>
+                <button type="button" class="att-btn" data-cond-act="refresh">重新扫描</button>
             </div>
         `;
         // 条件高亮与表格视觉样式关系紧密，放在视觉样式卡片后面；找不到则放到设置顶部。
@@ -27654,11 +27825,15 @@
         if (visual?.nextSibling) section.insertBefore(card, visual.nextSibling);
         else if (visual) section.appendChild(card);
         else section.prepend(card);
+        updateSettingsCard();
     }
 
     function openManager() {
         managerDraft = normalizeRules(JSON.parse(JSON.stringify(rules)));
-        managerSelectedId = managerDraft[0]?.id || '';
+        managerGroupsDraft = normalizeGroups(JSON.parse(JSON.stringify(groups)));
+        managerActiveGroupId = managerGroupsDraft.some(g => g.id === activeGroupId) ? activeGroupId : managerGroupsDraft[0]?.id || '';
+        managerGroupId = managerActiveGroupId || managerGroupsDraft[0]?.id || '';
+        managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
         managerFilter = '';
         const modal = ensureManager();
         modal.classList.add('att-show');
@@ -27677,18 +27852,30 @@
         modal.innerHTML = `
             <div class="chr-shell" role="dialog" aria-modal="true" aria-label="字段条件高亮规则">
                 <div class="chr-head">
-                    <div><div class="chr-title">字段条件高亮规则</div><div class="chr-sub">V7.8.1 · 单元格 / 整行 · 上下强调边缘 · 日期语义 · 安全高级表达式 · 快捷开关</div></div>
+                    <div><div class="chr-title">字段条件高亮规则组</div><div class="chr-sub">V7.15.1 · 多规则组快速切换 · 单元格 / 整行 · 日期语义 · 安全高级表达式</div></div>
                     <button type="button" data-chr-act="close">×</button>
                 </div>
                 <div class="chr-main">
                     <aside class="chr-side">
-                        <div class="chr-side-tools"><button type="button" class="primary" data-chr-act="new">+ 新建规则</button><button type="button" data-chr-act="enable-all">全启用</button><button type="button" data-chr-act="disable-all">全停用</button></div>
-                        <div class="chr-filter"><input type="search" data-chr-filter placeholder="搜索规则 / 字段…"></div>
+                        <div class="chr-group-panel">
+                            <div class="chr-group-top">
+                                <select data-chr-group-select aria-label="规则组"></select>
+                                <button type="button" class="chr-group-active" data-chr-act="set-active-group"></button>
+                            </div>
+                            <div class="chr-group-actions">
+                                <button type="button" data-chr-act="new-group">+ 新组</button>
+                                <button type="button" data-chr-act="rename-group">重命名</button>
+                                <button type="button" data-chr-act="duplicate-group">复制组</button>
+                                <button type="button" data-chr-act="delete-group">删除组</button>
+                            </div>
+                        </div>
+                        <div class="chr-side-tools"><button type="button" class="primary" data-chr-act="new">+ 新建规则</button><button type="button" data-chr-act="enable-all">本组全启用</button><button type="button" data-chr-act="disable-all">本组全停用</button></div>
+                        <div class="chr-filter"><input type="search" data-chr-filter placeholder="搜索当前组规则 / 字段…"></div>
                         <div class="chr-list" data-chr-list></div>
                     </aside>
                     <main class="chr-detail" data-chr-detail></main>
                 </div>
-                <div class="chr-foot"><div class="chr-sub">规则从上到下为优先级；聚焦高亮优先于条件高亮。</div><div class="chr-actions"><button type="button" data-chr-act="cancel">取消</button><button type="button" class="primary" data-chr-act="save">保存全部</button></div></div>
+                <div class="chr-foot"><div class="chr-sub">同一时间仅当前规则组参与高亮；组内规则从上到下为优先级，聚焦高亮仍然优先。</div><div class="chr-actions"><button type="button" data-chr-act="cancel">取消</button><button type="button" class="primary" data-chr-act="save">保存全部</button></div></div>
             </div>`;
         document.body.appendChild(modal);
         modal.addEventListener('click', onManagerClick);
@@ -27701,10 +27888,60 @@
         return managerDraft.find(r => r.id === managerSelectedId) || null;
     }
 
+    function getManagerGroup() {
+        return getGroupById(managerGroupId, managerGroupsDraft);
+    }
+
+    function makeUniqueGroupName(baseName, excludeId = '') {
+        const base = cleanText(baseName) || '新规则组';
+        const used = new Set(managerGroupsDraft.filter(g => g.id !== excludeId).map(g => g.name));
+        if (!used.has(base)) return base;
+        let i = 2;
+        while (used.has(`${base} ${i}`)) i++;
+        return `${base} ${i}`;
+    }
+
+    function selectManagerGroup(groupId) {
+        const group = getGroupById(groupId, managerGroupsDraft);
+        if (!group) return;
+        managerGroupId = group.id;
+        managerFilter = '';
+        managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
+        renderManager();
+    }
+
+    function renderManagerGroups() {
+        const modal = ensureManager();
+        const select = modal.querySelector('[data-chr-group-select]');
+        if (select) {
+            select.innerHTML = managerGroupsDraft.map(g => {
+                const count = managerDraft.filter(r => r.groupId === g.id).length;
+                const activeMark = g.id === managerActiveGroupId ? ' ★' : '';
+                return `<option value="${escAttr(g.id)}" ${g.id===managerGroupId?'selected':''}>${escHtml(g.name)} (${count})${activeMark}</option>`;
+            }).join('');
+            select.value = managerGroupId;
+        }
+        const activeBtn = modal.querySelector('[data-chr-act="set-active-group"]');
+        if (activeBtn) {
+            const isCurrent = managerGroupId === managerActiveGroupId;
+            activeBtn.textContent = isCurrent ? '当前生效' : '设为当前';
+            activeBtn.classList.toggle('is-current', isCurrent);
+            activeBtn.disabled = false;
+            activeBtn.setAttribute('aria-pressed', isCurrent ? 'true' : 'false');
+        }
+        const deleteBtn = modal.querySelector('[data-chr-act="delete-group"]');
+        if (deleteBtn) deleteBtn.disabled = managerGroupsDraft.length <= 1;
+    }
+
     function renderManager() {
         const modal = ensureManager();
+        if (!managerGroupsDraft.length) managerGroupsDraft = [{ id:DEFAULT_GROUP_ID, name:'默认规则组' }];
+        if (!managerGroupsDraft.some(g => g.id === managerGroupId)) managerGroupId = managerGroupsDraft[0].id;
+        const selected = getSelectedDraftRule();
+        if (selected && selected.groupId !== managerGroupId) managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
         const filter = modal.querySelector('[data-chr-filter]');
         if (filter && document.activeElement !== filter) filter.value = managerFilter;
+        renderManagerGroups();
         renderManagerList();
         renderManagerDetail();
     }
@@ -27713,12 +27950,13 @@
         const list = document.querySelector(`#${MOD.modalId} [data-chr-list]`);
         if (!list) return;
         const q = cleanText(managerFilter).toLowerCase();
-        const visible = managerDraft.filter(r => !q || `${r.name} ${r.fieldName} ${r.tableName}`.toLowerCase().includes(q));
+        const inGroup = managerDraft.filter(r => r.groupId === managerGroupId);
+        const visible = inGroup.filter(r => !q || `${r.name} ${r.fieldName} ${r.tableName}`.toLowerCase().includes(q));
         if (!visible.length) {
-            list.innerHTML = '<div class="chr-empty" style="height:auto;min-height:140px;">没有匹配的规则</div>';
+            list.innerHTML = `<div class="chr-empty" style="height:auto;min-height:140px;">${inGroup.length ? '没有匹配的规则' : '当前规则组还没有规则'}<br><span>${inGroup.length ? '可清空搜索词查看全部规则。' : '点击“+ 新建规则”开始配置。'}</span></div>`;
             return;
         }
-        list.innerHTML = visible.map((r, index) => `
+        list.innerHTML = visible.map(r => `
             <div class="chr-item ${r.id === managerSelectedId ? 'active' : ''}" data-chr-rule-id="${escAttr(r.id)}" style="--chr-color:${escAttr(r.color)}">
                 <span class="chr-dot"></span>
                 <div style="min-width:0;"><div class="chr-item-name">${r.enabled ? '' : '○ '}${escHtml(r.name)}</div><div class="chr-item-meta">${escHtml(r.fieldName || '未选字段')} · ${r.ruleType==='advanced'?'高级表达式':OP_META[r.operator]} · ${r.mode === 'row' ? '整行' : '单元格'} · ${escHtml(ruleScopeLabel(r))}</div></div>
@@ -27740,7 +27978,8 @@
         if (!detail) return;
         const rule = getSelectedDraftRule();
         if (!rule) {
-            detail.innerHTML = '<div class="chr-empty"><div><b>还没有高亮规则</b><br><span>点击左侧“新建规则”开始配置。</span></div></div>';
+            const group = getManagerGroup();
+            detail.innerHTML = `<div class="chr-empty"><div><b>${escHtml(group?.name || '当前规则组')} 暂无规则</b><br><span>点击左侧“+ 新建规则”开始配置，或切换到其它规则组。</span></div></div>`;
             return;
         }
         const context = getTableContext();
@@ -27751,6 +27990,8 @@
                 <div class="chr-grid2">
                     <label class="chr-field"><span>规则名称</span><input type="text" data-chr-edit="name" value="${escAttr(rule.name)}"></label>
                     <label class="chr-check"><input type="checkbox" data-chr-edit="enabled" ${rule.enabled ? 'checked' : ''}> 启用这条规则</label>
+                    <label class="chr-field"><span>所属规则组</span><select data-chr-edit="groupId">${managerGroupsDraft.map(g => `<option value="${escAttr(g.id)}" ${g.id===rule.groupId?'selected':''}>${escHtml(g.name)}</option>`).join('')}</select></label>
+                    <div class="chr-preview">${rule.groupId === managerActiveGroupId ? '<span style="color:#81c995;">当前生效组中的规则</span>' : '此规则所在组当前未激活，切换到该组后才参与高亮。'}</div>
                 </div>
             </div>
             <div class="chr-section">
@@ -27836,13 +28077,25 @@
         const context = getTableContext();
         const field = getCurrentFields()[0] || null;
         return normalizeRule({
-            id: makeId(), enabled: true, name: '新高亮规则',
+            id: makeId(), enabled: true, groupId: managerGroupId || managerGroupsDraft[0]?.id || DEFAULT_GROUP_ID, name: '新高亮规则',
             scope: context ? 'table' : 'global', tableKey: context?.key || '', tableName: context?.tableName || '',
             fieldId: field?.fieldId || '', fieldName: field?.name || '',
             ruleType:'standard', operator: 'contains', value: '', advancedExpr:'', mode: 'cell',
             color: '#f59e0b', opacity: 24, edgeColor: '#f59e0b', edgeOpacity: 58, edgeWidth: 1,
             edgeTop: true, edgeBottom: true, bold: false
         }, managerDraft.length);
+    }
+
+    function moveDraftRuleWithinGroup(ruleId, direction) {
+        const groupRules = managerDraft.filter(r => r.groupId === managerGroupId);
+        const pos = groupRules.findIndex(r => r.id === ruleId);
+        const other = pos + (direction < 0 ? -1 : 1);
+        if (pos < 0 || other < 0 || other >= groupRules.length) return false;
+        const aIndex = managerDraft.findIndex(r => r.id === groupRules[pos].id);
+        const bIndex = managerDraft.findIndex(r => r.id === groupRules[other].id);
+        if (aIndex < 0 || bIndex < 0) return false;
+        [managerDraft[aIndex], managerDraft[bIndex]] = [managerDraft[bIndex], managerDraft[aIndex]];
+        return true;
     }
 
     function onManagerClick(event) {
@@ -27869,33 +28122,116 @@
         const action = event.target.closest('[data-chr-act]')?.dataset.chrAct;
         if (!action) return;
         const selected = getSelectedDraftRule();
+        const currentGroup = getManagerGroup();
         if (action === 'close' || action === 'cancel') return closeManager();
+
+        if (action === 'new-group') {
+            const name = prompt('新规则组名称：', makeUniqueGroupName('新规则组'));
+            if (name === null) return;
+            const group = { id: makeGroupId(), name: makeUniqueGroupName(name) };
+            managerGroupsDraft.push(group);
+            managerGroupId = group.id;
+            managerSelectedId = '';
+            managerFilter = '';
+            return renderManager();
+        }
+        if (action === 'rename-group') {
+            if (!currentGroup) return;
+            const name = prompt('规则组名称：', currentGroup.name);
+            if (name === null) return;
+            currentGroup.name = makeUniqueGroupName(name, currentGroup.id);
+            return renderManager();
+        }
+        if (action === 'duplicate-group') {
+            if (!currentGroup) return;
+            const newGroup = { id: makeGroupId(), name: makeUniqueGroupName(`${currentGroup.name} - 副本`) };
+            managerGroupsDraft.push(newGroup);
+            const copies = managerDraft
+                .filter(r => r.groupId === currentGroup.id)
+                .map((r, i) => normalizeRule({ ...JSON.parse(JSON.stringify(r)), id:makeId(), groupId:newGroup.id, name:r.name }, managerDraft.length + i));
+            managerDraft.push(...copies);
+            managerGroupId = newGroup.id;
+            managerSelectedId = copies[0]?.id || '';
+            managerFilter = '';
+            return renderManager();
+        }
+        if (action === 'delete-group') {
+            if (!currentGroup || managerGroupsDraft.length <= 1) return;
+            const count = managerDraft.filter(r => r.groupId === currentGroup.id).length;
+            if (!confirm(`删除规则组“${currentGroup.name}”吗？\n该组中的 ${count} 条规则也会一并删除。`)) return;
+            const groupIndex = managerGroupsDraft.findIndex(g => g.id === currentGroup.id);
+            managerGroupsDraft = managerGroupsDraft.filter(g => g.id !== currentGroup.id);
+            managerDraft = managerDraft.filter(r => r.groupId !== currentGroup.id);
+            const nextGroup = managerGroupsDraft[Math.min(groupIndex, managerGroupsDraft.length - 1)] || managerGroupsDraft[0];
+            managerGroupId = nextGroup?.id || '';
+            if (managerActiveGroupId === currentGroup.id) managerActiveGroupId = managerGroupId;
+            managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
+            managerFilter = '';
+            return renderManager();
+        }
+        if (action === 'set-active-group') {
+            if (!currentGroup) return;
+            managerActiveGroupId = currentGroup.id;
+            return renderManager();
+        }
+
         if (action === 'new') {
-            const rule = createDefaultRule(); managerDraft.push(rule); managerSelectedId = rule.id; return renderManager();
+            const rule = createDefaultRule();
+            managerDraft.push(rule);
+            managerSelectedId = rule.id;
+            return renderManager();
         }
         if (action === 'enable-all' || action === 'disable-all') {
-            managerDraft.forEach(r => r.enabled = action === 'enable-all'); return renderManager();
+            managerDraft.forEach(r => {
+                if (r.groupId === managerGroupId) r.enabled = action === 'enable-all';
+            });
+            return renderManager();
         }
         if (action === 'save') {
             const bad = managerDraft.find(r => r.enabled && r.ruleType === 'advanced' && !validateAdvancedExpression(r).ok);
-            if (bad) { const v=validateAdvancedExpression(bad); alert(`规则“${bad.name}”的高级表达式有误：${v.error}`); managerSelectedId=bad.id; renderManager(); return; }
-            rules = normalizeRules(managerDraft); GM_setValue(MOD.keyRules, rules); closeManager(); updateSettingsCard(); rescanAllVisibleRows(); return;
+            if (bad) {
+                const v = validateAdvancedExpression(bad);
+                alert(`规则“${bad.name}”的高级表达式有误：${v.error}`);
+                managerGroupId = bad.groupId;
+                managerSelectedId = bad.id;
+                renderManager();
+                return;
+            }
+            groups = normalizeGroups(managerGroupsDraft);
+            activeGroupId = groups.some(g => g.id === managerActiveGroupId) ? managerActiveGroupId : groups[0].id;
+            rules = normalizeRules(managerDraft);
+            repairGroupIntegrity(false);
+            GM_setValue(MOD.keyGroups, groups);
+            GM_setValue(MOD.keyActiveGroup, activeGroupId);
+            GM_setValue(MOD.keyRules, rules);
+            rebuildActiveRulesCache();
+            closeManager();
+            updateSettingsCard();
+            rescanAllVisibleRows();
+            emitGroupChanged('manager-save');
+            return;
         }
         if (!selected) return;
         const index = managerDraft.findIndex(r => r.id === selected.id);
         if (action === 'delete') {
             if (!confirm(`删除高亮规则“${selected.name}”吗？`)) return;
-            managerDraft.splice(index,1); managerSelectedId = managerDraft[index]?.id || managerDraft[index-1]?.id || ''; return renderManager();
+            managerDraft.splice(index,1);
+            managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
+            return renderManager();
         }
         if (action === 'duplicate') {
-            const copy = normalizeRule({...JSON.parse(JSON.stringify(selected)), id:makeId(), name:`${selected.name} - 副本`}, managerDraft.length);
-            managerDraft.splice(index+1,0,copy); managerSelectedId=copy.id; return renderManager();
+            const copy = normalizeRule({ ...JSON.parse(JSON.stringify(selected)), id:makeId(), groupId:selected.groupId, name:`${selected.name} - 副本` }, managerDraft.length);
+            managerDraft.splice(index+1,0,copy);
+            managerSelectedId = copy.id;
+            return renderManager();
         }
-        if (action === 'up' && index > 0) {
-            [managerDraft[index-1],managerDraft[index]]=[managerDraft[index],managerDraft[index-1]]; return renderManager();
+        if (action === 'up') {
+            if (moveDraftRuleWithinGroup(selected.id, -1)) renderManager();
+            return;
         }
-        if (action === 'down' && index >= 0 && index < managerDraft.length-1) {
-            [managerDraft[index+1],managerDraft[index]]=[managerDraft[index],managerDraft[index+1]]; return renderManager();
+        if (action === 'down') {
+            if (moveDraftRuleWithinGroup(selected.id, 1)) renderManager();
+            return;
         }
         if (action === 'validate-expr') {
             const v = validateAdvancedExpression(selected);
@@ -27922,10 +28258,24 @@
     }
 
     function onManagerChange(event) {
+        if (event.target.matches('[data-chr-group-select]')) {
+            selectManagerGroup(event.target.value);
+            return;
+        }
         const key = event.target.dataset.chrEdit;
         const rule = getSelectedDraftRule();
         if (!key || !rule) return;
         if (key === 'enabled' || key === 'caseSensitive' || key === 'bold' || key === 'edgeTop' || key === 'edgeBottom') rule[key] = Boolean(event.target.checked);
+        if (key === 'groupId') {
+            const nextGroup = getGroupById(event.target.value, managerGroupsDraft);
+            if (nextGroup) {
+                rule.groupId = nextGroup.id;
+                managerGroupId = nextGroup.id;
+                managerSelectedId = rule.id;
+                managerFilter = '';
+            }
+            return renderManager();
+        }
         if (key === 'scope') {
             rule.scope = VALID_SCOPES.has(event.target.value) ? event.target.value : 'table';
             if (rule.scope === 'table') {
@@ -27947,12 +28297,15 @@
 
     function bindSettingsCardEvents() {
         document.addEventListener('change', event => {
-            const input = event.target.closest?.(`#${MOD.cardId} [data-cond-setting="enabled"]`);
-            if (input) setEnabled(input.checked);
+            const enabledInput = event.target.closest?.(`#${MOD.cardId} [data-cond-setting="enabled"]`);
+            if (enabledInput) { setEnabled(enabledInput.checked); return; }
+            const groupSelect = event.target.closest?.(`#${MOD.cardId} [data-cond-setting="group"]`);
+            if (groupSelect) { setActiveGroup(groupSelect.value, 'settings'); return; }
         }, true);
         document.addEventListener('click', event => {
             const action = event.target.closest?.(`#${MOD.cardId} [data-cond-act]`)?.dataset.condAct;
             if (action === 'manage') openManager();
+            if (action === 'next-group') cycleActiveGroup(1, 'settings');
             if (action === 'refresh') rescanAllVisibleRows();
         }, true);
     }
@@ -28007,6 +28360,17 @@
                 syncEngineState();
             }
         });
+
+        // V7.15.1：规则组快捷切换桥接必须绑定在条件高亮模块内部，
+        // 这样才能访问 activeGroupId / groups / setActiveGroup 等模块私有状态。
+        window.addEventListener('att:conditional-highlight:cycle-group', event => {
+            const direction = Number(event?.detail?.direction) < 0 ? -1 : 1;
+            cycleActiveGroup(direction, event?.detail?.source || 'shortcut');
+        });
+
+        window.addEventListener('att:conditional-highlight:set-group', event => {
+            setActiveGroup(String(event?.detail?.groupId || ''), event?.detail?.source || 'external');
+        });
     }
 
     function init() {
@@ -28016,7 +28380,7 @@
         attachToolboxObserver();
         attachPageObserver();
         syncEngineState();
-        console.log('[AutoTable 条件高亮] V7.8.1 已加载：字段规则 / 日期语义 / 安全高级表达式 / 整行上下强调边缘 / 虚拟滚动增量高亮 / Alt+H 快捷总开关');
+        console.log('[AutoTable 条件高亮] V7.15.1 已加载：规则组 / 快捷切换 / 字段规则 / 日期语义 / 安全高级表达式 / 整行上下强调边缘 / 虚拟滚动增量高亮');
     }
 
     if (document.body) init();
