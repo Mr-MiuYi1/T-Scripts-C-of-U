@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.15.2
-// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.15.3
+// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.15.2
+ * AutoTable 工具集 V7.15.3
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，规则组/规则分层管理，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -44,7 +44,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.15.2',
+        version: 'V7.15.3',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -26857,7 +26857,7 @@
 
 
 /* ============================================================================
- * AutoTable 字段条件高亮规则中心 V7.15.2
+ * AutoTable 字段条件高亮规则中心 V7.15.3
  * --------------------------------------------------------------------------
  * 设计目标：
  * 1) 指定字段内容符合规则时，支持只高亮该单元格或高亮整行；
@@ -26875,7 +26875,7 @@
     'use strict';
 
     const MOD = {
-        version: 'V7.15.2',
+        version: 'V7.15.3',
         keyEnabled: 'att_v3_conditionalHighlightEnabled',
         keyRules: 'att_v3_conditionalHighlightRules',
         keyGroups: 'att_v3_conditionalHighlightGroups',
@@ -26928,6 +26928,7 @@
     let managerGroupId = '';
     let managerActiveGroupId = '';
     let managerCheckedIds = new Set();
+    let managerLocalDialog = null;
 
     const bodyObservers = new Map();
     const dirtyRows = new Set();
@@ -27837,12 +27838,14 @@
         managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
         managerFilter = '';
         managerCheckedIds = new Set();
+        managerLocalDialog = null;
         const modal = ensureManager();
         modal.classList.add('att-show');
         renderManager();
     }
 
     function closeManager() {
+        closeManagerLocalDialog();
         document.getElementById(MOD.modalId)?.classList.remove('att-show');
     }
 
@@ -27856,7 +27859,7 @@
                 <div class="chr-head">
                     <div>
                         <div class="chr-title">字段条件高亮规则组</div>
-                        <div class="chr-sub">V7.15.2 · 规则组与规则分层管理 · 快捷切换 · 单元格 / 整行 · 日期语义 · 安全高级表达式</div>
+                        <div class="chr-sub">V7.15.3 · 规则组与规则分层管理 · 快捷切换 · 单元格 / 整行 · 日期语义 · 安全高级表达式</div>
                     </div>
                     <button type="button" data-chr-act="close" title="关闭">×</button>
                 </div>
@@ -27916,12 +27919,117 @@
                         <button type="button" class="primary" data-chr-act="save">保存全部</button>
                     </div>
                 </div>
+
+                <div class="chr-local-dialog-layer" data-chr-local-dialog hidden></div>
             </div>`;
         document.body.appendChild(modal);
         modal.addEventListener('click', onManagerClick);
         modal.addEventListener('input', onManagerInput);
         modal.addEventListener('change', onManagerChange);
+        modal.addEventListener('keydown', onManagerKeydown);
         return modal;
+    }
+
+
+    function closeManagerLocalDialog() {
+        const layer = document.querySelector(`#${MOD.modalId} [data-chr-local-dialog]`);
+        if (layer) {
+            layer.hidden = true;
+            layer.innerHTML = '';
+        }
+        managerLocalDialog = null;
+    }
+
+    function openManagerLocalDialog(options = {}) {
+        const modal = ensureManager();
+        const layer = modal.querySelector('[data-chr-local-dialog]');
+        if (!layer) return;
+
+        const kind = options.kind === 'input' ? 'input' : 'confirm';
+        const danger = Boolean(options.danger);
+        const value = String(options.value ?? '');
+        const confirmText = String(options.confirmText || (danger ? '确认删除' : '确定'));
+        const cancelText = String(options.cancelText || '取消');
+
+        managerLocalDialog = {
+            kind,
+            onConfirm: typeof options.onConfirm === 'function' ? options.onConfirm : null
+        };
+
+        layer.hidden = false;
+        layer.innerHTML = `
+            <div class="chr-local-dialog-backdrop" aria-hidden="true"></div>
+            <div class="chr-local-dialog-card ${danger ? 'is-danger' : ''}" role="dialog" aria-modal="true" aria-label="${escAttr(options.title || '操作确认')}">
+                <div class="chr-local-dialog-head">
+                    <div>
+                        <div class="chr-local-dialog-title">${escHtml(options.title || '操作确认')}</div>
+                        ${options.subtitle ? `<div class="chr-local-dialog-sub">${escHtml(options.subtitle)}</div>` : ''}
+                    </div>
+                    <button type="button" class="chr-local-dialog-close" data-chr-dialog-act="cancel" title="关闭">×</button>
+                </div>
+                <div class="chr-local-dialog-body">
+                    ${options.message ? `<div class="chr-local-dialog-message">${escHtml(options.message)}</div>` : ''}
+                    ${options.detail ? `<div class="chr-local-dialog-detail">${escHtml(options.detail)}</div>` : ''}
+                    ${kind === 'input' ? `
+                        <label class="chr-local-dialog-field">
+                            <span>${escHtml(options.label || '名称')}</span>
+                            <input type="text" data-chr-dialog-input value="${escAttr(value)}" placeholder="${escAttr(options.placeholder || '')}" autocomplete="off">
+                            <small data-chr-dialog-error></small>
+                        </label>
+                    ` : ''}
+                </div>
+                <div class="chr-local-dialog-foot">
+                    <button type="button" data-chr-dialog-act="cancel">${escHtml(cancelText)}</button>
+                    <button type="button" class="${danger ? 'danger' : 'primary'}" data-chr-dialog-act="confirm">${escHtml(confirmText)}</button>
+                </div>
+            </div>`;
+
+        requestAnimationFrame(() => {
+            const input = layer.querySelector('[data-chr-dialog-input]');
+            if (input) {
+                input.focus();
+                input.select();
+            } else {
+                layer.querySelector('[data-chr-dialog-act="confirm"]')?.focus();
+            }
+        });
+    }
+
+    function submitManagerLocalDialog() {
+        if (!managerLocalDialog) return;
+        const layer = document.querySelector(`#${MOD.modalId} [data-chr-local-dialog]`);
+        if (!layer) return;
+
+        let value = '';
+        if (managerLocalDialog.kind === 'input') {
+            const input = layer.querySelector('[data-chr-dialog-input]');
+            value = cleanText(input?.value);
+            const error = layer.querySelector('[data-chr-dialog-error]');
+            if (!value) {
+                if (error) error.textContent = '名称不能为空';
+                input?.focus();
+                return;
+            }
+        }
+
+        const callback = managerLocalDialog.onConfirm;
+        closeManagerLocalDialog();
+        callback?.(value);
+    }
+
+    function onManagerKeydown(event) {
+        if (!managerLocalDialog) return;
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            event.stopPropagation();
+            closeManagerLocalDialog();
+            return;
+        }
+        if (event.key === 'Enter' && managerLocalDialog.kind === 'input' && !event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey) {
+            event.preventDefault();
+            event.stopPropagation();
+            submitManagerLocalDialog();
+        }
     }
 
     function getSelectedDraftRule() {
@@ -28376,6 +28484,13 @@
     }
 
     function onManagerClick(event) {
+        const localAction = event.target.closest?.('[data-chr-dialog-act]')?.dataset.chrDialogAct;
+        if (localAction) {
+            if (localAction === 'cancel') closeManagerLocalDialog();
+            else if (localAction === 'confirm') submitManagerLocalDialog();
+            return;
+        }
+        if (managerLocalDialog) return;
         if (event.target.closest?.('[data-chr-check-id],[data-chr-select-all]')) return;
         const item = event.target.closest('[data-chr-rule-id]');
         if (item) {
@@ -28439,33 +28554,62 @@
             }
 
             if (action === 'batch-delete') {
-                if (!confirm(`删除已选择的 ${ids.length} 条高亮规则吗？`)) return;
-                managerDraft = managerDraft.filter(r => !ids.includes(r.id));
-                managerCheckedIds.clear();
-                if (!managerDraft.some(r => r.id === managerSelectedId)) {
-                    managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
-                }
-                return renderManager();
+                openManagerLocalDialog({
+                    kind: 'confirm',
+                    danger: true,
+                    title: `删除 ${ids.length} 条规则`,
+                    message: '这些规则将从当前规则组中移除。',
+                    detail: '此修改只有点击“保存全部”后才会正式写入配置；在保存前仍可通过“取消”放弃本次修改。',
+                    confirmText: '删除所选规则',
+                    onConfirm: () => {
+                        managerDraft = managerDraft.filter(r => !ids.includes(r.id));
+                        managerCheckedIds.clear();
+                        if (!managerDraft.some(r => r.id === managerSelectedId)) {
+                            managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
+                        }
+                        renderManager();
+                    }
+                });
+                return;
             }
         }
 
         if (action === 'new-group') {
-            const name = prompt('新规则组名称：', makeUniqueGroupName('新规则组'));
-            if (name === null) return;
-            const group = { id: makeGroupId(), name: makeUniqueGroupName(name) };
-            managerGroupsDraft.push(group);
-            managerGroupId = group.id;
-            managerSelectedId = '';
-            managerFilter = '';
-            managerCheckedIds.clear();
-            return renderManager();
+            openManagerLocalDialog({
+                kind: 'input',
+                title: '新建高亮规则组',
+                subtitle: '规则组用于快速切换一整套高亮场景',
+                label: '规则组名称',
+                value: makeUniqueGroupName('新规则组'),
+                placeholder: '例如：到期预警 / 商业反馈 / 数据异常',
+                confirmText: '创建规则组',
+                onConfirm: name => {
+                    const group = { id: makeGroupId(), name: makeUniqueGroupName(name) };
+                    managerGroupsDraft.push(group);
+                    managerGroupId = group.id;
+                    managerSelectedId = '';
+                    managerFilter = '';
+                    managerCheckedIds.clear();
+                    renderManager();
+                }
+            });
+            return;
         }
         if (action === 'rename-group') {
             if (!currentGroup) return;
-            const name = prompt('规则组名称：', currentGroup.name);
-            if (name === null) return;
-            currentGroup.name = makeUniqueGroupName(name, currentGroup.id);
-            return renderManager();
+            openManagerLocalDialog({
+                kind: 'input',
+                title: '重命名规则组',
+                subtitle: `正在编辑：${currentGroup.name}`,
+                label: '规则组名称',
+                value: currentGroup.name,
+                confirmText: '保存名称',
+                onConfirm: name => {
+                    currentGroup.name = makeUniqueGroupName(name, currentGroup.id);
+                    renderManager();
+                }
+            });
+            return;
         }
         if (action === 'duplicate-group') {
             if (!currentGroup) return;
@@ -28484,17 +28628,29 @@
         if (action === 'delete-group') {
             if (!currentGroup || managerGroupsDraft.length <= 1) return;
             const count = managerDraft.filter(r => r.groupId === currentGroup.id).length;
-            if (!confirm(`删除规则组“${currentGroup.name}”吗？\n该组中的 ${count} 条规则也会一并删除。`)) return;
-            const groupIndex = managerGroupsDraft.findIndex(g => g.id === currentGroup.id);
-            managerGroupsDraft = managerGroupsDraft.filter(g => g.id !== currentGroup.id);
-            managerDraft = managerDraft.filter(r => r.groupId !== currentGroup.id);
-            const nextGroup = managerGroupsDraft[Math.min(groupIndex, managerGroupsDraft.length - 1)] || managerGroupsDraft[0];
-            managerGroupId = nextGroup?.id || '';
-            if (managerActiveGroupId === currentGroup.id) managerActiveGroupId = managerGroupId;
-            managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
-            managerFilter = '';
-            managerCheckedIds.clear();
-            return renderManager();
+            openManagerLocalDialog({
+                kind: 'confirm',
+                danger: true,
+                title: `删除规则组“${currentGroup.name}”`,
+                message: `该组中的 ${count} 条规则会一起移除。`,
+                detail: managerActiveGroupId === currentGroup.id
+                    ? '当前组正在生效。删除后会自动切换到相邻规则组；只有点击“保存全部”后才正式应用。'
+                    : '此修改只有点击“保存全部”后才正式写入配置。',
+                confirmText: '删除规则组',
+                onConfirm: () => {
+                    const groupIndex = managerGroupsDraft.findIndex(g => g.id === currentGroup.id);
+                    managerGroupsDraft = managerGroupsDraft.filter(g => g.id !== currentGroup.id);
+                    managerDraft = managerDraft.filter(r => r.groupId !== currentGroup.id);
+                    const nextGroup = managerGroupsDraft[Math.min(groupIndex, managerGroupsDraft.length - 1)] || managerGroupsDraft[0];
+                    managerGroupId = nextGroup?.id || '';
+                    if (managerActiveGroupId === currentGroup.id) managerActiveGroupId = managerGroupId;
+                    managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
+                    managerFilter = '';
+                    managerCheckedIds.clear();
+                    renderManager();
+                }
+            });
+            return;
         }
         if (action === 'set-active-group') {
             if (!currentGroup) return;
@@ -28519,10 +28675,20 @@
             const bad = managerDraft.find(r => r.enabled && r.ruleType === 'advanced' && !validateAdvancedExpression(r).ok);
             if (bad) {
                 const v = validateAdvancedExpression(bad);
-                alert(`规则“${bad.name}”的高级表达式有误：${v.error}`);
                 managerGroupId = bad.groupId;
                 managerSelectedId = bad.id;
                 renderManager();
+                openManagerLocalDialog({
+                    kind: 'confirm',
+                    title: '暂时无法保存',
+                    message: `规则“${bad.name}”的高级表达式有误。`,
+                    detail: v.error,
+                    confirmText: '返回修正',
+                    cancelText: '关闭',
+                    onConfirm: () => {
+                        document.querySelector(`#${MOD.modalId} textarea[data-chr-edit="advancedExpr"]`)?.focus();
+                    }
+                });
                 return;
             }
             groups = normalizeGroups(managerGroupsDraft);
@@ -28542,11 +28708,21 @@
         if (!selected) return;
         const index = managerDraft.findIndex(r => r.id === selected.id);
         if (action === 'delete') {
-            if (!confirm(`删除高亮规则“${selected.name}”吗？`)) return;
-            managerDraft.splice(index,1);
-            managerCheckedIds.delete(selected.id);
-            managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
-            return renderManager();
+            openManagerLocalDialog({
+                kind: 'confirm',
+                danger: true,
+                title: `删除规则“${selected.name}”`,
+                message: '这条规则将从当前规则组中移除。',
+                detail: '只有点击“保存全部”后才会正式写入配置。',
+                confirmText: '删除规则',
+                onConfirm: () => {
+                    managerDraft.splice(index,1);
+                    managerCheckedIds.delete(selected.id);
+                    managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
+                    renderManager();
+                }
+            });
+            return;
         }
         if (action === 'duplicate') {
             const copy = normalizeRule({ ...JSON.parse(JSON.stringify(selected)), id:makeId(), groupId:selected.groupId, name:`${selected.name} - 副本` }, managerDraft.length);
@@ -28564,8 +28740,20 @@
         }
         if (action === 'validate-expr') {
             const v = validateAdvancedExpression(selected);
-            alert(v.ok ? '高级表达式语法有效。' : `高级表达式错误：${v.error}`);
-            return renderManagerDetail();
+            renderManagerDetail();
+            openManagerLocalDialog({
+                kind: 'confirm',
+                danger: !v.ok,
+                title: v.ok ? '表达式验证通过' : '表达式需要修正',
+                message: v.ok ? '当前高级表达式语法有效，可以参与规则计算。' : '当前高级表达式无法通过安全解析器。',
+                detail: v.ok ? '你可以继续调整其它规则参数，最后统一点击“保存全部”。' : v.error,
+                confirmText: v.ok ? '知道了' : '返回修正',
+                cancelText: '关闭',
+                onConfirm: () => {
+                    if (!v.ok) document.querySelector(`#${MOD.modalId} textarea[data-chr-edit="advancedExpr"]`)?.focus();
+                }
+            });
+            return;
         }
         if (action === 'test') return renderManagerDetail();
     }
@@ -28712,7 +28900,7 @@
             }
         });
 
-        // V7.15.2：规则组快捷切换桥接必须绑定在条件高亮模块内部，
+        // V7.15.3：规则组快捷切换桥接必须绑定在条件高亮模块内部，
         // 这样才能访问 activeGroupId / groups / setActiveGroup 等模块私有状态。
         window.addEventListener('att:conditional-highlight:cycle-group', event => {
             const direction = Number(event?.detail?.direction) < 0 ? -1 : 1;
@@ -28731,7 +28919,7 @@
         attachToolboxObserver();
         attachPageObserver();
         syncEngineState();
-        console.log('[AutoTable 条件高亮] V7.15.2 已加载：规则组 / 分层管理面板 / 批量规则操作 / 快捷切换 / 日期语义 / 安全高级表达式 / 整行上下强调边缘 / 虚拟滚动增量高亮');
+        console.log('[AutoTable 条件高亮] V7.15.3 已加载：规则组 / 分层管理面板 / 一体化内嵌操作流 / 批量规则操作 / 快捷切换 / 日期语义 / 安全高级表达式 / 整行上下强调边缘 / 虚拟滚动增量高亮');
     }
 
     if (document.body) init();
@@ -28739,7 +28927,7 @@
 })();
 
 /* ============================================================================
- * AutoTable 条件高亮规则组管理器 V7.15.2 · 分层商业化布局
+ * AutoTable 条件高亮规则组管理器 V7.15.3 · 分层商业化布局
  * ========================================================================== */
 (function () {
     'use strict';
@@ -28947,6 +29135,147 @@
         }
         #att-cond-highlight-manager-v770 .chr-empty-card b{font-size:14px;color:#dfe3e7;}
         #att-cond-highlight-manager-v770 .chr-empty-card span{font-size:11px;line-height:1.6;color:#8f949b;}
+
+        #att-cond-highlight-manager-v770 .chr-shell-v7152{position:relative!important;}
+        #att-cond-highlight-manager-v770 .chr-local-dialog-layer[hidden]{display:none!important;}
+        #att-cond-highlight-manager-v770 .chr-local-dialog-layer{
+            position:absolute;
+            inset:0;
+            z-index:80;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:24px;
+            border-radius:inherit;
+            overflow:hidden;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-backdrop{
+            position:absolute;
+            inset:0;
+            background:rgba(9,10,12,.58);
+            backdrop-filter:blur(2px);
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-card{
+            position:relative;
+            z-index:1;
+            width:min(430px,calc(100% - 32px));
+            border:1px solid #45484d;
+            border-radius:12px;
+            background:#25272a;
+            box-shadow:0 22px 60px rgba(0,0,0,.42);
+            overflow:hidden;
+            animation:attChrLocalDialogIn .16s cubic-bezier(.2,.8,.2,1);
+        }
+        @keyframes attChrLocalDialogIn{
+            from{opacity:0;transform:translateY(6px);}
+            to{opacity:1;transform:translateY(0);}
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-card.is-danger{
+            border-color:#65413e;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-head{
+            min-height:58px;
+            display:flex;
+            align-items:flex-start;
+            justify-content:space-between;
+            gap:12px;
+            padding:13px 14px 10px;
+            border-bottom:1px solid #383b3f;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-title{
+            color:#f1f3f4;
+            font-size:14px;
+            font-weight:760;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-sub{
+            margin-top:3px;
+            color:#8f949b;
+            font-size:10px;
+            line-height:1.45;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-close{
+            width:28px;
+            min-width:28px;
+            height:28px!important;
+            padding:0!important;
+            border:0!important;
+            background:transparent!important;
+            color:#9aa0a6;
+            font-size:16px;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-close:hover{
+            color:#fff;
+            background:#34363a!important;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-body{
+            padding:14px;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-message{
+            color:#dfe3e7;
+            font-size:12px;
+            line-height:1.6;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-detail{
+            margin-top:8px;
+            padding:8px 9px;
+            border-radius:7px;
+            border:1px solid #373a3e;
+            background:#202124;
+            color:#9399a0;
+            font-size:10px;
+            line-height:1.55;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-card.is-danger .chr-local-dialog-detail{
+            border-color:#4d3534;
+            background:#2b2425;
+            color:#d4aaa7;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-field{
+            display:block;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-field > span{
+            display:block;
+            margin-bottom:6px;
+            color:#b9bec4;
+            font-size:10px;
+            font-weight:700;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-field input{
+            width:100%;
+            height:36px;
+            border:1px solid #4a4d52;
+            border-radius:7px;
+            background:#202124;
+            color:#f1f3f4;
+            padding:0 10px;
+            outline:none;
+            box-sizing:border-box;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-field input:focus{
+            border-color:#4b8dda;
+            box-shadow:0 0 0 2px rgba(75,141,218,.18);
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-field small{
+            display:block;
+            min-height:14px;
+            margin-top:4px;
+            color:#ff9b94;
+            font-size:9px;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-foot{
+            min-height:52px;
+            display:flex;
+            align-items:center;
+            justify-content:flex-end;
+            gap:7px;
+            padding:9px 14px;
+            border-top:1px solid #383b3f;
+            background:#222326;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-foot button{
+            min-width:70px;
+            height:31px;
+        }
 
         @media (max-width:900px){
             #att-cond-highlight-manager-v770 .chr-main{grid-template-columns:270px minmax(0,1fr)!important;}
