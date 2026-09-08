@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.16.1
-// @description  AutoTable 一体化效率增强工具：四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.16.2
+// @description  AutoTable 一体化效率增强工具：四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.16.1
+ * AutoTable 工具集 V7.16.2
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，规则组/规则分层管理，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -44,7 +44,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.16.1',
+        version: 'V7.16.2',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -250,6 +250,17 @@
 
     let lastPinContextKey = '';
     let lastComboContextKey = '';
+
+
+    // V7.16.2：悬浮菜单交互稳定层。
+    // 页面尚未加载完成时，AutoTable 会连续替换表格 / 视图 DOM；旧逻辑一检测到
+    // contextKey 变化就立即 renderFeaturesSection()，会销毁当前菜单中的 focus 节点。
+    // 这里把“页面上下文刷新”和“用户正在操作菜单”解耦：DOM 变化只排队刷新，
+    // 用户正在按下 / 输入 / 聚焦菜单控件时绝不重建当前工作区。
+    let panelContextRefreshTimer = 0;
+    let panelInteractionUntil = 0;
+    let panelPointerActive = false;
+    let panelOpenedAt = 0;
 
     // V5.6：分页条数增强。
     // 通过当前页面 React Select 的 onChange 回调设置任意 pageSize，
@@ -10774,6 +10785,40 @@
         root.addEventListener('pointermove', resetIdleTimer);
         root.addEventListener('pointerleave', resetIdleTimer);
 
+        // V7.16.2：用户正在菜单内操作时，页面加载造成的 DOM/context 变化只能排队，
+        // 不能立即 innerHTML 重建当前 section。
+        root.addEventListener('pointerdown', event => {
+            if (!event.target.closest?.(`#${APP.panelId}`)) return;
+            panelPointerActive = true;
+            markPanelInteraction(1100);
+        }, true);
+        root.addEventListener('pointerup', event => {
+            if (!event.target.closest?.(`#${APP.panelId}`)) return;
+            panelPointerActive = false;
+            markPanelInteraction(520);
+            schedulePanelContextRefresh(560);
+        }, true);
+        root.addEventListener('pointercancel', () => {
+            panelPointerActive = false;
+            markPanelInteraction(320);
+            schedulePanelContextRefresh(360);
+        }, true);
+        root.addEventListener('focusin', event => {
+            if (!event.target.closest?.(`#${APP.panelId}`)) return;
+            markPanelInteraction(1400);
+        }, true);
+        root.addEventListener('focusout', event => {
+            if (!event.target.closest?.(`#${APP.panelId}`)) return;
+            markPanelInteraction(260);
+            schedulePanelContextRefresh(320);
+        }, true);
+        root.addEventListener('input', event => {
+            if (event.target.closest?.(`#${APP.panelId}`)) markPanelInteraction(1200);
+        }, true);
+        root.addEventListener('change', event => {
+            if (event.target.closest?.(`#${APP.panelId}`)) markPanelInteraction(800);
+        }, true);
+
         setupFabDrag();
         applyFabSettings();
         renderPanel();
@@ -10942,6 +10987,63 @@
         state.comboPickerOpen = true;
     }
 
+    function markPanelInteraction(holdMs = 700) {
+        panelInteractionUntil = Math.max(panelInteractionUntil, performance.now() + Math.max(80, Number(holdMs) || 0));
+    }
+
+    function isPanelInteractionBusy() {
+        const panel = document.getElementById(APP.panelId);
+        const active = document.activeElement;
+        const focusedEditor = Boolean(
+            panel &&
+            active instanceof Element &&
+            panel.contains(active) &&
+            active.matches('input:not([type="button"]):not([type="submit"]),select,textarea,[contenteditable="true"]')
+        );
+        return Boolean(
+            panelPointerActive ||
+            performance.now() < panelInteractionUntil ||
+            focusedEditor
+        );
+    }
+
+    function refreshPanelContextSafely() {
+        if (!state.panelOpen) return;
+
+        updateActiveComboBadge();
+
+        // 只刷新当前可见工作区；不要像 renderPanel() 那样把所有 section 都重建一遍。
+        if (state.activeTab === 'features') renderFeaturesSection();
+        else if (state.activeTab === 'combos') renderCombosSection();
+        else if (state.activeTab === 'pinning') renderPinningSection();
+
+        injectTableToolsSubnav();
+        requestAnimationFrame(positionPanelInsideViewport);
+    }
+
+    function schedulePanelContextRefresh(delay = 180) {
+        clearTimeout(panelContextRefreshTimer);
+        panelContextRefreshTimer = setTimeout(() => {
+            panelContextRefreshTimer = 0;
+            if (!state.panelOpen) return;
+
+            // 打开后的首段时间属于“页面加载稳定窗口”。即使此时没有 input 获得焦点，
+            // 也先让 AutoTable 把表格 / 筛选栏 / 视图状态挂载完，再一次性刷新菜单上下文。
+            const sinceOpen = performance.now() - panelOpenedAt;
+            if (sinceOpen >= 0 && sinceOpen < 850) {
+                schedulePanelContextRefresh(Math.max(120, 850 - sinceOpen));
+                return;
+            }
+
+            if (isPanelInteractionBusy()) {
+                schedulePanelContextRefresh(220);
+                return;
+            }
+
+            refreshPanelContextSafely();
+        }, Math.max(60, Number(delay) || 180));
+    }
+
     function renderPanel() {
         const root = document.getElementById(APP.rootId);
         if (!root) return;
@@ -11103,9 +11205,11 @@
                         <span class="att-switch"><input type="checkbox" data-setting="focusEnabled" ${state.focusEnabled ? 'checked' : ''}><span class="att-slider"></span></span>
                     </label>
 
-                    <button type="button" class="att-quick-mode-v7160 ${conditionEnabled ? 'is-on' : ''}" data-act="toggle-conditional-highlight-quick">
-                        <span><b>条件高亮</b><small>${escapeHtml(conditionActiveGroup.name)} · ${conditionRuleCount} 条</small></span>
-                        <i class="att-quick-state-dot-v790"></i>
+                    <button type="button" class="att-quick-mode-v7160 att-quick-condition-v7162 ${conditionEnabled ? 'is-on' : ''}" data-act="toggle-conditional-highlight-quick" aria-pressed="${conditionEnabled ? 'true' : 'false'}" title="点击${conditionEnabled ? '关闭' : '开启'}字段条件高亮">
+                        <span><b>条件高亮</b><small>${escapeHtml(conditionActiveGroup.name)} · ${conditionRuleCount} 条规则</small></span>
+                        <span class="att-quick-status-v7162 ${conditionEnabled ? 'is-enabled' : 'is-disabled'}">
+                            <i></i>${conditionEnabled ? '已开启' : '已关闭'}
+                        </span>
                     </button>
 
                     <label class="att-quick-mode-v7160 ${state.tableWheelReverseEnabled ? 'is-on' : ''}">
@@ -11126,9 +11230,10 @@
                         <label><input type="checkbox" data-setting="columnHighlightEnabled" ${state.columnHighlightEnabled ? 'checked' : ''} ${state.focusEnabled ? '' : 'disabled'}> 列</label>
                         <button type="button" data-act="clear-focus" ${activeCell ? '' : 'disabled'}>清除</button>
                     </div>
-                    <div class="att-quick-detail-v7160">
+                    <div class="att-quick-detail-v7160 att-quick-highlight-detail-v7162 ${conditionEnabled ? 'is-enabled' : 'is-disabled'}">
                         <span class="att-quick-detail-label-v7160">高亮组</span>
-                        <button type="button" data-act="cycle-conditional-highlight-group" ${conditionGroups.length > 1 ? '' : 'disabled'}>${escapeHtml(conditionActiveGroup.name)}</button>
+                        <button type="button" data-act="cycle-conditional-highlight-group" ${conditionGroups.length > 1 ? '' : 'disabled'} title="切换条件高亮规则组">${escapeHtml(conditionActiveGroup.name)}</button>
+                        <span class="att-quick-detail-status-v7162">${conditionEnabled ? '生效中' : '已停用'}</span>
                         <button type="button" data-act="open-conditional-highlight-manager">规则</button>
                     </div>
                 </div>
@@ -12574,6 +12679,7 @@
                 window.dispatchEvent(new CustomEvent('att:conditional-highlight:set', {
                     detail: { enabled: nextEnabled, source: 'floating-menu' }
                 }));
+                markPanelInteraction(520);
                 renderFeaturesSection();
                 showToast(`字段条件高亮：已${nextEnabled ? '开启' : '关闭'}`);
                 break;
@@ -13547,10 +13653,18 @@
 
         state.panelOpen = open;
         if (open) {
+            panelOpenedAt = performance.now();
+            markPanelInteraction(900);
             updateMenuDirection();
             renderPanel();
+            // 页面仍在加载时只在稳定窗口结束后补一次上下文，不在加载过程中反复重建。
+            schedulePanelContextRefresh(900);
         } else {
             state.recordingHotkeyTarget = null;
+            panelPointerActive = false;
+            panelInteractionUntil = 0;
+            clearTimeout(panelContextRefreshTimer);
+            panelContextRefreshTimer = 0;
         }
 
         root.classList.toggle('att-open', open);
@@ -17983,8 +18097,9 @@
                 lastComboContextKey = comboContextKey;
                 updateActiveComboBadge();
                 if (state.panelOpen) {
-                    if (state.activeTab === 'combos') renderCombosSection();
-                    if (state.activeTab === 'features') renderFeaturesSection();
+                    // V7.16.2：SPA / 首屏加载中的上下文变化只排队刷新。
+                    // 直接 renderFeaturesSection 会销毁当前聚焦的 select / input / button。
+                    schedulePanelContextRefresh(180);
                 }
             }
 
@@ -18019,13 +18134,14 @@
 
         // V7.15：条件高亮规则组切换后，快捷页立即同步当前组名称与命中规则数。
         window.addEventListener('att:conditional-highlight:group-changed', event => {
-            if (state.panelOpen && state.activeTab === 'features') renderFeaturesSection();
+            if (state.panelOpen && state.activeTab === 'features') schedulePanelContextRefresh(80);
             const name = String(event?.detail?.name || '高亮规则组');
             const count = Number(event?.detail?.activeCount || 0);
             showToast(`高亮规则组：${name}${Number.isFinite(count) ? ` · ${count} 条启用规则` : ''}`);
         });
 
         console.log(`[AutoTable 工具集] ${APP.version} 已加载`);
+        console.log('[AutoTable 工具集] V7.16.2：条件高亮状态显式徽标 + 页面加载期间菜单交互焦点保护已启用。');
         console.log('[AutoTable 工具集] V6.8：基于 V6.6 稳定渲染版升级规则化快捷短语、日期时间模板、条件显示与编辑首行自动预留。');
     }
 
@@ -25135,6 +25251,76 @@
         }
 
         /* 深色继承 UI 变量，不另起一套颜色。 */
+        /* V7.16.2：条件高亮状态不再只靠一个小圆点，深色/浅色都明确显示“已开启 / 已关闭”。 */
+        #att-toolbox-panel .att-quick-condition-v7162{
+            position:relative;
+        }
+        #att-toolbox-panel .att-quick-condition-v7162.is-on{
+            border-color:rgba(34,197,94,.42)!important;
+            background:linear-gradient(135deg,rgba(34,197,94,.10),var(--att-ui-surface-2,#f2f4f7))!important;
+            box-shadow:inset 3px 0 0 rgba(34,197,94,.72);
+        }
+        #att-toolbox-panel .att-quick-status-v7162{
+            flex:0 0 auto;
+            min-width:48px;
+            height:22px;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:5px;
+            padding:0 7px;
+            border:1px solid var(--att-ui-border,#e4e7ec);
+            border-radius:999px;
+            background:var(--att-ui-surface,#fff);
+            color:var(--att-ui-muted,#667085);
+            font-size:9px;
+            font-weight:800;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-status-v7162 i{
+            width:6px;height:6px;border-radius:50%;background:#98a2b3;
+            box-shadow:0 0 0 2px rgba(152,162,179,.12);
+        }
+        #att-toolbox-panel .att-quick-status-v7162.is-enabled{
+            color:#14803b;
+            border-color:rgba(34,197,94,.30);
+            background:rgba(34,197,94,.10);
+        }
+        #att-toolbox-panel .att-quick-status-v7162.is-enabled i{
+            background:#22c55e;
+            box-shadow:0 0 0 2px rgba(34,197,94,.16);
+        }
+        #att-toolbox-panel .att-quick-highlight-detail-v7162{
+            display:grid!important;
+            grid-template-columns:auto minmax(0,1fr) auto auto!important;
+        }
+        #att-toolbox-panel .att-quick-detail-status-v7162{
+            flex:0 0 auto;
+            padding:2px 6px;
+            border-radius:999px;
+            color:#8a919a;
+            background:var(--att-ui-surface-2,#f2f4f7);
+            border:1px solid var(--att-ui-border-soft,#edf0f3);
+            font-size:8.5px;
+            font-weight:800;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-highlight-detail-v7162.is-enabled .att-quick-detail-status-v7162{
+            color:#14803b;
+            border-color:rgba(34,197,94,.28);
+            background:rgba(34,197,94,.10);
+        }
+        body.att-native-dark #att-toolbox-panel .att-quick-condition-v7162.is-on{
+            border-color:rgba(60,210,116,.38)!important;
+            background:linear-gradient(135deg,rgba(35,126,69,.18),var(--att-ui-surface-2,#2e3033))!important;
+        }
+        body.att-native-dark #att-toolbox-panel .att-quick-status-v7162.is-enabled,
+        body.att-native-dark #att-toolbox-panel .att-quick-highlight-detail-v7162.is-enabled .att-quick-detail-status-v7162{
+            color:#8ee7aa;
+            border-color:rgba(60,210,116,.30);
+            background:rgba(35,126,69,.22);
+        }
+
         body.att-native-dark #att-toolbox-panel .att-quick-context-main-v7160,
         body.att-native-dark #att-toolbox-panel .att-quick-section-v7160,
         body.att-native-dark #att-toolbox-panel .att-quick-detail-v7160 label,
@@ -30033,7 +30219,7 @@
     'use strict';
 
     const SH = {
-        version: 'V7.16.1',
+        version: 'V7.16.2',
         enabledKey: 'att_v3_viewSearchHistoryEnabled',
         maxKey: 'att_v3_viewSearchHistoryMaxPerView',
         perViewKey: 'att_v3_viewSearchHistoryPerViewMode',
