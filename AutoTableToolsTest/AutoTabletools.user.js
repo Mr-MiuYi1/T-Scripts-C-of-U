@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.15.1
-// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.15.2
+// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,9 +23,9 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.15.1
+ * AutoTable 工具集 V7.15.2
  * 当前整合能力：
- * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
+ * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，规则组/规则分层管理，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
  * - 编辑：统一快捷短语中心；表格多行单元格与记录详情多行字段共用快捷面板；双栏独立滚动、固定页头/页脚、批量选择、批量启停、批量编辑与安全高级模板表达式
  * - 规则：支持可视化条件 + 代码式 {{=表达式}} / {{#if}} 条件内容；系统规则可恢复默认；旧配置自动迁移
@@ -44,7 +44,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.15.1',
+        version: 'V7.15.2',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -26857,7 +26857,7 @@
 
 
 /* ============================================================================
- * AutoTable 字段条件高亮规则中心 V7.15.1
+ * AutoTable 字段条件高亮规则中心 V7.15.2
  * --------------------------------------------------------------------------
  * 设计目标：
  * 1) 指定字段内容符合规则时，支持只高亮该单元格或高亮整行；
@@ -26875,7 +26875,7 @@
     'use strict';
 
     const MOD = {
-        version: 'V7.15.1',
+        version: 'V7.15.2',
         keyEnabled: 'att_v3_conditionalHighlightEnabled',
         keyRules: 'att_v3_conditionalHighlightRules',
         keyGroups: 'att_v3_conditionalHighlightGroups',
@@ -26927,6 +26927,7 @@
     let managerFilter = '';
     let managerGroupId = '';
     let managerActiveGroupId = '';
+    let managerCheckedIds = new Set();
 
     const bodyObservers = new Map();
     const dirtyRows = new Set();
@@ -27835,6 +27836,7 @@
         managerGroupId = managerActiveGroupId || managerGroupsDraft[0]?.id || '';
         managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
         managerFilter = '';
+        managerCheckedIds = new Set();
         const modal = ensureManager();
         modal.classList.add('att-show');
         renderManager();
@@ -27850,32 +27852,70 @@
         modal = document.createElement('div');
         modal.id = MOD.modalId;
         modal.innerHTML = `
-            <div class="chr-shell" role="dialog" aria-modal="true" aria-label="字段条件高亮规则">
+            <div class="chr-shell chr-shell-v7152" role="dialog" aria-modal="true" aria-label="字段条件高亮规则组">
                 <div class="chr-head">
-                    <div><div class="chr-title">字段条件高亮规则组</div><div class="chr-sub">V7.15.1 · 多规则组快速切换 · 单元格 / 整行 · 日期语义 · 安全高级表达式</div></div>
-                    <button type="button" data-chr-act="close">×</button>
+                    <div>
+                        <div class="chr-title">字段条件高亮规则组</div>
+                        <div class="chr-sub">V7.15.2 · 规则组与规则分层管理 · 快捷切换 · 单元格 / 整行 · 日期语义 · 安全高级表达式</div>
+                    </div>
+                    <button type="button" data-chr-act="close" title="关闭">×</button>
                 </div>
+
+                <div class="chr-groupbar">
+                    <div class="chr-groupbar-main">
+                        <span class="chr-groupbar-label">规则组</span>
+                        <button type="button" class="chr-group-nav" data-chr-act="prev-group" title="上一个规则组">‹</button>
+                        <select data-chr-group-select aria-label="规则组"></select>
+                        <button type="button" class="chr-group-nav" data-chr-act="next-group" title="下一个规则组">›</button>
+                        <button type="button" class="chr-group-active" data-chr-act="set-active-group"></button>
+                    </div>
+                    <div class="chr-groupbar-actions">
+                        <button type="button" class="primary" data-chr-act="new-group">+ 新建组</button>
+                        <button type="button" data-chr-act="rename-group">重命名</button>
+                        <button type="button" data-chr-act="duplicate-group">复制组</button>
+                        <button type="button" class="danger-soft" data-chr-act="delete-group">删除组</button>
+                    </div>
+                </div>
+
                 <div class="chr-main">
                     <aside class="chr-side">
-                        <div class="chr-group-panel">
-                            <div class="chr-group-top">
-                                <select data-chr-group-select aria-label="规则组"></select>
-                                <button type="button" class="chr-group-active" data-chr-act="set-active-group"></button>
+                        <div class="chr-side-head">
+                            <div>
+                                <div class="chr-side-title">当前组规则</div>
+                                <div class="chr-side-count" data-chr-group-count>0 条规则</div>
                             </div>
-                            <div class="chr-group-actions">
-                                <button type="button" data-chr-act="new-group">+ 新组</button>
-                                <button type="button" data-chr-act="rename-group">重命名</button>
-                                <button type="button" data-chr-act="duplicate-group">复制组</button>
-                                <button type="button" data-chr-act="delete-group">删除组</button>
+                            <button type="button" class="primary" data-chr-act="new">+ 新建规则</button>
+                        </div>
+
+                        <div class="chr-batchbar">
+                            <div class="chr-batchbar-top">
+                                <label class="chr-select-all"><input type="checkbox" data-chr-select-all> 全选</label>
+                                <span data-chr-selected-count>已选 0 条</span>
+                            </div>
+                            <div class="chr-batch-actions">
+                                <button type="button" data-chr-act="batch-enable">启用</button>
+                                <button type="button" data-chr-act="batch-disable">停用</button>
+                                <button type="button" data-chr-act="batch-duplicate">复制</button>
+                                <button type="button" class="danger-soft" data-chr-act="batch-delete">删除</button>
                             </div>
                         </div>
-                        <div class="chr-side-tools"><button type="button" class="primary" data-chr-act="new">+ 新建规则</button><button type="button" data-chr-act="enable-all">本组全启用</button><button type="button" data-chr-act="disable-all">本组全停用</button></div>
-                        <div class="chr-filter"><input type="search" data-chr-filter placeholder="搜索当前组规则 / 字段…"></div>
+
+                        <div class="chr-filter">
+                            <input type="search" data-chr-filter placeholder="搜索规则名称 / 字段 / 表名…">
+                        </div>
                         <div class="chr-list" data-chr-list></div>
                     </aside>
+
                     <main class="chr-detail" data-chr-detail></main>
                 </div>
-                <div class="chr-foot"><div class="chr-sub">同一时间仅当前规则组参与高亮；组内规则从上到下为优先级，聚焦高亮仍然优先。</div><div class="chr-actions"><button type="button" data-chr-act="cancel">取消</button><button type="button" class="primary" data-chr-act="save">保存全部</button></div></div>
+
+                <div class="chr-foot">
+                    <div class="chr-sub">仅当前生效规则组参与高亮；组内规则从上到下决定优先级。所有修改在“保存全部”后正式应用。</div>
+                    <div class="chr-actions">
+                        <button type="button" data-chr-act="cancel">取消</button>
+                        <button type="button" class="primary" data-chr-act="save">保存全部</button>
+                    </div>
+                </div>
             </div>`;
         document.body.appendChild(modal);
         modal.addEventListener('click', onManagerClick);
@@ -27907,6 +27947,7 @@
         managerGroupId = group.id;
         managerFilter = '';
         managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
+        managerCheckedIds.clear();
         renderManager();
     }
 
@@ -27917,20 +27958,35 @@
             select.innerHTML = managerGroupsDraft.map(g => {
                 const count = managerDraft.filter(r => r.groupId === g.id).length;
                 const activeMark = g.id === managerActiveGroupId ? ' ★' : '';
-                return `<option value="${escAttr(g.id)}" ${g.id===managerGroupId?'selected':''}>${escHtml(g.name)} (${count})${activeMark}</option>`;
+                return `<option value="${escAttr(g.id)}" ${g.id===managerGroupId?'selected':''}>${escHtml(g.name)} · ${count} 条${activeMark}</option>`;
             }).join('');
             select.value = managerGroupId;
         }
+
+        const currentGroup = getManagerGroup();
+        const currentRules = managerDraft.filter(r => r.groupId === managerGroupId);
+        const enabledCount = currentRules.filter(r => r.enabled).length;
+
+        const countEl = modal.querySelector('[data-chr-group-count]');
+        if (countEl) countEl.textContent = `${currentRules.length} 条规则 · ${enabledCount} 条启用`;
+
         const activeBtn = modal.querySelector('[data-chr-act="set-active-group"]');
         if (activeBtn) {
             const isCurrent = managerGroupId === managerActiveGroupId;
-            activeBtn.textContent = isCurrent ? '当前生效' : '设为当前';
+            activeBtn.textContent = isCurrent ? '当前生效' : '设为生效组';
             activeBtn.classList.toggle('is-current', isCurrent);
             activeBtn.disabled = false;
             activeBtn.setAttribute('aria-pressed', isCurrent ? 'true' : 'false');
+            activeBtn.title = isCurrent ? `“${currentGroup?.name || ''}”当前参与高亮` : `保存后将“${currentGroup?.name || ''}”设为生效组`;
         }
+
         const deleteBtn = modal.querySelector('[data-chr-act="delete-group"]');
         if (deleteBtn) deleteBtn.disabled = managerGroupsDraft.length <= 1;
+
+        const prev = modal.querySelector('[data-chr-act="prev-group"]');
+        const next = modal.querySelector('[data-chr-act="next-group"]');
+        if (prev) prev.disabled = managerGroupsDraft.length <= 1;
+        if (next) next.disabled = managerGroupsDraft.length <= 1;
     }
 
     function renderManager() {
@@ -27946,21 +28002,70 @@
         renderManagerDetail();
     }
 
+    function updateManagerBatchBar(visibleRules = null) {
+        const modal = ensureManager();
+        const inGroup = managerDraft.filter(r => r.groupId === managerGroupId);
+        const validIds = new Set(inGroup.map(r => r.id));
+        managerCheckedIds = new Set([...managerCheckedIds].filter(id => validIds.has(id)));
+
+        const selectedCount = managerCheckedIds.size;
+        const count = modal.querySelector('[data-chr-selected-count]');
+        if (count) count.textContent = `已选 ${selectedCount} 条`;
+
+        const allBox = modal.querySelector('[data-chr-select-all]');
+        const q = cleanText(managerFilter).toLowerCase();
+        const targetRules = Array.isArray(visibleRules)
+            ? visibleRules
+            : inGroup.filter(r => !q || `${r.name} ${r.fieldName} ${r.tableName}`.toLowerCase().includes(q));
+        if (allBox) {
+            const visibleIds = targetRules.map(r => r.id);
+            const selectedVisible = visibleIds.filter(id => managerCheckedIds.has(id)).length;
+            allBox.checked = visibleIds.length > 0 && selectedVisible === visibleIds.length;
+            allBox.indeterminate = selectedVisible > 0 && selectedVisible < visibleIds.length;
+        }
+
+        modal.querySelectorAll('[data-chr-act^="batch-"]').forEach(btn => {
+            btn.disabled = selectedCount === 0;
+        });
+    }
+
     function renderManagerList() {
         const list = document.querySelector(`#${MOD.modalId} [data-chr-list]`);
         if (!list) return;
         const q = cleanText(managerFilter).toLowerCase();
         const inGroup = managerDraft.filter(r => r.groupId === managerGroupId);
         const visible = inGroup.filter(r => !q || `${r.name} ${r.fieldName} ${r.tableName}`.toLowerCase().includes(q));
+
         if (!visible.length) {
             list.innerHTML = `<div class="chr-empty" style="height:auto;min-height:140px;">${inGroup.length ? '没有匹配的规则' : '当前规则组还没有规则'}<br><span>${inGroup.length ? '可清空搜索词查看全部规则。' : '点击“+ 新建规则”开始配置。'}</span></div>`;
+            updateManagerBatchBar(visible);
             return;
         }
-        list.innerHTML = visible.map(r => `
-            <div class="chr-item ${r.id === managerSelectedId ? 'active' : ''}" data-chr-rule-id="${escAttr(r.id)}" style="--chr-color:${escAttr(r.color)}">
+
+        list.innerHTML = visible.map(r => {
+            const checked = managerCheckedIds.has(r.id);
+            return `
+            <div class="chr-item ${r.id === managerSelectedId ? 'active' : ''} ${r.enabled ? '' : 'is-disabled'}"
+                 data-chr-rule-id="${escAttr(r.id)}" style="--chr-color:${escAttr(r.color)}">
+                <label class="chr-item-check" title="加入批量选择">
+                    <input type="checkbox" data-chr-check-id="${escAttr(r.id)}" ${checked ? 'checked' : ''}>
+                </label>
                 <span class="chr-dot"></span>
-                <div style="min-width:0;"><div class="chr-item-name">${r.enabled ? '' : '○ '}${escHtml(r.name)}</div><div class="chr-item-meta">${escHtml(r.fieldName || '未选字段')} · ${r.ruleType==='advanced'?'高级表达式':OP_META[r.operator]} · ${r.mode === 'row' ? '整行' : '单元格'} · ${escHtml(ruleScopeLabel(r))}</div></div>
-            </div>`).join('');
+                <div class="chr-item-body">
+                    <div class="chr-item-top">
+                        <div class="chr-item-name">${escHtml(r.name)}</div>
+                        <div class="chr-item-badges">
+                            <span class="chr-mini-badge ${r.ruleType==='advanced'?'is-advanced':''}">${r.ruleType==='advanced'?'高级':'标准'}</span>
+                            <span class="chr-mini-badge ${r.enabled?'is-enabled':'is-off'}">${r.enabled?'启用':'停用'}</span>
+                        </div>
+                    </div>
+                    <div class="chr-item-meta">${escHtml(r.fieldName || '未选字段')} · ${r.ruleType==='advanced'?'表达式':OP_META[r.operator]} · ${r.mode === 'row' ? '整行' : '单元格'}</div>
+                    <div class="chr-item-scope">${escHtml(ruleScopeLabel(r))}</div>
+                </div>
+            </div>`;
+        }).join('');
+
+        updateManagerBatchBar(visible);
     }
 
     function buildFieldOptions(rule) {
@@ -27973,104 +28078,276 @@
         return options.join('');
     }
 
+    function buildOperatorOptions(rule) {
+        const sections = [
+            ['文本与空值', ['contains','notContains','equals','notEquals','startsWith','endsWith','regex','empty','notEmpty']],
+            ['数值', ['gt','gte','lt','lte']],
+            ['日期语义', ['dateToday','dateYesterday','dateTomorrow','dateBeforeToday','dateAfterToday','dateWithinNextDays','dateWithinPastDays','dateEquals']]
+        ];
+        return sections.map(([label, ops]) =>
+            `<optgroup label="${escAttr(label)}">${ops.map(v => `<option value="${v}" ${v===rule.operator?'selected':''}>${escHtml(OP_META[v])}</option>`).join('')}</optgroup>`
+        ).join('');
+    }
+
+    function getRuleMatchSummary(rule) {
+        if (rule.ruleType === 'advanced') return cleanText(rule.advancedExpr) ? '高级表达式' : '高级表达式未填写';
+        const label = OP_META[rule.operator] || rule.operator;
+        const noValue = ['empty','notEmpty','dateToday','dateYesterday','dateTomorrow','dateBeforeToday','dateAfterToday'].includes(rule.operator);
+        if (noValue) return label;
+        const value = cleanText(rule.value);
+        return value ? `${label} · ${value}` : label;
+    }
+
+    function getRuleSummaryParts(rule) {
+        return [
+            rule.scope === 'global' ? '全部表' : (rule.tableName || '当前表'),
+            rule.fieldName || '未选字段',
+            getRuleMatchSummary(rule),
+            rule.mode === 'row' ? '整行高亮' : '单元格高亮'
+        ];
+    }
+
     function renderManagerDetail() {
         const detail = document.querySelector(`#${MOD.modalId} [data-chr-detail]`);
         if (!detail) return;
         const rule = getSelectedDraftRule();
         if (!rule) {
             const group = getManagerGroup();
-            detail.innerHTML = `<div class="chr-empty"><div><b>${escHtml(group?.name || '当前规则组')} 暂无规则</b><br><span>点击左侧“+ 新建规则”开始配置，或切换到其它规则组。</span></div></div>`;
+            detail.innerHTML = `
+                <div class="chr-empty">
+                    <div class="chr-empty-card">
+                        <b>${escHtml(group?.name || '当前规则组')} 暂无规则</b>
+                        <span>左侧点击“+ 新建规则”开始配置，或使用顶部规则组切换器查看其它组。</span>
+                    </div>
+                </div>`;
             return;
         }
+
         const context = getTableContext();
         const valueDisabled = ['empty','notEmpty','dateToday','dateYesterday','dateTomorrow','dateBeforeToday','dateAfterToday'].includes(rule.operator);
         const matchCount = countVisibleMatches(rule);
+        const summaryParts = getRuleSummaryParts(rule);
+        const isActiveGroup = rule.groupId === managerActiveGroupId;
+        const exprValidation = rule.ruleType === 'advanced' ? validateAdvancedExpression(rule) : {ok:true,error:''};
+
         detail.innerHTML = `
-            <div class="chr-section">
-                <div class="chr-grid2">
-                    <label class="chr-field"><span>规则名称</span><input type="text" data-chr-edit="name" value="${escAttr(rule.name)}"></label>
-                    <label class="chr-check"><input type="checkbox" data-chr-edit="enabled" ${rule.enabled ? 'checked' : ''}> 启用这条规则</label>
-                    <label class="chr-field"><span>所属规则组</span><select data-chr-edit="groupId">${managerGroupsDraft.map(g => `<option value="${escAttr(g.id)}" ${g.id===rule.groupId?'selected':''}>${escHtml(g.name)}</option>`).join('')}</select></label>
-                    <div class="chr-preview">${rule.groupId === managerActiveGroupId ? '<span style="color:#81c995;">当前生效组中的规则</span>' : '此规则所在组当前未激活，切换到该组后才参与高亮。'}</div>
+            <div class="chr-rule-summary">
+                <div class="chr-rule-summary-main">
+                    <div class="chr-rule-summary-title">${escHtml(rule.name)}</div>
+                    <div class="chr-rule-summary-chips">
+                        <span class="chr-summary-chip ${rule.enabled?'is-ok':'is-muted'}">${rule.enabled?'已启用':'已停用'}</span>
+                        <span class="chr-summary-chip ${isActiveGroup?'is-active':''}">${isActiveGroup?'当前生效组':'非生效组'}</span>
+                        <span class="chr-summary-chip">${rule.ruleType==='advanced'?'高级表达式':'标准规则'}</span>
+                    </div>
                 </div>
+                <div class="chr-rule-summary-line">${summaryParts.map(v => `<span>${escHtml(v)}</span>`).join('<i>›</i>')}</div>
             </div>
-            <div class="chr-section">
-                <div class="chr-section-title">规则模式</div>
+
+            <section class="chr-section chr-section-v7152">
+                <div class="chr-section-head">
+                    <div>
+                        <div class="chr-section-title">基本信息</div>
+                        <div class="chr-section-desc">定义规则身份、所属规则组和编辑模式。</div>
+                    </div>
+                </div>
+                <div class="chr-grid2">
+                    <label class="chr-field">
+                        <span>规则名称</span>
+                        <input type="text" data-chr-edit="name" value="${escAttr(rule.name)}">
+                    </label>
+                    <label class="chr-field">
+                        <span>所属规则组</span>
+                        <select data-chr-edit="groupId">${managerGroupsDraft.map(g => `<option value="${escAttr(g.id)}" ${g.id===rule.groupId?'selected':''}>${escHtml(g.name)}</option>`).join('')}</select>
+                    </label>
+                </div>
+                <div class="chr-basic-status-row">
+                    <label class="chr-check chr-switch-line"><input type="checkbox" data-chr-edit="enabled" ${rule.enabled ? 'checked' : ''}> 启用这条规则</label>
+                    <span class="chr-inline-status ${isActiveGroup?'is-active':''}">${isActiveGroup ? '所在规则组当前参与高亮' : '所在规则组当前未激活'}</span>
+                </div>
+
+                <div class="chr-subsection-label">规则模式</div>
                 <div class="chr-rule-type">
                     <label><input type="radio" name="chr-rule-type" data-chr-edit="ruleType" value="standard" ${rule.ruleType==='standard'?'checked':''}>标准规则</label>
                     <label><input type="radio" name="chr-rule-type" data-chr-edit="ruleType" value="advanced" ${rule.ruleType==='advanced'?'checked':''}>高级表达式</label>
                 </div>
-                <div class="chr-guide">标准模式适合常用文本、数值和日期判断；高级模式使用安全表达式，不执行 JavaScript，不允许访问 window / document / 网络 / 存储。</div>
-            </div>
-            <div class="chr-section">
-                <div class="chr-section-title">匹配规则</div>
-                <div class="chr-grid2">
-                    <label class="chr-field"><span>作用范围</span><select data-chr-edit="scope"><option value="table" ${rule.scope === 'table' ? 'selected' : ''}>仅当前表${context ? `：${escHtml(context.tableName)}` : ''}</option><option value="global" ${rule.scope === 'global' ? 'selected' : ''}>全部表（按字段名称匹配）</option></select></label>
-                    <label class="chr-field"><span>${rule.ruleType==='advanced'?'高亮目标字段 / value':'目标字段'}</span><select data-chr-edit="field">${buildFieldOptions(rule)}</select></label>
-                </div>
-                ${rule.ruleType === 'standard' ? `
-                <div class="chr-grid2" style="margin-top:10px;">
-                    <label class="chr-field"><span>判断方式</span><select data-chr-edit="operator">${Object.entries(OP_META).map(([v,l]) => `<option value="${v}" ${v===rule.operator?'selected':''}>${l}</option>`).join('')}</select></label>
-                    <label class="chr-field"><span>${rule.operator === 'dateWithinNextDays' || rule.operator === 'dateWithinPastDays' ? '天数 N' : rule.operator === 'dateEquals' ? '指定日期' : '匹配内容'}</span>${valueDisabled
-                        ? `<input type="text" disabled placeholder="此判断无需填写内容">`
-                        : rule.operator === 'dateEquals'
-                            ? `<input type="date" data-chr-edit="value" value="${escAttr(rule.value)}">`
-                            : (rule.operator === 'dateWithinNextDays' || rule.operator === 'dateWithinPastDays')
-                                ? `<input type="number" min="0" step="1" data-chr-edit="value" value="${escAttr(rule.value || '3')}" placeholder="例如：3">`
-                                : `<input type="text" data-chr-edit="value" value="${escAttr(rule.value)}" placeholder="${rule.operator === 'regex' ? '例如：^BRL\\d+$' : '输入要匹配的内容'}">`}</label>
-                </div>
-                ${TEXT_OPERATORS.has(rule.operator) ? `<div class="chr-check" style="margin-top:8px;"><input type="checkbox" data-chr-edit="caseSensitive" ${rule.caseSensitive ? 'checked' : ''}> 区分大小写 <span style="color:#8f949b;">（正则同样适用）</span></div>` : ''}
-                ${DATE_OPERATORS.has(rule.operator) ? `<div class="chr-guide">日期支持 <code>YYYY-MM-DD</code>、<code>YYYY/MM/DD</code>、<code>YYYY年M月D日</code>。其中“未来 N 天内”包含今天和第 N 天，“已逾期”严格早于今天。</div>` : ''}
-                ` : `
-                <div style="margin-top:10px;">
-                    <label class="chr-field"><span>高级条件表达式（结果为 true 时命中）</span><textarea class="chr-code" data-chr-edit="advancedExpr" spellcheck="false" placeholder='例如：date(value) < today && field("二级阶段") == "商业流程中"'>${escHtml(rule.advancedExpr)}</textarea></label>
-                    <div class="chr-code-tools">
-                        <button type="button" data-chr-expr='date(value) == today'>今天</button>
-                        <button type="button" data-chr-expr='date(value) < today'>已逾期</button>
-                        <button type="button" data-chr-expr='withinNextDays(value, 3)'>未来3天</button>
-                        <button type="button" data-chr-expr='field("二级阶段") == "商业流程中"'>同行字段</button>
-                        <button type="button" data-chr-expr='contains(field("商业名称"), "国药")'>包含字段</button>
-                        <button type="button" data-chr-expr='regex(value, "^BRL\\d+$")'>正则</button>
-                        <button type="button" data-chr-expr=' && '>AND</button>
-                        <button type="button" data-chr-expr=' || '>OR</button>
-                        <button type="button" data-chr-act="validate-expr">验证表达式</button>
+                <details class="chr-help">
+                    <summary>规则模式说明</summary>
+                    <div>标准规则适合常用文本、空值、数值和日期语义判断；高级表达式使用受限安全解析器，不执行 JavaScript，也不能访问 window / document / 网络 / 存储。</div>
+                </details>
+            </section>
+
+            <section class="chr-section chr-section-v7152">
+                <div class="chr-section-head">
+                    <div>
+                        <div class="chr-section-title">匹配条件</div>
+                        <div class="chr-section-desc">决定在哪张表、哪个字段、什么条件下触发高亮。</div>
                     </div>
-                    <div class="chr-guide"><b>可用变量：</b><code>value</code> 当前目标字段、<code>today</code>、<code>yesterday</code>、<code>tomorrow</code>、<code>now</code>、<code>table</code>。<br><b>同行字段：</b><code>field("字段名")</code>。<b>日期：</b><code>date(x)</code>、<code>daysFromToday(x)</code>、<code>isToday(x)</code>、<code>isPast(x)</code>、<code>withinNextDays(x,n)</code>。<br><b>文本：</b><code>contains</code>、<code>startsWith</code>、<code>endsWith</code>、<code>regex</code>、<code>empty</code>、<code>notEmpty</code>、<code>len</code>。支持 <code>== != &gt; &gt;= &lt; &lt;= && || ! + - * / % ?:</code>。</div>
-                </div>`}
-            </div>
-            <div class="chr-section">
-                <div class="chr-section-title">高亮范围</div>
+                </div>
+
+                <div class="chr-grid2">
+                    <label class="chr-field">
+                        <span>作用范围</span>
+                        <select data-chr-edit="scope">
+                            <option value="table" ${rule.scope === 'table' ? 'selected' : ''}>仅当前表${context ? `：${escHtml(context.tableName)}` : ''}</option>
+                            <option value="global" ${rule.scope === 'global' ? 'selected' : ''}>全部表（按字段名称匹配）</option>
+                        </select>
+                    </label>
+                    <label class="chr-field">
+                        <span>${rule.ruleType==='advanced'?'高亮目标字段 / value':'目标字段'}</span>
+                        <select data-chr-edit="field">${buildFieldOptions(rule)}</select>
+                    </label>
+                </div>
+
+                ${rule.ruleType === 'standard' ? `
+                    <div class="chr-grid2" style="margin-top:10px;">
+                        <label class="chr-field">
+                            <span>判断方式</span>
+                            <select data-chr-edit="operator">${buildOperatorOptions(rule)}</select>
+                        </label>
+                        <label class="chr-field">
+                            <span>${rule.operator === 'dateWithinNextDays' || rule.operator === 'dateWithinPastDays' ? '天数 N' : rule.operator === 'dateEquals' ? '指定日期' : '匹配内容'}</span>
+                            ${valueDisabled
+                                ? `<input type="text" disabled placeholder="此判断无需填写内容">`
+                                : rule.operator === 'dateEquals'
+                                    ? `<input type="date" data-chr-edit="value" value="${escAttr(rule.value)}">`
+                                    : (rule.operator === 'dateWithinNextDays' || rule.operator === 'dateWithinPastDays')
+                                        ? `<input type="number" min="0" step="1" data-chr-edit="value" value="${escAttr(rule.value || '3')}" placeholder="例如：3">`
+                                        : `<input type="text" data-chr-edit="value" value="${escAttr(rule.value)}" placeholder="${rule.operator === 'regex' ? '例如：^BRL\\d+$' : '输入要匹配的内容'}">`}
+                        </label>
+                    </div>
+                    ${TEXT_OPERATORS.has(rule.operator) ? `
+                        <label class="chr-check chr-inline-check"><input type="checkbox" data-chr-edit="caseSensitive" ${rule.caseSensitive ? 'checked' : ''}> 区分大小写 <span>（正则同样适用）</span></label>
+                    ` : ''}
+                    ${DATE_OPERATORS.has(rule.operator) ? `
+                        <details class="chr-help">
+                            <summary>日期格式与边界说明</summary>
+                            <div>支持 YYYY-MM-DD、YYYY/MM/DD、YYYY年M月D日。“未来 N 天内”包含今天和第 N 天；“已逾期”严格早于今天。</div>
+                        </details>
+                    ` : ''}
+                ` : `
+                    <div class="chr-advanced-placeholder">
+                        此规则使用高级表达式。下方“高级能力”区域负责编辑和验证表达式。
+                    </div>
+                `}
+            </section>
+
+            ${rule.ruleType === 'advanced' ? `
+            <section class="chr-section chr-section-v7152">
+                <div class="chr-section-head">
+                    <div>
+                        <div class="chr-section-title">高级能力</div>
+                        <div class="chr-section-desc">像写条件代码一样组合同行字段、日期、文本、正则与逻辑运算。</div>
+                    </div>
+                    <span class="chr-inline-status ${exprValidation.ok?'is-active':'is-error'}">${exprValidation.ok?'表达式有效':'表达式有误'}</span>
+                </div>
+
+                <label class="chr-field">
+                    <span>高级条件表达式（结果为 true 时命中）</span>
+                    <textarea class="chr-code" data-chr-edit="advancedExpr" spellcheck="false" placeholder='例如：date(value) < today && field("二级阶段") == "商业流程中"'>${escHtml(rule.advancedExpr)}</textarea>
+                </label>
+
+                <div class="chr-code-tools">
+                    <button type="button" data-chr-expr='date(value) == today'>今天</button>
+                    <button type="button" data-chr-expr='date(value) < today'>已逾期</button>
+                    <button type="button" data-chr-expr='withinNextDays(value, 3)'>未来3天</button>
+                    <button type="button" data-chr-expr='field("二级阶段") == "商业流程中"'>同行字段</button>
+                    <button type="button" data-chr-expr='contains(field("商业名称"), "国药")'>包含字段</button>
+                    <button type="button" data-chr-expr='regex(value, "^BRL\\d+$")'>正则</button>
+                    <button type="button" data-chr-expr=' && '>AND</button>
+                    <button type="button" data-chr-expr=' || '>OR</button>
+                    <button type="button" class="primary-lite" data-chr-act="validate-expr">验证表达式</button>
+                </div>
+
+                ${!exprValidation.ok ? `<div class="chr-error-line">${escHtml(exprValidation.error)}</div>` : ''}
+
+                <details class="chr-help">
+                    <summary>可用变量、函数与运算符</summary>
+                    <div>
+                        <b>变量：</b> value、today、yesterday、tomorrow、now、table。<br>
+                        <b>同行字段：</b> field("字段名")。<br>
+                        <b>日期：</b> date(x)、daysFromToday(x)、isToday(x)、isPast(x)、withinNextDays(x,n)。<br>
+                        <b>文本：</b> contains、startsWith、endsWith、regex、empty、notEmpty、len。<br>
+                        <b>运算：</b> == != &gt; &gt;= &lt; &lt;= && || ! + - * / % ?:
+                    </div>
+                </details>
+            </section>` : ''}
+
+            <section class="chr-section chr-section-v7152">
+                <div class="chr-section-head">
+                    <div>
+                        <div class="chr-section-title">高亮方式</div>
+                        <div class="chr-section-desc">控制高亮范围、底色、边缘强调和文字样式。</div>
+                    </div>
+                </div>
+
                 <div class="chr-mode">
                     <label><input type="radio" name="chr-mode" data-chr-edit="mode" value="cell" ${rule.mode==='cell'?'checked':''}>只高亮匹配单元格</label>
                     <label><input type="radio" name="chr-mode" data-chr-edit="mode" value="row" ${rule.mode==='row'?'checked':''}>高亮整行</label>
                 </div>
-            </div>
-            <div class="chr-section">
-                <div class="chr-section-title">视觉样式</div>
-                <div class="chr-grid2">
-                    <label class="chr-field"><span>高亮底色</span><input type="color" data-chr-edit="color" value="${escAttr(rule.color)}" style="width:100%;height:34px;padding:2px;background:#292a2d;border:1px solid #424448;border-radius:7px;"></label>
-                    <label class="chr-field"><span>边缘颜色</span><input type="color" data-chr-edit="edgeColor" value="${escAttr(rule.edgeColor)}" style="width:100%;height:34px;padding:2px;background:#292a2d;border:1px solid #424448;border-radius:7px;"></label>
-                    <label class="chr-field"><span>底色高亮程度</span><div class="chr-range"><input type="range" min="4" max="80" step="1" data-chr-edit="opacity" value="${rule.opacity}"><b data-chr-value="opacity">${rule.opacity}%</b></div></label>
-                    <label class="chr-field"><span>边缘强度（透明度）</span><div class="chr-range"><input type="range" min="0" max="100" step="1" data-chr-edit="edgeOpacity" value="${rule.edgeOpacity}"><b data-chr-value="edgeOpacity">${rule.edgeOpacity}%</b></div></label>
-                    <label class="chr-field"><span>强调边缘宽度</span><div class="chr-range"><input type="range" min="0" max="5" step="1" data-chr-edit="edgeWidth" value="${rule.edgeWidth}"><b data-chr-value="edgeWidth">${rule.edgeWidth}px</b></div></label>
-                    <label class="chr-check"><input type="checkbox" data-chr-edit="bold" ${rule.bold?'checked':''}> 高亮内容文字加粗</label>
+
+                <div class="chr-grid2 chr-visual-grid">
+                    <label class="chr-field">
+                        <span>高亮底色</span>
+                        <input type="color" data-chr-edit="color" value="${escAttr(rule.color)}" class="chr-color-input">
+                    </label>
+                    <label class="chr-field">
+                        <span>边缘颜色</span>
+                        <input type="color" data-chr-edit="edgeColor" value="${escAttr(rule.edgeColor)}" class="chr-color-input">
+                    </label>
+                    <label class="chr-field">
+                        <span>底色高亮程度</span>
+                        <div class="chr-range"><input type="range" min="4" max="80" step="1" data-chr-edit="opacity" value="${rule.opacity}"><b data-chr-value="opacity">${rule.opacity}%</b></div>
+                    </label>
+                    <label class="chr-field">
+                        <span>边缘强度</span>
+                        <div class="chr-range"><input type="range" min="0" max="100" step="1" data-chr-edit="edgeOpacity" value="${rule.edgeOpacity}"><b data-chr-value="edgeOpacity">${rule.edgeOpacity}%</b></div>
+                    </label>
+                    <label class="chr-field">
+                        <span>强调边缘宽度</span>
+                        <div class="chr-range"><input type="range" min="0" max="5" step="1" data-chr-edit="edgeWidth" value="${rule.edgeWidth}"><b data-chr-value="edgeWidth">${rule.edgeWidth}px</b></div>
+                    </label>
+                    <label class="chr-check chr-switch-line"><input type="checkbox" data-chr-edit="bold" ${rule.bold?'checked':''}> 高亮内容文字加粗</label>
                 </div>
+
                 ${rule.mode === 'row' ? `
-                <div class="chr-guide" style="margin-top:10px;">
-                    <b>整行强调边缘</b>
-                    <div style="display:flex;gap:18px;align-items:center;margin-top:7px;">
-                        <label class="chr-check" style="min-height:auto;"><input type="checkbox" data-chr-edit="edgeTop" ${rule.edgeTop?'checked':''}> 顶部边缘</label>
-                        <label class="chr-check" style="min-height:auto;"><input type="checkbox" data-chr-edit="edgeBottom" ${rule.edgeBottom?'checked':''}> 底部边缘</label>
+                    <div class="chr-edge-options">
+                        <div>
+                            <b>整行强调边缘</b>
+                            <span>默认上下同时开启；左置顶、主体和右置顶使用同一套参数。</span>
+                        </div>
+                        <label class="chr-check"><input type="checkbox" data-chr-edit="edgeTop" ${rule.edgeTop?'checked':''}> 顶部边缘</label>
+                        <label class="chr-check"><input type="checkbox" data-chr-edit="edgeBottom" ${rule.edgeBottom?'checked':''}> 底部边缘</label>
                     </div>
-                    <div style="margin-top:5px;color:#8f949b;">默认上下同时开启；左置顶区、滚动主体和右置顶区使用同一套边缘参数。</div>
-                </div>` : `
-                <div class="chr-guide" style="margin-top:10px;">单元格模式继续使用左侧强调边缘；边缘颜色、强度和宽度与上方设置一致。</div>`}
-            </div>
-            <div class="chr-section">
-                <div class="chr-section-title">规则检查</div>
-                <div class="chr-preview">当前页面可见区域命中 <b>${matchCount}</b> 行。${rule.ruleType === 'advanced' ? (()=>{const v=validateAdvancedExpression(rule);return v.ok?'<br><span style="color:#81c995;">高级表达式语法有效</span>':`<br><span style="color:#ff8a80;">表达式错误：${escHtml(v.error)}</span>`;})() : ''}${rule.scope === 'table' && context && rule.tableKey && rule.tableKey !== context.key ? '<br>注意：此规则属于另一张表，当前表不会生效。' : ''}</div>
-                <div class="chr-actions" style="margin-top:9px;"><button type="button" data-chr-act="test">重新测试</button><button type="button" data-chr-act="up">提高优先级</button><button type="button" data-chr-act="down">降低优先级</button><button type="button" data-chr-act="duplicate">复制规则</button><button type="button" class="danger" data-chr-act="delete">删除规则</button></div>
-            </div>`;
+                ` : `
+                    <div class="chr-inline-note">单元格模式使用左侧强调边缘；颜色、强度和宽度沿用上方设置。</div>
+                `}
+            </section>
+
+            <section class="chr-section chr-section-v7152 chr-check-section">
+                <div class="chr-section-head">
+                    <div>
+                        <div class="chr-section-title">规则检查</div>
+                        <div class="chr-section-desc">当前页面可见区域实时检查，不会保存任何修改。</div>
+                    </div>
+                    <div class="chr-match-count">命中 <b>${matchCount}</b> 行</div>
+                </div>
+
+                <div class="chr-preview">
+                    ${rule.scope === 'table' && context && rule.tableKey && rule.tableKey !== context.key
+                        ? '<span style="color:#f6c26b;">此规则属于另一张表，当前表不会生效。</span>'
+                        : isActiveGroup
+                            ? '<span style="color:#81c995;">当前规则组已设为生效组。</span>'
+                            : '<span>当前规则组尚未设为生效组，保存并切换后才会参与实际高亮。</span>'}
+                </div>
+
+                <div class="chr-actions chr-rule-actions">
+                    <button type="button" data-chr-act="test">重新测试</button>
+                    <button type="button" data-chr-act="up">提高优先级</button>
+                    <button type="button" data-chr-act="down">降低优先级</button>
+                    <button type="button" data-chr-act="duplicate">复制规则</button>
+                    <button type="button" class="danger" data-chr-act="delete">删除规则</button>
+                </div>
+            </section>`;
     }
 
     function createDefaultRule() {
@@ -28099,6 +28376,7 @@
     }
 
     function onManagerClick(event) {
+        if (event.target.closest?.('[data-chr-check-id],[data-chr-select-all]')) return;
         const item = event.target.closest('[data-chr-rule-id]');
         if (item) {
             managerSelectedId = item.dataset.chrRuleId || '';
@@ -28125,6 +28403,52 @@
         const currentGroup = getManagerGroup();
         if (action === 'close' || action === 'cancel') return closeManager();
 
+        if (action === 'prev-group' || action === 'next-group') {
+            if (managerGroupsDraft.length <= 1) return;
+            const index = Math.max(0, managerGroupsDraft.findIndex(g => g.id === managerGroupId));
+            const step = action === 'prev-group' ? -1 : 1;
+            const nextIndex = (index + step + managerGroupsDraft.length) % managerGroupsDraft.length;
+            selectManagerGroup(managerGroupsDraft[nextIndex].id);
+            return;
+        }
+
+        if (action.startsWith('batch-')) {
+            const ids = [...managerCheckedIds];
+            if (!ids.length) return;
+
+            if (action === 'batch-enable' || action === 'batch-disable') {
+                const nextEnabled = action === 'batch-enable';
+                managerDraft.forEach(r => {
+                    if (ids.includes(r.id) && r.groupId === managerGroupId) r.enabled = nextEnabled;
+                });
+                return renderManager();
+            }
+
+            if (action === 'batch-duplicate') {
+                const sourceRules = managerDraft.filter(r => ids.includes(r.id) && r.groupId === managerGroupId);
+                const copies = sourceRules.map((r, i) => normalizeRule({
+                    ...JSON.parse(JSON.stringify(r)),
+                    id: makeId(),
+                    groupId: managerGroupId,
+                    name: `${r.name} - 副本`
+                }, managerDraft.length + i));
+                managerDraft.push(...copies);
+                managerCheckedIds = new Set(copies.map(r => r.id));
+                managerSelectedId = copies[0]?.id || managerSelectedId;
+                return renderManager();
+            }
+
+            if (action === 'batch-delete') {
+                if (!confirm(`删除已选择的 ${ids.length} 条高亮规则吗？`)) return;
+                managerDraft = managerDraft.filter(r => !ids.includes(r.id));
+                managerCheckedIds.clear();
+                if (!managerDraft.some(r => r.id === managerSelectedId)) {
+                    managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
+                }
+                return renderManager();
+            }
+        }
+
         if (action === 'new-group') {
             const name = prompt('新规则组名称：', makeUniqueGroupName('新规则组'));
             if (name === null) return;
@@ -28133,6 +28457,7 @@
             managerGroupId = group.id;
             managerSelectedId = '';
             managerFilter = '';
+            managerCheckedIds.clear();
             return renderManager();
         }
         if (action === 'rename-group') {
@@ -28153,6 +28478,7 @@
             managerGroupId = newGroup.id;
             managerSelectedId = copies[0]?.id || '';
             managerFilter = '';
+            managerCheckedIds.clear();
             return renderManager();
         }
         if (action === 'delete-group') {
@@ -28167,6 +28493,7 @@
             if (managerActiveGroupId === currentGroup.id) managerActiveGroupId = managerGroupId;
             managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
             managerFilter = '';
+            managerCheckedIds.clear();
             return renderManager();
         }
         if (action === 'set-active-group') {
@@ -28179,6 +28506,7 @@
             const rule = createDefaultRule();
             managerDraft.push(rule);
             managerSelectedId = rule.id;
+            managerCheckedIds.clear();
             return renderManager();
         }
         if (action === 'enable-all' || action === 'disable-all') {
@@ -28216,6 +28544,7 @@
         if (action === 'delete') {
             if (!confirm(`删除高亮规则“${selected.name}”吗？`)) return;
             managerDraft.splice(index,1);
+            managerCheckedIds.delete(selected.id);
             managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
             return renderManager();
         }
@@ -28258,6 +28587,27 @@
     }
 
     function onManagerChange(event) {
+        const checkId = event.target?.dataset?.chrCheckId;
+        if (checkId) {
+            if (event.target.checked) managerCheckedIds.add(checkId);
+            else managerCheckedIds.delete(checkId);
+            updateManagerBatchBar();
+            return;
+        }
+
+        if (event.target.matches('[data-chr-select-all]')) {
+            const q = cleanText(managerFilter).toLowerCase();
+            const visible = managerDraft
+                .filter(r => r.groupId === managerGroupId)
+                .filter(r => !q || `${r.name} ${r.fieldName} ${r.tableName}`.toLowerCase().includes(q));
+            visible.forEach(r => {
+                if (event.target.checked) managerCheckedIds.add(r.id);
+                else managerCheckedIds.delete(r.id);
+            });
+            renderManagerList();
+            return;
+        }
+
         if (event.target.matches('[data-chr-group-select]')) {
             selectManagerGroup(event.target.value);
             return;
@@ -28273,6 +28623,7 @@
                 managerGroupId = nextGroup.id;
                 managerSelectedId = rule.id;
                 managerFilter = '';
+                managerCheckedIds.clear();
             }
             return renderManager();
         }
@@ -28361,7 +28712,7 @@
             }
         });
 
-        // V7.15.1：规则组快捷切换桥接必须绑定在条件高亮模块内部，
+        // V7.15.2：规则组快捷切换桥接必须绑定在条件高亮模块内部，
         // 这样才能访问 activeGroupId / groups / setActiveGroup 等模块私有状态。
         window.addEventListener('att:conditional-highlight:cycle-group', event => {
             const direction = Number(event?.detail?.direction) < 0 ? -1 : 1;
@@ -28380,12 +28731,237 @@
         attachToolboxObserver();
         attachPageObserver();
         syncEngineState();
-        console.log('[AutoTable 条件高亮] V7.15.1 已加载：规则组 / 快捷切换 / 字段规则 / 日期语义 / 安全高级表达式 / 整行上下强调边缘 / 虚拟滚动增量高亮');
+        console.log('[AutoTable 条件高亮] V7.15.2 已加载：规则组 / 分层管理面板 / 批量规则操作 / 快捷切换 / 日期语义 / 安全高级表达式 / 整行上下强调边缘 / 虚拟滚动增量高亮');
     }
 
     if (document.body) init();
     else window.addEventListener('DOMContentLoaded', init, { once:true });
 })();
+
+/* ============================================================================
+ * AutoTable 条件高亮规则组管理器 V7.15.2 · 分层商业化布局
+ * ========================================================================== */
+(function () {
+    'use strict';
+    const ID = 'att-cond-highlight-manager-layout-v7152';
+    if (document.getElementById(ID)) return;
+    const style = document.createElement('style');
+    style.id = ID;
+    style.textContent = `
+        #att-cond-highlight-manager-v770 .chr-shell-v7152{
+            width:min(1160px,calc(100vw - 36px))!important;
+            height:min(790px,calc(100vh - 36px))!important;
+            grid-template-rows:auto auto minmax(0,1fr) auto!important;
+        }
+
+        #att-cond-highlight-manager-v770 .chr-groupbar{
+            display:flex;align-items:center;justify-content:space-between;gap:14px;
+            padding:10px 14px;border-bottom:1px solid #34363a;background:#222326;flex-wrap:wrap;
+        }
+        #att-cond-highlight-manager-v770 .chr-groupbar-main{
+            min-width:0;display:grid;grid-template-columns:auto 30px minmax(220px,360px) 30px auto;
+            align-items:center;gap:6px;
+        }
+        #att-cond-highlight-manager-v770 .chr-groupbar-label{
+            color:#9aa0a6;font-size:11px;font-weight:700;letter-spacing:.04em;white-space:nowrap;
+        }
+        #att-cond-highlight-manager-v770 .chr-groupbar-main select{height:32px!important;}
+        #att-cond-highlight-manager-v770 .chr-group-nav{
+            width:30px;min-width:30px;height:32px!important;padding:0!important;font-size:18px;
+        }
+        #att-cond-highlight-manager-v770 .chr-groupbar-actions{
+            display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+        }
+        #att-cond-highlight-manager-v770 .chr-groupbar-actions button{height:30px;padding:0 9px;font-size:11px;}
+        #att-cond-highlight-manager-v770 button.danger-soft{
+            color:#ffaaa3;border-color:#5a3b3a;background:#2a2425;
+        }
+        #att-cond-highlight-manager-v770 button.danger-soft:hover{background:#382829;}
+
+        #att-cond-highlight-manager-v770 .chr-main{grid-template-columns:310px minmax(0,1fr)!important;}
+        #att-cond-highlight-manager-v770 .chr-side{
+            grid-template-rows:auto auto auto minmax(0,1fr)!important;background:#1f2022;
+        }
+        #att-cond-highlight-manager-v770 .chr-side-head{
+            padding:11px 12px 9px;display:flex;align-items:center;justify-content:space-between;gap:8px;
+            border-bottom:1px solid #303236;
+        }
+        #att-cond-highlight-manager-v770 .chr-side-head button{height:30px;font-size:11px;}
+        #att-cond-highlight-manager-v770 .chr-side-title{font-size:12px;font-weight:750;color:#e5e7eb;}
+        #att-cond-highlight-manager-v770 .chr-side-count{margin-top:2px;font-size:10px;color:#8f949b;}
+
+        #att-cond-highlight-manager-v770 .chr-batchbar{
+            padding:8px 12px;border-bottom:1px solid #303236;background:#222326;
+        }
+        #att-cond-highlight-manager-v770 .chr-batchbar-top{
+            display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:24px;
+            color:#9aa0a6;font-size:10px;
+        }
+        #att-cond-highlight-manager-v770 .chr-select-all{display:flex;align-items:center;gap:6px;cursor:pointer;}
+        #att-cond-highlight-manager-v770 .chr-batch-actions{
+            display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:6px;
+        }
+        #att-cond-highlight-manager-v770 .chr-batch-actions button{height:26px;padding:0 4px;font-size:10px;}
+        #att-cond-highlight-manager-v770 .chr-filter{padding:9px 12px!important;}
+        #att-cond-highlight-manager-v770 .chr-filter input{height:32px!important;}
+        #att-cond-highlight-manager-v770 input[type="number"],
+        #att-cond-highlight-manager-v770 input[type="date"]{
+            width:100%;min-width:0;box-sizing:border-box;height:34px;padding:0 9px;
+            color:#e8eaed;background:#292a2d;border:1px solid #424448;border-radius:7px;outline:none;
+        }
+        #att-cond-highlight-manager-v770 input[type="number"]:focus,
+        #att-cond-highlight-manager-v770 input[type="date"]:focus{
+            border-color:#4c8bf5;box-shadow:0 0 0 2px rgba(76,139,245,.16);
+        }
+
+        #att-cond-highlight-manager-v770 .chr-item{
+            grid-template-columns:auto auto minmax(0,1fr)!important;gap:7px!important;padding:9px 8px!important;align-items:start;
+        }
+        #att-cond-highlight-manager-v770 .chr-item.is-disabled{opacity:.72;}
+        #att-cond-highlight-manager-v770 .chr-item-check{
+            display:flex;align-items:center;justify-content:center;width:17px;min-height:18px;cursor:pointer;
+        }
+        #att-cond-highlight-manager-v770 .chr-item-check input{margin:2px 0 0;}
+        #att-cond-highlight-manager-v770 .chr-item-body{min-width:0;}
+        #att-cond-highlight-manager-v770 .chr-item-top{
+            display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:0;
+        }
+        #att-cond-highlight-manager-v770 .chr-item-name{min-width:0;flex:1;}
+        #att-cond-highlight-manager-v770 .chr-item-badges{
+            display:flex;align-items:center;gap:4px;flex-shrink:0;
+        }
+        #att-cond-highlight-manager-v770 .chr-mini-badge{
+            height:18px;display:inline-flex;align-items:center;padding:0 5px;border-radius:999px;
+            border:1px solid #45484d;color:#aeb4bb;background:#292b2f;font-size:9px;font-weight:700;white-space:nowrap;
+        }
+        #att-cond-highlight-manager-v770 .chr-mini-badge.is-advanced{color:#c4b5fd;background:#2b2540;border-color:#55458d;}
+        #att-cond-highlight-manager-v770 .chr-mini-badge.is-enabled{color:#9de4b0;background:#203329;border-color:#345d42;}
+        #att-cond-highlight-manager-v770 .chr-mini-badge.is-off{color:#a1a7ae;background:#292a2d;border-color:#424448;}
+        #att-cond-highlight-manager-v770 .chr-item-meta{margin-top:4px!important;}
+        #att-cond-highlight-manager-v770 .chr-item-scope{
+            margin-top:3px;color:#747a82;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+        }
+
+        #att-cond-highlight-manager-v770 .chr-detail{padding:0 16px 24px!important;background:#202124;}
+        #att-cond-highlight-manager-v770 .chr-rule-summary{
+            position:sticky;top:0;z-index:4;margin:0 -16px 14px;padding:12px 16px 10px;
+            background:linear-gradient(to bottom,#202124 78%,rgba(32,33,36,.94));
+            border-bottom:1px solid #34363a;backdrop-filter:blur(8px);
+        }
+        #att-cond-highlight-manager-v770 .chr-rule-summary-main{
+            display:flex;align-items:center;justify-content:space-between;gap:10px;
+        }
+        #att-cond-highlight-manager-v770 .chr-rule-summary-title{
+            min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+            font-size:15px;font-weight:750;color:#f1f3f4;
+        }
+        #att-cond-highlight-manager-v770 .chr-rule-summary-chips{
+            display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:flex-end;
+        }
+        #att-cond-highlight-manager-v770 .chr-summary-chip{
+            height:20px;display:inline-flex;align-items:center;padding:0 7px;border-radius:999px;
+            color:#b7bbc0;background:#292b2f;border:1px solid #424448;font-size:9px;font-weight:700;
+        }
+        #att-cond-highlight-manager-v770 .chr-summary-chip.is-ok{color:#9de4b0;background:#203329;border-color:#345d42;}
+        #att-cond-highlight-manager-v770 .chr-summary-chip.is-active{color:#9ecbff;background:#203047;border-color:#315b91;}
+        #att-cond-highlight-manager-v770 .chr-summary-chip.is-muted{color:#8f949b;}
+        #att-cond-highlight-manager-v770 .chr-rule-summary-line{
+            margin-top:7px;display:flex;align-items:center;gap:6px;min-width:0;color:#9aa0a6;
+            font-size:10px;white-space:nowrap;overflow:hidden;
+        }
+        #att-cond-highlight-manager-v770 .chr-rule-summary-line span{
+            min-width:0;max-width:220px;overflow:hidden;text-overflow:ellipsis;
+        }
+        #att-cond-highlight-manager-v770 .chr-rule-summary-line i{color:#5f6368;font-style:normal;flex-shrink:0;}
+
+        #att-cond-highlight-manager-v770 .chr-section-v7152{padding:14px!important;margin-bottom:11px!important;}
+        #att-cond-highlight-manager-v770 .chr-section-head{
+            display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:11px;
+        }
+        #att-cond-highlight-manager-v770 .chr-section-head .chr-section-title{margin-bottom:0!important;font-size:13px;}
+        #att-cond-highlight-manager-v770 .chr-section-desc{
+            margin-top:3px;color:#858b92;font-size:10px;line-height:1.45;
+        }
+        #att-cond-highlight-manager-v770 .chr-subsection-label{
+            margin:12px 0 6px;color:#aeb4bb;font-size:10px;font-weight:700;
+        }
+        #att-cond-highlight-manager-v770 .chr-basic-status-row{
+            margin-top:9px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+        }
+        #att-cond-highlight-manager-v770 .chr-switch-line{min-height:28px!important;padding:0 2px;}
+        #att-cond-highlight-manager-v770 .chr-inline-status{
+            display:inline-flex;align-items:center;min-height:22px;padding:0 7px;border-radius:999px;
+            color:#9aa0a6;background:#202124;border:1px solid #3b3d40;font-size:9px;font-weight:700;white-space:nowrap;
+        }
+        #att-cond-highlight-manager-v770 .chr-inline-status.is-active{
+            color:#9de4b0;background:#203329;border-color:#345d42;
+        }
+        #att-cond-highlight-manager-v770 .chr-inline-status.is-error{
+            color:#ffaaa3;background:#382829;border-color:#68413f;
+        }
+        #att-cond-highlight-manager-v770 .chr-inline-check{margin-top:7px;min-height:26px!important;}
+        #att-cond-highlight-manager-v770 .chr-inline-check span{color:#7f858c;font-size:10px;}
+
+        #att-cond-highlight-manager-v770 .chr-help{
+            margin-top:9px;border:1px solid #36383c;border-radius:8px;background:#212225;
+            color:#959ba2;font-size:10px;line-height:1.55;
+        }
+        #att-cond-highlight-manager-v770 .chr-help summary{
+            padding:7px 9px;cursor:pointer;color:#aeb4bb;font-weight:650;user-select:none;
+        }
+        #att-cond-highlight-manager-v770 .chr-help > div{padding:0 9px 9px;}
+        #att-cond-highlight-manager-v770 .chr-advanced-placeholder,
+        #att-cond-highlight-manager-v770 .chr-inline-note{
+            margin-top:10px;padding:8px 9px;border:1px dashed #3a3d42;border-radius:8px;
+            color:#8f949b;background:#202124;font-size:10px;
+        }
+        #att-cond-highlight-manager-v770 .chr-error-line{
+            margin-top:8px;padding:7px 9px;border-radius:7px;color:#ffaaa3;
+            background:#382829;border:1px solid #68413f;font-size:10px;
+        }
+
+        #att-cond-highlight-manager-v770 .chr-visual-grid{margin-top:11px;}
+        #att-cond-highlight-manager-v770 .chr-color-input{
+            width:100%!important;height:34px!important;padding:2px!important;background:#292a2d!important;
+            border:1px solid #424448!important;border-radius:7px!important;
+        }
+        #att-cond-highlight-manager-v770 .chr-edge-options{
+            margin-top:10px;display:grid;grid-template-columns:minmax(0,1fr) auto auto;
+            align-items:center;gap:12px;padding:9px 10px;border:1px solid #36383c;border-radius:8px;background:#202124;
+        }
+        #att-cond-highlight-manager-v770 .chr-edge-options > div{min-width:0;}
+        #att-cond-highlight-manager-v770 .chr-edge-options b{display:block;font-size:10px;color:#b9bec4;}
+        #att-cond-highlight-manager-v770 .chr-edge-options span{display:block;margin-top:2px;color:#7f858c;font-size:9px;}
+        #att-cond-highlight-manager-v770 .chr-edge-options .chr-check{min-height:24px!important;white-space:nowrap;}
+        #att-cond-highlight-manager-v770 .chr-check-section{margin-bottom:0!important;}
+        #att-cond-highlight-manager-v770 .chr-match-count{
+            min-width:78px;text-align:center;padding:6px 8px;border-radius:8px;color:#9ecbff;
+            background:#203047;border:1px solid #315b91;font-size:10px;
+        }
+        #att-cond-highlight-manager-v770 .chr-rule-actions{margin-top:9px;}
+        #att-cond-highlight-manager-v770 button.primary-lite{color:#b9d7ff;background:#22344c;border-color:#3b679d;}
+
+        #att-cond-highlight-manager-v770 .chr-empty-card{
+            display:flex;flex-direction:column;gap:6px;max-width:380px;padding:22px;
+            border:1px dashed #3b3d40;border-radius:12px;background:#222326;
+        }
+        #att-cond-highlight-manager-v770 .chr-empty-card b{font-size:14px;color:#dfe3e7;}
+        #att-cond-highlight-manager-v770 .chr-empty-card span{font-size:11px;line-height:1.6;color:#8f949b;}
+
+        @media (max-width:900px){
+            #att-cond-highlight-manager-v770 .chr-main{grid-template-columns:270px minmax(0,1fr)!important;}
+            #att-cond-highlight-manager-v770 .chr-groupbar-main{
+                grid-template-columns:auto 28px minmax(180px,1fr) 28px auto;
+            }
+            #att-cond-highlight-manager-v770 .chr-groupbar-actions{width:100%;justify-content:flex-end;}
+            #att-cond-highlight-manager-v770 .chr-grid2{grid-template-columns:1fr!important;}
+            #att-cond-highlight-manager-v770 .chr-edge-options{grid-template-columns:1fr 1fr;}
+            #att-cond-highlight-manager-v770 .chr-edge-options > div{grid-column:1/-1;}
+        }
+    `;
+    document.documentElement.appendChild(style);
+})();
+
 
 
 /* ============================================================================
