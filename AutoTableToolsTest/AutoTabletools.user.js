@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.15.4
+// @version      7.15.5
 // @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.15.4
+ * AutoTable 工具集 V7.15.5
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，规则组/规则分层管理，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -44,7 +44,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.15.4',
+        version: 'V7.15.5',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -29383,7 +29383,7 @@
 
 
 /* ============================================================================
- * AutoTable 全视图模糊搜索记录与搜索栏清空优化 V7.15.4
+ * AutoTable 全视图模糊搜索记录与搜索栏清空优化 V7.15.5
  * --------------------------------------------------------------------------
  * 1) 搜索框下方默认使用更紧凑的历史层，支持列表 / 胶囊自动填充两种展示；
  * 2) 可调历史文字大小；每个视图最大保存条数继续独立控制；
@@ -29404,13 +29404,13 @@
  * 17) V7.13.2 新增“紧凑搜索记录显示全部”开关：列表与胶囊均可取消前 8 / 14 条限制，剩余记录在原历史区域内部滚动查看。
  * 18) V7.13.3 修复鼠标松开闪烁：搜索历史层不再使用 dialog 角色，并显式跳过全局丝滑弹窗入场动画，避免 click 阶段二次 opacity / translate / scale。
  * 19) V7.13.4 “查看全部视图搜索记录”改为真正的展开/收起双态入口；展开区改用单一 height + opacity + translate 动画链，并移除重复定位，避免先撑开再跳动。
- * 20) V7.15.4 新增搜索记录模块尺寸上限：最大宽度 / 最大高度可独立调节；紧凑层与原位“查看全部”共同遵循，超限后内部滚动。
+ * 20) V7.15.5 新增搜索记录模块尺寸上限：最大宽度 / 最大高度可独立调节；紧凑层与原位“查看全部”共同遵循，超限后内部滚动。
  * ========================================================================== */
 (function () {
     'use strict';
 
     const SH = {
-        version: 'V7.15.4',
+        version: 'V7.15.5',
         enabledKey: 'att_v3_viewSearchHistoryEnabled',
         maxKey: 'att_v3_viewSearchHistoryMaxPerView',
         perViewKey: 'att_v3_viewSearchHistoryPerViewMode',
@@ -29499,6 +29499,8 @@
     let capsuleLayoutRaf = 0;
     let capsuleResizeObserver = null;
     let dropdownMeasuredHeight = 0;
+    // V7.15.5：缓存搜索历史层的内容自适应宽度；仅内容/设置变化时重新测量。
+    let dropdownMeasuredWidth = 0;
     let anchorScrollCleanups = [];
     const EXPANDED_CHUNK = 80;
     const MANAGER_CHUNK = 120;
@@ -29994,17 +29996,45 @@
             if(cur?.classList.contains('is-open')&&activeSearchInput?.isConnected)positionDropdown(activeSearchInput,cur);
         });
     }
+    function measureDropdownPreferredWidth(input,d=ensureDropdown()){
+        if(!input?.isConnected)return 300;
+        const margin=10;
+        const r=input.getBoundingClientRect();
+        const viewportCap=Math.max(220,Math.min(dropdownMaxWidth,window.innerWidth-margin*2));
+        const minWidth=Math.min(viewportCap,Math.max(280,Math.ceil(r.width)));
+
+        // 展开“查看全部”时允许充分使用用户配置的宽度上限。
+        if(dropdownExpanded){
+            return Math.round(Math.max(minWidth,Math.min(viewportCap,Math.max(520,r.width*1.8))));
+        }
+
+        // 紧凑层按真实内容测量，不再额外锁死在 300/420px。
+        // max-content 只在隐藏测量阶段读取一次，随后使用缓存，避免滚动时反复强制布局。
+        const prevWidth=d.style.width;
+        const prevMaxWidth=d.style.maxWidth;
+        try{
+            d.style.width='max-content';
+            d.style.maxWidth=`${viewportCap}px`;
+            const rectWidth=Math.ceil(d.getBoundingClientRect().width||0);
+            const scrollWidth=Math.ceil(d.scrollWidth||0);
+            const intrinsic=Math.max(rectWidth,scrollWidth,minWidth);
+            return Math.round(Math.min(viewportCap,Math.max(minWidth,intrinsic)));
+        }finally{
+            d.style.width=prevWidth;
+            d.style.maxWidth=prevMaxWidth;
+        }
+    }
+
     function positionDropdown(input,d=ensureDropdown(),allowMeasure=false,force=false){
         if(!input?.isConnected)return false;
         if(!allowMeasure&&!d.classList.contains('is-open'))return false;
         const r=input.getBoundingClientRect(),margin=10,gap=5;
-        // V7.15.4：宽度上限是“真正的上限”，紧凑层继续贴合搜索框；展开区允许更宽，但绝不突破用户设置和视口。
-        const compactWidthCap=Math.min(420,dropdownMaxWidth);
-        const expandedWidthCap=dropdownMaxWidth;
-        const desired=dropdownExpanded
-            ? Math.min(expandedWidthCap,Math.max(Math.min(460,expandedWidthCap),r.width*1.55))
-            : Math.min(compactWidthCap,Math.max(Math.min(300,compactWidthCap),r.width));
-        const width=Math.min(desired,window.innerWidth-margin*2);
+        // V7.15.5：最大宽度现在是真正的“内容自动扩展上限”。
+        // 之前即使设置 900px，紧凑层仍被内部 300/420px 逻辑卡住；现在已移除该隐性限制。
+        if(allowMeasure || force || !dropdownMeasuredWidth){
+            dropdownMeasuredWidth=measureDropdownPreferredWidth(input,d);
+        }
+        const width=Math.min(dropdownMeasuredWidth||Math.max(280,r.width),dropdownMaxWidth,window.innerWidth-margin*2);
         let left=r.right-width;left=Math.max(margin,Math.min(left,window.innerWidth-width-margin));
         // measuring 状态的 scrollHeight 是唯一一次用于决定上下方向的高度；总高度同样服从用户上限。
         const viewportHeightCap=Math.max(120,window.innerHeight-margin*2);
@@ -30073,7 +30103,15 @@
         // “自动补位”保持时间顺序，只把一行中原本空着的尾部空间分配给该行胶囊。
         // 单独一枚的最后行不强行拉满，避免一个很短的词变成整行大按钮。
         rows.forEach((items,rowIndex)=>{
-            if(items.length<2)return;
+            // 中间某一行若因长文本只能放 1 个胶囊，则补满该行，避免右侧形成明显空洞；
+            // 只有最后一行的单个胶囊保留自然宽度。
+            if(items.length===1){
+                if(rowIndex<rows.length-1){
+                    items[0].chip.style.width=`${available}px`;
+                    items[0].chip.style.flexBasis=`${available}px`;
+                }
+                return;
+            }
             const natural=items.reduce((sum,x)=>sum+x.width,0)+gap*(items.length-1);
             let extra=Math.max(0,available-natural);
             if(extra<2)return;
@@ -30119,6 +30157,7 @@
         d.style.setProperty('--att-sh-max-width',`${dropdownMaxWidth}px`);
         d.style.setProperty('--att-sh-max-height',`${dropdownMaxHeight}px`);
         dropdownMeasuredHeight=0;
+        dropdownMeasuredWidth=0;
         if(dropdownExpanded)updateExpandedMotionTarget(d);
         if(reposition&&d.classList.contains('is-open')&&activeSearchInput?.isConnected){
             dropdownLastGeometry={width:NaN,left:NaN,top:NaN};
@@ -30153,6 +30192,7 @@
         const sameRender=signature===dropdownRenderSignature;
         if(!sameRender){
             dropdownMeasuredHeight=0;
+            dropdownMeasuredWidth=0;
             const items=getDisplayItems(input.value||'');
             d.style.setProperty('--att-sh-font-size',`${historyFontSize}px`);d.style.setProperty('--att-sh-max-width',`${dropdownMaxWidth}px`);d.style.setProperty('--att-sh-max-height',`${dropdownMaxHeight}px`);d.classList.toggle('is-capsule',layoutMode==='capsule');
             const head=d.querySelector('[data-shd-head]');if(head)head.innerHTML=`<div><b>${escHtml(scopeLabel()==='当前视图'?ctx.viewName:scopeLabel())}</b><span>${total} 条 · ${layoutMode==='capsule'?'胶囊':'列表'} · ${compactDisplayStatus()}</span></div>${perViewMode&&!sameTableShare&&historyData[ctx.key]?.items?.length?'<button type="button" data-sh-act="clear-current">清空</button>':''}`;
@@ -30175,7 +30215,7 @@
         clearTimeout(dropdownResizeMotionTimer);dropdownResizeMotionTimer=0;
         d?.classList.remove('is-open','is-expanded','is-measuring','is-opening-stable','allow-resize-motion');
         dropdownExpanded=false;expandedFilter='';expandedRenderLimit=EXPANDED_CHUNK;clearTimeout(expandedFilterTimer);
-        dropdownLastGeometry={width:NaN,left:NaN,top:NaN};dropdownMeasuredHeight=0;
+        dropdownLastGeometry={width:NaN,left:NaN,top:NaN};dropdownMeasuredHeight=0;dropdownMeasuredWidth=0;
     }
     function toggleExpandedPanel(nextExpanded=!dropdownExpanded){
         const d=ensureDropdown();
@@ -30263,7 +30303,7 @@
         <div class="att-label" style="margin-top:10px;">搜索记录字体大小</div><div class="att-sh-range-row-v7110"><input type="range" min="10" max="16" step="1" value="${historyFontSize}" data-sh-setting="fontSize"><b data-sh-font-value>${historyFontSize}px</b></div>
         <div class="att-label" style="margin-top:10px;">搜索记录模块尺寸上限</div><div class="att-sub-label">控制搜索框下方历史层及“查看全部”原位展开区的最大占位；不会突破浏览器可用空间，超出高度后内部滚动。</div>
         <div class="att-sh-size-grid-v7154">
-            <div><span>最大宽度</span><div class="att-sh-range-row-v7110"><input type="range" min="280" max="900" step="10" value="${dropdownMaxWidth}" data-sh-setting="dropdownMaxWidth"><b data-sh-width-value>${dropdownMaxWidth}px</b></div></div>
+            <div><span>最大宽度（内容自动扩展上限）</span><div class="att-sh-range-row-v7110"><input type="range" min="280" max="900" step="10" value="${dropdownMaxWidth}" data-sh-setting="dropdownMaxWidth"><b data-sh-width-value>${dropdownMaxWidth}px</b></div></div>
             <div><span>最大高度</span><div class="att-sh-range-row-v7110"><input type="range" min="220" max="900" step="10" value="${dropdownMaxHeight}" data-sh-setting="dropdownMaxHeight"><b data-sh-height-value>${dropdownMaxHeight}px</b></div></div>
         </div>
         <div class="att-label" style="margin-top:10px;">每个视图最多保存</div><div class="att-sh-range-row-v7110"><input type="range" min="3" max="100" step="1" value="${maxPerView}" data-sh-setting="maxPerView"><b data-sh-max-value>${maxPerView} 条</b></div>
@@ -30473,6 +30513,6 @@
         window.addEventListener('pagehide',()=>{clearIdleCommitTimer();flushHistoryPersist();},{capture:true});
         document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){clearIdleCommitTimer();flushHistoryPersist();}},{passive:true});
     }
-    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();attachSearchClearToolbarObserver();bindPersistLifecycle();buildHistoryIndex();applySearchClearOptimizeState();console.log('[AutoTable 工具集 V7.15.4] 已加载：正式历史提交策略 / 搜索记录模块尺寸上限 / 紧凑记录全部显示 / 胶囊智能补位 / 精准 toolbar / 内置 X / 零闪烁历史层 / 查看全部双态收展 / 单链路丝滑展开 / 分块渲染 / GM 批处理');}
+    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();attachSearchClearToolbarObserver();bindPersistLifecycle();buildHistoryIndex();applySearchClearOptimizeState();console.log('[AutoTable 工具集 V7.15.5] 已加载：正式历史提交策略 / 搜索记录模块尺寸上限 / 紧凑记录全部显示 / 胶囊智能补位 / 精准 toolbar / 内置 X / 零闪烁历史层 / 查看全部双态收展 / 单链路丝滑展开 / 分块渲染 / GM 批处理');}
     if(document.body)init();else window.addEventListener('DOMContentLoaded',init,{once:true});
 })();
