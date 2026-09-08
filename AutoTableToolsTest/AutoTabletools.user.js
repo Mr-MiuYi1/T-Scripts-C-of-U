@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.15.5
-// @description  AutoTable 一体化效率增强工具：重整后的悬浮快捷菜单、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.16.0
+// @description  AutoTable 一体化效率增强工具：四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.15.5
+ * AutoTable 工具集 V7.16.0
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，规则组/规则分层管理，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -32,19 +32,19 @@
  * - 主题：可回退 Edge / Fluent 深色优化；可选丝滑高级全局交互动效；记录详情只动画抽屉、不扰动底层页面，并可选择是否忽略系统 Reduce Motion
  * - 文档：原生风格大纲、滚动跟随、查找/替换/定位、正则表达式与高亮
  * - 界面：可隐藏关联字段复制按钮，并释放按钮原先占用的文字空间；收起侧边栏可显示智能微标签，快速区分大量重复业务图标
- * - 悬浮菜单：V7.9 重整为“快捷 / 字段 / 置顶 / 文档 / 设置”，快捷页聚合高频操作，设置页提供分区导航与合理功能归类
+ * - 悬浮菜单：V7.16 重构为“快捷 / 表格 / 文档 / 设置”四区；字段组合与列置顶归入表格二级导航，快捷页按工作流 / 视图状态 / 复制行为 / 工具入口重新分层
  * - 搜索：全视图模糊搜索支持可配置正式记录条件、紧凑历史层、列表/胶囊智能补位、胶囊删除按钮显示开关、字体大小、同表视图互通、原位丝滑展开全部记录、可自定义搜索记录模块宽度/高度上限、独立搜索记录管理面板及搜索栏内置 X 清空优化
  * - 设置：支持字段条件高亮规则中心；全部工具配置 JSON 备份、跨版本导入恢复与全部重置；导入/重置后统一刷新确保各独立模块同步生效
  * - 渲染：按真实行号稳定斑马纹；虚拟滚动增量渲染；聚焦行/字段分别保存稳定身份；横向虚拟化时绝不回退到其它字段；编辑与置顶表头保持稳定层级；置顶表头高亮使用不透明底层防止滚动表头穿透
  * - 置顶：右置顶严格镜像；“+ 添加列”保持 AutoTable 原生末端位置，不参与置顶 sticky/offset
- * - 面板：分区式导航、统一卡片层级、紧凑间距和当前页说明；原功能与设置项完整保留
+ * - 面板：V7.16 采用主导航 + 表格二级导航；减少顶部分类数量，按任务频率分布内容，保留原功能与设置项
  * ========================================================================== */
 
 (function () {
     'use strict';
 
     const APP = {
-        version: 'V7.15.5',
+        version: 'V7.16.0',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -198,6 +198,7 @@
         combos: [],
         panelOpen: false,
         activeTab: 'features',
+        lastTableToolsTab: 'combos',
         recordingHotkeyTarget: null,
         focusedCell: null,
         // V7.5.3：虚拟列表会销毁/复用 focusedCell DOM，必须独立保存逻辑聚焦身份。
@@ -10733,8 +10734,7 @@
 
                 <div class="att-tabs">
                     <button type="button" class="att-tab" data-tab="features">快捷</button>
-                    <button type="button" class="att-tab" data-tab="combos">字段</button>
-                    <button type="button" class="att-tab" data-tab="pinning">置顶</button>
+                    <button type="button" class="att-tab" data-tab="table-tools">表格</button>
                     <button type="button" class="att-tab" data-tab="settings">设置</button>
                 </div>
 
@@ -10947,7 +10947,9 @@
         if (!root) return;
 
         root.querySelectorAll('.att-tab').forEach(tab => {
-            tab.classList.toggle('att-active', tab.dataset.tab === state.activeTab);
+            const tabId = tab.dataset.tab;
+            const isTableTools = tabId === 'table-tools' && (state.activeTab === 'combos' || state.activeTab === 'pinning');
+            tab.classList.toggle('att-active', isTableTools || tabId === state.activeTab);
         });
         root.querySelectorAll('.att-section').forEach(section => {
             section.classList.toggle('att-active', section.dataset.section === state.activeTab);
@@ -10957,12 +10959,55 @@
         renderCombosSection();
         renderPinningSection();
         renderSettingsSection();
+        injectTableToolsSubnav();
 
         updateActiveComboBadge();
 
         if (state.panelOpen) {
             requestAnimationFrame(positionPanelInsideViewport);
         }
+    }
+
+    function getPinnedCountsForCurrentTable() {
+        const context = getCurrentTableContext();
+        if (!context?.key) return { left: 0, right: 0, total: 0 };
+        const profile = getPinnedProfile(context, false);
+        const left = Array.isArray(profile?.left) ? profile.left.length : 0;
+        const right = Array.isArray(profile?.right) ? profile.right.length : 0;
+        return { left, right, total: left + right };
+    }
+
+    function injectTableToolsSubnav() {
+        const context = getCurrentTableContext();
+        const pins = getPinnedCountsForCurrentTable();
+        const comboCount = state.combos.length;
+        ['combos', 'pinning'].forEach(sectionId => {
+            const section = document.querySelector(`[data-section="${sectionId}"]`);
+            if (!section || section.querySelector('.att-table-tools-nav-v7160')) return;
+            const nav = document.createElement('div');
+            nav.className = 'att-table-tools-nav-v7160';
+            nav.innerHTML = `
+                <div class="att-table-tools-context-v7160">
+                    <div>
+                        <b>表格工具</b>
+                        <span>${escapeHtml(context?.tableName || '当前页面')}</span>
+                    </div>
+                    <div class="att-table-tools-stats-v7160">
+                        <span>${comboCount} 个组合</span>
+                        <span>左 ${pins.left} · 右 ${pins.right}</span>
+                    </div>
+                </div>
+                <div class="att-table-tools-segment-v7160" role="tablist" aria-label="表格工具">
+                    <button type="button" role="tab" data-act="switch-table-tool" data-target="combos" class="${sectionId === 'combos' ? 'is-active' : ''}">
+                        字段组合
+                    </button>
+                    <button type="button" role="tab" data-act="switch-table-tool" data-target="pinning" class="${sectionId === 'pinning' ? 'is-active' : ''}">
+                        列置顶
+                    </button>
+                </div>
+            `;
+            section.prepend(nav);
+        });
     }
 
     function renderFeaturesSection() {
@@ -10973,9 +11018,12 @@
         const activeCombo = getActiveCombo();
         const context = getCurrentTableContext();
         const activeCell = getActiveRowCell();
+        const selectedRows = getSelectedGridRowsForBulkProgress();
+        const selectedCount = selectedRows.length;
         const currentHeader = activeCell ? (getHeaderTextForCell(activeCell) || '未知字段') : '未选择单元格';
         const currentValueRaw = activeCell ? (getCellText(activeCell) || '（空）') : '点击表格中的任意单元格即可开始';
-        const currentValue = currentValueRaw.length > 72 ? currentValueRaw.slice(0, 72) + '…' : currentValueRaw;
+        const currentValue = currentValueRaw.length > 64 ? currentValueRaw.slice(0, 64) + '…' : currentValueRaw;
+
         const conditionEnabled = Boolean(GM_getValue('att_v3_conditionalHighlightEnabled', false));
         const conditionRules = GM_getValue('att_v3_conditionalHighlightRules', []);
         const rawConditionGroups = GM_getValue('att_v3_conditionalHighlightGroups', []);
@@ -10991,7 +11039,7 @@
         const comboOptions = state.combos.map(combo => {
             const status = getComboCompatibility(combo);
             const suffix = status.context
-                ? (status.binding ? ' · 当前表已配置' : status.missing.length ? ' · 部分匹配' : ' · 自动匹配')
+                ? (status.binding ? ' · 当前表' : status.missing.length ? ' · 部分匹配' : ' · 自动匹配')
                 : '';
             return `
                 <option value="${escapeAttr(combo.id)}" ${combo.id === activeComboId ? 'selected' : ''}>
@@ -11001,91 +11049,114 @@
         }).join('');
 
         section.innerHTML = `
-            <div class="att-quick-context-v790">
-                <div class="att-quick-context-head-v790">
-                    <div>
-                        <div class="att-quick-context-label-v790">当前上下文</div>
-                        <div class="att-quick-context-table-v790">${escapeHtml(context?.tableName || '当前页面')}</div>
+            <div class="att-quick-context-v7160">
+                <div class="att-quick-context-main-v7160">
+                    <div class="att-quick-context-eyebrow-v7160">当前工作上下文</div>
+                    <div class="att-quick-context-title-v7160">${escapeHtml(context?.tableName || '当前页面')}</div>
+                    <div class="att-quick-context-cell-v7160" title="${escapeAttr(currentValueRaw)}">
+                        <b>${escapeHtml(currentHeader)}</b>
+                        <span>${escapeHtml(currentValue)}</span>
                     </div>
-                    <span class="att-quick-combo-badge-v790" title="当前 Ctrl + 单击字段组合">${escapeHtml(activeCombo?.name || '无字段组合')}</span>
                 </div>
-                <div class="att-quick-cell-v790">
-                    <span class="att-quick-cell-field-v790">${escapeHtml(currentHeader)}</span>
-                    <span class="att-quick-cell-value-v790">${escapeHtml(currentValue)}</span>
-                </div>
-            </div>
-
-            <div class="att-quick-action-grid-v790" aria-label="常用操作">
-                <button type="button" class="att-quick-action-v790" data-act="copy-current-cell" ${activeCell ? '' : 'disabled'}>
-                    <b>复制单元格</b><span>Alt + 单击</span>
-                </button>
-                <button type="button" class="att-quick-action-v790" data-act="copy-current-row" ${activeCell ? '' : 'disabled'}>
-                    <b>复制整行</b><span>Alt + R</span>
-                </button>
-                <button type="button" class="att-quick-action-v790" data-act="copy-ctrl-combo" ${activeCell && activeCombo ? '' : 'disabled'}>
-                    <b>复制字段组合</b><span>${escapeHtml(activeCombo?.name || '未配置')}</span>
-                </button>
-                <button type="button" class="att-quick-action-v790" data-act="quick-combo-picker" ${state.combos.length ? '' : 'disabled'}>
-                    <b>切换字段组合</b><span>${state.combos.length} 个可用</span>
+                <button type="button" class="att-quick-combo-button-v7160" data-act="quick-combo-picker" ${state.combos.length ? '' : 'disabled'} title="切换当前字段组合">
+                    <span>字段组合</span>
+                    <b>${escapeHtml(activeCombo?.name || '未配置')}</b>
+                    <i>⌄</i>
                 </button>
             </div>
 
-            <div class="att-card att-quick-state-card-v790">
-                <div class="att-card-title">常用状态</div>
-                <div class="att-card-desc">高频开关集中在这里；详细参数统一放到“设置”。</div>
-                <div class="att-quick-toggle-grid-v790">
-                    <label class="att-quick-toggle-v790 ${state.focusEnabled ? 'is-on' : ''}">
-                        <span><b>聚焦模式</b><small>${state.rowHighlightEnabled ? '行' : ''}${state.rowHighlightEnabled && state.columnHighlightEnabled ? ' + ' : ''}${state.columnHighlightEnabled ? '列' : ''}${!state.rowHighlightEnabled && !state.columnHighlightEnabled ? '仅当前格' : ''}</small></span>
+            <div class="att-quick-section-v7160">
+                <div class="att-quick-section-head-v7160">
+                    <div><b>立即操作</b><span>围绕当前单元格和已选记录的高频动作</span></div>
+                    ${selectedCount ? `<em>${selectedCount} 条已选</em>` : ''}
+                </div>
+                <div class="att-quick-action-grid-v7160">
+                    <button type="button" class="att-quick-action-v7160" data-act="copy-current-cell" ${activeCell ? '' : 'disabled'}>
+                        <span class="att-quick-action-icon-v7160">格</span>
+                        <span><b>复制当前格</b><small>Alt + 单击</small></span>
+                    </button>
+                    <button type="button" class="att-quick-action-v7160" data-act="copy-ctrl-combo" ${activeCell && activeCombo ? '' : 'disabled'}>
+                        <span class="att-quick-action-icon-v7160">组</span>
+                        <span><b>复制字段组合</b><small>${escapeHtml(activeCombo?.name || '未配置')}</small></span>
+                    </button>
+                    <button type="button" class="att-quick-action-v7160" data-act="copy-current-row" ${activeCell ? '' : 'disabled'}>
+                        <span class="att-quick-action-icon-v7160">行</span>
+                        <span><b>复制整行</b><small>Alt + R</small></span>
+                    </button>
+                    <button type="button" class="att-quick-action-v7160 ${selectedCount ? 'is-accent' : ''}" data-act="open-bulk-progress-quick" ${selectedCount ? '' : 'disabled'}>
+                        <span class="att-quick-action-icon-v7160">批</span>
+                        <span><b>批量追加进展</b><small>${selectedCount ? `${selectedCount} 条记录` : '先勾选记录'}</small></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="att-quick-section-v7160">
+                <div class="att-quick-section-head-v7160">
+                    <div><b>视图状态</b><span>只保留工作时经常切换的表格增强</span></div>
+                </div>
+                <div class="att-quick-mode-grid-v7160">
+                    <label class="att-quick-mode-v7160 ${state.focusEnabled ? 'is-on' : ''}">
+                        <span><b>聚焦模式</b><small>${state.rowHighlightEnabled ? '行' : ''}${state.rowHighlightEnabled && state.columnHighlightEnabled ? ' + ' : ''}${state.columnHighlightEnabled ? '列' : ''}${!state.rowHighlightEnabled && !state.columnHighlightEnabled ? '当前格' : ''}</small></span>
                         <span class="att-switch"><input type="checkbox" data-setting="focusEnabled" ${state.focusEnabled ? 'checked' : ''}><span class="att-slider"></span></span>
                     </label>
-                    <button type="button" class="att-quick-toggle-v790 ${conditionEnabled ? 'is-on' : ''}" data-act="toggle-conditional-highlight-quick">
-                        <span><b>条件高亮</b><small data-cond-group-summary>${escapeHtml(conditionActiveGroup.name)} · ${conditionRuleCount} 条</small></span><i class="att-quick-state-dot-v790"></i>
+
+                    <button type="button" class="att-quick-mode-v7160 ${conditionEnabled ? 'is-on' : ''}" data-act="toggle-conditional-highlight-quick">
+                        <span><b>条件高亮</b><small>${escapeHtml(conditionActiveGroup.name)} · ${conditionRuleCount} 条</small></span>
+                        <i class="att-quick-state-dot-v790"></i>
                     </button>
-                    <label class="att-quick-toggle-v790 ${state.tableWheelReverseEnabled ? 'is-on' : ''}">
+
+                    <label class="att-quick-mode-v7160 ${state.tableWheelReverseEnabled ? 'is-on' : ''}">
                         <span><b>滚轮横向</b><small>${escapeHtml(state.hotkeys.toggleTableWheelReverse || 'Alt+W')}</small></span>
                         <span class="att-switch"><input type="checkbox" data-setting="tableWheelReverseEnabled" ${state.tableWheelReverseEnabled ? 'checked' : ''}><span class="att-slider"></span></span>
                     </label>
-                    <label class="att-quick-toggle-v790 ${state.darkModeOptimized ? 'is-on' : ''}">
-                        <span><b>Edge 深色</b><small>${state.nativeThemeMode === 'dark' ? (state.darkModeOptimized ? '生效中' : '原版深色') : '仅深色模式生效'}</small></span>
-                        <span class="att-switch"><input type="checkbox" data-setting="darkModeOptimized" ${state.darkModeOptimized ? 'checked' : ''}><span class="att-slider"></span></span>
+
+                    <label class="att-quick-mode-v7160 ${state.quickPinHeaderEnabled ? 'is-on' : ''}">
+                        <span><b>快捷表头置顶</b><small>单击左置顶 · Shift 右置顶</small></span>
+                        <span class="att-switch"><input type="checkbox" data-setting="quickPinHeaderEnabled" ${state.quickPinHeaderEnabled ? 'checked' : ''}><span class="att-slider"></span></span>
                     </label>
                 </div>
-                <div class="att-quick-focus-sub-v790 ${state.focusEnabled ? '' : 'is-disabled'}">
-                    <label><input type="checkbox" data-setting="rowHighlightEnabled" ${state.rowHighlightEnabled ? 'checked' : ''} ${state.focusEnabled ? '' : 'disabled'}> 行高亮</label>
-                    <label><input type="checkbox" data-setting="columnHighlightEnabled" ${state.columnHighlightEnabled ? 'checked' : ''} ${state.focusEnabled ? '' : 'disabled'}> 列高亮</label>
-                    <button type="button" data-act="clear-focus" ${activeCell ? '' : 'disabled'}>清除聚焦</button>
-                    <button type="button" data-act="cycle-conditional-highlight-group" ${conditionGroups.length > 1 ? '' : 'disabled'}>切换高亮组</button>
-                    <button type="button" data-act="open-conditional-highlight-manager">管理高亮规则</button>
+
+                <div class="att-quick-detail-groups-v7160">
+                    <div class="att-quick-detail-v7160 ${state.focusEnabled ? '' : 'is-disabled'}">
+                        <span class="att-quick-detail-label-v7160">聚焦</span>
+                        <label><input type="checkbox" data-setting="rowHighlightEnabled" ${state.rowHighlightEnabled ? 'checked' : ''} ${state.focusEnabled ? '' : 'disabled'}> 行</label>
+                        <label><input type="checkbox" data-setting="columnHighlightEnabled" ${state.columnHighlightEnabled ? 'checked' : ''} ${state.focusEnabled ? '' : 'disabled'}> 列</label>
+                        <button type="button" data-act="clear-focus" ${activeCell ? '' : 'disabled'}>清除</button>
+                    </div>
+                    <div class="att-quick-detail-v7160">
+                        <span class="att-quick-detail-label-v7160">高亮组</span>
+                        <button type="button" data-act="cycle-conditional-highlight-group" ${conditionGroups.length > 1 ? '' : 'disabled'}>${escapeHtml(conditionActiveGroup.name)}</button>
+                        <button type="button" data-act="open-conditional-highlight-manager">规则</button>
+                    </div>
                 </div>
             </div>
 
-            <div class="att-card att-quick-copy-card-v790">
-                <div class="att-row">
-                    <div style="min-width:0;">
-                        <div class="att-card-title">智能复制</div>
-                        <div class="att-card-desc">普通单击仅聚焦；Alt + 单击复制当前格；Ctrl + 单击按字段组合复制。</div>
-                    </div>
+            <div class="att-quick-section-v7160">
+                <div class="att-quick-section-head-v7160">
+                    <div><b>复制行为</b><span>一次设置，日常直接点击表格使用</span></div>
                     <label class="att-switch">
                         <input type="checkbox" data-setting="clickCopyEnabled" ${state.clickCopyEnabled ? 'checked' : ''}>
                         <span class="att-slider"></span>
                     </label>
                 </div>
-                <div class="att-quick-copy-row-v790">
+                <div class="att-quick-copy-row-v7160">
                     <select class="att-select" data-setting="ctrlClickComboId">
                         ${comboOptions || '<option value="">暂无字段组合</option>'}
                     </select>
-                    <button type="button" class="att-btn" data-act="go-tab" data-tab-target="combos">管理字段</button>
+                    <button type="button" class="att-btn" data-act="go-tab" data-tab-target="combos">字段管理</button>
                 </div>
-                <div class="att-quick-hotkeys-v790">
-                    <span>Alt + 单击 <b>单元格</b></span>
-                    <span>Ctrl + 单击 <b>字段组合</b></span>
-                    <span>Alt + R <b>整行</b></span>
+                <div class="att-quick-hint-v7160">
+                    <span><kbd>普通单击</kbd> 聚焦</span>
+                    <span><kbd>Alt + 单击</kbd> 当前格</span>
+                    <span><kbd>Ctrl + 单击</kbd> 字段组合</span>
                 </div>
             </div>
 
-            <div class="att-quick-footer-v790">
-                <button type="button" data-act="go-tab" data-tab-target="pinning">置顶列设置</button>
-                <button type="button" data-act="go-tab" data-tab-target="settings">更多设置</button>
+            <div class="att-quick-tools-v7160" aria-label="工具入口">
+                <button type="button" data-act="go-tab" data-tab-target="combos"><b>表格工具</b><span>字段组合 / 列置顶</span></button>
+                <button type="button" data-act="open-editor-phrase-manager"><b>快捷短语</b><span>规则中心</span></button>
+                <button type="button" data-act="open-search-history-manager"><b>搜索记录</b><span>跨视图管理</span></button>
+                <button type="button" data-act="go-tab" data-tab-target="settings"><b>设置</b><span>全部参数</span></button>
             </div>
         `;
     }
@@ -12431,6 +12502,14 @@
         if (content && state.activeTab) {
             state.panelTabScrollPositions[state.activeTab] = content.scrollTop;
         }
+
+        if (tabId === 'table-tools') {
+            tabId = state.lastTableToolsTab === 'pinning' ? 'pinning' : 'combos';
+        }
+        if (tabId === 'combos' || tabId === 'pinning') {
+            state.lastTableToolsTab = tabId;
+        }
+
         state.activeTab = tabId;
         renderPanel();
         requestAnimationFrame(() => {
@@ -12456,12 +12535,29 @@
         switch (act) {
             case 'go-tab': {
                 const targetTab = action.dataset.tabTarget || 'features';
-                const tabButton = document.querySelector(`#${APP.panelId} .att-tab[data-tab="${targetTab}"]`);
-                if (tabButton) {
+                const normalizedTopTab = (targetTab === 'combos' || targetTab === 'pinning') ? 'table-tools' : targetTab;
+                const tabButton = document.querySelector(`#${APP.panelId} .att-tab[data-tab="${normalizedTopTab}"]`);
+                if (tabButton || targetTab === 'combos' || targetTab === 'pinning') {
                     switchPanelTab(targetTab);
                 }
                 break;
             }
+
+            case 'switch-table-tool': {
+                const target = action.dataset.target === 'pinning' ? 'pinning' : 'combos';
+                switchPanelTab(target);
+                break;
+            }
+
+            case 'open-bulk-progress-quick':
+                openBulkProgressDialog();
+                break;
+
+            case 'open-search-history-manager':
+                window.dispatchEvent(new CustomEvent('att:search-history:open-manager', {
+                    detail: { source: 'floating-menu' }
+                }));
+                break;
 
             case 'quick-combo-picker':
                 if (state.comboPickerOpen) closeQuickComboPicker();
@@ -12989,6 +13085,7 @@
             setBodyModes();
             scheduleApplyPinnedColumns(0);
             renderPinningSection();
+            if (state.activeTab === 'features') renderFeaturesSection();
             showToast(
                 state.quickPinHeaderEnabled
                     ? '快捷表头置顶已开启：单击=左置顶，Shift+单击=右置顶'
@@ -24057,13 +24154,17 @@
             title: '快捷操作',
             desc: '当前单元格、复制与高频状态开关'
         },
+        'table-tools': {
+            title: '表格工具',
+            desc: '字段组合、左右列置顶与当前表配置'
+        },
         combos: {
-            title: '字段组合',
-            desc: '字段模板、当前表映射与组合切换'
+            title: '表格工具',
+            desc: '字段组合与当前表字段映射'
         },
         pinning: {
-            title: '列置顶',
-            desc: '左右固定、快捷表头置顶与列宽记忆'
+            title: '表格工具',
+            desc: '左右列置顶、列宽记忆与表管理'
         },
         settings: {
             title: '设置',
@@ -24545,6 +24646,525 @@
 
     if (document.body) boot();
     else window.addEventListener('DOMContentLoaded', boot, { once: true });
+})();
+
+
+
+/* ============================================================================
+ * AutoTable 悬浮球菜单 V7.16.0 · 信息架构重构
+ * --------------------------------------------------------------------------
+ * 1) 主导航收敛为“快捷 / 表格 / 文档 / 设置”；
+ * 2) 字段组合与列置顶归入“表格”二级导航；
+ * 3) 快捷页按“工作上下文 → 立即操作 → 视图状态 → 复制行为 → 工具入口”排列；
+ * 4) 条件高亮与聚焦分别拥有独立次级操作，不再混在同一行；
+ * 5) 不改原业务逻辑，只重排入口与视觉层级。
+ * ========================================================================== */
+(function () {
+    'use strict';
+    const ID = 'att-floating-menu-ia-v7160';
+    if (document.getElementById(ID)) return;
+    const style = document.createElement('style');
+    style.id = ID;
+    style.textContent = `
+        #att-toolbox-panel{
+            width:440px!important;
+        }
+
+        /* 主导航只有 3 个常驻项；文档页动态插入后为 4 个。 */
+        #att-toolbox-panel .att-tabs{
+            gap:5px!important;
+            padding:6px 9px!important;
+        }
+        #att-toolbox-panel .att-tab{
+            min-width:0!important;
+            height:31px!important;
+        }
+
+        /* 新快捷页已经自带信息分层，不再重复显示旧的 section 说明横线。 */
+        #att-toolbox-panel [data-section="features"].att-active::before,
+        #att-toolbox-panel [data-section="combos"].att-active::before,
+        #att-toolbox-panel [data-section="pinning"].att-active::before{
+            display:none!important;
+            content:none!important;
+        }
+
+        #att-toolbox-panel .att-content{
+            padding:9px 10px 11px!important;
+        }
+
+        /* -------- 当前工作上下文 -------- */
+        #att-toolbox-panel .att-quick-context-v7160{
+            display:grid;
+            grid-template-columns:minmax(0,1fr) 150px;
+            gap:9px;
+            align-items:stretch;
+            margin-bottom:9px;
+        }
+        #att-toolbox-panel .att-quick-context-main-v7160{
+            min-width:0;
+            padding:9px 10px;
+            border:1px solid var(--att-ui-border,#e4e7ec);
+            border-radius:10px;
+            background:var(--att-ui-surface,#fff);
+        }
+        #att-toolbox-panel .att-quick-context-eyebrow-v7160{
+            color:var(--att-ui-subtle,#98a2b3);
+            font-size:9px;
+            font-weight:750;
+            letter-spacing:.04em;
+        }
+        #att-toolbox-panel .att-quick-context-title-v7160{
+            margin-top:2px;
+            color:var(--att-ui-text,#101828);
+            font-size:12px;
+            font-weight:800;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-context-cell-v7160{
+            min-width:0;
+            display:flex;
+            align-items:center;
+            gap:6px;
+            margin-top:6px;
+            padding-top:6px;
+            border-top:1px solid var(--att-ui-border-soft,#edf0f3);
+            color:var(--att-ui-muted,#667085);
+            font-size:9.5px;
+        }
+        #att-toolbox-panel .att-quick-context-cell-v7160 b{
+            max-width:90px;
+            flex:0 0 auto;
+            color:var(--att-ui-text-2,#344054);
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-context-cell-v7160 span{
+            min-width:0;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-combo-button-v7160{
+            min-width:0;
+            display:flex;
+            flex-direction:column;
+            align-items:flex-start;
+            justify-content:center;
+            position:relative;
+            padding:9px 28px 9px 10px;
+            border:1px solid rgba(37,99,235,.18);
+            border-radius:10px;
+            background:var(--att-ui-blue-soft,#eff6ff);
+            color:var(--att-ui-blue,#2563eb);
+            text-align:left;
+            cursor:pointer;
+        }
+        #att-toolbox-panel .att-quick-combo-button-v7160:hover:not(:disabled){
+            border-color:rgba(37,99,235,.34);
+        }
+        #att-toolbox-panel .att-quick-combo-button-v7160:disabled{opacity:.45;cursor:not-allowed;}
+        #att-toolbox-panel .att-quick-combo-button-v7160 span{
+            font-size:9px;
+            opacity:.78;
+        }
+        #att-toolbox-panel .att-quick-combo-button-v7160 b{
+            width:100%;
+            margin-top:2px;
+            font-size:10.5px;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-combo-button-v7160 i{
+            position:absolute;
+            right:10px;
+            top:50%;
+            transform:translateY(-50%);
+            font-style:normal;
+            font-size:12px;
+        }
+
+        /* -------- 分区 -------- */
+        #att-toolbox-panel .att-quick-section-v7160{
+            margin-top:8px;
+            padding:10px;
+            border:1px solid var(--att-ui-border,#e4e7ec);
+            border-radius:11px;
+            background:var(--att-ui-surface,#fff);
+        }
+        #att-toolbox-panel .att-quick-section-head-v7160{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:8px;
+            margin-bottom:8px;
+        }
+        #att-toolbox-panel .att-quick-section-head-v7160 > div{
+            min-width:0;
+            display:flex;
+            align-items:baseline;
+            gap:7px;
+        }
+        #att-toolbox-panel .att-quick-section-head-v7160 b{
+            color:var(--att-ui-text,#101828);
+            font-size:11px;
+            font-weight:800;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-section-head-v7160 span{
+            min-width:0;
+            color:var(--att-ui-subtle,#98a2b3);
+            font-size:9px;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-section-head-v7160 em{
+            flex:0 0 auto;
+            padding:2px 6px;
+            border-radius:999px;
+            background:rgba(37,99,235,.10);
+            color:var(--att-ui-blue,#2563eb);
+            font-size:9px;
+            font-style:normal;
+            font-weight:750;
+        }
+
+        /* -------- 高频操作 -------- */
+        #att-toolbox-panel .att-quick-action-grid-v7160{
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:6px;
+        }
+        #att-toolbox-panel .att-quick-action-v7160{
+            min-width:0;
+            min-height:46px;
+            display:grid;
+            grid-template-columns:28px minmax(0,1fr);
+            gap:7px;
+            align-items:center;
+            padding:7px 8px;
+            border:1px solid var(--att-ui-border-soft,#edf0f3);
+            border-radius:9px;
+            background:var(--att-ui-surface-2,#f2f4f7);
+            color:var(--att-ui-text-2,#344054);
+            text-align:left;
+            cursor:pointer;
+            transition:background-color .14s ease,border-color .14s ease,transform .14s ease;
+        }
+        #att-toolbox-panel .att-quick-action-v7160:hover:not(:disabled){
+            border-color:rgba(37,99,235,.24);
+            background:var(--att-ui-blue-soft,#eff6ff);
+            transform:translateY(-1px);
+        }
+        #att-toolbox-panel .att-quick-action-v7160:disabled{opacity:.40;cursor:not-allowed;}
+        #att-toolbox-panel .att-quick-action-v7160.is-accent{
+            border-color:rgba(37,99,235,.22);
+            background:var(--att-ui-blue-soft,#eff6ff);
+        }
+        #att-toolbox-panel .att-quick-action-icon-v7160{
+            width:28px;
+            height:28px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border-radius:8px;
+            background:rgba(37,99,235,.09);
+            color:var(--att-ui-blue,#2563eb);
+            font-size:10px;
+            font-weight:850;
+        }
+        #att-toolbox-panel .att-quick-action-v7160 > span:last-child{
+            min-width:0;
+            display:flex;
+            flex-direction:column;
+            gap:2px;
+        }
+        #att-toolbox-panel .att-quick-action-v7160 b{
+            font-size:10.5px;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-action-v7160 small{
+            color:var(--att-ui-muted,#667085);
+            font-size:8.8px;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+
+        /* -------- 视图状态 -------- */
+        #att-toolbox-panel .att-quick-mode-grid-v7160{
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:6px;
+        }
+        #att-toolbox-panel .att-quick-mode-v7160{
+            min-width:0;
+            min-height:44px;
+            box-sizing:border-box;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:7px;
+            padding:7px 8px;
+            border:1px solid var(--att-ui-border-soft,#edf0f3);
+            border-radius:9px;
+            background:var(--att-ui-surface-2,#f2f4f7);
+            color:var(--att-ui-text-2,#344054);
+            text-align:left;
+            cursor:pointer;
+        }
+        #att-toolbox-panel button.att-quick-mode-v7160{
+            width:100%;
+            font:inherit;
+        }
+        #att-toolbox-panel .att-quick-mode-v7160.is-on{
+            border-color:rgba(37,99,235,.23);
+            background:var(--att-ui-blue-soft,#eff6ff);
+        }
+        #att-toolbox-panel .att-quick-mode-v7160 > span:first-child{
+            min-width:0;
+            display:flex;
+            flex-direction:column;
+            gap:2px;
+        }
+        #att-toolbox-panel .att-quick-mode-v7160 b{font-size:10px;}
+        #att-toolbox-panel .att-quick-mode-v7160 small{
+            max-width:126px;
+            color:var(--att-ui-muted,#667085);
+            font-size:8.5px;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-mode-v7160 .att-switch{
+            transform:scale(.78);
+            transform-origin:right center;
+            margin-right:-5px;
+        }
+        #att-toolbox-panel .att-quick-detail-groups-v7160{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:6px;
+            margin-top:7px;
+        }
+        #att-toolbox-panel .att-quick-detail-v7160{
+            min-width:0;
+            display:flex;
+            align-items:center;
+            gap:4px;
+            padding:5px 6px;
+            border:1px solid var(--att-ui-border-soft,#edf0f3);
+            border-radius:8px;
+            background:rgba(148,163,184,.05);
+        }
+        #att-toolbox-panel .att-quick-detail-v7160.is-disabled{opacity:.52;}
+        #att-toolbox-panel .att-quick-detail-label-v7160{
+            margin-right:auto;
+            color:var(--att-ui-subtle,#98a2b3);
+            font-size:8.5px;
+            font-weight:750;
+        }
+        #att-toolbox-panel .att-quick-detail-v7160 label,
+        #att-toolbox-panel .att-quick-detail-v7160 button{
+            min-height:23px;
+            box-sizing:border-box;
+            display:inline-flex;
+            align-items:center;
+            gap:3px;
+            padding:0 5px;
+            border:1px solid var(--att-ui-border,#e4e7ec);
+            border-radius:6px;
+            background:var(--att-ui-surface,#fff);
+            color:var(--att-ui-text-2,#344054);
+            font-size:8.5px;
+            cursor:pointer;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-detail-v7160 button:disabled{opacity:.45;cursor:not-allowed;}
+
+        /* -------- 复制行为 -------- */
+        #att-toolbox-panel .att-quick-copy-row-v7160{
+            display:grid;
+            grid-template-columns:minmax(0,1fr) auto;
+            gap:6px;
+            align-items:center;
+        }
+        #att-toolbox-panel .att-quick-copy-row-v7160 .att-select{margin:0!important;}
+        #att-toolbox-panel .att-quick-hint-v7160{
+            display:flex;
+            flex-wrap:wrap;
+            gap:5px 9px;
+            margin-top:7px;
+            color:var(--att-ui-muted,#667085);
+            font-size:8.8px;
+        }
+        #att-toolbox-panel .att-quick-hint-v7160 kbd{
+            padding:1px 4px;
+            border:1px solid var(--att-ui-border,#e4e7ec);
+            border-radius:5px;
+            background:var(--att-ui-surface-2,#f2f4f7);
+            color:var(--att-ui-text-2,#344054);
+            font:700 8.5px/1.4 inherit;
+        }
+
+        /* -------- 底部工具入口 -------- */
+        #att-toolbox-panel .att-quick-tools-v7160{
+            display:grid;
+            grid-template-columns:repeat(4,minmax(0,1fr));
+            gap:5px;
+            margin-top:8px;
+        }
+        #att-toolbox-panel .att-quick-tools-v7160 button{
+            min-width:0;
+            min-height:40px;
+            display:flex;
+            flex-direction:column;
+            align-items:flex-start;
+            justify-content:center;
+            padding:6px 7px;
+            border:1px solid var(--att-ui-border,#e4e7ec);
+            border-radius:8px;
+            background:var(--att-ui-surface,#fff);
+            color:var(--att-ui-text-2,#344054);
+            text-align:left;
+            cursor:pointer;
+        }
+        #att-toolbox-panel .att-quick-tools-v7160 button:hover{
+            border-color:rgba(37,99,235,.24);
+            background:var(--att-ui-blue-soft,#eff6ff);
+        }
+        #att-toolbox-panel .att-quick-tools-v7160 b{
+            width:100%;
+            font-size:9px;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-tools-v7160 span{
+            width:100%;
+            margin-top:2px;
+            color:var(--att-ui-subtle,#98a2b3);
+            font-size:7.8px;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+
+        /* -------- 表格工具二级导航 -------- */
+        #att-toolbox-panel .att-table-tools-nav-v7160{
+            position:sticky;
+            top:-9px;
+            z-index:5;
+            margin:-9px -10px 9px;
+            padding:9px 10px 8px;
+            border-bottom:1px solid var(--att-ui-border,#e4e7ec);
+            background:var(--att-ui-panel,#f7f8fa);
+        }
+        #att-toolbox-panel .att-table-tools-context-v7160{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:8px;
+            margin-bottom:7px;
+        }
+        #att-toolbox-panel .att-table-tools-context-v7160 > div:first-child{
+            min-width:0;
+            display:flex;
+            align-items:baseline;
+            gap:6px;
+        }
+        #att-toolbox-panel .att-table-tools-context-v7160 b{
+            color:var(--att-ui-text,#101828);
+            font-size:11px;
+        }
+        #att-toolbox-panel .att-table-tools-context-v7160 span{
+            min-width:0;
+            max-width:220px;
+            color:var(--att-ui-muted,#667085);
+            font-size:9px;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-table-tools-stats-v7160{
+            flex:0 0 auto;
+            display:flex;
+            gap:4px;
+        }
+        #att-toolbox-panel .att-table-tools-stats-v7160 span{
+            max-width:none;
+            padding:2px 5px;
+            border:1px solid var(--att-ui-border-soft,#edf0f3);
+            border-radius:999px;
+            background:var(--att-ui-surface,#fff);
+            color:var(--att-ui-subtle,#98a2b3);
+            font-size:8px;
+        }
+        #att-toolbox-panel .att-table-tools-segment-v7160{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:4px;
+            padding:3px;
+            border:1px solid var(--att-ui-border,#e4e7ec);
+            border-radius:9px;
+            background:var(--att-ui-surface-2,#f2f4f7);
+        }
+        #att-toolbox-panel .att-table-tools-segment-v7160 button{
+            height:27px;
+            border:0;
+            border-radius:6px;
+            background:transparent;
+            color:var(--att-ui-muted,#667085);
+            font-size:9.5px;
+            font-weight:750;
+            cursor:pointer;
+        }
+        #att-toolbox-panel .att-table-tools-segment-v7160 button.is-active{
+            background:var(--att-ui-surface,#fff);
+            color:var(--att-ui-blue,#2563eb);
+            box-shadow:0 1px 3px rgba(15,23,42,.08);
+        }
+
+        /* 深色继承 UI 变量，不另起一套颜色。 */
+        body.att-native-dark #att-toolbox-panel .att-quick-context-main-v7160,
+        body.att-native-dark #att-toolbox-panel .att-quick-section-v7160,
+        body.att-native-dark #att-toolbox-panel .att-quick-detail-v7160 label,
+        body.att-native-dark #att-toolbox-panel .att-quick-detail-v7160 button,
+        body.att-native-dark #att-toolbox-panel .att-quick-tools-v7160 button,
+        body.att-native-dark #att-toolbox-panel .att-table-tools-stats-v7160 span{
+            background:var(--att-ui-surface,#27282a)!important;
+            border-color:var(--att-ui-border,#3a3c40)!important;
+        }
+        body.att-native-dark #att-toolbox-panel .att-quick-action-v7160,
+        body.att-native-dark #att-toolbox-panel .att-quick-mode-v7160,
+        body.att-native-dark #att-toolbox-panel .att-quick-hint-v7160 kbd,
+        body.att-native-dark #att-toolbox-panel .att-table-tools-segment-v7160{
+            background:var(--att-ui-surface-2,#2e3033)!important;
+            border-color:var(--att-ui-border-soft,#323438)!important;
+        }
+        body.att-native-dark #att-toolbox-panel .att-table-tools-nav-v7160{
+            background:var(--att-ui-panel,#202124)!important;
+            border-color:var(--att-ui-border,#3a3c40)!important;
+        }
+        body.att-native-dark #att-toolbox-panel .att-table-tools-segment-v7160 button.is-active{
+            background:var(--att-ui-surface,#27282a)!important;
+        }
+
+        @media(max-width:520px){
+            #att-toolbox-panel{width:calc(100vw - 14px)!important;}
+            #att-toolbox-panel .att-quick-context-v7160{grid-template-columns:1fr;}
+            #att-toolbox-panel .att-quick-combo-button-v7160{min-height:48px;}
+            #att-toolbox-panel .att-quick-detail-groups-v7160{grid-template-columns:1fr;}
+            #att-toolbox-panel .att-quick-tools-v7160{grid-template-columns:repeat(2,1fr);}
+        }
+    `;
+    document.documentElement.appendChild(style);
 })();
 
 
@@ -29410,7 +30030,7 @@
     'use strict';
 
     const SH = {
-        version: 'V7.15.5',
+        version: 'V7.16.0',
         enabledKey: 'att_v3_viewSearchHistoryEnabled',
         maxKey: 'att_v3_viewSearchHistoryMaxPerView',
         perViewKey: 'att_v3_viewSearchHistoryPerViewMode',
@@ -30513,6 +31133,6 @@
         window.addEventListener('pagehide',()=>{clearIdleCommitTimer();flushHistoryPersist();},{capture:true});
         document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){clearIdleCommitTimer();flushHistoryPersist();}},{passive:true});
     }
-    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();attachSearchClearToolbarObserver();bindPersistLifecycle();buildHistoryIndex();applySearchClearOptimizeState();console.log('[AutoTable 工具集 V7.15.5] 已加载：正式历史提交策略 / 搜索记录模块尺寸上限 / 紧凑记录全部显示 / 胶囊智能补位 / 精准 toolbar / 内置 X / 零闪烁历史层 / 查看全部双态收展 / 单链路丝滑展开 / 分块渲染 / GM 批处理');}
+    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();attachSearchClearToolbarObserver();bindPersistLifecycle();buildHistoryIndex();applySearchClearOptimizeState();window.addEventListener('att:search-history:open-manager',()=>openManager());console.log('[AutoTable 工具集 V7.16.0] 已加载：正式历史提交策略 / 搜索记录模块尺寸上限 / 紧凑记录全部显示 / 胶囊智能补位 / 精准 toolbar / 内置 X / 零闪烁历史层 / 查看全部双态收展 / 单链路丝滑展开 / 分块渲染 / GM 批处理');}
     if(document.body)init();else window.addEventListener('DOMContentLoaded',init,{once:true});
 })();
