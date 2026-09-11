@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.16.5
+// @version      7.16.6
 // @description  AutoTable 一体化效率增强工具：四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.16.5
+ * AutoTable 工具集 V7.16.6
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，规则组/规则分层管理，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -38,14 +38,14 @@
  * - 渲染：按真实行号稳定斑马纹；虚拟滚动增量渲染；聚焦行/字段分别保存稳定身份；横向虚拟化时绝不回退到其它字段；编辑与置顶表头保持稳定层级；置顶表头高亮使用不透明底层防止滚动表头穿透
  * - 置顶：右置顶严格镜像；“+ 添加列”保持 AutoTable 原生末端位置，不参与置顶 sticky/offset
  * - 面板：V7.16 采用主导航 + 表格二级导航；减少顶部分类数量，按任务频率分布内容，保留原功能与设置项
- * - 性能：V7.16.5 无感加固第二阶段；保留 V7.16.4 菜单增量刷新与短生命周期缓存，并新增文档模块虚拟表格早退、条件高亮规则执行计划缓存与重复扫描消除
+ * - 性能：V7.16.6 菜单定位稳定修复；保留 V7.16.5 性能加固，并修复菜单入场 transform 尺寸误判、页面加载后重复居中造成的位置漂移
  * ========================================================================== */
 
 (function () {
     'use strict';
 
     const APP = {
-        version: 'V7.16.5',
+        version: 'V7.16.6',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -253,10 +253,11 @@
     let lastComboContextKey = '';
 
 
-    // V7.16.4：悬浮菜单“无感性能加固”。
+    // V7.16.6：悬浮菜单“无感性能加固 + 定位稳定”。
     // - 页面变化只设置 dirty；用户正在交互时不做循环 retry；
     // - 交互结束 / 稳定窗口结束后只合并刷新一次；
-    // - 普通上下文同步只重绘当前可见 section，完整 renderPanel 仅保留给显式全量场景。
+    // - 普通上下文同步只重绘当前可见 section，完整 renderPanel 仅保留给显式全量场景；
+    // - 打开时按未 transform 的 layout 尺寸锚定一次，后续内容变化只做视口越界校正。
     let panelContextRefreshTimer = 0;
     let panelContextRefreshRaf = 0;
     let panelInteractionUntil = 0;
@@ -264,6 +265,11 @@
     let panelOpenedAt = 0;
     let panelContextRefreshPending = false;
     const panelDirtySections = new Set();
+
+    // V7.16.6：菜单定位分成“重新锚定”和“稳定校正”两条路径。
+    // 打开/拖动/明确改变方向时才重新围绕悬浮球计算位置；
+    // 页面加载、section 重绘、内容高度变化只做越界夹紧，避免菜单在打开后继续漂移。
+    let panelStabilizeRaf = 0;
 
     // 条件高亮快捷页只读快照。首次仍从 GM 读取保证兼容，之后由条件高亮模块事件同步，
     // 避免每次快捷页重绘重复读取 4 份 GM Storage。
@@ -11148,7 +11154,7 @@
         if (!panelContextRefreshRaf) {
             panelContextRefreshRaf = requestAnimationFrame(() => {
                 panelContextRefreshRaf = 0;
-                if (state.panelOpen) positionPanelInsideViewport();
+                if (state.panelOpen) stabilizePanelInsideViewport();
             });
         }
     }
@@ -11215,7 +11221,7 @@
         if (state.panelOpen && !panelContextRefreshRaf) {
             panelContextRefreshRaf = requestAnimationFrame(() => {
                 panelContextRefreshRaf = 0;
-                if (state.panelOpen) positionPanelInsideViewport();
+                if (state.panelOpen) stabilizePanelInsideViewport();
             });
         }
     }
@@ -13437,7 +13443,8 @@
         if (setting === 'menuDirection') {
             state.menuDirection = event.target.value;
             persistCore();
-            updateMenuDirection();
+            updateMenuDirection(false);
+            if (state.panelOpen) requestAnimationFrame(positionPanelInsideViewport);
         }
 
         resetIdleTimer();
@@ -13750,7 +13757,7 @@
 
             root.style.left = `${pos.x}px`;
             root.style.top = `${pos.y}px`;
-            updateMenuDirection();
+            updateMenuDirection(false);
             if (state.panelOpen) positionPanelInsideViewport();
         });
 
@@ -13786,7 +13793,47 @@
         });
     }
 
-    function updateMenuDirection() {
+    function getPanelLayoutSize(panel, margin = 12) {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        // 关键：不能使用 getBoundingClientRect().width/height 作为主尺寸来源。
+        // 菜单关闭态存在 scale(.97) / translate 入场准备动画，rect 会把 transform 算进去，
+        // 从而导致刚打开和动画结束后得到两套尺寸，重新定位时就会出现肉眼可见的漂移。
+        const css = panel ? getComputedStyle(panel) : null;
+        const cssWidth = Number.parseFloat(css?.width || '');
+        const cssHeight = Number.parseFloat(css?.height || '');
+        const width = Math.min(
+            panel?.offsetWidth || (Number.isFinite(cssWidth) ? cssWidth : 448),
+            Math.max(1, vw - margin * 2)
+        );
+        const height = Math.min(
+            panel?.offsetHeight || (Number.isFinite(cssHeight) ? cssHeight : 520),
+            Math.max(1, vh - margin * 2)
+        );
+        return { width, height };
+    }
+
+    function applyPanelViewportHeightLimits(panel, margin = 12) {
+        if (!panel) return;
+        const vh = window.innerHeight;
+        panel.style.maxHeight = `${Math.max(180, vh - margin * 2)}px`;
+        const content = panel.querySelector('.att-content');
+        if (content) {
+            // 头部 + Tab 大约 100px，留一点安全余量。
+            content.style.maxHeight = `${Math.max(120, vh - margin * 2 - 104)}px`;
+        }
+    }
+
+    function schedulePanelStableClamp() {
+        if (!state.panelOpen || panelStabilizeRaf) return;
+        panelStabilizeRaf = requestAnimationFrame(() => {
+            panelStabilizeRaf = 0;
+            if (state.panelOpen) stabilizePanelInsideViewport();
+        });
+    }
+
+    function updateMenuDirection(reposition = true) {
         const root = document.getElementById(APP.rootId);
         if (!root) return;
 
@@ -13796,10 +13843,10 @@
             const fab = document.getElementById(APP.fabId);
             const panel = document.getElementById(APP.panelId);
             const rect = fab?.getBoundingClientRect() || root.getBoundingClientRect();
-            // V7.9：不再沿用早期 360px 假定，直接读取当前 polish 后的真实菜单尺寸。
-            const panelRect = panel?.getBoundingClientRect();
-            const panelWidth = Math.min(panelRect?.width || 448, window.innerWidth - 24);
-            const panelHeight = Math.min(panelRect?.height || 520, window.innerHeight - 24);
+
+            // V7.16.6：按未经过 transform 的布局尺寸选方向。
+            // 关闭态 scale(.97) 不再影响方向判断，因此打开前后不会因为尺寸变化切换方向。
+            const { width: panelWidth, height: panelHeight } = getPanelLayoutSize(panel);
             const gap = 12;
 
             const rightSpace = window.innerWidth - rect.right;
@@ -13824,7 +13871,7 @@
 
         root.dataset.direction = direction;
 
-        if (state.panelOpen) {
+        if (state.panelOpen && reposition) {
             requestAnimationFrame(positionPanelInsideViewport);
         }
     }
@@ -13840,27 +13887,13 @@
         const vw = window.innerWidth;
         const vh = window.innerHeight;
 
-        // 每次都先清掉旧定位，防止切换方向后残留。
-        panel.style.left = '0px';
-        panel.style.top = '0px';
+        // fixed 菜单始终只使用 left/top；不再为了测量把可见菜单临时写回 (0,0)。
         panel.style.right = 'auto';
         panel.style.bottom = 'auto';
-
-        // 保证菜单永远不高于当前浏览器可视区域。
-        panel.style.maxHeight = `${Math.max(180, vh - margin * 2)}px`;
-
-        const content = panel.querySelector('.att-content');
-        if (content) {
-            // 头部 + Tab 大约 100px，留一点安全余量。
-            content.style.maxHeight = `${Math.max(120, vh - margin * 2 - 104)}px`;
-        }
+        applyPanelViewportHeightLimits(panel, margin);
 
         const fabRect = fab.getBoundingClientRect();
-
-        // 面板即使 opacity=0 也能正常测量。
-        const panelRect = panel.getBoundingClientRect();
-        const panelWidth = Math.min(panelRect.width || 360, vw - margin * 2);
-        const panelHeight = Math.min(panelRect.height || 500, vh - margin * 2);
+        const { width: panelWidth, height: panelHeight } = getPanelLayoutSize(panel, margin);
 
         let left;
         let top;
@@ -13868,7 +13901,6 @@
 
         if (direction === 'right') {
             left = fabRect.right + gap;
-            // 左右弹出时尽量让菜单和悬浮球垂直居中。
             top = fabRect.top + fabRect.height / 2 - panelHeight / 2;
         } else if (direction === 'up') {
             left = fabRect.left + fabRect.width / 2 - panelWidth / 2;
@@ -13881,12 +13913,53 @@
             top = fabRect.top + fabRect.height / 2 - panelHeight / 2;
         }
 
-        // 核心：最终无条件夹在视口范围内。
+        // 真正“重新锚定”时才围绕悬浮球计算；结果仍无条件夹在视口内。
         left = Math.max(margin, Math.min(left, vw - panelWidth - margin));
         top = Math.max(margin, Math.min(top, vh - panelHeight - margin));
 
-        panel.style.left = `${Math.round(left)}px`;
-        panel.style.top = `${Math.round(top)}px`;
+        const nextLeft = Math.round(left);
+        const nextTop = Math.round(top);
+        if (Math.abs((Number.parseFloat(panel.style.left) || 0) - nextLeft) > .5) {
+            panel.style.left = `${nextLeft}px`;
+        }
+        if (Math.abs((Number.parseFloat(panel.style.top) || 0) - nextTop) > .5) {
+            panel.style.top = `${nextTop}px`;
+        }
+    }
+
+    function stabilizePanelInsideViewport() {
+        const panel = document.getElementById(APP.panelId);
+        if (!panel) return;
+
+        const margin = 12;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        applyPanelViewportHeightLimits(panel, margin);
+        const { width: panelWidth, height: panelHeight } = getPanelLayoutSize(panel, margin);
+
+        // 优先读取 layout left/top，而不是 getBoundingClientRect()。
+        // rect 会受到菜单入场 transform 影响；layout 坐标在动画前后保持稳定。
+        let left = Number.parseFloat(panel.style.left);
+        let top = Number.parseFloat(panel.style.top);
+
+        if (!Number.isFinite(left) || !Number.isFinite(top)) {
+            const rect = panel.getBoundingClientRect();
+            if (!Number.isFinite(left)) left = rect.left;
+            if (!Number.isFinite(top)) top = rect.top;
+        }
+
+        const nextLeft = Math.round(
+            Math.max(margin, Math.min(left, vw - panelWidth - margin))
+        );
+        const nextTop = Math.round(
+            Math.max(margin, Math.min(top, vh - panelHeight - margin))
+        );
+
+        // 页面加载导致内容尺寸改变时，位置只在真正越界的轴上做最小修正，
+        // 不再重新围绕悬浮球居中，因此不会出现“打开几秒后菜单自己挪一下”。
+        if (Math.abs(left - nextLeft) > .5) panel.style.left = `${nextLeft}px`;
+        if (Math.abs(top - nextTop) > .5) panel.style.top = `${nextTop}px`;
     }
 
     function setPanelOpen(open) {
@@ -13897,10 +13970,19 @@
         if (open) {
             panelOpenedAt = performance.now();
             markPanelInteraction(900);
-            updateMenuDirection();
+
+            // 先生成最终内容，再按“未 transform 的布局尺寸”计算方向和位置。
+            // 此时 att-open 尚未加上，用户看不到任何中间位置。
             renderPanel();
-            // 页面仍在加载时只在稳定窗口结束后补一次上下文，不在加载过程中反复重建。
+            updateMenuDirection(false);
+            positionPanelInsideViewport();
+
+            root.classList.add('att-open');
+
+            // 页面仍在加载时只在稳定窗口结束后补一次上下文；
+            // 后续 section 变化只做越界校正，不重新围绕悬浮球居中。
             schedulePanelContextRefresh(900);
+            schedulePanelStableClamp();
         } else {
             state.recordingHotkeyTarget = null;
             panelPointerActive = false;
@@ -13909,17 +13991,11 @@
             panelContextRefreshTimer = 0;
             if (panelContextRefreshRaf) cancelAnimationFrame(panelContextRefreshRaf);
             panelContextRefreshRaf = 0;
+            if (panelStabilizeRaf) cancelAnimationFrame(panelStabilizeRaf);
+            panelStabilizeRaf = 0;
             panelContextRefreshPending = false;
             panelDirtySections.clear();
-        }
-
-        root.classList.toggle('att-open', open);
-
-        if (open) {
-            requestAnimationFrame(() => {
-                updateMenuDirection();
-                positionPanelInsideViewport();
-            });
+            root.classList.remove('att-open');
         }
 
         resetIdleTimer();
@@ -18104,7 +18180,7 @@
                 store.set('position', bounded);
             }
             applyFabPosition(false);
-            updateMenuDirection();
+            updateMenuDirection(false);
             scheduleApplyPinnedColumns(0);
             if (state.panelOpen) {
                 requestAnimationFrame(positionPanelInsideViewport);
@@ -18387,7 +18463,7 @@
         });
 
         console.log(`[AutoTable 工具集] ${APP.version} 已加载`);
-        console.log('[AutoTable 工具集] V7.16.5：V7.16.4 增量刷新保留；新增虚拟表格早退 + 条件高亮执行计划缓存 + 重复扫描消除。');
+        console.log('[AutoTable 工具集] V7.16.6：保留 V7.16.5 性能加固；菜单改为布局尺寸测量 + 打开后位置稳定，仅在越界时最小校正。');
         console.log('[AutoTable 工具集] V6.8：基于 V6.6 稳定渲染版升级规则化快捷短语、日期时间模板、条件显示与编辑首行自动预留。');
     }
 
@@ -30062,7 +30138,7 @@
         attachPageObserver();
         syncEngineState();
         emitStateSnapshot('init');
-        console.log('[AutoTable 条件高亮] V7.16.5 已加载：原规则结果保持不变 / 活动规则执行计划缓存 / 同字段单元格查询复用 / 虚拟滚动增量高亮');
+        console.log('[AutoTable 条件高亮] V7.16.6 已加载：沿用 V7.16.5 原规则结果与执行计划缓存 / 同字段单元格查询复用 / 虚拟滚动增量高亮');
     }
 
     if (document.body) init();
@@ -30553,7 +30629,7 @@
     'use strict';
 
     const SH = {
-        version: 'V7.16.5',
+        version: 'V7.16.6',
         enabledKey: 'att_v3_viewSearchHistoryEnabled',
         maxKey: 'att_v3_viewSearchHistoryMaxPerView',
         perViewKey: 'att_v3_viewSearchHistoryPerViewMode',
