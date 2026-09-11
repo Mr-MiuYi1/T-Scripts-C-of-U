@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.16.2
-// @description  AutoTable 一体化效率增强工具：四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.16.3
+// @description  AutoTable 一体化效率增强工具：四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.16.2
+ * AutoTable 工具集 V7.16.3
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，规则组/规则分层管理，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -44,7 +44,7 @@
     'use strict';
 
     const APP = {
-        version: 'V7.16.2',
+        version: 'V7.16.3',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -252,7 +252,7 @@
     let lastComboContextKey = '';
 
 
-    // V7.16.2：悬浮菜单交互稳定层。
+    // V7.16.3：悬浮菜单交互稳定层。
     // 页面尚未加载完成时，AutoTable 会连续替换表格 / 视图 DOM；旧逻辑一检测到
     // contextKey 变化就立即 renderFeaturesSection()，会销毁当前菜单中的 focus 节点。
     // 这里把“页面上下文刷新”和“用户正在操作菜单”解耦：DOM 变化只排队刷新，
@@ -261,6 +261,12 @@
     let panelInteractionUntil = 0;
     let panelPointerActive = false;
     let panelOpenedAt = 0;
+    let panelContextRefreshPending = false;
+
+    // V7.16.3：字段组合编辑器属于“长生命周期编辑会话”。
+    // 以前页面加载稳定刷新、Tab 重绘或重新读取字段都会 renderCombosSection()，
+    // 从而直接销毁 #att-combo-editor。现在编辑会话拥有独立草稿，后台刷新不得覆盖它。
+    let comboEditorDraftState = null;
 
     // V5.6：分页条数增强。
     // 通过当前页面 React Select 的 onChange 回调设置任意 pageSize，
@@ -10785,7 +10791,7 @@
         root.addEventListener('pointermove', resetIdleTimer);
         root.addEventListener('pointerleave', resetIdleTimer);
 
-        // V7.16.2：用户正在菜单内操作时，页面加载造成的 DOM/context 变化只能排队，
+        // V7.16.3：用户正在菜单内操作时，页面加载造成的 DOM/context 变化只能排队，
         // 不能立即 innerHTML 重建当前 section。
         root.addEventListener('pointerdown', event => {
             if (!event.target.closest?.(`#${APP.panelId}`)) return;
@@ -11014,18 +11020,30 @@
 
         // 只刷新当前可见工作区；不要像 renderPanel() 那样把所有 section 都重建一遍。
         if (state.activeTab === 'features') renderFeaturesSection();
-        else if (state.activeTab === 'combos') renderCombosSection();
-        else if (state.activeTab === 'pinning') renderPinningSection();
+        else if (state.activeTab === 'combos') {
+            if (isComboEditorOpen()) {
+                // 编辑期间只记录“待刷新”，绝不销毁字段组合编辑器。
+                panelContextRefreshPending = true;
+            } else {
+                renderCombosSection();
+                panelContextRefreshPending = false;
+            }
+        } else if (state.activeTab === 'pinning') renderPinningSection();
 
         injectTableToolsSubnav();
         requestAnimationFrame(positionPanelInsideViewport);
     }
 
     function schedulePanelContextRefresh(delay = 180) {
+        panelContextRefreshPending = true;
         clearTimeout(panelContextRefreshTimer);
         panelContextRefreshTimer = setTimeout(() => {
             panelContextRefreshTimer = 0;
             if (!state.panelOpen) return;
+
+            // 字段组合编辑属于显式编辑会话。后台 React/表格加载变化只记脏标记，
+            // 不循环定时重试，更不能把 editor 整段 innerHTML 覆盖掉。
+            if (isComboEditorOpen()) return;
 
             // 打开后的首段时间属于“页面加载稳定窗口”。即使此时没有 input 获得焦点，
             // 也先让 AutoTable 把表格 / 筛选栏 / 视图状态挂载完，再一次性刷新菜单上下文。
@@ -11040,6 +11058,7 @@
                 return;
             }
 
+            panelContextRefreshPending = false;
             refreshPanelContextSafely();
         }, Math.max(60, Number(delay) || 180));
     }
@@ -11058,7 +11077,9 @@
         });
 
         renderFeaturesSection();
-        renderCombosSection();
+        // V7.16.3：字段组合编辑器是会话型 UI。只要编辑器还开着，任何普通 panel 重绘
+        // 都不得 renderCombosSection()，否则会把用户尚未保存的编辑 DOM 直接销毁。
+        if (!isComboEditorOpen()) renderCombosSection();
         renderPinningSection();
         renderSettingsSection();
         injectTableToolsSubnav();
@@ -11381,37 +11402,98 @@
         `;
     }
 
-    function renderComboEditor(combo = null, editMode = 'table') {
+    function isComboEditorOpen() {
+        const editor = document.getElementById('att-combo-editor');
+        return Boolean(editor?.classList.contains('att-show'));
+    }
+
+    function makeComboEditorDraft(combo = null) {
+        const context = getCurrentTableContext();
+        const editing = combo || {
+            id: '', name: '', fields: [], format: 'pipe', customDelimiter: '', hotkey: '', tableBindings: {}
+        };
+        const binding = context ? getComboTableBinding(editing, context) : null;
+        const autoPreview = combo ? resolveComboForCurrentTable(combo) : null;
+        const tableFields = binding
+            ? binding.fields.map(item => ({ fieldId:String(item.fieldId || ''), name:sanitizeText(item.name || item.label || '') })).filter(item => item.name)
+            : (autoPreview?.resolved || []).map(item => ({ fieldId:String(item.fieldId || ''), name:sanitizeText(item.name || '') })).filter(item => item.name);
+
+        return {
+            editId: editing.id || '',
+            contextKey: context?.key || '',
+            contextTableName: context?.tableName || '',
+            name: editing.name || '',
+            format: editing.format || 'pipe',
+            customDelimiter: editing.customDelimiter || '',
+            tableFields,
+            templateNames: Array.isArray(editing.fields) ? editing.fields.map(sanitizeText).filter(Boolean) : [],
+            searchByMode: { table:'', template:'' }
+        };
+    }
+
+    function syncComboEditorDraftFromDom() {
+        const editor = document.getElementById('att-combo-editor');
+        const draft = comboEditorDraftState;
+        if (!editor?.classList.contains('att-show') || !draft) return draft;
+
+        draft.name = document.getElementById('att-combo-name')?.value ?? draft.name;
+        draft.format = document.getElementById('att-combo-format')?.value || draft.format || 'pipe';
+        draft.customDelimiter = document.getElementById('att-combo-custom-delimiter')?.value ?? draft.customDelimiter;
+
+        const mode = editor.dataset.editMode === 'template' ? 'template' : 'table';
+        const selected = Array.from(editor.querySelectorAll('[data-combo-field]:checked')).map(el => ({
+            fieldId: String(el.dataset.comboFieldId || ''),
+            name: sanitizeText(el.dataset.comboFieldName || el.dataset.comboField || '')
+        })).filter(item => item.name);
+
+        if (mode === 'table') draft.tableFields = selected;
+        else draft.templateNames = selected.map(item => item.name);
+
+        const search = editor.querySelector('[data-setting="comboFieldSearch"]');
+        if (search) draft.searchByMode[mode] = search.value || '';
+        return draft;
+    }
+
+    function resetComboEditorDraft(combo = null) {
+        comboEditorDraftState = makeComboEditorDraft(combo);
+        return comboEditorDraftState;
+    }
+
+    function clearComboEditorDraft() {
+        comboEditorDraftState = null;
+    }
+
+    function renderComboEditor(combo = null, editMode = 'table', options = {}) {
         const editor = document.getElementById('att-combo-editor');
         if (!editor) return;
+
+        // 切换编辑模式 / 重新读取字段之前，先把当前 DOM 中尚未保存的内容写入会话草稿。
+        if (!options.resetDraft) syncComboEditorDraftFromDom();
 
         const context = getCurrentTableContext();
         const defs = getCurrentComboFieldDefs();
         if (!context && editMode === 'table') editMode = 'template';
 
-        const editing = combo || {
-            id: '',
-            name: '',
-            fields: [],
-            format: 'pipe',
-            customDelimiter: '',
-            hotkey: '',
-            tableBindings: {}
+        const comboId = combo?.id || '';
+        const contextKey = context?.key || '';
+        const draftIdentityChanged = !comboEditorDraftState ||
+            comboEditorDraftState.editId !== comboId ||
+            comboEditorDraftState.contextKey !== contextKey;
+        if (options.resetDraft || draftIdentityChanged) resetComboEditorDraft(combo);
+
+        const draft = comboEditorDraftState || resetComboEditorDraft(combo);
+        const editing = {
+            ...(combo || { id:'', fields:[], hotkey:'', tableBindings:{} }),
+            id: comboId,
+            name: draft.name,
+            format: draft.format,
+            customDelimiter: draft.customDelimiter,
+            fields: draft.templateNames
         };
 
-        const binding = context ? getComboTableBinding(editing, context) : null;
-        const autoPreview = combo ? resolveComboForCurrentTable(combo) : null;
-
-        let selectedIds = new Set();
-        let selectedNames = new Set(editing.fields || []);
-
-        if (editMode === 'table') {
-            if (binding) {
-                selectedIds = new Set(binding.fields.map(item => item.fieldId).filter(Boolean));
-            } else if (autoPreview) {
-                selectedIds = new Set(autoPreview.resolved.map(item => item.fieldId));
-            }
-        }
+        const binding = context ? getComboTableBinding(combo || editing, context) : null;
+        const selectedIds = new Set((draft.tableFields || []).map(item => item.fieldId).filter(Boolean));
+        const selectedNames = new Set(draft.templateNames || []);
 
         editor.dataset.editId = editing.id || '';
         editor.dataset.editMode = editMode;
@@ -11501,6 +11583,17 @@
                 <button type="button" class="att-btn" data-act="cancel-combo-editor">取消</button>
             </div>
         `;
+
+        const searchInput = editor.querySelector('[data-setting="comboFieldSearch"]');
+        const rememberedSearch = draft.searchByMode?.[editMode] || '';
+        if (searchInput && rememberedSearch) {
+            searchInput.value = rememberedSearch;
+            const q = sanitizeText(rememberedSearch).toLowerCase();
+            editor.querySelectorAll('.att-field-item').forEach(item => {
+                const name = sanitizeText(item.textContent || '').toLowerCase();
+                item.style.display = !q || name.includes(q) ? 'flex' : 'none';
+            });
+        }
     }
 
     // =====================================================================
@@ -12769,7 +12862,7 @@
             }
 
             case 'new-combo':
-                renderComboEditor(null, getCurrentTableContext() ? 'table' : 'template');
+                renderComboEditor(null, getCurrentTableContext() ? 'table' : 'template', { resetDraft:true });
                 break;
 
             case 'set-ctrl-combo':
@@ -12779,13 +12872,13 @@
             case 'edit-combo':
             case 'configure-combo-table': {
                 const combo = state.combos.find(c => c.id === id);
-                if (combo) renderComboEditor(combo, 'table');
+                if (combo) renderComboEditor(combo, 'table', { resetDraft:true });
                 break;
             }
 
             case 'edit-combo-template': {
                 const combo = state.combos.find(c => c.id === id);
-                if (combo) renderComboEditor(combo, 'template');
+                if (combo) renderComboEditor(combo, 'template', { resetDraft:true });
                 break;
             }
 
@@ -12869,6 +12962,8 @@
                     editor.classList.remove('att-show');
                     editor.innerHTML = '';
                 }
+                clearComboEditorDraft();
+                if (panelContextRefreshPending) schedulePanelContextRefresh(80);
                 break;
             }
 
@@ -12880,12 +12975,14 @@
                 document.querySelectorAll('#att-combo-editor [data-combo-field]').forEach(el => {
                     if (el.closest('.att-field-item')?.style.display !== 'none') el.checked = true;
                 });
+                syncComboEditorDraftFromDom();
                 break;
 
             case 'combo-clear-fields':
                 document.querySelectorAll('#att-combo-editor [data-combo-field]').forEach(el => {
                     if (el.closest('.att-field-item')?.style.display !== 'none') el.checked = false;
                 });
+                syncComboEditorDraftFromDom();
                 break;
 
             case 'record-hotkey':
@@ -12978,6 +13075,9 @@
 
     function onPanelChange(event) {
         const setting = event.target.dataset.setting;
+        if (event.target.closest?.('#att-combo-editor')) {
+            syncComboEditorDraftFromDom();
+        }
         if (!setting) return;
 
         if (setting === 'comboFormat') {
@@ -13266,6 +13366,13 @@
     function onPanelInput(event) {
         const setting = event.target.dataset.setting;
 
+        if (event.target.closest?.('#att-combo-editor')) {
+            // 只更新轻量草稿对象，不触发任何 section 重绘。
+            if (event.target.id === 'att-combo-name' || event.target.id === 'att-combo-custom-delimiter') {
+                syncComboEditorDraftFromDom();
+            }
+        }
+
         if (setting === 'comboFieldSearch') {
             const q = sanitizeText(event.target.value || '').toLowerCase();
             document.querySelectorAll('#att-combo-editor .att-field-item').forEach(item => {
@@ -13304,9 +13411,11 @@
         const editor = document.getElementById('att-combo-editor');
         if (!editor) return;
 
-        const name = sanitizeText(document.getElementById('att-combo-name')?.value || '');
-        const format = document.getElementById('att-combo-format')?.value || 'pipe';
-        const customDelimiterRaw = document.getElementById('att-combo-custom-delimiter')?.value ?? '';
+        syncComboEditorDraftFromDom();
+        const draft = comboEditorDraftState;
+        const name = sanitizeText(draft?.name ?? document.getElementById('att-combo-name')?.value ?? '');
+        const format = draft?.format || document.getElementById('att-combo-format')?.value || 'pipe';
+        const customDelimiterRaw = draft?.customDelimiter ?? document.getElementById('att-combo-custom-delimiter')?.value ?? '';
         const customDelimiter = String(customDelimiterRaw)
             .replace(/[\u200B-\u200D\u2060\uFEFF]/g, '');
         const editMode = editor.dataset.editMode === 'template' ? 'template' : 'table';
@@ -13390,6 +13499,8 @@
         }
 
         persistCore();
+        clearComboEditorDraft();
+        panelContextRefreshPending = false;
         renderPanel();
         showToast(editMode === 'table'
             ? `已保存 ${context.tableName} 的字段配置`
@@ -13665,6 +13776,7 @@
             panelInteractionUntil = 0;
             clearTimeout(panelContextRefreshTimer);
             panelContextRefreshTimer = 0;
+            panelContextRefreshPending = false;
         }
 
         root.classList.toggle('att-open', open);
@@ -18097,7 +18209,7 @@
                 lastComboContextKey = comboContextKey;
                 updateActiveComboBadge();
                 if (state.panelOpen) {
-                    // V7.16.2：SPA / 首屏加载中的上下文变化只排队刷新。
+                    // V7.16.3：SPA / 首屏加载中的上下文变化只排队刷新。
                     // 直接 renderFeaturesSection 会销毁当前聚焦的 select / input / button。
                     schedulePanelContextRefresh(180);
                 }
@@ -18141,7 +18253,7 @@
         });
 
         console.log(`[AutoTable 工具集] ${APP.version} 已加载`);
-        console.log('[AutoTable 工具集] V7.16.2：条件高亮状态显式徽标 + 页面加载期间菜单交互焦点保护已启用。');
+        console.log('[AutoTable 工具集] V7.16.3：字段组合编辑会话保护 + 草稿持久化 + 页面加载期间菜单焦点保护已启用。');
         console.log('[AutoTable 工具集] V6.8：基于 V6.6 稳定渲染版升级规则化快捷短语、日期时间模板、条件显示与编辑首行自动预留。');
     }
 
@@ -25251,7 +25363,7 @@
         }
 
         /* 深色继承 UI 变量，不另起一套颜色。 */
-        /* V7.16.2：条件高亮状态不再只靠一个小圆点，深色/浅色都明确显示“已开启 / 已关闭”。 */
+        /* V7.16.3：条件高亮状态不再只靠一个小圆点，深色/浅色都明确显示“已开启 / 已关闭”。 */
         #att-toolbox-panel .att-quick-condition-v7162{
             position:relative;
         }
@@ -30219,7 +30331,7 @@
     'use strict';
 
     const SH = {
-        version: 'V7.16.2',
+        version: 'V7.16.3',
         enabledKey: 'att_v3_viewSearchHistoryEnabled',
         maxKey: 'att_v3_viewSearchHistoryMaxPerView',
         perViewKey: 'att_v3_viewSearchHistoryPerViewMode',
