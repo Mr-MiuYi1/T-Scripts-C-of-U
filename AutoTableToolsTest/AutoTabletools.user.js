@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.16.4
+// @version      7.16.5
 // @description  AutoTable 一体化效率增强工具：四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.16.4
+ * AutoTable 工具集 V7.16.5
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，规则组/规则分层管理，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -38,14 +38,14 @@
  * - 渲染：按真实行号稳定斑马纹；虚拟滚动增量渲染；聚焦行/字段分别保存稳定身份；横向虚拟化时绝不回退到其它字段；编辑与置顶表头保持稳定层级；置顶表头高亮使用不透明底层防止滚动表头穿透
  * - 置顶：右置顶严格镜像；“+ 添加列”保持 AutoTable 原生末端位置，不参与置顶 sticky/offset
  * - 面板：V7.16 采用主导航 + 表格二级导航；减少顶部分类数量，按任务频率分布内容，保留原功能与设置项
- * - 性能：V7.16.4 无感加固；菜单上下文改为 dirty + 事件驱动刷新，Tab 只重绘目标工作区；条件高亮状态用内存快照同步；同帧复用表格上下文与字段定义
+ * - 性能：V7.16.5 无感加固第二阶段；保留 V7.16.4 菜单增量刷新与短生命周期缓存，并新增文档模块虚拟表格早退、条件高亮规则执行计划缓存与重复扫描消除
  * ========================================================================== */
 
 (function () {
     'use strict';
 
     const APP = {
-        version: 'V7.16.4',
+        version: 'V7.16.5',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -18387,7 +18387,7 @@
         });
 
         console.log(`[AutoTable 工具集] ${APP.version} 已加载`);
-        console.log('[AutoTable 工具集] V7.16.4：事件驱动菜单刷新 + 分区增量渲染 + 短生命周期上下文/字段缓存已启用。');
+        console.log('[AutoTable 工具集] V7.16.5：V7.16.4 增量刷新保留；新增虚拟表格早退 + 条件高亮执行计划缓存 + 重复扫描消除。');
         console.log('[AutoTable 工具集] V6.8：基于 V6.6 稳定渲染版升级规则化快捷短语、日期时间模板、条件显示与编辑首行自动预留。');
     }
 
@@ -19512,7 +19512,9 @@
 
         docState.pageObserver = new MutationObserver(mutations => {
             const hasExternalMutation = mutations.some(record => {
-                const target = record.target;
+                const target = record.target instanceof Element ? record.target : record.target?.parentElement;
+                // V7.16.5：表格虚拟行复用不可能改变文档编辑上下文，直接早退。
+                if (target?.closest?.('.grid-virtual-body')) return false;
                 if (!(target instanceof Element)) return true;
                 return !target.closest('#att-toolbox-root, #att-document-outline');
             });
@@ -20436,7 +20438,8 @@
             let editorMayChange = false;
 
             for (const record of mutations) {
-                const target = record.target;
+                const target = record.target instanceof Element ? record.target : record.target?.parentElement;
+                if (target?.closest?.('.grid-virtual-body')) continue;
                 if (target instanceof Element && target.closest?.(`#${SEARCH.cardId}`)) continue;
                 needsEnsure = true;
                 editorMayChange = true;
@@ -21882,7 +21885,8 @@
         S.pageObserver = new MutationObserver(mutations => {
             let external = false;
             for (const record of mutations) {
-                const target = record.target;
+                const target = record.target instanceof Element ? record.target : record.target?.parentElement;
+                if (target?.closest?.('.grid-virtual-body')) continue;
                 if (target instanceof Element && target.closest?.(`#${MOD.barId}, #${MOD.settingsCardId}`)) continue;
                 external = true;
                 break;
@@ -22393,7 +22397,8 @@
             let relevant = false;
 
             for (const record of records) {
-                const target = record.target;
+                const target = record.target instanceof Element ? record.target : record.target?.parentElement;
+                if (target?.closest?.('.grid-virtual-body')) continue;
                 if (target instanceof Element && target.closest?.(`#${UI.barId}, #${UI.launcherId}`)) {
                     continue;
                 }
@@ -23468,7 +23473,8 @@
         state.observer = new MutationObserver(records => {
             let relevant = false;
             for (const record of records) {
-                const target = record.target;
+                const target = record.target instanceof Element ? record.target : record.target?.parentElement;
+                if (target?.closest?.('.grid-virtual-body')) continue;
                 if (target instanceof Element && target.closest?.(`#${R.barId}`)) continue;
                 relevant = true;
                 break;
@@ -24098,6 +24104,9 @@
                 const target = record.target instanceof Element
                     ? record.target
                     : record.target?.parentElement;
+
+                // V7.16.5：表格虚拟行及聚焦/高亮 class 变化与文档正则 UI 无关。
+                if (target?.closest?.('.grid-virtual-body')) continue;
 
                 if (target?.id === FIX.mirrorCountId || target?.id === FIX.mirrorMessageId || target?.closest?.(`#${FIX.mirrorCountId}, #${FIX.mirrorMessageId}`)) {
                     continue;
@@ -27976,6 +27985,10 @@
     let activeGroupId = String(GM_getValue(MOD.keyActiveGroup, '') || '');
     let rules = normalizeRules(GM_getValue(MOD.keyRules, []));
     let activeRulesCache = [];
+    // V7.16.5：按 grid-root + 当前 headerMap 缓存“规则 -> 实际字段”执行计划。
+    // 规则顺序完全保持不变，只避免每一行重复解析 table context / fieldId。
+    let activeRulePlanCache = new WeakMap();
+    let activeRulesGeneration = 0;
     let managerDraft = [];
     let managerGroupsDraft = [];
     let managerSelectedId = '';
@@ -27991,6 +28004,7 @@
     let flushRaf = 0;
     let scanRaf = 0;
     let toolboxObserver = null;
+    let settingsCardEnsureRaf = 0;
     let pageObserver = null;
 
     function clamp(value, min, max, fallback) {
@@ -28118,6 +28132,8 @@
     function rebuildActiveRulesCache() {
         const validGroupId = getActiveGroup()?.id || '';
         activeRulesCache = validGroupId ? rules.filter(r => r.enabled && r.groupId === validGroupId) : [];
+        activeRulesGeneration++;
+        activeRulePlanCache = new WeakMap();
     }
 
     function getActiveRules() {
@@ -28294,12 +28310,47 @@
         return cleanText(cell.textContent || '');
     }
 
-    function resolveFieldId(rule, root, map) {
-        const context = getTableContext(root);
-        if (rule.scope === 'table' && rule.tableKey && context?.key !== rule.tableKey) return '';
+    function resolveFieldId(rule, root, map, context = null) {
+        const resolvedContext = context || getTableContext(root);
+        if (rule.scope === 'table' && rule.tableKey && resolvedContext?.key !== rule.tableKey) return '';
         if (rule.scope === 'table' && rule.fieldId && map.byId.has(rule.fieldId)) return rule.fieldId;
         if (rule.fieldName && map.byName.has(rule.fieldName)) return map.byName.get(rule.fieldName).fieldId;
         return '';
+    }
+
+    function getActiveRulePlan(root, map) {
+        if (!(root instanceof Element) || !map) return [];
+
+        // tableKey 参与缓存签名：SPA 即使复用同一个 grid-root / 同一套表头，
+        // 换表后也必须重新解析 table-scope 规则，不能沿用旧计划。
+        const context = getTableContext(root);
+        const contextKey = context?.key || '';
+        const cached = activeRulePlanCache.get(root);
+        if (cached &&
+            cached.generation === activeRulesGeneration &&
+            cached.map === map &&
+            cached.contextKey === contextKey) {
+            return cached.entries;
+        }
+
+        const entries = [];
+        for (const rule of activeRulesCache) {
+            const fieldId = resolveFieldId(rule, root, map, context);
+            if (!fieldId) continue;
+            entries.push({
+                rule,
+                fieldId,
+                selector: `.grid-cell[data-grid-field-id="${cssEsc(fieldId)}"]`
+            });
+        }
+
+        activeRulePlanCache.set(root, {
+            generation: activeRulesGeneration,
+            map,
+            contextKey,
+            entries
+        });
+        return entries;
     }
 
     function localMidnight(date = new Date()) {
@@ -28561,17 +28612,23 @@
         const root = row.closest('.grid-root');
         if (!root) return;
         const map = buildHeaderMap(root);
-        const active = getActiveRules();
-        if (!active.length) return;
+        const plan = getActiveRulePlan(root, map);
+        if (!plan.length) return;
 
         let rowWinner = null;
         const cellWinners = new Set();
-        for (const rule of active) {
-            const fieldId = resolveFieldId(rule, root, map);
-            if (!fieldId) continue;
-            const cell = row.querySelector(`.grid-cell[data-grid-field-id="${cssEsc(fieldId)}"]`);
-            if (!cell) continue;
-            if (!matchRule(rule, getCellValue(cell), row, root, map)) continue;
+        const rowCellCache = new Map();
+        for (const entry of plan) {
+            const { rule, fieldId, selector } = entry;
+            let cachedCell = rowCellCache.get(fieldId);
+            if (cachedCell === undefined) {
+                const cell = row.querySelector(selector) || null;
+                cachedCell = cell ? { cell, value: getCellValue(cell) } : null;
+                rowCellCache.set(fieldId, cachedCell);
+            }
+            if (!cachedCell) continue;
+            const { cell, value } = cachedCell;
+            if (!matchRule(rule, value, row, root, map)) continue;
 
             if (rule.mode === 'row') {
                 if (!rowWinner) rowWinner = rule;
@@ -28690,7 +28747,7 @@
             clearAllHighlights();
             return;
         }
-        scheduleGridScan();
+        // rescanAllVisibleRows() 自身会安排 grid scan；避免同一状态切换重复调度。
         rescanAllVisibleRows();
     }
 
@@ -29922,12 +29979,24 @@
         }, true);
     }
 
+    function scheduleEnsureSettingsCard() {
+        if (settingsCardEnsureRaf) return;
+        settingsCardEnsureRaf = requestAnimationFrame(() => {
+            settingsCardEnsureRaf = 0;
+            ensureSettingsCard();
+        });
+    }
+
     function attachToolboxObserver() {
         const attach = () => {
             const root = document.getElementById('att-toolbox-root');
             if (!root) return false;
             if (!toolboxObserver) {
-                toolboxObserver = new MutationObserver(() => requestAnimationFrame(ensureSettingsCard));
+                toolboxObserver = new MutationObserver(records => {
+                    // settings 卡仍存在时，其它菜单区域的 DOM 更新无需重复 ensure。
+                    if (document.getElementById(MOD.cardId)?.isConnected) return;
+                    if (records.some(r => r.type === 'childList')) scheduleEnsureSettingsCard();
+                });
                 toolboxObserver.observe(root, { childList:true, subtree:true });
             }
             ensureSettingsCard();
@@ -29953,10 +30022,10 @@
                 }
                 if (needScan) break;
             }
-            if (needScan) {
-                getVisibleGridRoots().forEach(root => buildHeaderMap(root, true));
-                scheduleGridScan();
-                if (enabled) rescanAllVisibleRows();
+            if (needScan && enabled) {
+                // rescanAllVisibleRows() 已包含强制表头重建、可见行标脏与 body scan。
+                // 不再先重复 buildHeaderMap + scheduleGridScan。
+                rescanAllVisibleRows();
             }
         });
         pageObserver.observe(document.documentElement, { childList:true, subtree:true });
@@ -29993,7 +30062,7 @@
         attachPageObserver();
         syncEngineState();
         emitStateSnapshot('init');
-        console.log('[AutoTable 条件高亮] V7.15.3 已加载：规则组 / 分层管理面板 / 一体化内嵌操作流 / 批量规则操作 / 快捷切换 / 日期语义 / 安全高级表达式 / 整行上下强调边缘 / 虚拟滚动增量高亮');
+        console.log('[AutoTable 条件高亮] V7.16.5 已加载：原规则结果保持不变 / 活动规则执行计划缓存 / 同字段单元格查询复用 / 虚拟滚动增量高亮');
     }
 
     if (document.body) init();
@@ -30484,7 +30553,7 @@
     'use strict';
 
     const SH = {
-        version: 'V7.16.4',
+        version: 'V7.16.5',
         enabledKey: 'att_v3_viewSearchHistoryEnabled',
         maxKey: 'att_v3_viewSearchHistoryMaxPerView',
         perViewKey: 'att_v3_viewSearchHistoryPerViewMode',
