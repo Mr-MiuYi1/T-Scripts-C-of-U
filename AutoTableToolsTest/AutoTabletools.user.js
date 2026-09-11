@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.16.6
-// @description  AutoTable 一体化效率增强工具：四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.16.7
+// @description  AutoTable 一体化效率增强工具：四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.16.6
+ * AutoTable 工具集 V7.16.7
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，规则组/规则分层管理，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -38,14 +38,184 @@
  * - 渲染：按真实行号稳定斑马纹；虚拟滚动增量渲染；聚焦行/字段分别保存稳定身份；横向虚拟化时绝不回退到其它字段；编辑与置顶表头保持稳定层级；置顶表头高亮使用不透明底层防止滚动表头穿透
  * - 置顶：右置顶严格镜像；“+ 添加列”保持 AutoTable 原生末端位置，不参与置顶 sticky/offset
  * - 面板：V7.16 采用主导航 + 表格二级导航；减少顶部分类数量，按任务频率分布内容，保留原功能与设置项
- * - 性能：V7.16.6 菜单定位稳定修复；保留 V7.16.5 性能加固，并修复菜单入场 transform 尺寸误判、页面加载后重复居中造成的位置漂移
+ * - 性能：V7.16.7 完成 P8 性能回归与诊断层；默认不可见，仅统计关键渲染/Observer/缓存/条件高亮/置顶路径，并保留 V7.16.6 菜单定位稳定修复与 V7.16.5 性能加固
  * ========================================================================== */
+
+
+/* ============================================================================
+ * AutoTable P8 性能诊断与回归监测 V7.16.7
+ * --------------------------------------------------------------------------
+ * - 默认完全不可见：不增加菜单、设置项、Observer、Timer 或控制台刷屏。
+ * - 只做轻量计数与少量批次级耗时统计，用于确认性能优化是否真正生效。
+ * - 控制台可读取 __attPerfStats.snapshot() / __attPerfStats.summary()；
+ *   如需重新开始一次对比，可执行 __attPerfStats.reset()。
+ * ========================================================================== */
+(function () {
+    'use strict';
+
+    const KEY = '__attPerfStats';
+    const VERSION = 'V7.16.7';
+    const makeCounters = () => ({
+        panelFullRenders: 0,
+        panelSectionRenderCalls: 0,
+        panelSectionRenderDeferred: 0,
+        panelSectionRenders: { features: 0, combos: 0, pinning: 0, settings: 0, other: 0 },
+        panelContextRefreshRequests: 0,
+        panelContextRefreshQueued: 0,
+        panelContextRefreshCoalesced: 0,
+        panelContextRefreshFlushes: 0,
+        panelAnchorLayouts: 0,
+        panelStableClamps: 0,
+        mainObserverCallbacks: 0,
+        virtualObserverFastSkips: 0,
+        tableContextCacheHits: 0,
+        tableContextCacheMisses: 0,
+        gridFieldDefsCacheHits: 0,
+        gridFieldDefsCacheMisses: 0,
+        pinApplyCalls: 0,
+        pinFullLayouts: 0,
+        pinVirtualObserverCallbacks: 0,
+        pinVirtualHeaderRelayoutRequests: 0,
+        conditionalRowsProcessed: 0,
+        conditionalRuleEvaluations: 0,
+        conditionalFlushes: 0,
+        conditionalBodyObserverCallbacks: 0,
+        rulePlanCacheHits: 0,
+        rulePlanCacheMisses: 0
+    });
+    const makeTiming = () => ({ count: 0, totalMs: 0, maxMs: 0, lastMs: 0 });
+    const makeTimings = () => ({
+        panelFullRenderMs: makeTiming(),
+        panelSectionRenderMs: makeTiming(),
+        conditionalFlushMs: makeTiming()
+    });
+
+    let startedPerf = performance.now();
+    let startedAt = Date.now();
+
+    const api = {
+        version: VERSION,
+        startedAt,
+        counters: makeCounters(),
+        timings: makeTimings(),
+        recordTiming(name, ms) {
+            const timing = this.timings?.[name];
+            const value = Number(ms);
+            if (!timing || !Number.isFinite(value) || value < 0) return;
+            timing.count += 1;
+            timing.totalMs += value;
+            timing.lastMs = value;
+            if (value > timing.maxMs) timing.maxMs = value;
+        },
+        reset() {
+            this.counters = makeCounters();
+            this.timings = makeTimings();
+            startedPerf = performance.now();
+            startedAt = Date.now();
+            this.startedAt = startedAt;
+            return this.snapshot();
+        },
+        snapshot() {
+            const c = this.counters;
+            const ratio = (hit, total) => total > 0 ? Math.round((hit / total) * 10000) / 100 : null;
+            const timingSnapshot = {};
+            for (const [name, t] of Object.entries(this.timings)) {
+                timingSnapshot[name] = {
+                    count: t.count,
+                    totalMs: Math.round(t.totalMs * 1000) / 1000,
+                    avgMs: t.count ? Math.round((t.totalMs / t.count) * 1000) / 1000 : 0,
+                    maxMs: Math.round(t.maxMs * 1000) / 1000,
+                    lastMs: Math.round(t.lastMs * 1000) / 1000
+                };
+            }
+            return {
+                version: this.version,
+                startedAt: new Date(startedAt).toISOString(),
+                uptimeMs: Math.round(performance.now() - startedPerf),
+                counters: {
+                    ...c,
+                    panelSectionRenders: { ...c.panelSectionRenders }
+                },
+                timings: timingSnapshot,
+                rates: {
+                    mainObserverFastSkipPct: ratio(c.virtualObserverFastSkips, c.mainObserverCallbacks),
+                    tableContextFrameCacheHitPct: ratio(c.tableContextCacheHits, c.tableContextCacheHits + c.tableContextCacheMisses),
+                    gridFieldDefsFrameCacheHitPct: ratio(c.gridFieldDefsCacheHits, c.gridFieldDefsCacheHits + c.gridFieldDefsCacheMisses),
+                    rulePlanCacheHitPct: ratio(c.rulePlanCacheHits, c.rulePlanCacheHits + c.rulePlanCacheMisses),
+                    panelContextCoalescePct: ratio(c.panelContextRefreshCoalesced, c.panelContextRefreshRequests)
+                }
+            };
+        },
+        summary() {
+            const s = this.snapshot();
+            return {
+                version: s.version,
+                uptimeMs: s.uptimeMs,
+                panel: {
+                    fullRenders: s.counters.panelFullRenders,
+                    sectionRenders: s.counters.panelSectionRenders,
+                    refreshRequests: s.counters.panelContextRefreshRequests,
+                    coalesced: s.counters.panelContextRefreshCoalesced,
+                    flushes: s.counters.panelContextRefreshFlushes,
+                    anchorLayouts: s.counters.panelAnchorLayouts,
+                    stableClamps: s.counters.panelStableClamps,
+                    avgFullRenderMs: s.timings.panelFullRenderMs.avgMs,
+                    avgSectionRenderMs: s.timings.panelSectionRenderMs.avgMs
+                },
+                observer: {
+                    mainCallbacks: s.counters.mainObserverCallbacks,
+                    virtualFastSkips: s.counters.virtualObserverFastSkips,
+                    fastSkipPct: s.rates.mainObserverFastSkipPct
+                },
+                cache: {
+                    tableContextHitPct: s.rates.tableContextFrameCacheHitPct,
+                    gridFieldDefsHitPct: s.rates.gridFieldDefsFrameCacheHitPct,
+                    rulePlanHitPct: s.rates.rulePlanCacheHitPct
+                },
+                pinning: {
+                    applyCalls: s.counters.pinApplyCalls,
+                    fullLayouts: s.counters.pinFullLayouts,
+                    virtualCallbacks: s.counters.pinVirtualObserverCallbacks,
+                    headerRelayoutRequests: s.counters.pinVirtualHeaderRelayoutRequests
+                },
+                conditionalHighlight: {
+                    rows: s.counters.conditionalRowsProcessed,
+                    ruleEvaluations: s.counters.conditionalRuleEvaluations,
+                    flushes: s.counters.conditionalFlushes,
+                    avgFlushMs: s.timings.conditionalFlushMs.avgMs,
+                    maxFlushMs: s.timings.conditionalFlushMs.maxMs
+                }
+            };
+        }
+    };
+
+    const expose = target => {
+        if (!target) return;
+        try {
+            Object.defineProperty(target, KEY, {
+                configurable: true,
+                enumerable: false,
+                writable: false,
+                value: api
+            });
+        } catch {
+            try { target[KEY] = api; } catch {}
+        }
+    };
+
+    expose(globalThis);
+    try {
+        if (typeof unsafeWindow !== 'undefined' && unsafeWindow && unsafeWindow !== globalThis) expose(unsafeWindow);
+    } catch {}
+})();
 
 (function () {
     'use strict';
 
+    const PERF = globalThis.__attPerfStats || null;
+
     const APP = {
-        version: 'V7.16.6',
+        version: 'V7.16.7',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -8515,7 +8685,11 @@
         if (!root?.querySelectorAll) return [];
 
         const cached = gridFieldDefsFrameCache.get(root);
-        if (cached) return cached;
+        if (cached) {
+            if (PERF) PERF.counters.gridFieldDefsCacheHits++;
+            return cached;
+        }
+        if (PERF) PERF.counters.gridFieldDefsCacheMisses++;
 
         const defs = [];
         const seenIds = new Set();
@@ -8709,8 +8883,10 @@
         const path = location.pathname || '';
         const cached = tableContextFrameCache;
         if (cached && cached.path === path && cached.value?.root?.isConnected) {
+            if (PERF) PERF.counters.tableContextCacheHits++;
             return cached.value;
         }
+        if (PERF) PERF.counters.tableContextCacheMisses++;
 
         const root = getVisibleGridRoot();
         if (!root) return null;
@@ -9120,6 +9296,7 @@
 
         if (!pinVirtualObserver) {
             pinVirtualObserver = new MutationObserver(records => {
+                if (PERF) PERF.counters.pinVirtualObserverCallbacks++;
                 const cache = pinLayoutCache;
                 if (!state.columnPinEnabled || !cache?.root?.isConnected) return;
                 if (cache.root !== pinVirtualObservedRoot) return;
@@ -9160,6 +9337,7 @@
                 // 只有表头结构真的发生变化时才重新测量列宽 / offset。
                 // 普通纵向虚拟滚动绝不触发全表重算。
                 if (headerStructureChanged) {
+                    if (PERF) PERF.counters.pinVirtualHeaderRelayoutRequests++;
                     scheduleApplyPinnedColumns(0);
                 }
             });
@@ -9203,6 +9381,7 @@
     }
 
     function applyPinnedColumns() {
+        if (PERF) PERF.counters.pinApplyCalls++;
         clearTimeout(pinApplyTimer);
         pinApplyTimer = null;
 
@@ -9364,6 +9543,7 @@
         // 2) 切换表 / 置顶配置改变；
         // 3) 列宽改变；
         // 普通快速滚动只走专用 MutationObserver 的增量路径。
+        if (PERF) PERF.counters.pinFullLayouts++;
         syncVisiblePinnedCells(pinLayoutCache);
 
         updatePinResizeObserver(root, [...leftDefs, ...rightDefs]);
@@ -11130,18 +11310,29 @@
     }
 
     function renderPanelSection(sectionId) {
-        if (sectionId === 'features') renderFeaturesSection();
-        else if (sectionId === 'combos') {
-            if (isComboEditorOpen()) {
-                panelContextRefreshPending = true;
-                panelDirtySections.add('combos');
-                return false;
-            }
-            renderCombosSection();
-        } else if (sectionId === 'pinning') renderPinningSection();
-        else if (sectionId === 'settings') renderSettingsSection();
-        panelDirtySections.delete(sectionId);
-        return true;
+        const perfStarted = PERF ? performance.now() : 0;
+        if (PERF) {
+            PERF.counters.panelSectionRenderCalls++;
+            const key = Object.prototype.hasOwnProperty.call(PERF.counters.panelSectionRenders, sectionId) ? sectionId : 'other';
+            PERF.counters.panelSectionRenders[key]++;
+        }
+        try {
+            if (sectionId === 'features') renderFeaturesSection();
+            else if (sectionId === 'combos') {
+                if (isComboEditorOpen()) {
+                    if (PERF) PERF.counters.panelSectionRenderDeferred++;
+                    panelContextRefreshPending = true;
+                    panelDirtySections.add('combos');
+                    return false;
+                }
+                renderCombosSection();
+            } else if (sectionId === 'pinning') renderPinningSection();
+            else if (sectionId === 'settings') renderSettingsSection();
+            panelDirtySections.delete(sectionId);
+            return true;
+        } finally {
+            if (PERF) PERF.recordTiming('panelSectionRenderMs', performance.now() - perfStarted);
+        }
     }
 
     function flushPanelDirtySections(forceCurrent = false) {
@@ -11161,6 +11352,7 @@
 
     function refreshPanelContextSafely() {
         if (!state.panelOpen) return;
+        if (PERF) PERF.counters.panelContextRefreshFlushes++;
         invalidatePanelSections(state.activeTab || 'features');
         panelContextRefreshPending = false;
         flushPanelDirtySections();
@@ -11193,6 +11385,11 @@
     }
 
     function schedulePanelContextRefresh(delay = 180) {
+        if (PERF) {
+            PERF.counters.panelContextRefreshRequests++;
+            if (panelContextRefreshPending) PERF.counters.panelContextRefreshCoalesced++;
+            else PERF.counters.panelContextRefreshQueued++;
+        }
         panelContextRefreshPending = true;
         invalidatePanelSections(state.activeTab || 'features');
         if (!state.panelOpen) return;
@@ -11207,22 +11404,28 @@
     function renderPanel() {
         const root = document.getElementById(APP.rootId);
         if (!root) return;
+        const perfStarted = PERF ? performance.now() : 0;
+        if (PERF) PERF.counters.panelFullRenders++;
 
-        renderPanelShellState();
-        renderFeaturesSection();
-        // 字段组合编辑器是会话型 UI。完整 render 也不得覆盖正在编辑的 DOM。
-        if (!isComboEditorOpen()) renderCombosSection();
-        renderPinningSection();
-        renderSettingsSection();
-        panelDirtySections.clear();
-        injectTableToolsSubnav();
-        updateActiveComboBadge();
+        try {
+            renderPanelShellState();
+            renderFeaturesSection();
+            // 字段组合编辑器是会话型 UI。完整 render 也不得覆盖正在编辑的 DOM。
+            if (!isComboEditorOpen()) renderCombosSection();
+            renderPinningSection();
+            renderSettingsSection();
+            panelDirtySections.clear();
+            injectTableToolsSubnav();
+            updateActiveComboBadge();
 
-        if (state.panelOpen && !panelContextRefreshRaf) {
-            panelContextRefreshRaf = requestAnimationFrame(() => {
-                panelContextRefreshRaf = 0;
-                if (state.panelOpen) stabilizePanelInsideViewport();
-            });
+            if (state.panelOpen && !panelContextRefreshRaf) {
+                panelContextRefreshRaf = requestAnimationFrame(() => {
+                    panelContextRefreshRaf = 0;
+                    if (state.panelOpen) stabilizePanelInsideViewport();
+                });
+            }
+        } finally {
+            if (PERF) PERF.recordTiming('panelFullRenderMs', performance.now() - perfStarted);
         }
     }
 
@@ -13877,6 +14080,7 @@
     }
 
     function positionPanelInsideViewport() {
+        if (PERF) PERF.counters.panelAnchorLayouts++;
         const root = document.getElementById(APP.rootId);
         const fab = document.getElementById(APP.fabId);
         const panel = document.getElementById(APP.panelId);
@@ -13928,6 +14132,7 @@
     }
 
     function stabilizePanelInsideViewport() {
+        if (PERF) PERF.counters.panelStableClamps++;
         const panel = document.getElementById(APP.panelId);
         if (!panel) return;
 
@@ -18352,13 +18557,17 @@
         let themeRefreshTimer = null;
 
         const observer = new MutationObserver(mutations => {
+            if (PERF) PERF.counters.mainObserverCallbacks++;
             /*
              * V6.6 关键性能路径：
              * 虚拟滚动时 .grid-virtual-body 会频繁增删/复用行。
              * 置顶列已有专用 pinVirtualObserver，斑马纹也有专用增量 observer；
              * 因此这里直接跳过主题检测、Ant Select 全文扫描、分页增强、表上下文识别等全局工作。
              */
-            if (isVirtualGridOnlyMutationBatch(mutations)) return;
+            if (isVirtualGridOnlyMutationBatch(mutations)) {
+                if (PERF) PERF.counters.virtualObserverFastSkips++;
+                return;
+            }
 
             ensureRoot();
             ensureBulkProgressButton();
@@ -28014,6 +28223,8 @@
 (function () {
     'use strict';
 
+    const PERF = globalThis.__attPerfStats || null;
+
     const MOD = {
         version: 'V7.15.3',
         keyEnabled: 'att_v3_conditionalHighlightEnabled',
@@ -28406,8 +28617,10 @@
             cached.generation === activeRulesGeneration &&
             cached.map === map &&
             cached.contextKey === contextKey) {
+            if (PERF) PERF.counters.rulePlanCacheHits++;
             return cached.entries;
         }
+        if (PERF) PERF.counters.rulePlanCacheMisses++;
 
         const entries = [];
         for (const rule of activeRulesCache) {
@@ -28690,6 +28903,7 @@
         const map = buildHeaderMap(root);
         const plan = getActiveRulePlan(root, map);
         if (!plan.length) return;
+        if (PERF) PERF.counters.conditionalRuleEvaluations += plan.length;
 
         let rowWinner = null;
         const cellWinners = new Set();
@@ -28737,7 +28951,17 @@
         }
         const batch = Array.from(dirtyRows);
         dirtyRows.clear();
-        batch.forEach(evaluateRow);
+        if (!batch.length) return;
+        const perfStarted = PERF ? performance.now() : 0;
+        if (PERF) {
+            PERF.counters.conditionalFlushes++;
+            PERF.counters.conditionalRowsProcessed += batch.length;
+        }
+        try {
+            batch.forEach(evaluateRow);
+        } finally {
+            if (PERF) PERF.recordTiming('conditionalFlushMs', performance.now() - perfStarted);
+        }
     }
 
     function collectRowsFromNode(node, set) {
@@ -28751,6 +28975,7 @@
     function installBodyObserver(body) {
         if (!(body instanceof Element) || bodyObservers.has(body)) return;
         const observer = new MutationObserver(records => {
+            if (PERF) PERF.counters.conditionalBodyObserverCallbacks++;
             if (!enabled) return;
             const rows = new Set();
             for (const record of records) {
