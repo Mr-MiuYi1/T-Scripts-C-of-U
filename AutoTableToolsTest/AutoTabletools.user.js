@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.16.3
-// @description  AutoTable 一体化效率增强工具：四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.16.4
+// @description  AutoTable 一体化效率增强工具：四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.16.3
+ * AutoTable 工具集 V7.16.4
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，规则组/规则分层管理，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -38,13 +38,14 @@
  * - 渲染：按真实行号稳定斑马纹；虚拟滚动增量渲染；聚焦行/字段分别保存稳定身份；横向虚拟化时绝不回退到其它字段；编辑与置顶表头保持稳定层级；置顶表头高亮使用不透明底层防止滚动表头穿透
  * - 置顶：右置顶严格镜像；“+ 添加列”保持 AutoTable 原生末端位置，不参与置顶 sticky/offset
  * - 面板：V7.16 采用主导航 + 表格二级导航；减少顶部分类数量，按任务频率分布内容，保留原功能与设置项
+ * - 性能：V7.16.4 无感加固；菜单上下文改为 dirty + 事件驱动刷新，Tab 只重绘目标工作区；条件高亮状态用内存快照同步；同帧复用表格上下文与字段定义
  * ========================================================================== */
 
 (function () {
     'use strict';
 
     const APP = {
-        version: 'V7.16.3',
+        version: 'V7.16.4',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -252,16 +253,28 @@
     let lastComboContextKey = '';
 
 
-    // V7.16.3：悬浮菜单交互稳定层。
-    // 页面尚未加载完成时，AutoTable 会连续替换表格 / 视图 DOM；旧逻辑一检测到
-    // contextKey 变化就立即 renderFeaturesSection()，会销毁当前菜单中的 focus 节点。
-    // 这里把“页面上下文刷新”和“用户正在操作菜单”解耦：DOM 变化只排队刷新，
-    // 用户正在按下 / 输入 / 聚焦菜单控件时绝不重建当前工作区。
+    // V7.16.4：悬浮菜单“无感性能加固”。
+    // - 页面变化只设置 dirty；用户正在交互时不做循环 retry；
+    // - 交互结束 / 稳定窗口结束后只合并刷新一次；
+    // - 普通上下文同步只重绘当前可见 section，完整 renderPanel 仅保留给显式全量场景。
     let panelContextRefreshTimer = 0;
+    let panelContextRefreshRaf = 0;
     let panelInteractionUntil = 0;
     let panelPointerActive = false;
     let panelOpenedAt = 0;
     let panelContextRefreshPending = false;
+    const panelDirtySections = new Set();
+
+    // 条件高亮快捷页只读快照。首次仍从 GM 读取保证兼容，之后由条件高亮模块事件同步，
+    // 避免每次快捷页重绘重复读取 4 份 GM Storage。
+    let conditionalHighlightSnapshot = null;
+
+    // 同一 animation frame 内复用表格上下文 / 表头字段定义。
+    // 下一帧自动失效，既减少同帧重复 DOM 扫描，也不形成跨页面的陈旧长期缓存。
+    let tableContextFrameCache = null;
+    let tableContextFrameCacheRaf = 0;
+    let gridFieldDefsFrameCache = new WeakMap();
+    let gridFieldDefsFrameCacheRaf = 0;
 
     // V7.16.3：字段组合编辑器属于“长生命周期编辑会话”。
     // 以前页面加载稳定刷新、Tab 重绘或重新读取字段都会 renderCombosSection()，
@@ -8495,6 +8508,9 @@
     function getGridFieldDefs(root) {
         if (!root?.querySelectorAll) return [];
 
+        const cached = gridFieldDefsFrameCache.get(root);
+        if (cached) return cached;
+
         const defs = [];
         const seenIds = new Set();
 
@@ -8514,6 +8530,13 @@
             });
         });
 
+        gridFieldDefsFrameCache.set(root, defs);
+        if (!gridFieldDefsFrameCacheRaf) {
+            gridFieldDefsFrameCacheRaf = requestAnimationFrame(() => {
+                gridFieldDefsFrameCacheRaf = 0;
+                gridFieldDefsFrameCache = new WeakMap();
+            });
+        }
         return defs;
     }
 
@@ -8677,10 +8700,15 @@
     }
 
     function getCurrentTableContext() {
+        const path = location.pathname || '';
+        const cached = tableContextFrameCache;
+        if (cached && cached.path === path && cached.value?.root?.isConnected) {
+            return cached.value;
+        }
+
         const root = getVisibleGridRoot();
         if (!root) return null;
 
-        const path = location.pathname || '';
         const tableMatch = path.match(/\/t\/(tbl_[^/]+)/i);
         const baseMatch = path.match(/\/b\/([^/]+)/i);
         const tableId = tableMatch?.[1] || '';
@@ -8704,7 +8732,15 @@
             key = `path::${normalizedPath || '/'}`;
         }
 
-        return { key, tableId, baseId, tableName, root };
+        const value = { key, tableId, baseId, tableName, root };
+        tableContextFrameCache = { path, value };
+        if (!tableContextFrameCacheRaf) {
+            tableContextFrameCacheRaf = requestAnimationFrame(() => {
+                tableContextFrameCacheRaf = 0;
+                tableContextFrameCache = null;
+            });
+        }
+        return value;
     }
 
     function getPinnedTableProfile(context, create = false) {
@@ -10664,7 +10700,6 @@
             case 'openPinSettings':
                 state.activeTab = 'pinning';
                 setPanelOpen(true);
-                renderPanel();
                 showToast('已打开列置顶设置');
                 break;
 
@@ -10791,7 +10826,7 @@
         root.addEventListener('pointermove', resetIdleTimer);
         root.addEventListener('pointerleave', resetIdleTimer);
 
-        // V7.16.3：用户正在菜单内操作时，页面加载造成的 DOM/context 变化只能排队，
+        // V7.16.4：用户正在菜单内操作时，页面加载造成的 DOM/context 变化只能排队，
         // 不能立即 innerHTML 重建当前 section。
         root.addEventListener('pointerdown', event => {
             if (!event.target.closest?.(`#${APP.panelId}`)) return;
@@ -10802,12 +10837,12 @@
             if (!event.target.closest?.(`#${APP.panelId}`)) return;
             panelPointerActive = false;
             markPanelInteraction(520);
-            schedulePanelContextRefresh(560);
+            if (panelContextRefreshPending) schedulePanelContextRefresh(560);
         }, true);
         root.addEventListener('pointercancel', () => {
             panelPointerActive = false;
             markPanelInteraction(320);
-            schedulePanelContextRefresh(360);
+            if (panelContextRefreshPending) schedulePanelContextRefresh(360);
         }, true);
         root.addEventListener('focusin', event => {
             if (!event.target.closest?.(`#${APP.panelId}`)) return;
@@ -10816,13 +10851,15 @@
         root.addEventListener('focusout', event => {
             if (!event.target.closest?.(`#${APP.panelId}`)) return;
             markPanelInteraction(260);
-            schedulePanelContextRefresh(320);
+            if (panelContextRefreshPending) schedulePanelContextRefresh(320);
         }, true);
         root.addEventListener('input', event => {
             if (event.target.closest?.(`#${APP.panelId}`)) markPanelInteraction(1200);
         }, true);
         root.addEventListener('change', event => {
-            if (event.target.closest?.(`#${APP.panelId}`)) markPanelInteraction(800);
+            if (!event.target.closest?.(`#${APP.panelId}`)) return;
+            markPanelInteraction(800);
+            if (panelContextRefreshPending) schedulePanelContextRefresh(840);
         }, true);
 
         setupFabDrag();
@@ -10993,11 +11030,60 @@
         state.comboPickerOpen = true;
     }
 
+    function readConditionalHighlightSnapshotFromGM() {
+        const rules = GM_getValue('att_v3_conditionalHighlightRules', []);
+        const rawGroups = GM_getValue('att_v3_conditionalHighlightGroups', []);
+        const groups = Array.isArray(rawGroups) && rawGroups.length
+            ? rawGroups.filter(g => g && g.id).map(g => ({ id:String(g.id), name:String(g.name || '未命名规则组') }))
+            : [{ id:'group_default', name:'默认规则组' }];
+        const activeIdRaw = String(GM_getValue('att_v3_conditionalHighlightActiveGroup', '') || '');
+        const activeGroup = groups.find(g => g.id === activeIdRaw) || groups[0];
+        const activeRuleCount = Array.isArray(rules)
+            ? rules.filter(r => r && r.enabled !== false && String(r.groupId || 'group_default') === activeGroup.id).length
+            : 0;
+        return {
+            enabled: Boolean(GM_getValue('att_v3_conditionalHighlightEnabled', false)),
+            activeGroupId: activeGroup.id,
+            activeGroupName: activeGroup.name,
+            activeRuleCount,
+            groupCount: groups.length
+        };
+    }
+
+    function getConditionalHighlightSnapshot() {
+        if (!conditionalHighlightSnapshot) {
+            conditionalHighlightSnapshot = readConditionalHighlightSnapshotFromGM();
+        }
+        return conditionalHighlightSnapshot;
+    }
+
+    function applyConditionalHighlightSnapshot(detail) {
+        if (!detail || typeof detail !== 'object') return;
+        const previous = getConditionalHighlightSnapshot();
+        conditionalHighlightSnapshot = {
+            enabled: detail.enabled != null ? Boolean(detail.enabled) : previous.enabled,
+            activeGroupId: String(detail.activeGroupId ?? detail.id ?? previous.activeGroupId ?? 'group_default'),
+            activeGroupName: String(detail.activeGroupName ?? detail.name ?? previous.activeGroupName ?? '默认规则组'),
+            activeRuleCount: Number.isFinite(Number(detail.activeRuleCount ?? detail.activeCount))
+                ? Number(detail.activeRuleCount ?? detail.activeCount)
+                : previous.activeRuleCount,
+            groupCount: Number.isFinite(Number(detail.groupCount)) ? Number(detail.groupCount) : previous.groupCount
+        };
+        if (state.panelOpen && state.activeTab === 'features') {
+            invalidatePanelSections('features');
+            schedulePanelContextRefresh(0);
+        }
+    }
+
+    window.addEventListener('att:conditional-highlight:state', event => {
+        applyConditionalHighlightSnapshot(event?.detail);
+    });
+
     function markPanelInteraction(holdMs = 700) {
         panelInteractionUntil = Math.max(panelInteractionUntil, performance.now() + Math.max(80, Number(holdMs) || 0));
     }
 
-    function isPanelInteractionBusy() {
+    function getPanelInteractionState() {
         const panel = document.getElementById(APP.panelId);
         const active = document.activeElement;
         const focusedEditor = Boolean(
@@ -11006,67 +11092,27 @@
             panel.contains(active) &&
             active.matches('input:not([type="button"]):not([type="submit"]),select,textarea,[contenteditable="true"]')
         );
-        return Boolean(
-            panelPointerActive ||
-            performance.now() < panelInteractionUntil ||
-            focusedEditor
-        );
+        return {
+            pointer: panelPointerActive,
+            focusedEditor,
+            cooldownMs: Math.max(0, panelInteractionUntil - performance.now())
+        };
     }
 
-    function refreshPanelContextSafely() {
-        if (!state.panelOpen) return;
-
-        updateActiveComboBadge();
-
-        // 只刷新当前可见工作区；不要像 renderPanel() 那样把所有 section 都重建一遍。
-        if (state.activeTab === 'features') renderFeaturesSection();
-        else if (state.activeTab === 'combos') {
-            if (isComboEditorOpen()) {
-                // 编辑期间只记录“待刷新”，绝不销毁字段组合编辑器。
-                panelContextRefreshPending = true;
-            } else {
-                renderCombosSection();
-                panelContextRefreshPending = false;
-            }
-        } else if (state.activeTab === 'pinning') renderPinningSection();
-
-        injectTableToolsSubnav();
-        requestAnimationFrame(positionPanelInsideViewport);
+    function isPanelInteractionBusy() {
+        const s = getPanelInteractionState();
+        return Boolean(s.pointer || s.focusedEditor || s.cooldownMs > 0);
     }
 
-    function schedulePanelContextRefresh(delay = 180) {
-        panelContextRefreshPending = true;
-        clearTimeout(panelContextRefreshTimer);
-        panelContextRefreshTimer = setTimeout(() => {
-            panelContextRefreshTimer = 0;
-            if (!state.panelOpen) return;
-
-            // 字段组合编辑属于显式编辑会话。后台 React/表格加载变化只记脏标记，
-            // 不循环定时重试，更不能把 editor 整段 innerHTML 覆盖掉。
-            if (isComboEditorOpen()) return;
-
-            // 打开后的首段时间属于“页面加载稳定窗口”。即使此时没有 input 获得焦点，
-            // 也先让 AutoTable 把表格 / 筛选栏 / 视图状态挂载完，再一次性刷新菜单上下文。
-            const sinceOpen = performance.now() - panelOpenedAt;
-            if (sinceOpen >= 0 && sinceOpen < 850) {
-                schedulePanelContextRefresh(Math.max(120, 850 - sinceOpen));
-                return;
-            }
-
-            if (isPanelInteractionBusy()) {
-                schedulePanelContextRefresh(220);
-                return;
-            }
-
-            panelContextRefreshPending = false;
-            refreshPanelContextSafely();
-        }, Math.max(60, Number(delay) || 180));
+    function invalidatePanelSections(...sectionIds) {
+        const ids = sectionIds.flat().filter(Boolean);
+        if (!ids.length) ids.push(state.activeTab || 'features');
+        ids.forEach(id => panelDirtySections.add(id));
     }
 
-    function renderPanel() {
+    function renderPanelShellState() {
         const root = document.getElementById(APP.rootId);
         if (!root) return;
-
         root.querySelectorAll('.att-tab').forEach(tab => {
             const tabId = tab.dataset.tab;
             const isTableTools = tabId === 'table-tools' && (state.activeTab === 'combos' || state.activeTab === 'pinning');
@@ -11075,19 +11121,102 @@
         root.querySelectorAll('.att-section').forEach(section => {
             section.classList.toggle('att-active', section.dataset.section === state.activeTab);
         });
+    }
 
+    function renderPanelSection(sectionId) {
+        if (sectionId === 'features') renderFeaturesSection();
+        else if (sectionId === 'combos') {
+            if (isComboEditorOpen()) {
+                panelContextRefreshPending = true;
+                panelDirtySections.add('combos');
+                return false;
+            }
+            renderCombosSection();
+        } else if (sectionId === 'pinning') renderPinningSection();
+        else if (sectionId === 'settings') renderSettingsSection();
+        panelDirtySections.delete(sectionId);
+        return true;
+    }
+
+    function flushPanelDirtySections(forceCurrent = false) {
+        if (!state.panelOpen) return;
+        if (forceCurrent) panelDirtySections.add(state.activeTab || 'features');
+        const current = state.activeTab || 'features';
+        if (panelDirtySections.has(current)) renderPanelSection(current);
+        updateActiveComboBadge();
+        injectTableToolsSubnav();
+        if (!panelContextRefreshRaf) {
+            panelContextRefreshRaf = requestAnimationFrame(() => {
+                panelContextRefreshRaf = 0;
+                if (state.panelOpen) positionPanelInsideViewport();
+            });
+        }
+    }
+
+    function refreshPanelContextSafely() {
+        if (!state.panelOpen) return;
+        invalidatePanelSections(state.activeTab || 'features');
+        panelContextRefreshPending = false;
+        flushPanelDirtySections();
+    }
+
+    function flushPendingPanelContextRefresh() {
+        if (!panelContextRefreshPending || !state.panelOpen) return;
+        if (isComboEditorOpen()) return;
+
+        // 首次打开仍保留原来的稳定窗口，但只安排一次“到点刷新”，不循环轮询。
+        const sinceOpen = performance.now() - panelOpenedAt;
+        if (sinceOpen >= 0 && sinceOpen < 850) {
+            schedulePanelContextRefresh(Math.ceil(850 - sinceOpen) + 20);
+            return;
+        }
+
+        const interaction = getPanelInteractionState();
+        if (interaction.pointer || interaction.focusedEditor) {
+            // 真正的编辑/按压会由 pointerup / focusout / change 再触发一次；此处保持 dirty 即可。
+            return;
+        }
+        if (interaction.cooldownMs > 0) {
+            // 仅等待当前交互保护窗口结束一次，不再 220ms 轮询。
+            schedulePanelContextRefresh(Math.ceil(interaction.cooldownMs) + 20);
+            return;
+        }
+
+        panelContextRefreshPending = false;
+        refreshPanelContextSafely();
+    }
+
+    function schedulePanelContextRefresh(delay = 180) {
+        panelContextRefreshPending = true;
+        invalidatePanelSections(state.activeTab || 'features');
+        if (!state.panelOpen) return;
+
+        clearTimeout(panelContextRefreshTimer);
+        panelContextRefreshTimer = setTimeout(() => {
+            panelContextRefreshTimer = 0;
+            flushPendingPanelContextRefresh();
+        }, Math.max(0, Number(delay) || 0));
+    }
+
+    function renderPanel() {
+        const root = document.getElementById(APP.rootId);
+        if (!root) return;
+
+        renderPanelShellState();
         renderFeaturesSection();
-        // V7.16.3：字段组合编辑器是会话型 UI。只要编辑器还开着，任何普通 panel 重绘
-        // 都不得 renderCombosSection()，否则会把用户尚未保存的编辑 DOM 直接销毁。
+        // 字段组合编辑器是会话型 UI。完整 render 也不得覆盖正在编辑的 DOM。
         if (!isComboEditorOpen()) renderCombosSection();
         renderPinningSection();
         renderSettingsSection();
+        panelDirtySections.clear();
         injectTableToolsSubnav();
-
         updateActiveComboBadge();
 
-        if (state.panelOpen) {
-            requestAnimationFrame(positionPanelInsideViewport);
+        if (state.panelOpen && !panelContextRefreshRaf) {
+            panelContextRefreshRaf = requestAnimationFrame(() => {
+                panelContextRefreshRaf = 0;
+                if (state.panelOpen) positionPanelInsideViewport();
+            });
         }
     }
 
@@ -11150,17 +11279,14 @@
         const currentValueRaw = activeCell ? (getCellText(activeCell) || '（空）') : '点击表格中的任意单元格即可开始';
         const currentValue = currentValueRaw.length > 64 ? currentValueRaw.slice(0, 64) + '…' : currentValueRaw;
 
-        const conditionEnabled = Boolean(GM_getValue('att_v3_conditionalHighlightEnabled', false));
-        const conditionRules = GM_getValue('att_v3_conditionalHighlightRules', []);
-        const rawConditionGroups = GM_getValue('att_v3_conditionalHighlightGroups', []);
-        const conditionGroups = Array.isArray(rawConditionGroups) && rawConditionGroups.length
-            ? rawConditionGroups.filter(g => g && g.id).map(g => ({ id:String(g.id), name:String(g.name || '未命名规则组') }))
-            : [{ id:'group_default', name:'默认规则组' }];
-        const conditionActiveGroupIdRaw = String(GM_getValue('att_v3_conditionalHighlightActiveGroup', '') || '');
-        const conditionActiveGroup = conditionGroups.find(g => g.id === conditionActiveGroupIdRaw) || conditionGroups[0];
-        const conditionRuleCount = Array.isArray(conditionRules)
-            ? conditionRules.filter(r => r && r.enabled !== false && String(r.groupId || 'group_default') === conditionActiveGroup.id).length
-            : 0;
+        const conditionSnapshot = getConditionalHighlightSnapshot();
+        const conditionEnabled = conditionSnapshot.enabled;
+        const conditionActiveGroup = {
+            id: conditionSnapshot.activeGroupId,
+            name: conditionSnapshot.activeGroupName
+        };
+        const conditionRuleCount = conditionSnapshot.activeRuleCount;
+        const conditionGroupCount = conditionSnapshot.groupCount;
 
         const comboOptions = state.combos.map(combo => {
             const status = getComboCompatibility(combo);
@@ -11253,7 +11379,7 @@
                     </div>
                     <div class="att-quick-detail-v7160 att-quick-highlight-detail-v7162 ${conditionEnabled ? 'is-enabled' : 'is-disabled'}">
                         <span class="att-quick-detail-label-v7160">高亮组</span>
-                        <button type="button" data-act="cycle-conditional-highlight-group" ${conditionGroups.length > 1 ? '' : 'disabled'} title="切换条件高亮规则组">${escapeHtml(conditionActiveGroup.name)}</button>
+                        <button type="button" data-act="cycle-conditional-highlight-group" ${conditionGroupCount > 1 ? '' : 'disabled'} title="切换条件高亮规则组">${escapeHtml(conditionActiveGroup.name)}</button>
                         <span class="att-quick-detail-status-v7162">${conditionEnabled ? '生效中' : '已停用'}</span>
                         <button type="button" data-act="open-conditional-highlight-manager">规则</button>
                     </div>
@@ -12712,7 +12838,9 @@
         }
 
         state.activeTab = tabId;
-        renderPanel();
+        renderPanelShellState();
+        invalidatePanelSections(tabId);
+        flushPanelDirtySections();
         requestAnimationFrame(() => {
             const nextContent = document.querySelector(`#${APP.panelId} .att-content`);
             if (nextContent) nextContent.scrollTop = state.panelTabScrollPositions?.[tabId] || 0;
@@ -13501,6 +13629,9 @@
         persistCore();
         clearComboEditorDraft();
         panelContextRefreshPending = false;
+        clearTimeout(panelContextRefreshTimer);
+        panelContextRefreshTimer = 0;
+        panelDirtySections.clear();
         renderPanel();
         showToast(editMode === 'table'
             ? `已保存 ${context.tableName} 的字段配置`
@@ -13776,7 +13907,10 @@
             panelInteractionUntil = 0;
             clearTimeout(panelContextRefreshTimer);
             panelContextRefreshTimer = 0;
+            if (panelContextRefreshRaf) cancelAnimationFrame(panelContextRefreshRaf);
+            panelContextRefreshRaf = 0;
             panelContextRefreshPending = false;
+            panelDirtySections.clear();
         }
 
         root.classList.toggle('att-open', open);
@@ -18209,7 +18343,7 @@
                 lastComboContextKey = comboContextKey;
                 updateActiveComboBadge();
                 if (state.panelOpen) {
-                    // V7.16.3：SPA / 首屏加载中的上下文变化只排队刷新。
+                    // V7.16.4：SPA / 首屏加载中的上下文变化只排队刷新。
                     // 直接 renderFeaturesSection 会销毁当前聚焦的 select / input / button。
                     schedulePanelContextRefresh(180);
                 }
@@ -18253,7 +18387,7 @@
         });
 
         console.log(`[AutoTable 工具集] ${APP.version} 已加载`);
-        console.log('[AutoTable 工具集] V7.16.3：字段组合编辑会话保护 + 草稿持久化 + 页面加载期间菜单焦点保护已启用。');
+        console.log('[AutoTable 工具集] V7.16.4：事件驱动菜单刷新 + 分区增量渲染 + 短生命周期上下文/字段缓存已启用。');
         console.log('[AutoTable 工具集] V6.8：基于 V6.6 稳定渲染版升级规则化快捷短语、日期时间模板、条件显示与编辑首行自动预留。');
     }
 
@@ -27990,6 +28124,21 @@
         return activeRulesCache;
     }
 
+    function emitStateSnapshot(source = 'ui') {
+        const group = getActiveGroup();
+        window.dispatchEvent(new CustomEvent('att:conditional-highlight:state', {
+            detail: {
+                enabled,
+                activeGroupId: group?.id || DEFAULT_GROUP_ID,
+                activeGroupName: group?.name || '默认规则组',
+                activeRuleCount: activeRulesCache.length,
+                totalRuleCount: rules.filter(r => r.groupId === group?.id).length,
+                groupCount: groups.length,
+                source
+            }
+        }));
+    }
+
     function emitGroupChanged(source = 'ui') {
         const group = getActiveGroup();
         window.dispatchEvent(new CustomEvent('att:conditional-highlight:group-changed', {
@@ -28001,6 +28150,7 @@
                 source
             }
         }));
+        emitStateSnapshot(source);
     }
 
     function setActiveGroup(groupId, source = 'ui') {
@@ -28035,6 +28185,7 @@
         rebuildActiveRulesCache();
         updateSettingsCard();
         rescanAllVisibleRows();
+        emitStateSnapshot('rules-save');
     }
 
     function setEnabled(value) {
@@ -28043,6 +28194,7 @@
         if (enabled) rebuildActiveRulesCache();
         updateSettingsCard();
         syncEngineState();
+        emitStateSnapshot('enabled-change');
     }
 
     function hexToRgb(hex) {
@@ -29840,6 +29992,7 @@
         attachToolboxObserver();
         attachPageObserver();
         syncEngineState();
+        emitStateSnapshot('init');
         console.log('[AutoTable 条件高亮] V7.15.3 已加载：规则组 / 分层管理面板 / 一体化内嵌操作流 / 批量规则操作 / 快捷切换 / 日期语义 / 安全高级表达式 / 整行上下强调边缘 / 虚拟滚动增量高亮');
     }
 
@@ -30331,7 +30484,7 @@
     'use strict';
 
     const SH = {
-        version: 'V7.16.3',
+        version: 'V7.16.4',
         enabledKey: 'att_v3_viewSearchHistoryEnabled',
         maxKey: 'att_v3_viewSearchHistoryMaxPerView',
         perViewKey: 'att_v3_viewSearchHistoryPerViewMode',
