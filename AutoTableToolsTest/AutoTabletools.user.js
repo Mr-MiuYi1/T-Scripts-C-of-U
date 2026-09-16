@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.17.1
-// @description  AutoTable 一体化效率增强工具：文档表格增强（上下文稳定识别 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.17.4
+// @description  AutoTable 一体化效率增强工具：文档表格增强（跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.17.1
+ * AutoTable 工具集 V7.17.4
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，规则组/规则分层管理，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -54,7 +54,7 @@
     'use strict';
 
     const KEY = '__attPerfStats';
-    const VERSION = 'V7.17.1';
+    const VERSION = 'V7.17.4';
     const makeCounters = () => ({
         panelFullRenders: 0,
         panelSectionRenderCalls: 0,
@@ -215,7 +215,7 @@
     const PERF = globalThis.__attPerfStats || null;
 
     const APP = {
-        version: 'V7.17.1',
+        version: 'V7.17.4',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -19306,8 +19306,20 @@
 
         const headingCount = collectHeadings().length;
 
-        section.innerHTML = `
-            <div class="att-card">
+        let card = section.querySelector('[data-att-doc-outline-card="7173"]');
+        if (!card) {
+            card = document.createElement('div');
+            card.className = 'att-card';
+            card.dataset.attDocOutlineCard = '7173';
+            section.appendChild(card);
+        }
+        const signature = JSON.stringify([docState.outlineEnabled, docState.outlineFollowEnabled]);
+        if (card.dataset.renderSignature === signature) {
+            updateHeadingCountInToolbox(headingCount);
+            return;
+        }
+        card.dataset.renderSignature = signature;
+        card.innerHTML = `
                 <div class="att-card-title">文档大纲</div>
                 <div class="att-card-desc">仅在 AutoTable 文档视图中生效。开启后自动读取正文里的 H1–H6 标题，并随文档内容实时更新。</div>
                 <div class="att-divider"></div>
@@ -19347,7 +19359,6 @@
                 <div class="att-doc-tools-note">
                     V5 保留 V4 的内部容器定点跳转；开启“大纲滑动跟随”后，正文滚动到新章节时，大纲会自动跟随当前标题。
                 </div>
-            </div>
         `;
     }
 
@@ -19463,7 +19474,7 @@
 
     function updateHeadingCountInToolbox(count) {
         const status = document.getElementById(DOC_TOOLS.headingCountId);
-        if (status) status.textContent = `当前检测到 ${count} 个标题`;
+        if (status && status.textContent !== `当前检测到 ${count} 个标题`) status.textContent = `当前检测到 ${count} 个标题`;
     }
 
     function scheduleOutlineRebuild(delay = 180) {
@@ -19801,7 +19812,7 @@
                 // V7.16.5：表格虚拟行复用不可能改变文档编辑上下文，直接早退。
                 if (target?.closest?.('.grid-virtual-body')) return false;
                 if (!(target instanceof Element)) return true;
-                return !target.closest('#att-toolbox-root, #att-document-outline');
+                return !target.closest('#att-toolbox-root, #att-document-outline, #att-doc-table-mini-toolbar-v7170, #att-doc-table-nested-guard-v7170, #att-doc-table-toast-v7170, #att-doc-table-assist-overlay-v7172');
             });
 
             if (hasExternalMutation) scheduleContextSync(80);
@@ -31962,7 +31973,7 @@
 })();
 
 /* ============================================================================
- * AutoTable Document Table Plus V7.17.1 · 文档表格增强第一阶段
+ * AutoTable Document Table Plus V7.17.4 · 文档表格增强第一阶段
  * --------------------------------------------------------------------------
  * 目标：不重做 ProseMirror 表格引擎，只给原生表格能力增加一层稳定的交互外壳。
  *
@@ -31983,7 +31994,7 @@
     'use strict';
 
     const DTP = {
-        version: 'V7.17.1',
+        version: 'V7.17.4',
         styleId: 'att-doc-table-plus-style-v7170',
         toolbarId: 'att-doc-table-mini-toolbar-v7170',
         guardId: 'att-doc-table-nested-guard-v7170',
@@ -32003,7 +32014,9 @@
             assistHighlight: 'att_doc_table_plus_assist_highlight_v7170',
             resizeHit: 'att_doc_table_plus_resize_hit_v7170',
             nestedGuard: 'att_doc_table_plus_nested_guard_v7170',
-            navigator: 'att_doc_table_plus_navigator_v7170'
+            navigator: 'att_doc_table_plus_navigator_v7170',
+            preventCellMove: 'att_doc_table_plus_prevent_cell_move_v7172',
+            dragCells: 'att_doc_table_plus_drag_cells_v7173'
         }
     };
 
@@ -32013,7 +32026,9 @@
         assistHighlight: true,
         resizeHit: true,
         nestedGuard: true,
-        navigator: true
+        navigator: true,
+        preventCellMove: true,
+        dragCells: true
     };
 
     const S = {
@@ -32042,7 +32057,28 @@
         healthIssueCursor: 0,
         tableCache: [],
         health: { topLevel: 0, nested: 0, empty: 0, narrow: 0, issues: [] },
-        assistElements: []
+        assistElements: [],
+        assistOverlay: null,
+        editorView: null,
+        selectionBase: null,
+        cellSelectionType: null,
+        rangeAnchor: null,
+        rangeMode: false,
+        consumedCell: null,
+        consumedUntil: 0,
+        dragging: false,
+        dragPointerId: null,
+        dragTimer: 0,
+        gridCache: new WeakMap(),
+        metrics: { contextRefreshes: 0, dragRefreshSkips: 0, rangeSelections: 0 },
+        selectionError: '',
+        pointerGesture: null,
+        blockedCellDrags: 0,
+        nativeRectAvailable: null,
+        selectionRaf: 0,
+        rectEnd: null,
+        pendingStructureSync: false,
+        pendingContentRefresh: false
     };
 
     function safeGet(key, fallback) {
@@ -32068,6 +32104,9 @@
         safeSet(DTP.keys[name], S.settings[name]);
         applyFeatureClasses();
         if (!S.settings.enabled) {
+            S.rangeMode = false;
+            S.rangeAnchor = null;
+            finishDrag();
             hideToolbar();
             clearAssistClasses();
             removeNavigator();
@@ -32174,49 +32213,308 @@
         };
     }
 
+
     function clearAssistClasses() {
-        for (const el of S.assistElements) {
-            if (!(el instanceof Element)) continue;
-            el.classList.remove(
-                'att-dtp-current-cell-v7170',
-                'att-dtp-current-row-v7170',
-                'att-dtp-current-col-v7170',
-                'att-dtp-active-table-v7170'
-            );
-        }
+        // 高亮独立绘制在编辑器之外，不改 td/th 的 class，避免触发文档 Observer 和保存。
+        if (S.assistOverlay) S.assistOverlay.style.display = 'none';
         S.assistElements = [];
     }
 
-    function applyAssistClasses() {
-        clearAssistClasses();
-        if (!S.settings.enabled || !S.settings.assistHighlight || !S.table || !S.cell) return;
+    function ensureAssistOverlay() {
+        if (S.assistOverlay?.isConnected) return S.assistOverlay;
+        const host = document.createElement('div');
+        host.id = 'att-doc-table-assist-overlay-v7172';
+        host.setAttribute('data-lumatrace-ignore', '');
+        host.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2147482500;display:none;';
+        const styles = [
+            'background:rgba(59,130,246,.035);',
+            'background:rgba(59,130,246,.025);',
+            'border:2px solid rgba(59,130,246,.58);border-radius:2px;'
+        ];
+        for (const css of styles) {
+            const box = document.createElement('div');
+            box.style.cssText = 'position:absolute;box-sizing:border-box;pointer-events:none;' + css;
+            host.appendChild(box);
+        }
+        document.body.appendChild(host);
+        S.assistOverlay = host;
+        return host;
+    }
 
-        const touched = new Set();
-        S.table.classList.add('att-dtp-active-table-v7170');
-        touched.add(S.table);
-        const row = S.cell.parentElement;
-        if (row instanceof HTMLTableRowElement) {
-            Array.from(row.cells).forEach(cell => {
-                cell.classList.add('att-dtp-current-row-v7170');
-                touched.add(cell);
-            });
+    function editorClipRect() {
+        const clip = { left:0, top:0, right:window.innerWidth, bottom:window.innerHeight };
+        for (let node = S.editor?.parentElement; node && node !== document.body; node = node.parentElement) {
+            const style = getComputedStyle(node);
+            const r = node.getBoundingClientRect();
+            if (/(auto|scroll|hidden|clip)/.test(style.overflowX)) {
+                clip.left = Math.max(clip.left, r.left + node.clientLeft);
+                clip.right = Math.min(clip.right, r.left + node.clientLeft + node.clientWidth);
+            }
+            if (/(auto|scroll|hidden|clip)/.test(style.overflowY)) {
+                clip.top = Math.max(clip.top, r.top + node.clientTop);
+                clip.bottom = Math.min(clip.bottom, r.top + node.clientTop + node.clientHeight);
+            }
         }
-        if (S.colIndex >= 0) {
-            Array.from(S.table.rows).forEach(r => {
-                const cell = r.cells[S.colIndex];
-                if (cell) {
-                    cell.classList.add('att-dtp-current-col-v7170');
-                    touched.add(cell);
+        return clip;
+    }
+
+    function applyAssistClasses() {
+        if (S.dragging || S.pointerGesture || !S.settings.enabled || !S.settings.assistHighlight || !S.table?.isConnected || !S.cell?.isConnected) {
+            clearAssistClasses();
+            return;
+        }
+        const table = S.table.getBoundingClientRect();
+        const cell = S.cell.getBoundingClientRect();
+        const row = S.cell.parentElement.getBoundingClientRect();
+        const clip = editorClipRect();
+        const rects = [row, { left:cell.left, right:cell.right, top:table.top, bottom:table.bottom }, cell];
+        const host = ensureAssistOverlay();
+        const boxes = host.children;
+        rects.forEach((r, index) => {
+            const left = Math.max(r.left, clip.left), top = Math.max(r.top, clip.top);
+            const right = Math.min(r.right, clip.right), bottom = Math.min(r.bottom, clip.bottom);
+            const box = boxes[index];
+            box.style.display = right > left && bottom > top ? 'block' : 'none';
+            box.style.left = `${left}px`;
+            box.style.top = `${top}px`;
+            box.style.width = `${Math.max(0,right-left)}px`;
+            box.style.height = `${Math.max(0,bottom-top)}px`;
+        });
+        host.style.display = 'block';
+    }
+
+    function getEditorView(editor = S.editor) {
+        if (!editor) return null;
+        const inspect = value => value?.state?.doc && typeof value.dispatch === 'function' &&
+            typeof value.posAtDOM === 'function' && value.dom === editor ? value : null;
+        if (inspect(S.editorView)) return S.editorView;
+        const accept = value => {
+            const view = inspect(value) || inspect(value?.view) || inspect(value?.editorView);
+            if (view) S.editorView = view;
+            return view;
+        };
+        try {
+            let desc = editor.pmViewDesc;
+            for (let depth=0; desc && depth<8; depth++, desc=desc.parent) {
+                const view = accept(desc.view) || accept(desc.editorView);
+                if (view) return view;
+            }
+            for (const key of Object.getOwnPropertyNames(editor)) {
+                let value;
+                try { value = editor[key]; } catch (_) { continue; }
+                const view = accept(value);
+                if (view) return view;
+                if (!/^__react(?:Fiber|InternalInstance|Props)\$/.test(key)) continue;
+                for (let depth=0, fiber=value; fiber && depth<18; depth++, fiber=fiber.return) {
+                    for (const props of [fiber, fiber.memoizedProps, fiber.pendingProps]) {
+                        const fromProps = accept(props?.editor) || accept(props?.editorView) || accept(props?.view);
+                        if (fromProps) return fromProps;
+                    }
                 }
-            });
+            }
+            // AutoTable 的 Vue/Tiptap 编辑器：只沿当前组件的有限父链寻找，不扫描全站对象。
+            for (let el=editor, depth=0; el && depth<6; el=el.parentElement, depth++) {
+                let component = el.__vueParentComponent;
+                for (let n=0; component && n<14; component=component.parent, n++) {
+                    for (const data of [component.setupState, component.props, component.ctx]) {
+                        const owner = data?.editor?.value || data?.editor;
+                        const view = accept(owner) || accept(data?.editorView);
+                        if (view) return view;
+                    }
+                }
+            }
+        } catch (_) {}
+        return null;
+    }
+
+    function getSelectionBase(view) {
+        if (S.selectionBase) return S.selectionBase;
+        // TextSelection.fromJSON 会强制生成文本选择。必须沿静态继承链找到 Selection 注册入口。
+        for (let ctor=view?.state?.selection?.constructor, depth=0;
+             typeof ctor === 'function' && depth<8; ctor=Object.getPrototypeOf(ctor), depth++) {
+            if (Object.prototype.hasOwnProperty.call(ctor, 'jsonID') && typeof ctor.fromJSON === 'function') {
+                return S.selectionBase = ctor;
+            }
         }
-        S.cell.classList.add('att-dtp-current-cell-v7170');
-        touched.add(S.cell);
-        S.assistElements = Array.from(touched);
+        return null;
+    }
+
+    function cellPmPosition(view, cell) {
+        if (!(cell instanceof HTMLTableCellElement) || !S.editor?.contains(cell)) return null;
+        try {
+            const raw = view.posAtDOM(cell, 0);
+            if (!Number.isInteger(raw)) return null;
+            const doc = view.state.doc;
+            const $pos = doc.resolve(raw);
+            // posAtDOM(td,0) 通常是单元格内容起点；先找最内层 cell，再处理位于 cell 前的情况。
+            for (let depth=$pos.depth; depth>0; depth--) {
+                const role = $pos.node(depth).type.spec.tableRole;
+                if (role === 'cell' || role === 'header_cell') return $pos.before(depth);
+            }
+            const role = doc.nodeAt(raw)?.type?.spec?.tableRole;
+            return role === 'cell' || role === 'header_cell' ? raw : null;
+        } catch (_) { return null; }
+    }
+
+    function selectCellRange(anchor, head, notify = true) {
+        if (!anchor?.isConnected || !head?.isConnected || getTopTable(anchor) !== getTopTable(head) ||
+            !S.editor?.contains(anchor) || !S.editor.contains(head)) return false;
+        const view = getEditorView();
+        try {
+            if (!view || view.editable === false) throw new Error('editor view unavailable');
+            const anchorPos = cellPmPosition(view, anchor), headPos = cellPmPosition(view, head);
+            if (anchorPos === null || headPos === null) throw new Error('cell position unavailable');
+            const current = view.state.selection;
+            let selection;
+            if (current.$anchorCell && current.$headCell) S.cellSelectionType = current.constructor;
+            if (S.cellSelectionType) {
+                selection = new S.cellSelectionType(view.state.doc.resolve(anchorPos), view.state.doc.resolve(headPos));
+            } else {
+                const base = getSelectionBase(view);
+                if (!base) throw new Error('selection registry unavailable');
+                selection = base.fromJSON(view.state.doc, {type:'cell', anchor:anchorPos, head:headPos});
+            }
+            if (!selection?.$anchorCell || !selection?.$headCell) throw new Error('native CellSelection unavailable');
+            S.cellSelectionType = selection.constructor;
+            // 只更新 selection，不修改 doc，不给 undo history 增加内容记录。
+            if (!selection.eq(current)) {
+                const transaction = view.state.tr.setSelection(selection).setMeta('addToHistory', false);
+                view.dispatch(transaction);
+            }
+            if (!view.hasFocus?.()) view.focus();
+            if (!view.state.selection.$anchorCell) throw new Error('selection rejected by editor');
+            S.rangeAnchor = anchor;
+            rememberInteractionCell(head);
+            S.selectionError = '';
+            S.metrics.rangeSelections++;
+            scheduleContextRefresh();
+            return true;
+        } catch (error) {
+            S.selectionError = String(error?.message || error);
+            if (notify) showToast('暂时无法建立单元格选区，请刷新后重试；未改动表格内容');
+            return false;
+        }
+    }
+
+    function getTableGrid(table) {
+        const doc = getEditorView()?.state?.doc || null;
+        const cached = S.gridCache.get(table);
+        if (cached && doc && cached.doc === doc) return cached;
+        const grid = [], cells = new Map();
+        let slots = 0, width = 0;
+        const rows = Array.from(table.rows);
+        rows.forEach((row, r) => {
+            grid[r] ||= [];
+            let c=0;
+            for (const cell of Array.from(row.cells)) {
+                while (grid[r][c]) c++;
+                const height = Math.min(cell.rowSpan || rows.length-r, rows.length-r);
+                const span = Math.max(1,cell.colSpan);
+                if (slots + height*span > 100000) throw new Error('table range too large');
+                cells.set(cell, {row:r, col:c, height, width:span});
+                for (let y=r; y<r+height; y++) {
+                    grid[y] ||= [];
+                    for (let x=c; x<c+span; x++) { grid[y][x]=cell; slots++; }
+                }
+                c += span;
+                width = Math.max(width,c);
+            }
+        });
+        const result = {doc, grid, cells, width, height:rows.length};
+        if (doc) S.gridCache.set(table,result);
+        return result;
+    }
+
+    function selectTablePart(part) {
+        if (!S.table?.isConnected || !S.cell?.isConnected) return false;
+        try {
+            const map = getTableGrid(S.table), active = map.cells.get(S.cell);
+            if (!active || !map.width || !map.height) return false;
+            let anchor, head;
+            if (part === 'row') {
+                anchor = map.grid[active.row][0];
+                head = map.grid[active.row+active.height-1][map.width-1];
+            } else if (part === 'column') {
+                anchor = map.grid[0][active.col];
+                head = map.grid[map.height-1][active.col+active.width-1];
+            } else {
+                anchor = map.grid[0][0];
+                head = map.grid[map.height-1][map.width-1];
+            }
+            S.rangeMode = false;
+            return selectCellRange(anchor,head);
+        } catch (_) { showToast('当前表格范围过大或结构异常，请缩小选择范围'); return false; }
+    }
+
+    function toggleRangeMode() {
+        S.rangeMode = !S.rangeMode;
+        S.rangeAnchor = S.cell?.isConnected ? S.cell : null;
+        if (S.rangeMode) showToast('起点已设为当前格，请点击同一表格的终点；Esc 取消');
+        scheduleContextRefresh();
+    }
+
+    function consumeSelectionEvent(event) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+    }
+
+    function finishDrag() {
+        if (!S.dragging && !S.pointerGesture) return;
+        S.dragging = false;
+        S.editor?.classList.remove('att-dtp-selecting-v7173');
+        S.pointerGesture = null;
+        S.dragPointerId = null;
+        clearTimeout(S.dragTimer);
+        S.dragTimer = 0;
+        if (S.pendingStructureSync) { S.pendingStructureSync = false; scheduleStructureSync(0); }
+        if (S.pendingContentRefresh) { S.pendingContentRefresh = false; scheduleContentRefresh(0); }
+        scheduleContextRefresh();
+    }
+
+    function onSelectionPointerDown(event) {
+        S.consumedCell = null;
+        S.consumedUntil = 0;
+        if (!S.settings.enabled || event.button !== 0 || (event.pointerType && event.pointerType !== 'mouse')) return;
+        const cell = cellFromEventTarget(event.target);
+        if (!cell) return;
+        const target = event.target instanceof Element ? event.target : null;
+        if (target?.closest('a,button,input,textarea,select,[contenteditable="false"],.column-resize-handle') ||
+            isNativeResizeTarget(target)) return;
+        const anchor = S.rangeMode ? S.rangeAnchor : (S.rangeAnchor || S.cell);
+        if ((S.rangeMode || event.shiftKey) && anchor?.isConnected && getTopTable(anchor) === getTopTable(cell) &&
+            !event.altKey && !event.ctrlKey && !event.metaKey) {
+            consumeSelectionEvent(event);
+            S.consumedCell = cell;
+            S.consumedUntil = performance.now()+1000;
+            if (selectCellRange(anchor,cell)) S.rangeMode = false;
+            return;
+        }
+        S.rangeMode = false;
+        S.rangeAnchor = cell;
+        rememberInteractionCell(cell);
+        // 正常文本拖选保留给原生；按住期间停掉辅助高亮和菜单重排。
+        S.dragging = true;
+        S.dragPointerId = event.pointerId;
+        clearAssistClasses();
+        hideToolbar();
+        clearTimeout(S.dragTimer);
+    }
+
+    function swallowSelectionCompatibilityEvent(event) {
+        if (performance.now() >= S.consumedUntil) return;
+        const cell = cellFromEventTarget(event.target);
+        if (cell && cell === S.consumedCell) {
+            consumeSelectionEvent(event);
+            if (event.type === 'click') S.consumedUntil = 0;
+        }
     }
 
     function syncContextNow() {
         S.contextRaf = 0;
+        if (S.dragging || S.pointerGesture) { S.metrics.dragRefreshSkips++; return; }
+        S.metrics.contextRefreshes++;
+        // 按住鼠标选文字/选区域/调列宽时不重绘交互层，防止工具栏进入鼠标路径。
+        if (S.pointerGesture) return;
         if (!S.settings.enabled || !isDocumentView()) {
             S.table = null;
             S.cell = null;
@@ -32237,7 +32535,7 @@
 
         const selectedCells = getSelectedCells(editor);
         const selectionCell = getSelectionCell(editor);
-        let cell = selectionCell || selectedCells[0] || null;
+        let cell = selectedCells[0] || selectionCell || null;
 
         if (!cell && S.lastCell?.isConnected && editor.contains(S.lastCell)) {
             const now = performance.now();
@@ -32260,6 +32558,9 @@
             ? Array.from(table?.rows || []).indexOf(cell.parentElement)
             : -1;
         S.colIndex = cell instanceof HTMLTableCellElement ? cell.cellIndex : -1;
+        if (cell && table) {
+            try { S.colIndex = getTableGrid(table).cells.get(cell)?.col ?? S.colIndex; } catch (_) {}
+        }
 
         if (cell && table) {
             rememberInteractionCell(cell);
@@ -32272,6 +32573,7 @@
     }
 
     function scheduleContextRefresh() {
+        if (S.dragging) { S.metrics.dragRefreshSkips++; return; }
         if (S.contextRaf) return;
         S.contextRaf = requestAnimationFrame(syncContextNow);
     }
@@ -32281,6 +32583,7 @@
         S.positionRaf = requestAnimationFrame(() => {
             S.positionRaf = 0;
             positionToolbar();
+            applyAssistClasses();
         });
     }
 
@@ -32289,10 +32592,26 @@
         if (next === S.editor) return;
 
         try { S.editorAbort?.abort(); } catch (_) {}
+        S.pointerGesture = null;
         S.editorAbort = null;
         S.editor = next;
         S.lastCell = null;
         S.lastStableContext = null;
+        S.table = null;
+        S.cell = null;
+        S.selectedCells = [];
+        S.editorView = null;
+        S.selectionBase = null;
+        S.cellSelectionType = null;
+        S.rangeAnchor = null;
+        S.rangeMode = false;
+        S.gridCache = new WeakMap();
+        finishDrag();
+        if (S.observer) {
+            S.observer.disconnect();
+            S.observer.observe(document.documentElement,{childList:true,subtree:true});
+            if (next) S.observer.observe(next,{attributes:true,subtree:true,attributeFilter:['class'],attributeOldValue:true});
+        }
 
         if (!next) return;
 
@@ -32301,9 +32620,44 @@
         const opt = { signal: ac.signal };
 
         next.addEventListener('pointerdown', event => {
+            if (!S.settings.enabled || event.button !== 0 || event.isPrimary === false) return;
+            S.rectEnd = null;
             const cell = cellFromEventTarget(event.target, next);
+            const target = event.target instanceof Element ? event.target : event.target?.parentElement;
+            const table = cell?.closest('table') || target?.closest('table') ||
+                target?.closest('.tableWrapper')?.querySelector('table');
             if (cell) rememberInteractionCell(cell);
+            else if (!table) {
+                // 明确点击正文时结束旧表格上下文，避免误操作上一张表。
+                S.lastCell = null;
+                S.lastStableContext = null;
+                S.contextStickyUntil = 0;
+            }
+            if (table && next.contains(table)) {
+                S.pointerGesture = {
+                    pointerId: event.pointerId,
+                    table,
+                    cell,
+                    allowCellMove: Boolean(event.altKey),
+                    textOnly: Boolean(event.shiftKey) || (event.pointerType && event.pointerType !== 'mouse'),
+                    resize: isNativeResizeTarget(target, next),
+                    endCell: cell,
+                    cellSelecting: false,
+                    disabled: false
+                };
+                clearAssistClasses();
+                hideToolbar();
+            }
             scheduleContextRefresh();
+        }, { ...opt, capture: true });
+
+        next.addEventListener('dragstart', guardCellDrag, { ...opt, capture: true });
+        next.addEventListener('click', event => {
+            if (S.rectEnd && performance.now() < S.rectEnd.until &&
+                S.rectEnd.table.contains(event.target)) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+            }
         }, { ...opt, capture: true });
 
         next.addEventListener('pointerup', event => {
@@ -32333,6 +32687,127 @@
         }, opt);
     }
 
+    function isNativeResizeTarget(target, editor = S.editor) {
+        const el = target instanceof Element ? target : target?.parentElement;
+        return Boolean(el?.closest('.column-resize-handle') ||
+            editor?.classList.contains('resize-cursor') ||
+            editor?.classList.contains('column-resize-cursor') ||
+            (el && /^(col|ew)-resize$/.test(getComputedStyle(el).cursor)));
+    }
+
+    function finishPointerGesture(event) {
+        const gesture = S.pointerGesture;
+        if (!gesture) return;
+        if (event?.pointerId != null && gesture.pointerId != null &&
+            event.pointerId !== gesture.pointerId) return;
+        const finalize = gesture.cellSelecting && event?.type === 'pointerup';
+        if (finalize) {
+            const end = cellAtPointer(event, gesture);
+            if (end) gesture.endCell = end;
+            S.rectEnd = {table: gesture.table, until: performance.now() + 250};
+        }
+        S.editor?.classList.remove('att-dtp-selecting-v7173');
+        S.pointerGesture = null;
+        finishDrag();
+        // 在原生 mouseup/click 处理结束后恢复最终 CellSelection，防止其退回文本选择。
+        if (finalize) requestAnimationFrame(() => {
+            if (!S.pointerGesture && S.rectEnd?.table === gesture.table) setNativeCellSelection(gesture, gesture.endCell);
+        });
+        if (S.pendingStructureSync) { S.pendingStructureSync = false; scheduleStructureSync(0); }
+        if (S.pendingContentRefresh) { S.pendingContentRefresh = false; scheduleContentRefresh(0); }
+        scheduleContextRefresh();
+    }
+
+    function setNativeCellSelection(gesture, end) {
+        if (!gesture?.cell?.isConnected || !end?.isConnected || end.closest('table') !== gesture.table) return false;
+        const ok = selectCellRange(gesture.cell, end, false);
+        S.nativeRectAvailable = ok;
+        return ok;
+    }
+
+    function cellAtPointer(event, gesture) {
+        let target = event.target;
+        if (Number.isFinite(event.clientX) && Number.isFinite(event.clientY)) {
+            target = document.elementFromPoint(event.clientX, event.clientY) || target;
+        }
+        const cell = cellFromEventTarget(target);
+        return cell?.closest('table') === gesture.table ? cell : null;
+    }
+
+    function handleCellPointerMove(event) {
+        const gesture = S.pointerGesture;
+        if (!gesture || !S.settings.enabled || !S.settings.dragCells || gesture.disabled ||
+            gesture.resize || gesture.allowCellMove || gesture.textOnly || !gesture.cell) return;
+        if (event.pointerId != null && gesture.pointerId != null && event.pointerId !== gesture.pointerId) return;
+        if (event.buttons != null && !(event.buttons & 1)) { finishPointerGesture(); return; }
+        const end = cellAtPointer(event, gesture);
+        if (!end || (!gesture.cellSelecting && end === gesture.cell)) return;
+        // 首次跨格时先验证页面的真实 CellSelection 能力；不支持则保留原生交互。
+        if (!gesture.cellSelecting) {
+            if (!setNativeCellSelection(gesture, end)) { gesture.disabled = true; return; }
+            gesture.cellSelecting = true;
+            S.editor.classList.add('att-dtp-selecting-v7173');
+        }
+        if (end !== gesture.endCell) gesture.endCell = end;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (S.selectionRaf) return;
+        S.selectionRaf = requestAnimationFrame(() => {
+            S.selectionRaf = 0;
+            if (S.pointerGesture === gesture) setNativeCellSelection(gesture, gesture.endCell);
+        });
+    }
+
+    function guardCellDrag(event) {
+        if (!S.settings.enabled || !S.settings.preventCellMove) return;
+        const target = event.target instanceof Element ? event.target : event.target?.parentElement;
+        if (!target || !S.editor?.contains(target)) return;
+        const gesture = S.pointerGesture;
+        if (event.altKey || gesture?.allowCellMove || gesture?.resize ||
+            isNativeResizeTarget(target)) return;
+        // 单元格中的图片/附件保持其原生拖动；普通文本拖动同样不拦截。
+        if (target.closest('img,video,audio,[data-type="image"],[data-type="attachment"]')) return;
+        const cell = cellFromEventTarget(target);
+        const wrapper = target.closest('.tableWrapper');
+        const table = cell?.closest('table') || target.closest('table') || wrapper?.querySelector('table');
+        if (!table || !S.editor.contains(table)) return;
+        const cells = getSelectedCells(S.editor).filter(c => c.closest('table') === table);
+        let draggableBlock = null;
+        for (let el = target; el && el !== S.editor; el = el.parentElement) {
+            if (el.getAttribute('draggable') === 'true' &&
+                el.matches('td,th,tr,table,.tableWrapper')) {
+                draggableBlock = el;
+                break;
+            }
+        }
+        const tableNodeSelected = table.matches('.ProseMirror-selectednode') ||
+            Boolean(wrapper?.matches('.ProseMirror-selectednode'));
+        if (!cells.length && !draggableBlock && !tableNodeSelected && !gesture?.cellSelecting) return;
+        // 在 ProseMirror 收到 dragstart 前阻止块级搬移，不改 selection/doc/撤销记录。
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        event.stopPropagation();
+        S.blockedCellDrags++;
+        // 被取消的块拖动不会结束左键选区手势；等待真实松开或取消。
+        showToast('已阻止单元格误拖动；需要移动时可关闭防误移动');
+    }
+
+    function isolateToolbarEvents(bar) {
+        // 工具栏是独立控件；阻止页面把它的按下/拖动理解为表格操作。
+        for (const type of ['pointerdown', 'mousedown', 'pointerup', 'mouseup']) {
+            bar.addEventListener(type, event => {
+                if (event.button !== 0) return;
+                event.preventDefault();
+                event.stopPropagation();
+                if (type === 'pointerdown' || type === 'mousedown') snapshotStableContext();
+            }, true);
+        }
+        bar.addEventListener('dragstart', event => {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        }, true);
+    }
+
     function ensureToolbar() {
         let bar = document.getElementById(DTP.toolbarId);
         if (bar) return bar;
@@ -32343,6 +32818,7 @@
         bar.innerHTML = `
             <div class="att-dtp-status-v7170" data-dtp-role="status">表格</div>
             <div class="att-dtp-actions-v7170">
+                <button type="button" data-dtp-action="select-range" title="以当前格为起点，点击终点选择矩形区域；Esc 取消">选区域</button>
                 <button type="button" data-dtp-cmd="insertRowAbove" title="在当前行上方插入一行">＋行↑</button>
                 <button type="button" data-dtp-cmd="insertColumn" title="调用 AutoTable 原生插入列">＋列</button>
                 <button type="button" data-dtp-cmd="deleteRow" title="删除当前行">－行</button>
@@ -32350,18 +32826,18 @@
                 <button type="button" data-dtp-action="more" class="att-dtp-more-v7170" title="更多表格操作">⋯</button>
             </div>
             <div class="att-dtp-more-menu-v7170" data-dtp-role="more-menu">
+                <button type="button" data-dtp-action="select-row">选择整行</button>
+                <button type="button" data-dtp-action="select-column">选择整列</button>
+                <button type="button" data-dtp-action="select-table">选择整个表格</button>
                 <button type="button" data-dtp-action="copy-cell">复制当前单元格</button>
                 <button type="button" data-dtp-action="locate-table">定位当前表格</button>
                 <button type="button" data-dtp-action="delete-table" class="danger">删除整个表格</button>
             </div>
         `;
 
-        bar.addEventListener('pointerdown', event => {
-            if (event.target instanceof Element && event.target.closest('button')) {
-                // 保住 ProseMirror 当前 selection，避免工具栏抢焦点后原生命令失去上下文。
-                event.preventDefault();
-            }
-        }, true);
+        bar.setAttribute('contenteditable', 'false');
+        bar.setAttribute('draggable', 'false');
+        isolateToolbarEvents(bar);
 
         bar.addEventListener('click', event => {
             const button = event.target instanceof Element ? event.target.closest('button') : null;
@@ -32377,7 +32853,12 @@
             }
 
             const action = button.dataset.dtpAction;
-            if (action === 'more') {
+            if (action === 'select-range') {
+                toggleRangeMode();
+            } else if (['select-row','select-column','select-table'].includes(action)) {
+                selectTablePart(action.slice(7));
+                bar.classList.remove('att-dtp-more-open-v7170');
+            } else if (action === 'more') {
                 bar.classList.toggle('att-dtp-more-open-v7170');
                 schedulePosition();
             } else if (action === 'copy-cell') {
@@ -32399,23 +32880,15 @@
         if (S.table && S.cell) S.lastStableContext = makeContextSnapshot();
     }
 
+
     function getToolbarAnchorRect() {
-        const cells = S.selectedCells.filter(cell => cell.isConnected);
-        if (cells.length > 1) {
-            const rects = cells.map(c => c.getBoundingClientRect()).filter(r => r.width || r.height);
-            if (rects.length) {
-                const left = Math.min(...rects.map(r => r.left));
-                const top = Math.min(...rects.map(r => r.top));
-                const right = Math.max(...rects.map(r => r.right));
-                const bottom = Math.max(...rects.map(r => r.bottom));
-                return { left, top, right, bottom, width: right - left, height: bottom - top };
-            }
-        }
-        return S.cell?.getBoundingClientRect?.() || S.table?.getBoundingClientRect?.() || null;
+        // 工具栏跟随表格，不逐格读取大选区的 DOMRect。
+        return S.table?.getBoundingClientRect?.() || S.cell?.getBoundingClientRect?.() || null;
     }
 
     function updateToolbar() {
         const bar = ensureToolbar();
+        if (S.pointerGesture) { hideToolbar(); return; }
         const show = Boolean(
             S.settings.enabled && S.settings.miniToolbar && S.table && S.cell && S.table.isConnected && S.cell.isConnected
         );
@@ -32428,11 +32901,19 @@
         const status = bar.querySelector('[data-dtp-role="status"]');
         if (status) {
             const rows = S.table.rows.length;
-            const cols = Math.max(0, ...Array.from(S.table.rows).map(row => row.cells.length));
+            const cached = S.gridCache.get(S.table);
+            const cols = cached?.width || tableColumnCount(S.table);
             const cellText = S.rowIndex >= 0 && S.colIndex >= 0 ? `R${S.rowIndex + 1}C${S.colIndex + 1}` : '当前格';
-            status.textContent = selected > 1
+            const text = S.rangeMode ? '请选择终点 · Esc 取消' : selected > 1
                 ? `表格 ${rows}×${cols} · 已选 ${selected} 格`
                 : `表格 ${rows}×${cols} · ${cellText}`;
+            if (status.textContent !== text) status.textContent = text;
+            const rangeButton = bar.querySelector('[data-dtp-action="select-range"]');
+            if (rangeButton) {
+                rangeButton.setAttribute('aria-pressed',String(S.rangeMode));
+                const label = S.rangeMode ? '取消选择' : '选区域';
+                if (rangeButton.textContent !== label) rangeButton.textContent = label;
+            }
         }
 
         bar.classList.add('is-visible');
@@ -32446,6 +32927,7 @@
     }
 
     function positionToolbar() {
+        if (S.pointerGesture) return;
         const bar = document.getElementById(DTP.toolbarId);
         if (!bar?.classList.contains('is-visible')) return;
         const cellAnchor = getToolbarAnchorRect();
@@ -32453,6 +32935,12 @@
         const tableUsable = tableRect && tableRect.width > 0 && tableRect.height > 0;
         const anchor = tableUsable ? tableRect : cellAnchor;
         if (!anchor) return;
+        const clip = editorClipRect();
+        if (anchor.bottom <= clip.top || anchor.top >= clip.bottom || anchor.right <= clip.left || anchor.left >= clip.right) {
+            bar.style.visibility = 'hidden';
+            return;
+        }
+        bar.style.visibility = '';
 
         const w = bar.offsetWidth || 300;
         const h = bar.offsetHeight || 38;
@@ -32503,8 +32991,17 @@
         const resolver = COMMANDS[name];
         if (!resolver) return false;
         const button = resolver();
-        if (!button) {
-            showToast('当前页面没有检测到对应的原生表格命令');
+        if (!button || button.disabled || button.getAttribute('aria-disabled') === 'true') {
+            showToast('当前页面的对应原生表格命令不可用');
+            return false;
+        }
+        if (S.pointerGesture || !S.cell?.isConnected || !S.table?.isConnected ||
+            !S.editor?.contains(S.cell)) return false;
+        const liveCell = getSelectionCell();
+        const liveCells = getSelectedCells();
+        if ((liveCell && liveCell.closest('table') !== S.table) ||
+            liveCells.some(cell => cell.closest('table') !== S.table)) {
+            showToast('请先点击需要操作的表格单元格');
             return false;
         }
 
@@ -32743,6 +33240,7 @@
     function scheduleContentRefresh(delay = 100) {
         clearTimeout(S.contentTimer);
         S.contentTimer = window.setTimeout(() => {
+            if (S.dragging || S.pointerGesture) { S.pendingContentRefresh = true; return; }
             syncEditor();
             refreshTableInventory();
         }, Math.max(0, Number(delay) || 0));
@@ -32790,7 +33288,11 @@
             card.className = 'att-card';
             host.appendChild(card);
         }
-        renderSettingsCard(card);
+        const signature = JSON.stringify(S.settings);
+        if (card.dataset.renderSignature !== signature) {
+            card.dataset.renderSignature = signature;
+            renderSettingsCard(card);
+        }
         return card;
     }
 
@@ -32813,13 +33315,15 @@
         const disabledClass = S.settings.enabled ? '' : ' att-dtp-disabled-v7170';
         card.innerHTML = `
             <div class="att-card-title">文档表格增强</div>
-            <div class="att-card-desc">只增强 AutoTable 原生 ProseMirror 表格交互；结构修改优先调用原生命令，不直接改写文档表格 DOM。</div>
+            <div class="att-card-desc">点击起点后 Shift 点击终点即可选择多个单元格；也可用“选区域”或更多菜单选择整行、整列、整表。</div>
             <div class="att-divider"></div>
             ${toggleRow('enabled', '启用文档表格增强', '总开关；关闭后迷你工具栏、高亮、嵌套保护与表格导航全部停止。')}
             <div class="att-dtp-settings-group-v7170${disabledClass}">
-                ${toggleRow('miniToolbar', '单元格迷你工具栏', '进入表格后在当前单元格附近显示常用行列操作。')}
+                ${toggleRow('miniToolbar', '单元格迷你工具栏', '在表格边缘显示选择区域与行列操作；按住鼠标选区或调宽时暂时隐藏。')}
+                ${toggleRow('dragCells', '跨单元格拖选', '同一格内选文字，跨到其他格时建立原生矩形选区；关闭后恢复页面原生拖选。保留 Shift 点击和选区域入口。')}
+                ${toggleRow('preventCellMove', '防止单元格误移动', '拦截原生单元格或整表的拖动；不影响选文字、矩形选区与原生列宽调整。按住 Alt 开始拖动或关闭此项可放行。')}
                 ${toggleRow('assistHighlight', '当前行列辅助高亮', '仅作为编辑视觉辅助，不写入文档内容。')}
-                ${toggleRow('resizeHit', '扩大列宽拖拽热区', '保留原生细线外观，只扩大透明鼠标命中范围。')}
+                ${toggleRow('resizeHit', '列宽边界提示', '只扩展视觉提示，不占用单元格命中区域；调宽继续使用原生边界。')}
                 ${toggleRow('nestedGuard', '防止误插嵌套表格', '在现有表格中点击“插入表格”时先确认，避免误建嵌套表。')}
                 ${toggleRow('navigator', '在文档导航中显示表格', '在现有文档大纲侧栏下方追加表格列表，点击直接定位。')}
             </div>
@@ -32834,7 +33338,7 @@
                     <button type="button" data-dtp-settings-action="locate-issue" id="att-dtp-locate-issue-v7170">定位问题</button>
                 </div>
             </div>
-            <div class="att-doc-tools-note">V7.17.1 第一阶段只开放已验证的原生结构命令。当前“插入行”已确认是上方插行；“插入列”方向暂沿用 AutoTable 原生语义，不伪造左右双方向。</div>
+            <div class="att-doc-tools-note">选择区域无需按住鼠标拖动。选区保留原生复制、删除和撤销行为；按 Esc 取消选区域模式。合并格按实际行列跨度参与选择。</div>
         `;
         updateHealthUI();
     }
@@ -32982,6 +33486,8 @@
         const style = document.createElement('style');
         style.id = DTP.styleId;
         style.textContent = `
+            .document-editor__content.att-dtp-selecting-v7173,
+            .document-editor__content.att-dtp-selecting-v7173 * { user-select:none!important; }
             #${DTP.toolbarId} {
                 position: fixed;
                 z-index: 2147482550;
@@ -32989,7 +33495,7 @@
                 align-items: center;
                 gap: 7px;
                 min-height: 36px;
-                max-width: min(430px, calc(100vw - 16px));
+                max-width: min(520px, calc(100vw - 16px));flex-wrap:wrap;
                 padding: 5px 6px 5px 9px;
                 box-sizing: border-box;
                 border: 1px solid rgba(148,163,184,.34);
@@ -33009,7 +33515,8 @@
                 color: #aeb7c3;
                 font-size: 10.5px;
             }
-            #${DTP.toolbarId} .att-dtp-actions-v7170 { display:flex; align-items:center; gap:3px; }
+            #${DTP.toolbarId} .att-dtp-actions-v7170 { display:flex; align-items:center; gap:3px; flex-wrap:wrap; }
+            #${DTP.toolbarId} button[aria-pressed="true"] { background:#1d4ed8; color:white; }
             #${DTP.toolbarId} button {
                 height: 26px;
                 padding: 0 7px;
@@ -33100,9 +33607,10 @@
                 transition: outline-color .25s ease;
             }
 
-            /* 原生 resize widget 会动态创建/销毁；只通过 CSS 扩大透明命中区，不绑定单个 handle。 */
+            /* V7.17.4：提示层不占用命中区域，选区/移动/调宽均保留原生命中判断。 */
             html.att-dtp-resize-hit-v7170 .document-editor__content .column-resize-handle {
                 overflow: visible !important;
+                pointer-events: none !important;
             }
             html.att-dtp-resize-hit-v7170 .document-editor__content .column-resize-handle::before {
                 content:"";
@@ -33111,8 +33619,8 @@
                 bottom:0;
                 left:-5px;
                 right:-5px;
-                cursor:col-resize;
-                background:transparent;
+                pointer-events:none !important;
+                background:rgba(59,130,246,.08);
             }
 
             #${DTP.settingsHostId} { display:none; margin-top:7px; }
@@ -33165,6 +33673,7 @@
     function scheduleStructureSync(delay = 20) {
         clearTimeout(S.structureTimer);
         S.structureTimer = window.setTimeout(() => {
+            if (S.dragging || S.pointerGesture) { S.pendingStructureSync = true; return; }
             syncEditor();
             ensureSettingsCard();
             scheduleContextRefresh();
@@ -33176,8 +33685,44 @@
         if (document.documentElement.dataset.attDocTablePlusBoundV7170 === '1') return;
         document.documentElement.dataset.attDocTablePlusBoundV7170 = '1';
 
+        document.addEventListener('pointermove', handleCellPointerMove, {capture: true, passive: false});
+        document.addEventListener('mousemove', event => {
+            if (!S.pointerGesture?.cellSelecting) return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        }, true);
+        document.addEventListener('pointerup', finishPointerGesture, true);
+        document.addEventListener('pointercancel', finishPointerGesture, true);
+        document.addEventListener('dragend', () => finishPointerGesture(), true);
+        window.addEventListener('blur', () => finishPointerGesture());
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') finishPointerGesture();
+        });
+
+        document.addEventListener('pointerdown', onSelectionPointerDown, true);
+        document.addEventListener('mousedown', swallowSelectionCompatibilityEvent, true);
+        document.addEventListener('click', swallowSelectionCompatibilityEvent, true);
+        window.addEventListener('pointerup', event => {
+            if (S.pointerGesture) finishPointerGesture(event);
+            else if (S.dragging && event.pointerId === S.dragPointerId) finishDrag();
+        }, true);
+        window.addEventListener('pointercancel', finishDrag, true);
+        window.addEventListener('dragend', finishDrag, true);
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') finishDrag(); });
+        window.addEventListener('blur', () => { finishDrag(); S.rangeMode=false; scheduleContextRefresh(); });
+        window.addEventListener('pointermove', event => {
+            if (S.dragging && event.buttons === 0) finishDrag();
+        }, {capture:true,passive:true});
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && S.rangeMode) {
+                S.rangeMode=false;
+                consumeSelectionEvent(event);
+                scheduleContextRefresh();
+            }
+        }, true);
+
         document.addEventListener('selectionchange', () => {
-            if (!S.settings.enabled || !S.editor) return;
+            if (!S.settings.enabled || !S.editor || S.dragging) return;
             const cell = getSelectionCell(S.editor);
             if (cell || S.selectedCells.length || (S.cell && getNativeTableContextActive())) scheduleContextRefresh();
         }, { passive: true });
@@ -33190,6 +33735,8 @@
             const insideNativeDocToolbar = Boolean(target?.closest?.('.document-toolbar'));
             if (!insideEditor && !insideOwnUi && !insideNativeDocToolbar) {
                 S.contextStickyUntil = 0;
+                S.rangeMode = false;
+                S.rangeAnchor = null;
                 scheduleContextRefresh();
             }
             maybeBlockInsertTable(event);
@@ -33201,13 +33748,28 @@
         }, true);
 
         document.addEventListener('scroll', () => {
-            if (document.getElementById(DTP.toolbarId)?.classList.contains('is-visible')) schedulePosition();
+            if (document.getElementById(DTP.toolbarId)?.classList.contains('is-visible') || S.assistOverlay?.style.display === 'block') schedulePosition();
         }, { capture: true, passive: true });
         window.addEventListener('resize', schedulePosition, { passive: true });
         window.addEventListener('popstate', () => scheduleStructureSync(40));
 
         S.observer = new MutationObserver(records => {
-            if (records.some(structureMutationRelevant)) scheduleStructureSync(18);
+            let selectionChanged=false, structureChanged=false;
+            for (const record of records) {
+                if (record.type === 'attributes') {
+                    const target=record.target;
+                    if (S.editor?.contains(target) && target.matches?.('td,th') &&
+                        target.classList.contains('selectedCell') !== /(?:^|\s)selectedCell(?:\s|$)/.test(record.oldValue || '')) {
+                        selectionChanged=true;
+                    }
+                } else if (structureMutationRelevant(record)) {
+                    structureChanged=true;
+                    const table=record.target?.closest?.('table');
+                    if (table) S.gridCache.delete(table);
+                }
+            }
+            if (selectionChanged) scheduleContextRefresh();
+            if (structureChanged) scheduleStructureSync(18);
         });
         S.observer.observe(document.documentElement, { childList: true, subtree: true });
     }
@@ -33218,6 +33780,12 @@
             snapshot() {
                 return {
                     enabled: S.settings.enabled,
+                    preventCellMove: S.settings.preventCellMove,
+                    dragCells: S.settings.dragCells,
+                    nativeRectAvailable: S.nativeRectAvailable,
+                    rectangleSelecting: Boolean(S.pointerGesture?.cellSelecting),
+                    pointerGestureActive: Boolean(S.pointerGesture),
+                    blockedCellDrags: S.blockedCellDrags,
                     editorFound: Boolean(S.editor?.isConnected),
                     editorFocused: editorOwnsFocus(S.editor),
                     tableFound: Boolean(S.table?.isConnected),
@@ -33228,7 +33796,12 @@
                     colIndex: S.colIndex,
                     nativeTableContext: getNativeTableContextActive(),
                     lastCellAgeMs: S.lastCellAt ? Math.round(performance.now() - S.lastCellAt) : null,
-                    stickyRemainingMs: Math.max(0, Math.round(S.contextStickyUntil - performance.now()))
+                    stickyRemainingMs: Math.max(0, Math.round(S.contextStickyUntil - performance.now())),
+                    rangeMode: S.rangeMode,
+                    dragging: S.dragging,
+                    editorViewFound: Boolean(getEditorView()),
+                    selectionError: S.selectionError || null,
+                    metrics: {...S.metrics}
                 };
             },
             refresh() { scheduleContextRefresh(); scheduleContentRefresh(0); }
@@ -33255,7 +33828,7 @@
             refreshTableInventory();
             scheduleContextRefresh();
         }, 180);
-        console.log('[AutoTable Document Table Plus] V7.17.1 已加载：上下文稳定识别 / 表格边缘稳定工具栏 / 防误嵌套 / 表格导航 / 健康检查');
+        console.log('[AutoTable Document Table Plus] V7.17.4 已加载：跨格矩形拖选 / 设置卡增量更新 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 编辑器外高亮 / 保留防误移动');
     }
 
     if (document.body) init();
