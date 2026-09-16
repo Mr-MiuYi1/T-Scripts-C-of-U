@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.16.7
-// @description  AutoTable 一体化效率增强工具：四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.17.0
+// @description  AutoTable 一体化效率增强工具：文档表格增强（上下文迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,14 +23,14 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.16.7
+ * AutoTable 工具集 V7.17.0
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，规则组/规则分层管理，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
  * - 编辑：统一快捷短语中心；表格多行单元格与记录详情多行字段共用快捷面板；双栏独立滚动、固定页头/页脚、批量选择、批量启停、批量编辑与安全高级模板表达式
  * - 规则：支持可视化条件 + 代码式 {{=表达式}} / {{#if}} 条件内容；系统规则可恢复默认；旧配置自动迁移
  * - 主题：可回退 Edge / Fluent 深色优化；可选丝滑高级全局交互动效；记录详情只动画抽屉、不扰动底层页面，并可选择是否忽略系统 Reduce Motion
- * - 文档：原生风格大纲、滚动跟随、查找/替换/定位、正则表达式与高亮
+ * - 文档：原生风格大纲、滚动跟随、查找/替换/定位、正则表达式与高亮；V7.17 增加文档表格增强（上下文工具栏、原生命令适配、CellSelection 识别、防误嵌套、表格导航与健康检查）
  * - 界面：可隐藏关联字段复制按钮，并释放按钮原先占用的文字空间；收起侧边栏可显示智能微标签，快速区分大量重复业务图标
  * - 悬浮菜单：V7.16 重构为“快捷 / 表格 / 文档 / 设置”四区；字段组合与列置顶归入表格二级导航，快捷页按工作流 / 视图状态 / 复制行为 / 工具入口重新分层
  * - 搜索：全视图模糊搜索支持可配置正式记录条件、紧凑历史层、列表/胶囊智能补位、胶囊删除按钮显示开关、字体大小、同表视图互通、原位丝滑展开全部记录、可自定义搜索记录模块宽度/高度上限、独立搜索记录管理面板及搜索栏内置 X 清空优化
@@ -38,7 +38,7 @@
  * - 渲染：按真实行号稳定斑马纹；虚拟滚动增量渲染；聚焦行/字段分别保存稳定身份；横向虚拟化时绝不回退到其它字段；编辑与置顶表头保持稳定层级；置顶表头高亮使用不透明底层防止滚动表头穿透
  * - 置顶：右置顶严格镜像；“+ 添加列”保持 AutoTable 原生末端位置，不参与置顶 sticky/offset
  * - 面板：V7.16 采用主导航 + 表格二级导航；减少顶部分类数量，按任务频率分布内容，保留原功能与设置项
- * - 性能：V7.16.7 完成 P8 性能回归与诊断层；默认不可见，仅统计关键渲染/Observer/缓存/条件高亮/置顶路径，并保留 V7.16.6 菜单定位稳定修复与 V7.16.5 性能加固
+ * - 性能：V7.16.7 完成 P8 性能回归与诊断层；V7.17 文档表格增强继续采用事件委托、RAF 合并与单一结构 Observer，不引入轮询
  * ========================================================================== */
 
 
@@ -54,7 +54,7 @@
     'use strict';
 
     const KEY = '__attPerfStats';
-    const VERSION = 'V7.16.7';
+    const VERSION = 'V7.17.0';
     const makeCounters = () => ({
         panelFullRenders: 0,
         panelSectionRenderCalls: 0,
@@ -215,7 +215,7 @@
     const PERF = globalThis.__attPerfStats || null;
 
     const APP = {
-        version: 'V7.16.7',
+        version: 'V7.17.0',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -31960,3 +31960,1209 @@
     function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();attachSearchClearToolbarObserver();bindPersistLifecycle();buildHistoryIndex();applySearchClearOptimizeState();window.addEventListener('att:search-history:open-manager',()=>openManager());console.log('[AutoTable 工具集 V7.16.0] 已加载：正式历史提交策略 / 搜索记录模块尺寸上限 / 紧凑记录全部显示 / 胶囊智能补位 / 精准 toolbar / 内置 X / 零闪烁历史层 / 查看全部双态收展 / 单链路丝滑展开 / 分块渲染 / GM 批处理');}
     if(document.body)init();else window.addEventListener('DOMContentLoaded',init,{once:true});
 })();
+
+/* ============================================================================
+ * AutoTable Document Table Plus V7.17.0 · 文档表格增强第一阶段
+ * --------------------------------------------------------------------------
+ * 目标：不重做 ProseMirror 表格引擎，只给原生表格能力增加一层稳定的交互外壳。
+ *
+ * 本阶段：
+ * 1) ContextController：识别当前表 / 当前单元格 / selectedCell / 原生“表格编辑”上下文；
+ * 2) CommandAdapter：优先复用 AutoTable 原生表格命令，不直接篡改 ProseMirror 表格结构；
+ * 3) 单元格迷你工具栏：上方插行 / 插入列 / 删除行 / 删除列 / 删除表格；
+ * 4) 行列辅助高亮与动态 CellSelection 状态提示；
+ * 5) 列宽拖拽热区增强：只扩大透明命中区，不替换原生 resize widget；
+ * 6) 防误嵌套表格：表格内点击“插入表格”时先给出轻量确认层；
+ * 7) 文档表格导航：复用现有文档大纲侧栏，列出顶层表格并支持定位；
+ * 8) 表格健康检查：统计顶层表 / 嵌套表 / 空表 / 异常窄表，并支持逐项定位；
+ * 9) 所有增强均为 DOM Overlay / 原生命令桥接，不写入文档正文，不污染 Markdown/PDF。
+ *
+ * 性能边界：无 setInterval；一个结构 MutationObserver；交互更新按 RAF 合并。
+ * ========================================================================== */
+(function () {
+    'use strict';
+
+    const DTP = {
+        version: 'V7.17.0',
+        styleId: 'att-doc-table-plus-style-v7170',
+        toolbarId: 'att-doc-table-mini-toolbar-v7170',
+        guardId: 'att-doc-table-nested-guard-v7170',
+        toastId: 'att-doc-table-toast-v7170',
+        settingsHostId: 'att-doc-table-settings-host-v7170',
+        settingsCardId: 'att-doc-table-settings-card-v7170',
+        navId: 'att-doc-table-nav-v7170',
+        editorSelector: [
+            '.document-view-page .document-editor__content.ProseMirror',
+            '.document-view-page .document-editor__content[contenteditable="true"]',
+            '.document-view-shell .tiptap.ProseMirror',
+            '.ProseMirror.document-editor__content'
+        ].join(', '),
+        keys: {
+            enabled: 'att_doc_table_plus_enabled_v7170',
+            miniToolbar: 'att_doc_table_plus_mini_toolbar_v7170',
+            assistHighlight: 'att_doc_table_plus_assist_highlight_v7170',
+            resizeHit: 'att_doc_table_plus_resize_hit_v7170',
+            nestedGuard: 'att_doc_table_plus_nested_guard_v7170',
+            navigator: 'att_doc_table_plus_navigator_v7170'
+        }
+    };
+
+    const DEFAULTS = {
+        enabled: true,
+        miniToolbar: true,
+        assistHighlight: true,
+        resizeHit: true,
+        nestedGuard: true,
+        navigator: true
+    };
+
+    const S = {
+        settings: loadSettings(),
+        editor: null,
+        editorAbort: null,
+        table: null,
+        cell: null,
+        selectedCells: [],
+        selectionMode: 'none',
+        rowIndex: -1,
+        colIndex: -1,
+        lastCell: null,
+        lastCellAt: 0,
+        lastStableContext: null,
+        contextRaf: 0,
+        positionRaf: 0,
+        structureTimer: 0,
+        contentTimer: 0,
+        observer: null,
+        guardBypassUntil: 0,
+        guardButton: null,
+        deleteConfirmUntil: 0,
+        deleteConfirmTimer: 0,
+        healthIssueCursor: 0,
+        tableCache: [],
+        health: { topLevel: 0, nested: 0, empty: 0, narrow: 0, issues: [] },
+        assistElements: []
+    };
+
+    function safeGet(key, fallback) {
+        try { return GM_getValue(key, fallback); }
+        catch (_) { return fallback; }
+    }
+
+    function safeSet(key, value) {
+        try { GM_setValue(key, value); } catch (_) {}
+    }
+
+    function loadSettings() {
+        const out = {};
+        for (const [name, fallback] of Object.entries(DEFAULTS)) {
+            out[name] = Boolean(safeGet(DTP.keys[name], fallback));
+        }
+        return out;
+    }
+
+    function saveSetting(name, value) {
+        if (!(name in DEFAULTS)) return;
+        S.settings[name] = Boolean(value);
+        safeSet(DTP.keys[name], S.settings[name]);
+        applyFeatureClasses();
+        if (!S.settings.enabled) {
+            hideToolbar();
+            clearAssistClasses();
+            removeNavigator();
+            hideGuard();
+        } else {
+            scheduleContextRefresh();
+            scheduleContentRefresh(0);
+        }
+        updateSettingsCardState();
+    }
+
+    function isDocumentView() {
+        return /\/document(?:\/|$)/.test(location.pathname) || Boolean(document.querySelector('.document-view-page'));
+    }
+
+    function findEditor() {
+        const nodes = Array.from(document.querySelectorAll(DTP.editorSelector));
+        return nodes.find(el => el instanceof HTMLElement && el.isConnected && el.getAttribute('contenteditable') === 'true') ||
+            nodes.find(el => el instanceof HTMLElement && el.isConnected) || null;
+    }
+
+    function isVisible(el) {
+        if (!(el instanceof Element) || !el.isConnected) return false;
+        const style = getComputedStyle(el);
+        if (style.display === 'none' || style.visibility === 'hidden') return false;
+        const r = el.getBoundingClientRect();
+        return r.width > 0 && r.height > 0;
+    }
+
+    function getSelectionCell(editor = S.editor) {
+        if (!editor) return null;
+        try {
+            const selection = window.getSelection();
+            const node = selection?.anchorNode;
+            const el = node instanceof Element ? node : node?.parentElement;
+            const cell = el?.closest?.('td,th') || null;
+            return cell && editor.contains(cell) ? cell : null;
+        } catch (_) {
+            return null;
+        }
+    }
+
+    function getSelectedCells(editor = S.editor) {
+        if (!editor) return [];
+        return Array.from(editor.querySelectorAll('td.selectedCell,th.selectedCell'))
+            .filter(cell => cell instanceof HTMLTableCellElement && cell.isConnected);
+    }
+
+    function getNativeTableContextActive() {
+        return Array.from(document.querySelectorAll('.document-toolbar__context-label'))
+            .some(el => String(el.textContent || '').trim() === '表格编辑' && isVisible(el));
+    }
+
+    function getTopTable(cell) {
+        const table = cell?.closest?.('table') || null;
+        return table instanceof HTMLTableElement ? table : null;
+    }
+
+    function isNestedTable(table) {
+        return Boolean(table?.parentElement?.closest?.('td,th'));
+    }
+
+    function deriveSelectionMode(editor, selectedCells, cell) {
+        if (selectedCells.length) return 'cell';
+        const nodeSelected = editor?.querySelector?.('.ProseMirror-selectednode');
+        if (nodeSelected && nodeSelected.closest?.('table')) return 'node';
+        try {
+            const selection = window.getSelection();
+            if (cell && selection) return selection.isCollapsed ? 'caret' : 'text';
+        } catch (_) {}
+        return cell ? 'caret' : 'none';
+    }
+
+    function makeContextSnapshot() {
+        return {
+            editor: S.editor,
+            table: S.table,
+            cell: S.cell,
+            selectedCells: [...S.selectedCells],
+            selectionMode: S.selectionMode,
+            rowIndex: S.rowIndex,
+            colIndex: S.colIndex,
+            at: performance.now()
+        };
+    }
+
+    function clearAssistClasses() {
+        for (const el of S.assistElements) {
+            if (!(el instanceof Element)) continue;
+            el.classList.remove(
+                'att-dtp-current-cell-v7170',
+                'att-dtp-current-row-v7170',
+                'att-dtp-current-col-v7170',
+                'att-dtp-active-table-v7170'
+            );
+        }
+        S.assistElements = [];
+    }
+
+    function applyAssistClasses() {
+        clearAssistClasses();
+        if (!S.settings.enabled || !S.settings.assistHighlight || !S.table || !S.cell) return;
+
+        const touched = new Set();
+        S.table.classList.add('att-dtp-active-table-v7170');
+        touched.add(S.table);
+        const row = S.cell.parentElement;
+        if (row instanceof HTMLTableRowElement) {
+            Array.from(row.cells).forEach(cell => {
+                cell.classList.add('att-dtp-current-row-v7170');
+                touched.add(cell);
+            });
+        }
+        if (S.colIndex >= 0) {
+            Array.from(S.table.rows).forEach(r => {
+                const cell = r.cells[S.colIndex];
+                if (cell) {
+                    cell.classList.add('att-dtp-current-col-v7170');
+                    touched.add(cell);
+                }
+            });
+        }
+        S.cell.classList.add('att-dtp-current-cell-v7170');
+        touched.add(S.cell);
+        S.assistElements = Array.from(touched);
+    }
+
+    function syncContextNow() {
+        S.contextRaf = 0;
+        if (!S.settings.enabled || !isDocumentView()) {
+            S.table = null;
+            S.cell = null;
+            S.selectedCells = [];
+            S.selectionMode = 'none';
+            hideToolbar();
+            clearAssistClasses();
+            return;
+        }
+
+        syncEditor();
+        const editor = S.editor;
+        if (!editor) {
+            hideToolbar();
+            clearAssistClasses();
+            return;
+        }
+
+        const selectedCells = getSelectedCells(editor);
+        const selectionCell = getSelectionCell(editor);
+        let cell = selectionCell || selectedCells[0] || null;
+
+        if (!cell && S.lastCell?.isConnected && editor.contains(S.lastCell)) {
+            const age = performance.now() - S.lastCellAt;
+            if (age < 5000 && getNativeTableContextActive()) cell = S.lastCell;
+        }
+
+        const table = getTopTable(cell);
+        S.selectedCells = selectedCells;
+        S.cell = cell;
+        S.table = table;
+        S.selectionMode = deriveSelectionMode(editor, selectedCells, cell);
+        S.rowIndex = cell?.parentElement instanceof HTMLTableRowElement
+            ? Array.from(table?.rows || []).indexOf(cell.parentElement)
+            : -1;
+        S.colIndex = cell instanceof HTMLTableCellElement ? cell.cellIndex : -1;
+
+        if (cell && table) {
+            S.lastCell = cell;
+            S.lastCellAt = performance.now();
+            S.lastStableContext = makeContextSnapshot();
+        }
+
+        applyAssistClasses();
+        updateToolbar();
+        updateNavigatorActive();
+    }
+
+    function scheduleContextRefresh() {
+        if (S.contextRaf) return;
+        S.contextRaf = requestAnimationFrame(syncContextNow);
+    }
+
+    function schedulePosition() {
+        if (S.positionRaf) return;
+        S.positionRaf = requestAnimationFrame(() => {
+            S.positionRaf = 0;
+            positionToolbar();
+        });
+    }
+
+    function syncEditor() {
+        const next = findEditor();
+        if (next === S.editor) return;
+
+        try { S.editorAbort?.abort(); } catch (_) {}
+        S.editorAbort = null;
+        S.editor = next;
+        S.lastCell = null;
+        S.lastStableContext = null;
+
+        if (!next) return;
+
+        const ac = new AbortController();
+        S.editorAbort = ac;
+        const opt = { signal: ac.signal };
+
+        next.addEventListener('pointerdown', event => {
+            const target = event.target instanceof Element ? event.target : null;
+            const cell = target?.closest?.('td,th');
+            if (cell && next.contains(cell)) {
+                S.lastCell = cell;
+                S.lastCellAt = performance.now();
+            }
+            scheduleContextRefresh();
+        }, { ...opt, capture: true });
+
+        next.addEventListener('pointerup', scheduleContextRefresh, opt);
+        next.addEventListener('keyup', scheduleContextRefresh, opt);
+        next.addEventListener('focusin', scheduleContextRefresh, opt);
+        next.addEventListener('input', () => {
+            scheduleContextRefresh();
+            scheduleContentRefresh(120);
+        }, opt);
+    }
+
+    function ensureToolbar() {
+        let bar = document.getElementById(DTP.toolbarId);
+        if (bar) return bar;
+
+        bar = document.createElement('div');
+        bar.id = DTP.toolbarId;
+        bar.setAttribute('data-lumatrace-ignore', '');
+        bar.innerHTML = `
+            <div class="att-dtp-status-v7170" data-dtp-role="status">表格</div>
+            <div class="att-dtp-actions-v7170">
+                <button type="button" data-dtp-cmd="insertRowAbove" title="在当前行上方插入一行">＋行↑</button>
+                <button type="button" data-dtp-cmd="insertColumn" title="调用 AutoTable 原生插入列">＋列</button>
+                <button type="button" data-dtp-cmd="deleteRow" title="删除当前行">－行</button>
+                <button type="button" data-dtp-cmd="deleteColumn" title="删除当前列">－列</button>
+                <button type="button" data-dtp-action="more" class="att-dtp-more-v7170" title="更多表格操作">⋯</button>
+            </div>
+            <div class="att-dtp-more-menu-v7170" data-dtp-role="more-menu">
+                <button type="button" data-dtp-action="copy-cell">复制当前单元格</button>
+                <button type="button" data-dtp-action="locate-table">定位当前表格</button>
+                <button type="button" data-dtp-action="delete-table" class="danger">删除整个表格</button>
+            </div>
+        `;
+
+        bar.addEventListener('pointerdown', event => {
+            if (event.target instanceof Element && event.target.closest('button')) {
+                // 保住 ProseMirror 当前 selection，避免工具栏抢焦点后原生命令失去上下文。
+                event.preventDefault();
+            }
+        }, true);
+
+        bar.addEventListener('click', event => {
+            const button = event.target instanceof Element ? event.target.closest('button') : null;
+            if (!button) return;
+            event.preventDefault();
+            event.stopPropagation();
+
+            const cmd = button.dataset.dtpCmd;
+            if (cmd) {
+                snapshotStableContext();
+                runCommand(cmd);
+                return;
+            }
+
+            const action = button.dataset.dtpAction;
+            if (action === 'more') {
+                bar.classList.toggle('att-dtp-more-open-v7170');
+                schedulePosition();
+            } else if (action === 'copy-cell') {
+                copyCurrentCell();
+                bar.classList.remove('att-dtp-more-open-v7170');
+            } else if (action === 'locate-table') {
+                if (S.table) locateElement(S.table);
+                bar.classList.remove('att-dtp-more-open-v7170');
+            } else if (action === 'delete-table') {
+                handleDeleteTable(button);
+            }
+        });
+
+        document.body.appendChild(bar);
+        return bar;
+    }
+
+    function snapshotStableContext() {
+        if (S.table && S.cell) S.lastStableContext = makeContextSnapshot();
+    }
+
+    function getToolbarAnchorRect() {
+        const cells = S.selectedCells.filter(cell => cell.isConnected);
+        if (cells.length > 1) {
+            const rects = cells.map(c => c.getBoundingClientRect()).filter(r => r.width || r.height);
+            if (rects.length) {
+                const left = Math.min(...rects.map(r => r.left));
+                const top = Math.min(...rects.map(r => r.top));
+                const right = Math.max(...rects.map(r => r.right));
+                const bottom = Math.max(...rects.map(r => r.bottom));
+                return { left, top, right, bottom, width: right - left, height: bottom - top };
+            }
+        }
+        return S.cell?.getBoundingClientRect?.() || S.table?.getBoundingClientRect?.() || null;
+    }
+
+    function updateToolbar() {
+        const bar = ensureToolbar();
+        const show = Boolean(
+            S.settings.enabled && S.settings.miniToolbar && S.table && S.cell && S.table.isConnected && S.cell.isConnected
+        );
+        if (!show) {
+            hideToolbar();
+            return;
+        }
+
+        const selected = S.selectedCells.length;
+        const status = bar.querySelector('[data-dtp-role="status"]');
+        if (status) {
+            const rows = S.table.rows.length;
+            const cols = Math.max(0, ...Array.from(S.table.rows).map(row => row.cells.length));
+            const cellText = S.rowIndex >= 0 && S.colIndex >= 0 ? `R${S.rowIndex + 1}C${S.colIndex + 1}` : '当前格';
+            status.textContent = selected > 1
+                ? `表格 ${rows}×${cols} · 已选 ${selected} 格`
+                : `表格 ${rows}×${cols} · ${cellText}`;
+        }
+
+        bar.classList.add('is-visible');
+        schedulePosition();
+    }
+
+    function hideToolbar() {
+        const bar = document.getElementById(DTP.toolbarId);
+        if (!bar) return;
+        bar.classList.remove('is-visible', 'att-dtp-more-open-v7170');
+    }
+
+    function positionToolbar() {
+        const bar = document.getElementById(DTP.toolbarId);
+        if (!bar?.classList.contains('is-visible')) return;
+        const anchor = getToolbarAnchorRect();
+        if (!anchor) return;
+
+        const w = bar.offsetWidth || 300;
+        const h = bar.offsetHeight || 38;
+        const margin = 8;
+        let left = anchor.left + (anchor.width - w) / 2;
+        let top = anchor.top - h - 8;
+        if (top < margin) top = anchor.bottom + 8;
+        left = Math.max(margin, Math.min(left, window.innerWidth - w - margin));
+        top = Math.max(margin, Math.min(top, window.innerHeight - h - margin));
+        bar.style.left = `${Math.round(left)}px`;
+        bar.style.top = `${Math.round(top)}px`;
+    }
+
+    function findNativeButton(aliases, iconClass = '') {
+        const buttons = Array.from(document.querySelectorAll('.document-toolbar button.document-toolbar__button'));
+        const names = aliases.map(v => String(v).trim());
+        let candidates = buttons.filter(button => {
+            const title = String(button.getAttribute('title') || '').trim();
+            const aria = String(button.getAttribute('aria-label') || '').trim();
+            return names.includes(title) || names.includes(aria);
+        });
+        if (iconClass) {
+            const iconMatched = candidates.filter(button => button.querySelector(`.${iconClass}`));
+            if (iconMatched.length) candidates = iconMatched;
+        }
+        return candidates.find(isVisible) || candidates[0] || null;
+    }
+
+    const COMMANDS = {
+        insertRowAbove: () => findNativeButton(['插入行'], 'anticon-insert-row-above'),
+        insertColumn: () => findNativeButton(['插入列']),
+        deleteRow: () => findNativeButton(['删行', '删除行'], 'anticon-delete-row'),
+        deleteColumn: () => findNativeButton(['删列', '删除列'], 'anticon-delete-column'),
+        deleteTable: () => findNativeButton(['删除表格'])
+    };
+
+    function runCommand(name) {
+        const resolver = COMMANDS[name];
+        if (!resolver) return false;
+        const button = resolver();
+        if (!button) {
+            showToast('当前页面没有检测到对应的原生表格命令');
+            return false;
+        }
+
+        try {
+            button.click();
+            hideMoreMenuSoon();
+            window.setTimeout(() => {
+                syncEditor();
+                scheduleContextRefresh();
+                scheduleContentRefresh(0);
+            }, 32);
+            return true;
+        } catch (err) {
+            console.warn('[Document Table Plus] 原生命令执行失败：', name, err);
+            showToast('表格命令执行失败');
+            return false;
+        }
+    }
+
+    function hideMoreMenuSoon() {
+        requestAnimationFrame(() => document.getElementById(DTP.toolbarId)?.classList.remove('att-dtp-more-open-v7170'));
+    }
+
+    function handleDeleteTable(button) {
+        const now = performance.now();
+        if (now < S.deleteConfirmUntil) {
+            S.deleteConfirmUntil = 0;
+            clearTimeout(S.deleteConfirmTimer);
+            button.textContent = '删除整个表格';
+            runCommand('deleteTable');
+            return;
+        }
+
+        S.deleteConfirmUntil = now + 2400;
+        button.textContent = '再次点击确认删除';
+        button.classList.add('confirming');
+        clearTimeout(S.deleteConfirmTimer);
+        S.deleteConfirmTimer = window.setTimeout(() => {
+            S.deleteConfirmUntil = 0;
+            button.textContent = '删除整个表格';
+            button.classList.remove('confirming');
+        }, 2500);
+    }
+
+    async function copyCurrentCell() {
+        const cell = S.cell;
+        if (!cell) return;
+        const text = String(cell.innerText || cell.textContent || '').replace(/\u200b/g, '').trim();
+        try {
+            if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+            else if (typeof GM_setClipboard === 'function') GM_setClipboard(text);
+            else throw new Error('clipboard unavailable');
+            showToast('已复制当前单元格');
+        } catch (_) {
+            try {
+                if (typeof GM_setClipboard === 'function') {
+                    GM_setClipboard(text);
+                    showToast('已复制当前单元格');
+                }
+            } catch (_) { showToast('复制失败'); }
+        }
+    }
+
+    function ensureGuard() {
+        let guard = document.getElementById(DTP.guardId);
+        if (guard) return guard;
+        guard = document.createElement('div');
+        guard.id = DTP.guardId;
+        guard.setAttribute('data-lumatrace-ignore', '');
+        guard.innerHTML = `
+            <div class="att-dtp-guard-title-v7170">当前光标位于表格中</div>
+            <div class="att-dtp-guard-text-v7170">继续“插入表格”会创建嵌套表格。若不是有意嵌套，请先把光标移动到当前表格之外。</div>
+            <div class="att-dtp-guard-actions-v7170">
+                <button type="button" data-dtp-guard="cancel">取消</button>
+                <button type="button" data-dtp-guard="allow" class="danger">仍然嵌套</button>
+            </div>
+        `;
+        guard.addEventListener('pointerdown', event => {
+            if (event.target instanceof Element && event.target.closest('button')) event.preventDefault();
+        }, true);
+        guard.addEventListener('click', event => {
+            const button = event.target instanceof Element ? event.target.closest('button[data-dtp-guard]') : null;
+            if (!button) return;
+            event.preventDefault();
+            event.stopPropagation();
+            if (button.dataset.dtpGuard === 'cancel') {
+                hideGuard();
+                return;
+            }
+            if (button.dataset.dtpGuard === 'allow') {
+                const original = S.guardButton;
+                S.guardBypassUntil = performance.now() + 1200;
+                hideGuard();
+                if (original?.isConnected) requestAnimationFrame(() => original.click());
+            }
+        });
+        document.body.appendChild(guard);
+        return guard;
+    }
+
+    function hideGuard() {
+        const guard = document.getElementById(DTP.guardId);
+        guard?.classList.remove('is-visible');
+        S.guardButton = null;
+    }
+
+    function contextIsFreshInsideTable() {
+        if (!S.settings.enabled || !S.settings.nestedGuard) return false;
+        if (getSelectionCell(S.editor)) return true;
+        if (getSelectedCells(S.editor).length) return true;
+        return Boolean(S.cell && S.table && getNativeTableContextActive() && performance.now() - S.lastCellAt < 5000);
+    }
+
+    function maybeBlockInsertTable(event) {
+        if (performance.now() < S.guardBypassUntil) return false;
+        const target = event.target instanceof Element ? event.target : null;
+        const button = target?.closest?.('button[title="插入表格"],button[aria-label="插入表格"]');
+        if (!button || !contextIsFreshInsideTable()) return false;
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        event.stopPropagation();
+        S.guardButton = button;
+        const guard = ensureGuard();
+        guard.classList.add('is-visible');
+        const r = button.getBoundingClientRect();
+        const w = guard.offsetWidth || 330;
+        let left = r.left + r.width / 2 - w / 2;
+        let top = r.bottom + 8;
+        left = Math.max(10, Math.min(left, window.innerWidth - w - 10));
+        if (top + (guard.offsetHeight || 130) > window.innerHeight - 10) top = Math.max(10, r.top - (guard.offsetHeight || 130) - 8);
+        guard.style.left = `${Math.round(left)}px`;
+        guard.style.top = `${Math.round(top)}px`;
+        return true;
+    }
+
+    function ensureToast() {
+        let toast = document.getElementById(DTP.toastId);
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = DTP.toastId;
+            toast.setAttribute('data-lumatrace-ignore', '');
+            document.body.appendChild(toast);
+        }
+        return toast;
+    }
+
+    let toastTimer = 0;
+    function showToast(message) {
+        const toast = ensureToast();
+        toast.textContent = String(message || '');
+        toast.classList.add('is-visible');
+        clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => toast.classList.remove('is-visible'), 1700);
+    }
+
+    function getTopLevelTables(editor = S.editor) {
+        if (!editor) return [];
+        return Array.from(editor.querySelectorAll('.tableWrapper > table'))
+            .filter(table => table instanceof HTMLTableElement && !table.closest('td .tableWrapper, th .tableWrapper'));
+    }
+
+    function getNestedTables(editor = S.editor) {
+        if (!editor) return [];
+        return Array.from(editor.querySelectorAll('td .tableWrapper > table,th .tableWrapper > table'))
+            .filter(table => table instanceof HTMLTableElement);
+    }
+
+    function tableColumnCount(table) {
+        return Math.max(0, ...Array.from(table?.rows || []).map(row => row.cells.length));
+    }
+
+    function isEmptyTable(table) {
+        return Array.from(table.querySelectorAll('td,th')).every(cell => !String(cell.innerText || cell.textContent || '').replace(/\s+/g, '').trim());
+    }
+
+    function isNarrowTable(table) {
+        const cols = tableColumnCount(table);
+        if (cols < 3) return false;
+        const width = table.getBoundingClientRect().width || table.offsetWidth || 0;
+        return width > 0 && width < Math.max(220, cols * 62);
+    }
+
+    function getPreviousHeading(wrapper) {
+        let node = wrapper?.previousElementSibling || null;
+        while (node) {
+            if (/^H[1-6]$/.test(node.tagName)) {
+                const text = String(node.textContent || '').replace(/\s+/g, ' ').trim();
+                if (text) return text;
+            }
+            node = node.previousElementSibling;
+        }
+        return '';
+    }
+
+    function tableLabel(table, index) {
+        const wrapper = table.closest('.tableWrapper');
+        const heading = getPreviousHeading(wrapper);
+        if (heading) return heading;
+        const first = table.rows[0];
+        if (first) {
+            const labels = Array.from(first.cells)
+                .map(cell => String(cell.innerText || cell.textContent || '').replace(/\s+/g, ' ').trim())
+                .filter(Boolean)
+                .slice(0, 2);
+            if (labels.length) return labels.join(' / ');
+        }
+        return `未命名表格 ${index + 1}`;
+    }
+
+    function refreshTableInventory() {
+        const editor = S.editor;
+        const top = getTopLevelTables(editor);
+        const nested = getNestedTables(editor);
+        const empty = top.filter(isEmptyTable);
+        const narrow = top.filter(isNarrowTable);
+        const issues = [
+            ...nested.map(table => ({ type: '嵌套表格', table })),
+            ...empty.map(table => ({ type: '空表格', table })),
+            ...narrow.map(table => ({ type: '异常窄表', table }))
+        ];
+        S.tableCache = top;
+        S.health = { topLevel: top.length, nested: nested.length, empty: empty.length, narrow: narrow.length, issues };
+        refreshNavigator();
+        updateHealthUI();
+    }
+
+    function scheduleContentRefresh(delay = 100) {
+        clearTimeout(S.contentTimer);
+        S.contentTimer = window.setTimeout(() => {
+            syncEditor();
+            refreshTableInventory();
+        }, Math.max(0, Number(delay) || 0));
+    }
+
+    function ensureSettingsHost() {
+        const root = document.getElementById('att-toolbox-root');
+        const content = root?.querySelector('.att-content');
+        if (!root || !content) return null;
+
+        let host = document.getElementById(DTP.settingsHostId);
+        if (!host || host.parentElement !== content) {
+            host?.remove();
+            host = document.createElement('div');
+            host.id = DTP.settingsHostId;
+            host.setAttribute('data-lumatrace-ignore', '');
+            content.appendChild(host);
+        }
+        if (host.dataset.bound !== '1') {
+            host.dataset.bound = '1';
+            host.addEventListener('change', event => {
+                const input = event.target instanceof HTMLInputElement ? event.target : null;
+                const name = input?.dataset.dtpSetting;
+                if (!name) return;
+                saveSetting(name, input.checked);
+            });
+            host.addEventListener('click', event => {
+                const button = event.target instanceof Element ? event.target.closest('button[data-dtp-settings-action]') : null;
+                if (!button) return;
+                if (button.dataset.dtpSettingsAction === 'locate-issue') locateNextHealthIssue();
+                if (button.dataset.dtpSettingsAction === 'refresh-health') scheduleContentRefresh(0);
+            });
+        }
+        return host;
+    }
+
+    function ensureSettingsCard() {
+        const host = ensureSettingsHost();
+        if (!host) return null;
+        let card = document.getElementById(DTP.settingsCardId);
+        if (!card || card.parentElement !== host) {
+            card?.remove();
+            card = document.createElement('div');
+            card.id = DTP.settingsCardId;
+            card.className = 'att-card';
+            host.appendChild(card);
+        }
+        renderSettingsCard(card);
+        return card;
+    }
+
+    function toggleRow(name, title, desc) {
+        return `
+            <div class="att-row">
+                <div style="min-width:0;">
+                    <div class="att-label">${title}</div>
+                    <div class="att-sub-label">${desc}</div>
+                </div>
+                <label class="att-switch" title="${title}">
+                    <input type="checkbox" data-dtp-setting="${name}" ${S.settings[name] ? 'checked' : ''}>
+                    <span class="att-slider"></span>
+                </label>
+            </div>`;
+    }
+
+    function renderSettingsCard(card) {
+        if (!card) return;
+        const disabledClass = S.settings.enabled ? '' : ' att-dtp-disabled-v7170';
+        card.innerHTML = `
+            <div class="att-card-title">文档表格增强</div>
+            <div class="att-card-desc">只增强 AutoTable 原生 ProseMirror 表格交互；结构修改优先调用原生命令，不直接改写文档表格 DOM。</div>
+            <div class="att-divider"></div>
+            ${toggleRow('enabled', '启用文档表格增强', '总开关；关闭后迷你工具栏、高亮、嵌套保护与表格导航全部停止。')}
+            <div class="att-dtp-settings-group-v7170${disabledClass}">
+                ${toggleRow('miniToolbar', '单元格迷你工具栏', '进入表格后在当前单元格附近显示常用行列操作。')}
+                ${toggleRow('assistHighlight', '当前行列辅助高亮', '仅作为编辑视觉辅助，不写入文档内容。')}
+                ${toggleRow('resizeHit', '扩大列宽拖拽热区', '保留原生细线外观，只扩大透明鼠标命中范围。')}
+                ${toggleRow('nestedGuard', '防止误插嵌套表格', '在现有表格中点击“插入表格”时先确认，避免误建嵌套表。')}
+                ${toggleRow('navigator', '在文档导航中显示表格', '在现有文档大纲侧栏下方追加表格列表，点击直接定位。')}
+            </div>
+            <div class="att-divider"></div>
+            <div class="att-dtp-health-v7170">
+                <div>
+                    <b>表格健康检查</b>
+                    <span id="att-dtp-health-summary-v7170">正在检测…</span>
+                </div>
+                <div class="att-dtp-health-actions-v7170">
+                    <button type="button" data-dtp-settings-action="refresh-health">刷新</button>
+                    <button type="button" data-dtp-settings-action="locate-issue" id="att-dtp-locate-issue-v7170">定位问题</button>
+                </div>
+            </div>
+            <div class="att-doc-tools-note">V7.17.0 第一阶段只开放已验证的原生结构命令。当前“插入行”已确认是上方插行；“插入列”方向暂沿用 AutoTable 原生语义，不伪造左右双方向。</div>
+        `;
+        updateHealthUI();
+    }
+
+    function updateSettingsCardState() {
+        const card = document.getElementById(DTP.settingsCardId);
+        if (card) renderSettingsCard(card);
+    }
+
+    function updateHealthUI() {
+        const summary = document.getElementById('att-dtp-health-summary-v7170');
+        if (summary) {
+            const h = S.health;
+            summary.textContent = `顶层 ${h.topLevel} · 嵌套 ${h.nested} · 空表 ${h.empty} · 窄表 ${h.narrow}`;
+        }
+        const button = document.getElementById('att-dtp-locate-issue-v7170');
+        if (button instanceof HTMLButtonElement) button.disabled = !S.health.issues.length;
+    }
+
+    function ensureNavigator() {
+        if (!S.settings.enabled || !S.settings.navigator) {
+            removeNavigator();
+            return null;
+        }
+        const outline = document.getElementById('att-document-outline');
+        if (!outline) return null;
+        let nav = document.getElementById(DTP.navId);
+        if (!nav || nav.parentElement !== outline) {
+            nav?.remove();
+            nav = document.createElement('div');
+            nav.id = DTP.navId;
+            nav.setAttribute('data-lumatrace-ignore', '');
+            nav.innerHTML = `<div class="att-dtp-nav-head-v7170"><b>表格</b><span>0</span></div><div class="att-dtp-nav-list-v7170"></div>`;
+            nav.addEventListener('click', event => {
+                const button = event.target instanceof Element ? event.target.closest('button[data-dtp-table-index]') : null;
+                if (!button) return;
+                const index = Number(button.dataset.dtpTableIndex);
+                const table = getTopLevelTables()[index];
+                if (table) locateElement(table);
+            });
+            outline.appendChild(nav);
+        }
+        return nav;
+    }
+
+    function refreshNavigator() {
+        const nav = ensureNavigator();
+        if (!nav) return;
+        const tables = getTopLevelTables();
+        const count = nav.querySelector('.att-dtp-nav-head-v7170 span');
+        const list = nav.querySelector('.att-dtp-nav-list-v7170');
+        if (count) count.textContent = String(tables.length);
+        if (!list) return;
+        if (!tables.length) {
+            list.innerHTML = '<div class="att-dtp-nav-empty-v7170">当前文档没有顶层表格</div>';
+            return;
+        }
+        list.innerHTML = tables.map((table, index) => {
+            const rows = table.rows.length;
+            const cols = tableColumnCount(table);
+            const active = table === S.table ? ' is-active' : '';
+            return `<button type="button" class="att-dtp-nav-item-v7170${active}" data-dtp-table-index="${index}" title="${escapeAttr(tableLabel(table, index))}"><span>▦</span><b>${escapeHtml(tableLabel(table, index))}</b><em>${rows}×${cols}</em></button>`;
+        }).join('');
+    }
+
+    function updateNavigatorActive() {
+        const nav = document.getElementById(DTP.navId);
+        if (!nav) return;
+        const tables = getTopLevelTables();
+        nav.querySelectorAll('button[data-dtp-table-index]').forEach(button => {
+            const table = tables[Number(button.dataset.dtpTableIndex)];
+            button.classList.toggle('is-active', table === S.table);
+        });
+    }
+
+    function removeNavigator() {
+        document.getElementById(DTP.navId)?.remove();
+    }
+
+    function locateNextHealthIssue() {
+        const issues = S.health.issues.filter(issue => issue.table?.isConnected);
+        if (!issues.length) {
+            showToast('当前没有检测到表格结构问题');
+            return;
+        }
+        const index = S.healthIssueCursor % issues.length;
+        S.healthIssueCursor = (index + 1) % issues.length;
+        const issue = issues[index];
+        locateElement(issue.table);
+        showToast(`${issue.type} · ${index + 1}/${issues.length}`);
+    }
+
+    function getScrollHost(el) {
+        let node = el?.parentElement || null;
+        while (node && node !== document.body) {
+            const style = getComputedStyle(node);
+            if (/(auto|scroll)/.test(style.overflowY) && node.scrollHeight > node.clientHeight + 2) return node;
+            node = node.parentElement;
+        }
+        return null;
+    }
+
+    function locateElement(el) {
+        if (!(el instanceof Element) || !el.isConnected) return;
+        const host = getScrollHost(el);
+        try {
+            if (host) {
+                const er = el.getBoundingClientRect();
+                const hr = host.getBoundingClientRect();
+                host.scrollTo({ top: host.scrollTop + er.top - hr.top - 86, behavior: 'smooth' });
+            } else {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        } catch (_) {
+            try { el.scrollIntoView({ block: 'center' }); } catch (_) {}
+        }
+        const table = el instanceof HTMLTableElement ? el : el.closest('table');
+        if (table) {
+            table.classList.add('att-dtp-locate-flash-v7170');
+            window.setTimeout(() => table.classList.remove('att-dtp-locate-flash-v7170'), 1300);
+        }
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function escapeAttr(value) {
+        return escapeHtml(value).replace(/`/g, '&#96;');
+    }
+
+    function applyFeatureClasses() {
+        const root = document.documentElement;
+        root.classList.toggle('att-dtp-enabled-v7170', S.settings.enabled);
+        root.classList.toggle('att-dtp-resize-hit-v7170', S.settings.enabled && S.settings.resizeHit);
+    }
+
+    function addStyles() {
+        if (document.getElementById(DTP.styleId)) return;
+        const style = document.createElement('style');
+        style.id = DTP.styleId;
+        style.textContent = `
+            #${DTP.toolbarId} {
+                position: fixed;
+                z-index: 2147482550;
+                display: none;
+                align-items: center;
+                gap: 7px;
+                min-height: 36px;
+                max-width: min(430px, calc(100vw - 16px));
+                padding: 5px 6px 5px 9px;
+                box-sizing: border-box;
+                border: 1px solid rgba(148,163,184,.34);
+                border-radius: 10px;
+                background: rgba(24,27,32,.97);
+                color: #e7eaf0;
+                box-shadow: 0 10px 28px rgba(0,0,0,.28);
+                font: 11px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+                user-select: none;
+            }
+            #${DTP.toolbarId}.is-visible { display: flex; }
+            #${DTP.toolbarId} .att-dtp-status-v7170 {
+                max-width: 150px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                color: #aeb7c3;
+                font-size: 10.5px;
+            }
+            #${DTP.toolbarId} .att-dtp-actions-v7170 { display:flex; align-items:center; gap:3px; }
+            #${DTP.toolbarId} button {
+                height: 26px;
+                padding: 0 7px;
+                border: 1px solid #40464f;
+                border-radius: 6px;
+                background: #2a2f36;
+                color: #e8edf4;
+                cursor: pointer;
+                font: inherit;
+            }
+            #${DTP.toolbarId} button:hover { background:#343b44; border-color:#556170; }
+            #${DTP.toolbarId} .att-dtp-more-v7170 { min-width:27px; padding:0 6px; font-size:15px; }
+            #${DTP.toolbarId} .att-dtp-more-menu-v7170 {
+                position:absolute;
+                right:0;
+                top:calc(100% + 5px);
+                display:none;
+                width:168px;
+                padding:5px;
+                border:1px solid #414853;
+                border-radius:8px;
+                background:#22272d;
+                box-shadow:0 12px 28px rgba(0,0,0,.30);
+            }
+            #${DTP.toolbarId}.att-dtp-more-open-v7170 .att-dtp-more-menu-v7170 { display:grid; gap:3px; }
+            #${DTP.toolbarId} .att-dtp-more-menu-v7170 button { width:100%; text-align:left; }
+            #${DTP.toolbarId} .att-dtp-more-menu-v7170 button.danger { color:#ffaaa5; }
+            #${DTP.toolbarId} .att-dtp-more-menu-v7170 button.confirming { color:#fff; background:#7f1d1d; border-color:#a33; }
+
+            #${DTP.guardId} {
+                position: fixed;
+                z-index: 2147482700;
+                display: none;
+                width: min(340px, calc(100vw - 20px));
+                box-sizing: border-box;
+                padding: 12px;
+                border: 1px solid rgba(245,158,11,.38);
+                border-radius: 11px;
+                background: rgba(31,34,39,.98);
+                color: #e7eaf0;
+                box-shadow: 0 16px 38px rgba(0,0,0,.32);
+                font: 12px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+            }
+            #${DTP.guardId}.is-visible { display:block; }
+            #${DTP.guardId} .att-dtp-guard-title-v7170 { font-weight:800; color:#ffd38a; }
+            #${DTP.guardId} .att-dtp-guard-text-v7170 { margin-top:6px; color:#b8c0cb; }
+            #${DTP.guardId} .att-dtp-guard-actions-v7170 { display:flex; justify-content:flex-end; gap:6px; margin-top:10px; }
+            #${DTP.guardId} button { height:28px; padding:0 9px; border:1px solid #454c55; border-radius:6px; background:#2b3037; color:#e7eaf0; cursor:pointer; }
+            #${DTP.guardId} button.danger { color:#ffb4ad; border-color:#68433f; }
+
+            #${DTP.toastId} {
+                position:fixed;
+                left:50%;
+                bottom:28px;
+                z-index:2147482750;
+                transform:translate(-50%,8px);
+                opacity:0;
+                pointer-events:none;
+                padding:7px 11px;
+                border:1px solid rgba(148,163,184,.28);
+                border-radius:8px;
+                background:rgba(28,31,36,.96);
+                color:#e9edf3;
+                font:11px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+                transition:opacity .14s ease,transform .14s ease;
+            }
+            #${DTP.toastId}.is-visible { opacity:1; transform:translate(-50%,0); }
+
+            html.att-dtp-enabled-v7170 .document-editor__content table.att-dtp-active-table-v7170 {
+                outline: 1px solid rgba(59,130,246,.18);
+                outline-offset: 1px;
+            }
+            html.att-dtp-enabled-v7170 .document-editor__content td.att-dtp-current-row-v7170,
+            html.att-dtp-enabled-v7170 .document-editor__content th.att-dtp-current-row-v7170 {
+                background-image: linear-gradient(rgba(59,130,246,.035),rgba(59,130,246,.035));
+            }
+            html.att-dtp-enabled-v7170 .document-editor__content td.att-dtp-current-col-v7170,
+            html.att-dtp-enabled-v7170 .document-editor__content th.att-dtp-current-col-v7170 {
+                box-shadow: inset 0 0 0 999px rgba(59,130,246,.025);
+            }
+            html.att-dtp-enabled-v7170 .document-editor__content td.att-dtp-current-cell-v7170,
+            html.att-dtp-enabled-v7170 .document-editor__content th.att-dtp-current-cell-v7170 {
+                box-shadow: inset 0 0 0 2px rgba(59,130,246,.58) !important;
+            }
+            html.att-dtp-enabled-v7170 .document-editor__content table.att-dtp-locate-flash-v7170 {
+                outline: 2px solid rgba(59,130,246,.72) !important;
+                outline-offset: 3px !important;
+                transition: outline-color .25s ease;
+            }
+
+            /* 原生 resize widget 会动态创建/销毁；只通过 CSS 扩大透明命中区，不绑定单个 handle。 */
+            html.att-dtp-resize-hit-v7170 .document-editor__content .column-resize-handle {
+                overflow: visible !important;
+            }
+            html.att-dtp-resize-hit-v7170 .document-editor__content .column-resize-handle::before {
+                content:"";
+                position:absolute;
+                top:0;
+                bottom:0;
+                left:-5px;
+                right:-5px;
+                cursor:col-resize;
+                background:transparent;
+            }
+
+            #${DTP.settingsHostId} { display:none; margin-top:7px; }
+            #att-toolbox-root:has(.att-tab[data-tab="document-tools"].att-active) .att-content > #${DTP.settingsHostId} { display:block; }
+            #${DTP.settingsCardId} .att-dtp-settings-group-v7170.att-dtp-disabled-v7170 { opacity:.48; }
+            #${DTP.settingsCardId} .att-dtp-health-v7170 { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+            #${DTP.settingsCardId} .att-dtp-health-v7170 > div:first-child { min-width:0; display:flex; flex-direction:column; gap:3px; }
+            #${DTP.settingsCardId} .att-dtp-health-v7170 b { font-size:11.5px; color:var(--att-ui-text-2,#344054); }
+            #${DTP.settingsCardId} .att-dtp-health-v7170 span { font-size:10.5px; color:var(--att-ui-muted,#667085); }
+            #${DTP.settingsCardId} .att-dtp-health-actions-v7170 { display:flex; gap:5px; flex:0 0 auto; }
+            #${DTP.settingsCardId} .att-dtp-health-actions-v7170 button { height:27px; padding:0 8px; border:1px solid var(--att-ui-border,#e4e7ec); border-radius:6px; background:var(--att-ui-surface,#fff); color:var(--att-ui-text-2,#344054); cursor:pointer; font-size:10.5px; }
+            #${DTP.settingsCardId} .att-dtp-health-actions-v7170 button:disabled { opacity:.42; cursor:not-allowed; }
+
+            #${DTP.navId} {
+                flex:0 0 auto;
+                max-height:38%;
+                min-height:0;
+                display:flex;
+                flex-direction:column;
+                border-top:1px solid var(--border-color,rgba(148,163,184,.18));
+                background:var(--bg-panel,var(--bg-card,#fff));
+            }
+            #${DTP.navId} .att-dtp-nav-head-v7170 { display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:30px; padding:0 10px 0 13px; color:var(--text-muted,#64748b); font-size:10.5px; }
+            #${DTP.navId} .att-dtp-nav-head-v7170 b { color:var(--text-secondary,#475569); font-size:11px; }
+            #${DTP.navId} .att-dtp-nav-list-v7170 { min-height:0; overflow:auto; padding:2px 5px 7px; }
+            #${DTP.navId} .att-dtp-nav-item-v7170 { width:100%; min-height:28px; margin:1px 0; padding:4px 6px; display:grid; grid-template-columns:16px minmax(0,1fr) auto; align-items:center; gap:4px; border:0; border-radius:6px; background:transparent; color:var(--text-secondary,#475569); text-align:left; cursor:pointer; font:inherit; font-size:10.5px; line-height:1.3; }
+            #${DTP.navId} .att-dtp-nav-item-v7170:hover { background:rgba(148,163,184,.10); }
+            #${DTP.navId} .att-dtp-nav-item-v7170.is-active { background:rgba(59,130,246,.10); color:#2563eb; }
+            #${DTP.navId} .att-dtp-nav-item-v7170 b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
+            #${DTP.navId} .att-dtp-nav-item-v7170 em { font-style:normal; color:var(--text-muted,#94a3b8); font-size:9.5px; }
+            #${DTP.navId} .att-dtp-nav-empty-v7170 { padding:8px 10px 11px; color:var(--text-muted,#94a3b8); font-size:10px; text-align:center; }
+        `;
+        document.documentElement.appendChild(style);
+    }
+
+    function structureMutationRelevant(record) {
+        const target = record.target instanceof Element ? record.target : record.target?.parentElement;
+        if (target?.closest?.(`#${DTP.toolbarId},#${DTP.guardId},#${DTP.settingsHostId},#${DTP.navId}`)) return false;
+        if (target?.closest?.('.grid-virtual-body')) return false;
+
+        const nodes = [...(record.addedNodes || []), ...(record.removedNodes || [])];
+        return nodes.some(node => {
+            if (!(node instanceof Element)) return false;
+            if (node.matches?.('.column-resize-handle')) return false;
+            return node.matches?.('.document-view-page,.document-editor__content,.tableWrapper,table,tbody,tr,td,th,#att-toolbox-root,#att-document-outline') ||
+                Boolean(node.querySelector?.('.document-view-page,.document-editor__content,.tableWrapper,table,#att-toolbox-root,#att-document-outline'));
+        });
+    }
+
+    function scheduleStructureSync(delay = 20) {
+        clearTimeout(S.structureTimer);
+        S.structureTimer = window.setTimeout(() => {
+            syncEditor();
+            ensureSettingsCard();
+            scheduleContextRefresh();
+            scheduleContentRefresh(0);
+        }, Math.max(0, delay));
+    }
+
+    function bindGlobalEvents() {
+        if (document.documentElement.dataset.attDocTablePlusBoundV7170 === '1') return;
+        document.documentElement.dataset.attDocTablePlusBoundV7170 = '1';
+
+        document.addEventListener('selectionchange', () => {
+            if (!S.settings.enabled || !S.editor) return;
+            const cell = getSelectionCell(S.editor);
+            if (cell || S.selectedCells.length || (S.cell && getNativeTableContextActive())) scheduleContextRefresh();
+        }, { passive: true });
+
+        document.addEventListener('pointerdown', event => {
+            if (!S.settings.enabled) return;
+            maybeBlockInsertTable(event);
+        }, true);
+
+        document.addEventListener('click', event => {
+            if (!S.settings.enabled) return;
+            maybeBlockInsertTable(event);
+        }, true);
+
+        document.addEventListener('scroll', () => {
+            if (document.getElementById(DTP.toolbarId)?.classList.contains('is-visible')) schedulePosition();
+        }, { capture: true, passive: true });
+        window.addEventListener('resize', schedulePosition, { passive: true });
+        window.addEventListener('popstate', () => scheduleStructureSync(40));
+
+        S.observer = new MutationObserver(records => {
+            if (records.some(structureMutationRelevant)) scheduleStructureSync(18);
+        });
+        S.observer.observe(document.documentElement, { childList: true, subtree: true });
+    }
+
+    function init() {
+        addStyles();
+        applyFeatureClasses();
+        bindGlobalEvents();
+        syncEditor();
+        ensureToolbar();
+        ensureGuard();
+        ensureToast();
+        ensureSettingsCard();
+        refreshTableInventory();
+        scheduleContextRefresh();
+        window.setTimeout(() => {
+            syncEditor();
+            ensureSettingsCard();
+            refreshTableInventory();
+            scheduleContextRefresh();
+        }, 180);
+        console.log('[AutoTable Document Table Plus] V7.17.0 已加载：原生表格上下文增强 / 防误嵌套 / 表格导航 / 健康检查');
+    }
+
+    if (document.body) init();
+    else window.addEventListener('DOMContentLoaded', init, { once: true });
+})();
+
