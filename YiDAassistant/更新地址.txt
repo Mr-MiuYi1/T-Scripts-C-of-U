@@ -1,0 +1,7 @@
+//
+// @updateURL    https://raw.githubusercontent.com/Mr-MiuYi1/T-Scripts-C-of-U/main/YiDAassistant/YiDAassistant.meta.js
+// @downloadURL  https://raw.githubusercontent.com/Mr-MiuYi1/T-Scripts-C-of-U/main/YiDAassistant/YiDAassistant.user.js
+//
+
+
+YiDAassistant\YiDAassistant.user.js
