@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.17.0
-// @description  AutoTable 一体化效率增强工具：文档表格增强（上下文迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.17.1
+// @description  AutoTable 一体化效率增强工具：文档表格增强（上下文稳定识别 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.17.0
+ * AutoTable 工具集 V7.17.1
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，规则组/规则分层管理，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -54,7 +54,7 @@
     'use strict';
 
     const KEY = '__attPerfStats';
-    const VERSION = 'V7.17.0';
+    const VERSION = 'V7.17.1';
     const makeCounters = () => ({
         panelFullRenders: 0,
         panelSectionRenderCalls: 0,
@@ -215,7 +215,7 @@
     const PERF = globalThis.__attPerfStats || null;
 
     const APP = {
-        version: 'V7.17.0',
+        version: 'V7.17.1',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -31962,7 +31962,7 @@
 })();
 
 /* ============================================================================
- * AutoTable Document Table Plus V7.17.0 · 文档表格增强第一阶段
+ * AutoTable Document Table Plus V7.17.1 · 文档表格增强第一阶段
  * --------------------------------------------------------------------------
  * 目标：不重做 ProseMirror 表格引擎，只给原生表格能力增加一层稳定的交互外壳。
  *
@@ -31983,7 +31983,7 @@
     'use strict';
 
     const DTP = {
-        version: 'V7.17.0',
+        version: 'V7.17.1',
         styleId: 'att-doc-table-plus-style-v7170',
         toolbarId: 'att-doc-table-mini-toolbar-v7170',
         guardId: 'att-doc-table-nested-guard-v7170',
@@ -32028,6 +32028,7 @@
         colIndex: -1,
         lastCell: null,
         lastCellAt: 0,
+        contextStickyUntil: 0,
         lastStableContext: null,
         contextRaf: 0,
         positionRaf: 0,
@@ -32107,6 +32108,26 @@
         } catch (_) {
             return null;
         }
+    }
+
+    function editorOwnsFocus(editor = S.editor) {
+        if (!editor) return false;
+        const active = document.activeElement;
+        return active === editor || Boolean(active instanceof Element && editor.contains(active));
+    }
+
+    function cellFromEventTarget(target, editor = S.editor) {
+        const el = target instanceof Element ? target : target?.parentElement;
+        const cell = el?.closest?.('td,th') || null;
+        return cell && editor?.contains?.(cell) ? cell : null;
+    }
+
+    function rememberInteractionCell(cell, stickyMs = 12000) {
+        if (!(cell instanceof HTMLTableCellElement) || !S.editor?.contains?.(cell)) return false;
+        S.lastCell = cell;
+        S.lastCellAt = performance.now();
+        S.contextStickyUntil = S.lastCellAt + Math.max(1000, Number(stickyMs) || 12000);
+        return true;
     }
 
     function getSelectedCells(editor = S.editor) {
@@ -32219,8 +32240,15 @@
         let cell = selectionCell || selectedCells[0] || null;
 
         if (!cell && S.lastCell?.isConnected && editor.contains(S.lastCell)) {
-            const age = performance.now() - S.lastCellAt;
-            if (age < 5000 && getNativeTableContextActive()) cell = S.lastCell;
+            const now = performance.now();
+            const age = now - S.lastCellAt;
+            // 直接点进单元格本身就是最可靠的上下文证据。V7.17.0 过度依赖顶部“表格编辑”标签，
+            // 在其尚未出现/短暂重建时会把真实单元格误判为空，导致工具栏和高亮完全不显示。
+            if (
+                (age < 15000 && now < S.contextStickyUntil) ||
+                (age < 15000 && editorOwnsFocus(editor)) ||
+                (age < 5000 && getNativeTableContextActive())
+            ) cell = S.lastCell;
         }
 
         const table = getTopTable(cell);
@@ -32234,8 +32262,7 @@
         S.colIndex = cell instanceof HTMLTableCellElement ? cell.cellIndex : -1;
 
         if (cell && table) {
-            S.lastCell = cell;
-            S.lastCellAt = performance.now();
+            rememberInteractionCell(cell);
             S.lastStableContext = makeContextSnapshot();
         }
 
@@ -32274,18 +32301,32 @@
         const opt = { signal: ac.signal };
 
         next.addEventListener('pointerdown', event => {
-            const target = event.target instanceof Element ? event.target : null;
-            const cell = target?.closest?.('td,th');
-            if (cell && next.contains(cell)) {
-                S.lastCell = cell;
-                S.lastCellAt = performance.now();
-            }
+            const cell = cellFromEventTarget(event.target, next);
+            if (cell) rememberInteractionCell(cell);
             scheduleContextRefresh();
         }, { ...opt, capture: true });
 
-        next.addEventListener('pointerup', scheduleContextRefresh, opt);
-        next.addEventListener('keyup', scheduleContextRefresh, opt);
-        next.addEventListener('focusin', scheduleContextRefresh, opt);
+        next.addEventListener('pointerup', event => {
+            const cell = cellFromEventTarget(event.target, next);
+            if (cell) rememberInteractionCell(cell);
+            scheduleContextRefresh();
+        }, opt);
+        next.addEventListener('click', event => {
+            const cell = cellFromEventTarget(event.target, next);
+            if (cell) rememberInteractionCell(cell);
+            scheduleContextRefresh();
+        }, opt);
+        next.addEventListener('keyup', () => {
+            const cell = getSelectionCell(next);
+            if (cell) rememberInteractionCell(cell);
+            else if (S.lastCell?.isConnected && editorOwnsFocus(next)) S.contextStickyUntil = performance.now() + 12000;
+            scheduleContextRefresh();
+        }, opt);
+        next.addEventListener('focusin', event => {
+            const cell = cellFromEventTarget(event.target, next) || getSelectionCell(next);
+            if (cell) rememberInteractionCell(cell);
+            scheduleContextRefresh();
+        }, opt);
         next.addEventListener('input', () => {
             scheduleContextRefresh();
             scheduleContentRefresh(120);
@@ -32407,15 +32448,28 @@
     function positionToolbar() {
         const bar = document.getElementById(DTP.toolbarId);
         if (!bar?.classList.contains('is-visible')) return;
-        const anchor = getToolbarAnchorRect();
+        const cellAnchor = getToolbarAnchorRect();
+        const tableRect = S.table?.getBoundingClientRect?.() || null;
+        const tableUsable = tableRect && tableRect.width > 0 && tableRect.height > 0;
+        const anchor = tableUsable ? tableRect : cellAnchor;
         if (!anchor) return;
 
         const w = bar.offsetWidth || 300;
         const h = bar.offsetHeight || 38;
         const margin = 8;
-        let left = anchor.left + (anchor.width - w) / 2;
-        let top = anchor.top - h - 8;
-        if (top < margin) top = anchor.bottom + 8;
+
+        // 工具栏固定跟随“当前表格”的右上边缘，而不是跟着每个单元格跳来跳去。
+        // 这样切格、键盘输入、多格选择时位置稳定，也不会覆盖当前正在编辑的文字。
+        let left = anchor.right - w;
+        let top = anchor.top - h - 7;
+
+        // 表格离视口顶部太近时，退到当前单元格下方；仍然避免压住正在输入的格子。
+        if (top < margin) {
+            const cellRect = S.cell?.getBoundingClientRect?.() || cellAnchor;
+            top = (cellRect?.bottom || anchor.bottom) + 7;
+            left = Math.min(anchor.right - w, cellRect?.right ? cellRect.right - w : left);
+        }
+
         left = Math.max(margin, Math.min(left, window.innerWidth - w - margin));
         top = Math.max(margin, Math.min(top, window.innerHeight - h - margin));
         bar.style.left = `${Math.round(left)}px`;
@@ -32561,7 +32615,15 @@
         if (!S.settings.enabled || !S.settings.nestedGuard) return false;
         if (getSelectionCell(S.editor)) return true;
         if (getSelectedCells(S.editor).length) return true;
-        return Boolean(S.cell && S.table && getNativeTableContextActive() && performance.now() - S.lastCellAt < 5000);
+        const now = performance.now();
+        return Boolean(
+            S.cell && S.table &&
+            (
+                (S.cell.isConnected && now < S.contextStickyUntil) ||
+                (editorOwnsFocus(S.editor) && now - S.lastCellAt < 15000) ||
+                (getNativeTableContextActive() && now - S.lastCellAt < 5000)
+            )
+        );
     }
 
     function maybeBlockInsertTable(event) {
@@ -32772,7 +32834,7 @@
                     <button type="button" data-dtp-settings-action="locate-issue" id="att-dtp-locate-issue-v7170">定位问题</button>
                 </div>
             </div>
-            <div class="att-doc-tools-note">V7.17.0 第一阶段只开放已验证的原生结构命令。当前“插入行”已确认是上方插行；“插入列”方向暂沿用 AutoTable 原生语义，不伪造左右双方向。</div>
+            <div class="att-doc-tools-note">V7.17.1 第一阶段只开放已验证的原生结构命令。当前“插入行”已确认是上方插行；“插入列”方向暂沿用 AutoTable 原生语义，不伪造左右双方向。</div>
         `;
         updateHealthUI();
     }
@@ -33122,6 +33184,14 @@
 
         document.addEventListener('pointerdown', event => {
             if (!S.settings.enabled) return;
+            const target = event.target instanceof Element ? event.target : null;
+            const insideEditor = Boolean(target && S.editor?.contains?.(target));
+            const insideOwnUi = Boolean(target?.closest?.(`#${DTP.toolbarId},#${DTP.guardId}`));
+            const insideNativeDocToolbar = Boolean(target?.closest?.('.document-toolbar'));
+            if (!insideEditor && !insideOwnUi && !insideNativeDocToolbar) {
+                S.contextStickyUntil = 0;
+                scheduleContextRefresh();
+            }
             maybeBlockInsertTable(event);
         }, true);
 
@@ -33142,6 +33212,31 @@
         S.observer.observe(document.documentElement, { childList: true, subtree: true });
     }
 
+    function exposeDiagnostics() {
+        const api = {
+            version: DTP.version,
+            snapshot() {
+                return {
+                    enabled: S.settings.enabled,
+                    editorFound: Boolean(S.editor?.isConnected),
+                    editorFocused: editorOwnsFocus(S.editor),
+                    tableFound: Boolean(S.table?.isConnected),
+                    cellFound: Boolean(S.cell?.isConnected),
+                    selectionMode: S.selectionMode,
+                    selectedCells: S.selectedCells.filter(c => c?.isConnected).length,
+                    rowIndex: S.rowIndex,
+                    colIndex: S.colIndex,
+                    nativeTableContext: getNativeTableContextActive(),
+                    lastCellAgeMs: S.lastCellAt ? Math.round(performance.now() - S.lastCellAt) : null,
+                    stickyRemainingMs: Math.max(0, Math.round(S.contextStickyUntil - performance.now()))
+                };
+            },
+            refresh() { scheduleContextRefresh(); scheduleContentRefresh(0); }
+        };
+        try { globalThis.__attDocTablePlus = api; } catch (_) {}
+        try { if (typeof unsafeWindow !== 'undefined') unsafeWindow.__attDocTablePlus = api; } catch (_) {}
+    }
+
     function init() {
         addStyles();
         applyFeatureClasses();
@@ -33150,6 +33245,7 @@
         ensureToolbar();
         ensureGuard();
         ensureToast();
+        exposeDiagnostics();
         ensureSettingsCard();
         refreshTableInventory();
         scheduleContextRefresh();
@@ -33159,7 +33255,7 @@
             refreshTableInventory();
             scheduleContextRefresh();
         }, 180);
-        console.log('[AutoTable Document Table Plus] V7.17.0 已加载：原生表格上下文增强 / 防误嵌套 / 表格导航 / 健康检查');
+        console.log('[AutoTable Document Table Plus] V7.17.1 已加载：上下文稳定识别 / 表格边缘稳定工具栏 / 防误嵌套 / 表格导航 / 健康检查');
     }
 
     if (document.body) init();
