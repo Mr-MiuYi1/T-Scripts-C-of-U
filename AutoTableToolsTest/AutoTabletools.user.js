@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.19.1
-// @description  AutoTable 一体化效率增强工具：文档表格增强（书签独立开关 / 导航与书签分栏切换及侧栏收起 / 查找替换布局修复 / 大纲搜索筛选 / 批量展开折叠 / 文档阅读与折叠记忆 / 自定义书签 / 章节复制与导出 / 范围查找与替换预览 / 两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.19.2
+// @description  AutoTable 一体化效率增强工具：文档表格增强（大纲可见高度与底部滚动修复 / 查找范围同行布局 / 书签独立开关 / 导航与书签分栏切换及侧栏收起 / 查找替换布局修复 / 大纲搜索筛选 / 批量展开折叠 / 文档阅读与折叠记忆 / 自定义书签 / 章节复制与导出 / 范围查找与替换预览 / 两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -18925,6 +18925,7 @@
             collapse.setAttribute('aria-label',collapse.title);
             collapse.setAttribute('aria-expanded',String(!W.panelCollapsed));
         }
+        scheduleActiveHeadingUpdate();
     }
     function workspaceEnsurePaneControls(panel) {
         const head = panel.querySelector('.att-doc-outline-head');
@@ -18963,6 +18964,53 @@
         const list = panel.querySelector(`#${DOC_TOOLS.outlineListId}`);
         if (list) {list.setAttribute('role','tabpanel');list.setAttribute('aria-labelledby','att-doc-ws-outline-tab-v7191');}
         workspaceUpdatePane(panel);
+    }
+
+    // Use the real visible document viewport, including clipped application
+    // ancestors and CSS zoom. A fixed offset cannot describe this layout.
+    function workspaceLayoutScale(element, rect) {
+        const scale = element.offsetWidth > 0 ? rect.width / element.offsetWidth : 1;
+        return Number.isFinite(scale) && scale > 0 ? scale : 1;
+    }
+    function workspaceUpdateLayout() {
+        const panel = document.getElementById(DOC_TOOLS.outlineId);
+        if (panel?.isConnected && panel.getClientRects().length) {
+            const rect = panel.getBoundingClientRect();
+            const scale = workspaceLayoutScale(panel, rect);
+            const viewport = window.visualViewport;
+            let top = Math.max(0, viewport?.offsetTop || 0);
+            let bottom = Math.min(window.innerHeight,
+                viewport ? top + viewport.height : window.innerHeight);
+            for (let parent = panel.parentElement;
+                parent && parent !== document.body && parent !== document.documentElement;
+                parent = parent.parentElement) {
+                const style = getComputedStyle(parent);
+                if (!/^(auto|scroll|overlay|hidden|clip)$/.test(style.overflowY || style.overflow || '') || parent.clientHeight <= 0) continue;
+                const parentRect = parent.getBoundingClientRect();
+                const parentScale = workspaceLayoutScale(parent, parentRect);
+                const clientTop = parentRect.top + parent.clientTop * parentScale;
+                top = Math.max(top, clientTop);
+                bottom = Math.min(bottom, clientTop + parent.clientHeight * parentScale);
+            }
+            const height = Math.max(0, Math.floor((bottom - Math.max(top, rect.top) - 8) / scale));
+            const value = height + 'px';
+            if (panel.style.getPropertyValue('--att-doc-outline-height-v7192') !== value) {
+                panel.style.setProperty('--att-doc-outline-height-v7192', value);
+            }
+        }
+        const bar = document.getElementById('att-doc-page-search-bar-v62');
+        if (bar?.getClientRects().length) {
+            const rect = bar.getBoundingClientRect();
+            if (rect.width > 0) {
+                // Measure the available document column rather than the whole
+                // browser window, since both native and plugin sidebars vary.
+                const inline = rect.width / workspaceLayoutScale(bar, rect) >= 880;
+                const value = inline ? '1' : '0';
+                if (bar.getAttribute('data-att-ws-scope-inline') !== value) {
+                    bar.setAttribute('data-att-ws-scope-inline', value);
+                }
+            }
+        }
     }
 
     function workspaceRead(key, fallback) {
@@ -19452,11 +19500,18 @@
         const labels = {document:'全文',chapter:'当前章节',table:'当前表格',selection:'选区'};
         status.textContent = W.scope !== 'document' && !W.scopeRanges.length ? '范围为空：先点击正文或选中内容，再点“更新范围”' : `${labels[W.scope]}${W.scope !== 'document' ? ' · 已锁定' : ' · 搜索全部正文'}`;
         status.title = W.scope !== 'document' ? '范围已锁定。先在正文中点击章节、表格或选择内容，再点“更新范围”重新选取。' : '搜索当前文档的全部正文';
-        status.classList.toggle('is-warning', W.scope !== 'document' && !W.scopeRanges.length);
+        const warning = W.scope !== 'document' && !W.scopeRanges.length;
+        status.classList.toggle('is-warning', warning);
+        const controls = status.parentElement;
+        controls?.classList.toggle('is-warning', warning);
+        if (controls) controls.title = warning ? status.textContent : status.title;
+        const select = controls?.querySelector('select');
+        if (select) select.setAttribute('aria-invalid', String(warning));
     }
     function workspaceAttachSearchBar(bar) {
         if (!bar) return;
         bar.setAttribute('data-att-ws-layout','7191');
+        scheduleActiveHeadingUpdate();
         const existing = bar.querySelector('#att-doc-search-scope-v7190');
         if (existing) {existing.querySelector('select').value = W.scope; workspaceScopeStatus(); return;}
         const controls = document.createElement('div'); controls.id = 'att-doc-search-scope-v7190';
@@ -19651,6 +19706,7 @@
         const capture = event => {
             const target = event.target instanceof Element ? event.target : event.target?.parentElement;
             if (target && W.editor?.contains(target)) {workspaceNoteTarget(target); if (event.type !== 'pointerdown') workspaceCaptureSelection();}
+            if (event.type === 'focusin' && target?.closest?.('#att-doc-page-search-bar-v62')) scheduleActiveHeadingUpdate();
             if (event.type === 'pointerdown' && W.menu && !W.menu.contains(target)) closeChapterMenu();
         };
         for (const name of ['pointerdown','pointerup','keyup','focusin']) document.addEventListener(name,capture,true);
@@ -19876,6 +19932,39 @@
                 #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-replace {grid-row:4;}
                 #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-message {grid-row:5;}
             }
+            /* Bound the sidebar to the measured viewport, even in a short window. */
+            #att-document-outline[data-att-ws-pane] {min-height:0!important;height:var(--att-doc-outline-height-v7192,calc(100dvh - 164px))!important;max-height:var(--att-doc-outline-height-v7192,calc(100dvh - 164px))!important;}
+            #att-document-outline[data-att-ws-pane] #att-doc-workspace-controls-v7190 {flex:0 1 auto;min-height:0;max-height:40%;overflow-y:auto;box-sizing:border-box;}
+            #att-document-outline[data-att-ws-pane] #att-document-outline-list {flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;}
+            #att-document-outline[data-att-ws-pane] #att-doc-table-nav-v7170 {flex:0 1 auto;min-height:0;max-height:30%;overflow:hidden;box-sizing:border-box;}
+            #att-document-outline[data-att-ws-pane] #att-doc-table-nav-v7170 .att-dtp-nav-head-v7170 {flex:0 0 30px;min-height:0;box-sizing:border-box;}
+            #att-document-outline[data-att-ws-pane] #att-doc-table-nav-v7170 .att-dtp-nav-list-v7170 {flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;}
+
+            /* Wide document columns keep scope controls in the search row. */
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"].att-doc-search-compact-v63 {grid-template-columns:minmax(160px,1fr) auto auto auto auto auto 28px;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"].att-doc-search-compact-v63 .att-doc-page-search-find {grid-row:1;grid-column:1;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"].att-doc-search-compact-v63 #att-doc-search-scope-v7190 {grid-row:1;grid-column:2;flex-wrap:nowrap;position:relative;border:0;padding:0;white-space:nowrap;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"] #att-doc-search-scope-status-v7190 {position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"] #att-doc-search-scope-v7190.is-warning select {border-color:var(--warning,#f59e0b);}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"].att-doc-search-compact-v63 .att-doc-page-search-case {grid-row:1;grid-column:3;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"].att-doc-search-compact-v63 .att-doc-regex-toggle-v64 {grid-row:1;grid-column:4;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"].att-doc-search-compact-v63 :is([data-att-doc-page-search-act="clear"],[data-att-doc-regex-act-v64="clear"]) {grid-row:1;grid-column:5;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"].att-doc-search-compact-v63 .att-doc-search-replace-toggle-v63 {grid-row:1;grid-column:6;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"].att-doc-search-compact-v63 .att-doc-search-close-v63 {grid-row:1;grid-column:7;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"].att-doc-search-compact-v63 .att-doc-page-search-replace {grid-row:2;grid-column:1/-1;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"].att-doc-search-compact-v63 .att-doc-page-search-message {grid-row:3;grid-column:1/-1;}
+
+            /* Actual narrow columns can occur in wide browser windows, too. */
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="0"].att-doc-search-compact-v63 {grid-template-columns:repeat(4,auto) minmax(0,1fr) 28px;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="0"].att-doc-search-compact-v63 .att-doc-page-search-find {grid-row:1;grid-column:1/6;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="0"].att-doc-search-compact-v63 .att-doc-search-close-v63 {grid-row:1;grid-column:6;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="0"].att-doc-search-compact-v63 .att-doc-page-search-case {grid-row:2;grid-column:1;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="0"].att-doc-search-compact-v63 .att-doc-regex-toggle-v64 {grid-row:2;grid-column:2;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="0"].att-doc-search-compact-v63 :is([data-att-doc-page-search-act="clear"],[data-att-doc-regex-act-v64="clear"]) {grid-row:2;grid-column:3;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="0"].att-doc-search-compact-v63 .att-doc-search-replace-toggle-v63 {grid-row:2;grid-column:4;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="0"].att-doc-search-compact-v63 #att-doc-search-scope-v7190 {grid-row:3;grid-column:1/-1;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="0"].att-doc-search-compact-v63 .att-doc-page-search-replace {grid-row:4;grid-column:1/-1;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="0"].att-doc-search-compact-v63 .att-doc-page-search-message {grid-row:5;grid-column:1/-1;}
             #att-doc-workspace-controls-v7190 {flex:0 0 auto;padding:7px 8px;border-bottom:1px solid var(--border-color,#3b424b);font-size:11px;}
             #att-doc-workspace-controls-v7190 input,#att-doc-workspace-controls-v7190 select,#att-doc-workspace-controls-v7190 button,
             #att-doc-workspace-bookmarks-v7190 button,#att-doc-search-scope-v7190 select,#att-doc-search-scope-v7190 button {box-sizing:border-box;min-width:0;border:1px solid var(--border-color,#475569);border-radius:5px;background:var(--surface-subtle,#27313a);color:var(--text-main,var(--text-primary,#e2e8f0));font:inherit;padding:5px;}
@@ -20644,6 +20733,7 @@
         if (docState.activeRaf) return;
         docState.activeRaf = requestAnimationFrame(() => {
             docState.activeRaf = 0;
+            workspaceUpdateLayout();
             updateActiveHeading();
         });
     }
@@ -20910,6 +21000,8 @@
         }, true);
 
         window.addEventListener('resize', scheduleActiveHeadingUpdate, { passive: true });
+        window.visualViewport?.addEventListener('resize', scheduleActiveHeadingUpdate, { passive: true });
+        window.visualViewport?.addEventListener('scroll', scheduleActiveHeadingUpdate, { passive: true });
 
         console.log('[AutoTable 文档工具] V5 已加载：嵌入式大纲 / 大纲滑动跟随 / 内部容器定点跳转 / 锁定外层页面');
     }
