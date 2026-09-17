@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.18.3
-// @description  AutoTable 一体化效率增强工具：文档表格增强（菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.18.4
+// @description  AutoTable 一体化效率增强工具：文档表格增强（标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.18.3
+ * AutoTable 工具集 V7.18.4
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，规则组/规则分层管理，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -18856,6 +18856,9 @@
         outlineFollowEnabled: readOutlineFollowEnabled(),
         editor: null,
         headings: [],
+        navigationMerged: readMergedNavigationEnabled(),
+        navigationTables: [],
+        navigationCollapsed: new WeakSet(),
         headingObserver: null,
         pageObserver: null,
         rebuildTimer: 0,
@@ -18863,6 +18866,119 @@
         activeRaf: 0,
         jumpToken: 0
     };
+
+    // Headings and top-level tables share one outline, in document order.
+    // This module owns rendering; Table Plus retains its internal-scroll locator.
+    const DOCUMENT_NAV_EVENTS = {
+        settings: 'att-document-navigation-settings-v7184',
+        rendered: 'att-document-navigation-rendered-v7184',
+        navigate: 'att-document-table-navigate-v7184',
+        active: 'att-document-table-active-v7184'
+    };
+
+    function readMergedNavigationEnabled() {
+        try {
+            return Boolean(GM_getValue('att_doc_table_plus_enabled_v7170', true)) &&
+                Boolean(GM_getValue('att_doc_table_plus_navigator_v7170', true)) &&
+                Boolean(GM_getValue('att_doc_table_plus_navigation_hierarchy_v7184', true));
+        } catch (_) { return true; }
+    }
+
+    function dispatchNavigationEvent(type, detail) {
+        if (typeof CustomEvent === 'function') document.dispatchEvent(new CustomEvent(type, {detail}));
+    }
+
+    function navigationTableInfo(table, index) {
+        const labels = Array.from(table.rows[0]?.cells || [])
+            .map(cell => String(cell.innerText || cell.textContent || '').replace(/\s+/g, ' ').trim())
+            .filter(Boolean).slice(0, 2);
+        const columns = Array.from(table.rows).reduce((maximum, row) => Math.max(maximum,
+            Array.from(row.cells).reduce((total, cell) => total + Math.max(1, Number(cell.colSpan) || 1), 0)), 0);
+        return {element: table, text: labels.join(' / ') || `未命名表格 ${index + 1}`,
+            rows: table.rows.length, columns, index, kind: 'table', children: []};
+    }
+
+    function buildDocumentNavigation(editor, headings) {
+        const roots = [], stack = [], tables = [];
+        const headingMap = new Map(headings.map((heading, index) => [heading.element, {...heading, index}]));
+        if (!editor) return {roots, tables};
+        for (const element of editor.querySelectorAll('h1,h2,h3,h4,h5,h6,table')) {
+            // Content inside a table belongs to that table, not to a new chapter.
+            if (element.parentElement?.closest('table')) continue;
+            const heading = headingMap.get(element);
+            let node;
+            if (heading) {
+                node = {...heading, kind: 'heading', children: []};
+                while (stack.length && stack[stack.length - 1].level >= node.level) stack.pop();
+            } else if (element.tagName === 'TABLE') {
+                node = navigationTableInfo(element, tables.length);
+                tables.push(node);
+            } else continue;
+            const parent = stack[stack.length - 1];
+            (parent ? parent.children : roots).push(node);
+            if (node.kind === 'heading') stack.push(node);
+        }
+        return {roots, tables};
+    }
+
+    function renderDocumentNavigationNodes(nodes) {
+        return nodes.map(node => {
+            if (node.kind === 'table') {
+                return `<button type="button" class="att-doc-nav-table-v7184"
+                    data-att-nav-table-index="${node.index}" title="${escapeAttr(node.text)} · ${node.rows}行 × ${node.columns}列">
+                    <svg class="att-doc-nav-table-icon-v7184" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="2" y="3" width="12" height="10" rx="1"/><path d="M2 6h12M2 9h12M6 3v10M10 3v10"/></svg>
+                    <span class="att-doc-nav-label-v7184">${escapeHtml(node.text)}</span>
+                    <span class="att-doc-nav-size-v7184">${node.rows}×${node.columns}</span></button>`;
+            }
+            const hasChildren = node.children.length > 0;
+            const collapsed = hasChildren && docState.navigationCollapsed.has(node.element);
+            const groupId = `att-doc-nav-group-v7184-${node.index}`;
+            const disclosure = hasChildren
+                ? `<button type="button" class="att-doc-nav-toggle-v7184" data-att-nav-toggle="${node.index}"
+                    aria-expanded="${!collapsed}" aria-controls="${groupId}"
+                    aria-label="${collapsed ? '展开' : '收起'}章节：${escapeAttr(node.text)}"
+                    title="${collapsed ? '展开章节' : '收起章节'}"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="m6 3 5 5-5 5"/></svg></button>`
+                : '<span class="att-doc-nav-toggle-space-v7184" aria-hidden="true"></span>';
+            return `<div class="att-doc-nav-node-v7184"><div class="att-doc-nav-row-v7184">${disclosure}
+                <button type="button" class="att-doc-outline-item" data-index="${node.index}" data-level="${node.level}" title="${escapeAttr(node.text)}">
+                <span class="att-doc-nav-heading-level-v7184" aria-hidden="true">H${node.level}</span><span class="att-doc-nav-label-v7184">${escapeHtml(node.text)}</span></button></div>
+                ${hasChildren ? `<div class="att-doc-nav-group-v7184" id="${groupId}" role="group" aria-label="${escapeAttr(node.text)}" ${collapsed ? 'hidden' : ''}>${renderDocumentNavigationNodes(node.children)}</div>` : ''}</div>`;
+        }).join('');
+    }
+
+    function toggleNavigationChapter(panel, button) {
+        const index = Number(button.dataset.attNavToggle), heading = docState.headings[index];
+        const group = panel.querySelector(`#att-doc-nav-group-v7184-${index}`);
+        if (!heading || !group) return;
+        group.hidden = !group.hidden;
+        if (group.hidden) docState.navigationCollapsed.add(heading.element);
+        else docState.navigationCollapsed.delete(heading.element);
+        button.setAttribute('aria-expanded', String(!group.hidden));
+        button.setAttribute('aria-label', `${group.hidden ? '展开' : '收起'}章节：${heading.text}`);
+        button.setAttribute('title', group.hidden ? '展开章节' : '收起章节');
+    }
+
+    function updateMergedTableActive(table) {
+        const panel = document.getElementById(DOC_TOOLS.outlineId);
+        if (!panel || panel.dataset.attNavigationMerged !== '1') return;
+        panel.querySelectorAll('button[data-att-nav-table-index]').forEach(button => {
+            const item = docState.navigationTables[Number(button.dataset.attNavTableIndex)];
+            const active = Boolean(table && item?.element === table);
+            button.classList.toggle('is-active', active);
+            if (active) button.setAttribute('aria-current', 'true');
+            else button.removeAttribute('aria-current');
+        });
+    }
+
+    function bindDocumentNavigationEvents() {
+        document.addEventListener(DOCUMENT_NAV_EVENTS.settings, event => {
+            const enabled = Boolean(event.detail?.enabled);
+            if (docState.navigationMerged === enabled) return;
+            docState.navigationMerged = enabled;
+            scheduleOutlineRebuild(0);
+        });
+        document.addEventListener(DOCUMENT_NAV_EVENTS.active, event => updateMergedTableActive(event.detail?.table || null));
+    }
 
     function readOutlineEnabled() {
         try {
@@ -19108,6 +19224,27 @@
             #att-document-outline .att-doc-outline-item[data-level="4"] { padding-left: 40px; }
             #att-document-outline .att-doc-outline-item[data-level="5"] { padding-left: 50px; }
             #att-document-outline .att-doc-outline-item[data-level="6"] { padding-left: 60px; }
+
+            #att-document-outline[data-att-navigation-merged="1"] .att-doc-nav-row-v7184 {display:flex;align-items:center;min-width:0;}
+            #att-document-outline[data-att-navigation-merged="1"] .att-doc-outline-item {display:flex;align-items:center;gap:6px;flex:1;min-width:0;width:auto;padding:6px;}
+            #att-document-outline .att-doc-nav-label-v7184 {flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+            #att-document-outline .att-doc-nav-heading-level-v7184 {flex:none;font-size:9px;font-weight:500;opacity:.65;}
+            #att-document-outline .att-doc-nav-group-v7184 {margin-left:10px;padding-left:5px;border-left:1px solid var(--border-color,rgba(148,163,184,.22));}
+            #att-document-outline .att-doc-nav-group-v7184[hidden] {display:none !important;}
+            #att-document-outline .att-doc-nav-toggle-v7184,#att-document-outline .att-doc-nav-toggle-space-v7184 {flex:0 0 18px;width:18px;height:26px;box-sizing:border-box;}
+            #att-document-outline .att-doc-nav-toggle-v7184 {padding:2px;border:0;border-radius:4px;background:transparent;color:inherit;cursor:pointer;}
+            #att-document-outline .att-doc-nav-toggle-v7184:hover {background:var(--bg-hover,rgba(148,163,184,.12));}
+            #att-document-outline .att-doc-nav-toggle-v7184 svg {display:block;width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.6;transition:transform .12s ease;}
+            #att-document-outline .att-doc-nav-toggle-v7184[aria-expanded="true"] svg {transform:rotate(90deg);}
+            #att-document-outline .att-doc-nav-table-v7184 {display:flex;align-items:center;gap:6px;width:100%;min-width:0;min-height:30px;box-sizing:border-box;margin:1px 0;padding:6px 7px;border:0;border-radius:6px;background:transparent;color:var(--text-secondary,#475569);font-family:inherit;font-size:11px;line-height:1.45;text-align:left;cursor:pointer;}
+            #att-document-outline .att-doc-nav-table-v7184:hover {background:var(--bg-hover,rgba(148,163,184,.10));color:var(--text-main,#1f2937);}
+            #att-document-outline .att-doc-nav-table-v7184.is-active {background:var(--primary-bg,rgba(22,119,255,.10));color:var(--primary,var(--ant-color-primary,#1677ff));}
+            #att-document-outline .att-doc-nav-table-icon-v7184 {flex:none;width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.2;}
+            #att-document-outline .att-doc-nav-size-v7184 {flex:none;font-size:9px;opacity:.65;}
+            #att-document-outline .att-doc-nav-toggle-v7184:focus-visible,#att-document-outline .att-doc-nav-table-v7184:focus-visible {outline:1px solid var(--primary,#1677ff);outline-offset:-1px;}
+            body.att-native-dark #att-document-outline .att-doc-nav-table-v7184 {color:var(--text-secondary,var(--edge-text-2,#d2d2d2));}
+            body.att-native-dark #att-document-outline .att-doc-nav-table-v7184:hover {color:var(--text-main,var(--edge-text,#f3f3f3));}
+            body.att-native-dark #att-document-outline .att-doc-nav-table-v7184.is-active {color:var(--primary,var(--edge-blue,#60cdff));background:var(--primary-bg,rgba(96,205,255,.12));}
 
             /* scrollIntoView 的辅助安全边距；不改变正文尺寸或滚动容器。 */
             .document-editor__content h1,
@@ -19367,7 +19504,7 @@
         if (!editor) return [];
 
         return Array.from(editor.querySelectorAll('h1,h2,h3,h4,h5,h6'))
-            .filter(heading => isVisibleElement(heading))
+            .filter(heading => isVisibleElement(heading) && (!docState.navigationMerged || !heading.parentElement?.closest('table')))
             .map(heading => ({
                 element: heading,
                 level: Number(heading.tagName.slice(1)) || 1,
@@ -19394,7 +19531,25 @@
                 <div id="${DOC_TOOLS.outlineListId}"></div>
             `;
 
+            panel.addEventListener('pointerdown', event => {
+                if (event.button === 0 && event.target?.closest?.('button')) event.preventDefault();
+            });
             panel.addEventListener('click', event => {
+                const toggle = event.target?.closest?.('button[data-att-nav-toggle]');
+                if (toggle && docState.navigationMerged) {
+                    event.preventDefault(); event.stopPropagation();
+                    toggleNavigationChapter(panel, toggle);
+                    return;
+                }
+                const tableButton = event.target?.closest?.('button[data-att-nav-table-index]');
+                if (tableButton && docState.navigationMerged) {
+                    event.preventDefault(); event.stopPropagation();
+                    const table = docState.navigationTables[Number(tableButton.dataset.attNavTableIndex)]?.element;
+                    if (table?.isConnected && docState.editor?.contains(table)) {
+                        dispatchNavigationEvent(DOCUMENT_NAV_EVENTS.navigate, {table});
+                    } else scheduleOutlineRebuild(0);
+                    return;
+                }
                 const button = event.target.closest('.att-doc-outline-item[data-index]');
                 if (!button) return;
 
@@ -19402,15 +19557,15 @@
                 event.stopPropagation();
 
                 const index = Number(button.dataset.index);
-                const latestHeadings = collectHeadings();
-                const target = latestHeadings[index]?.element || docState.headings[index]?.element;
+                // Indices belong to the rendered snapshot; inserts before a click
+                // must not silently redirect navigation to a different heading.
+                const target = docState.headings[index]?.element;
 
                 if (!target?.isConnected) {
                     scheduleOutlineRebuild(0);
                     return;
                 }
 
-                docState.headings = latestHeadings.length ? latestHeadings : docState.headings;
                 jumpToHeading(target, index);
             });
         }
@@ -19433,6 +19588,7 @@
         panel?.remove();
         host?.classList.remove('att-doc-outline-layout');
         docState.headings = [];
+        docState.navigationTables = [];
     }
 
     function rebuildOutline() {
@@ -19451,24 +19607,33 @@
         const list = panel.querySelector(`#${DOC_TOOLS.outlineListId}`);
         const count = panel.querySelector('.att-doc-outline-count');
 
-        if (count) count.textContent = String(docState.headings.length);
+        const merged = docState.navigationMerged;
+        panel.dataset.attNavigationMerged = merged ? '1' : '0';
+        const title = panel.querySelector('.att-doc-outline-title');
+        if (title) title.textContent = merged ? '文档导航' : '文档大纲';
+        panel.setAttribute('aria-label', merged ? '文档导航：标题与表格' : '文档大纲');
         updateHeadingCountInToolbox(docState.headings.length);
-
         if (!list) return;
-
-        if (!docState.headings.length) {
-            list.innerHTML = '<div class="att-doc-outline-empty">当前文档还没有 H1–H6 标题</div>';
-            return;
+        const scrollTop = list.scrollTop;
+        if (merged) {
+            const navigation = buildDocumentNavigation(docState.editor, docState.headings);
+            docState.navigationTables = navigation.tables;
+            list.innerHTML = navigation.roots.length ? renderDocumentNavigationNodes(navigation.roots)
+                : '<div class="att-doc-outline-empty">当前文档还没有标题或表格</div>';
+            document.getElementById('att-doc-table-nav-v7170')?.remove();
+        } else {
+            docState.navigationTables = [];
+            list.innerHTML = docState.headings.length ? docState.headings.map((item, index) => `
+                <button type="button" class="att-doc-outline-item" data-index="${index}" data-level="${item.level}"
+                        title="${escapeAttr(item.text)}">${escapeHtml(item.text)}</button>`).join('')
+                : '<div class="att-doc-outline-empty">当前文档还没有 H1–H6 标题</div>';
         }
-
-        list.innerHTML = docState.headings.map((item, index) => `
-            <button type="button"
-                    class="att-doc-outline-item"
-                    data-index="${index}"
-                    data-level="${item.level}"
-                    title="${escapeAttr(item.text)}">${escapeHtml(item.text)}</button>
-        `).join('');
-
+        list.scrollTop = scrollTop;
+        if (count) {
+            count.textContent = merged ? `${docState.headings.length} / ${docState.navigationTables.length}` : String(docState.headings.length);
+            count.setAttribute('title', merged ? `${docState.headings.length} 个标题 · ${docState.navigationTables.length} 张表格` : `${docState.headings.length} 个标题`);
+        }
+        dispatchNavigationEvent(DOCUMENT_NAV_EVENTS.rendered, {merged});
         scheduleActiveHeadingUpdate();
     }
 
@@ -19502,7 +19667,15 @@
         });
 
         if (keepItemVisible && list && items[index]) {
-            keepOutlineItemVisible(list, items[index]);
+            let visibleItem = items[index];
+            // A collapsed chapter stays collapsed. Follow its visible parent row
+            // rather than measuring a hidden child as a zero-sized rectangle.
+            for (let ancestor = visibleItem.parentElement; ancestor && ancestor !== list; ancestor = ancestor.parentElement) {
+                if (ancestor.classList.contains('att-doc-nav-group-v7184') && ancestor.hidden) {
+                    visibleItem = ancestor.previousElementSibling || visibleItem;
+                }
+            }
+            keepOutlineItemVisible(list, visibleItem);
         }
     }
 
@@ -19803,6 +19976,7 @@
     }
 
     function initDocumentTools() {
+        bindDocumentNavigationEvents();
         addStyles();
         syncDocumentContext();
 
@@ -31973,7 +32147,7 @@
 })();
 
 /* ============================================================================
- * AutoTable Document Table Plus V7.18.3 · 文档表格完整交互增强
+ * AutoTable Document Table Plus V7.18.4 · 文档表格完整交互增强
  * --------------------------------------------------------------------------
  * 目标：不重做 ProseMirror 表格引擎，只给原生表格能力增加一层稳定的交互外壳。
  *
@@ -31990,7 +32164,7 @@
     'use strict';
 
     const DTP = {
-        version: 'V7.18.3',
+        version: 'V7.18.4',
         styleId: 'att-doc-table-plus-style-v7170',
         toolbarId: 'att-doc-table-mini-toolbar-v7170',
         guardId: 'att-doc-table-nested-guard-v7170',
@@ -32011,6 +32185,7 @@
             resizeHit: 'att_doc_table_plus_resize_hit_v7170',
             nestedGuard: 'att_doc_table_plus_nested_guard_v7170',
             navigator: 'att_doc_table_plus_navigator_v7170',
+            navigationHierarchy: 'att_doc_table_plus_navigation_hierarchy_v7184',
             preventCellMove: 'att_doc_table_plus_prevent_cell_move_v7172',
             dragCells: 'att_doc_table_plus_drag_cells_v7173',
             clipboard:'att_doc_table_plus_clipboard_v7180',
@@ -32026,6 +32201,7 @@
         resizeHit: true,
         nestedGuard: true,
         navigator: true,
+        navigationHierarchy: true,
         preventCellMove: true,
         dragCells: true,
         clipboard:true, edgeHandles:true, contextMenu:true
@@ -32104,6 +32280,7 @@
         if (!(name in DEFAULTS)) return;
         S.settings[name] = Boolean(value);
         safeSet(DTP.keys[name], S.settings[name]);
+        if (['enabled', 'navigator', 'navigationHierarchy'].includes(name)) publishNavigationSettings();
         applyFeatureClasses();
         if (!S.settings.enabled || !S.settings.resizeHit) {cancelColumnResize();finishDrag();}
         if (!S.settings.enabled) { S.frozenTable=null; hideProductivityUi(); closeTableDialog(); updateFrozenHeader(); }
@@ -32945,7 +33122,7 @@
         showToast('已阻止单元格误拖动；需要移动时可关闭防误移动');
     }
 
-    // V7.18.3: keep menus inside the document viewport and preserve header paint.
+    // V7.18.4: keep menus inside the document viewport and preserve header paint.
     const MENU_ICONS = {
         'select-row':'M3 3h18v18H3z M3 9h18 M3 15h18 M3 12h18',
         'select-column':'M3 3h18v18H3z M9 3v18 M15 3v18 M12 3v18',
@@ -34809,7 +34986,8 @@
                 ${toggleRow('assistHighlight', '当前行列辅助高亮', '仅作为编辑视觉辅助，不写入文档内容。')}
                 ${toggleRow('resizeHit', '扩大列宽拖拽热区', '边界附近显示 2px 细线和 12px 命中区；拖动仅预览，松开保存列宽，Esc 取消。')}
                 ${toggleRow('nestedGuard', '防止误插嵌套表格', '在现有表格中点击“插入表格”时先确认，避免误建嵌套表。')}
-                ${toggleRow('navigator', '在文档导航中显示表格', '在现有文档大纲侧栏下方追加表格列表，点击直接定位。')}
+                ${toggleRow('navigator', '在文档导航中显示表格', '在文档大纲侧栏显示表格入口，点击直接定位。')}
+                ${toggleRow('navigationHierarchy', '标题与表格合并成层级导航', '将表格归入所属标题，支持折叠章节。需开启自动文档大纲和表格导航；关闭后恢复独立表格列表。')}
             </div>
             <div class="att-divider"></div>
             <div class="att-dtp-health-v7170">
@@ -34842,6 +35020,30 @@
         if (button instanceof HTMLButtonElement) button.disabled = !S.health.issues.length;
     }
 
+    function emitDocumentNavigation(type, detail) {
+        if (typeof CustomEvent === 'function') document.dispatchEvent(new CustomEvent(type, {detail}));
+    }
+
+    function publishNavigationSettings() {
+        emitDocumentNavigation('att-document-navigation-settings-v7184', {
+            enabled: S.settings.enabled && S.settings.navigator && S.settings.navigationHierarchy
+        });
+    }
+
+    function bindTableNavigationEvents() {
+        document.addEventListener('att-document-navigation-rendered-v7184', () => {
+            refreshNavigator();
+            updateNavigatorActive();
+        });
+        document.addEventListener('att-document-table-navigate-v7184', event => {
+            const table = event.detail?.table;
+            if (!S.settings.enabled || !S.settings.navigator || !(table instanceof HTMLTableElement) ||
+                !table.isConnected || !S.editor?.contains(table) || table.parentElement?.closest('table')) return;
+            locateElement(table);
+            emitDocumentNavigation('att-document-table-active-v7184', {table});
+        });
+    }
+
     function ensureNavigator() {
         if (!S.settings.enabled || !S.settings.navigator) {
             removeNavigator();
@@ -34849,6 +35051,10 @@
         }
         const outline = document.getElementById('att-document-outline');
         if (!outline) return null;
+        if (S.settings.navigationHierarchy && outline.dataset.attNavigationMerged === '1') {
+            removeNavigator();
+            return null;
+        }
         let nav = document.getElementById(DTP.navId);
         if (!nav || nav.parentElement !== outline) {
             nav?.remove();
@@ -34893,6 +35099,7 @@
     }
 
     function updateNavigatorActive() {
+        emitDocumentNavigation('att-document-table-active-v7184', {table: S.table});
         const nav = document.getElementById(DTP.navId);
         if (!nav) return;
         const tables = getTopLevelTables();
@@ -35346,6 +35553,7 @@
             snapshot() {
                 return {
                     enabled: S.settings.enabled,
+                    navigationHierarchy: S.settings.navigationHierarchy,
                     preventCellMove: S.settings.preventCellMove,
                     dragCells: S.settings.dragCells,
                     nativeRectAvailable: S.nativeRectAvailable,
@@ -35383,6 +35591,8 @@
         addStyles();
         applyFeatureClasses();
         bindGlobalEvents();
+        bindTableNavigationEvents();
+        publishNavigationSettings();
         bindProductivityEvents();
         bindColumnResize();
         syncEditor();
@@ -35399,7 +35609,7 @@
             refreshTableInventory();
             scheduleContextRefresh();
         }, 180);
-        console.log('[AutoTable Document Table Plus] V7.18.3 已加载：菜单边界与图标 / 冻结表头样式和停靠修复 / 表格内部跳转 / 滚动内容锚定浮层 / 跨格矩形拖选 / 设置卡增量更新 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 编辑器外高亮 / 保留防误移动');
+        console.log('[AutoTable Document Table Plus] V7.18.4 已加载：标题与表格层级导航 / 菜单边界与图标 / 冻结表头样式和停靠修复 / 表格内部跳转 / 滚动内容锚定浮层 / 跨格矩形拖选 / 设置卡增量更新 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 编辑器外高亮 / 保留防误移动');
     }
 
     if (document.body) init();
