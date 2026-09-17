@@ -1,0 +1,3151 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="AutoTable 工具集 V7.20.0 完整功能与操作说明：复制、字段组合、列置顶、短语、条件高亮、搜索记录、文档与表格增强。"
+    />
+    <title>AutoTable 工具集 V7.20.0 · 使用说明书</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 92px;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font:
+          15px/1.85 "Segoe UI",
+          "Microsoft YaHei",
+          sans-serif;
+        --bg: #f7f8fa;
+        --surface: #fff;
+        --text: #253247;
+        --muted: #707c8f;
+        --line: #e5e9ef;
+        --accent: #236c58;
+        --soft: #edf5f1;
+        --code: #f3f5f8;
+      }
+      body.dark {
+        --bg: #13191f;
+        --surface: #1c242d;
+        --text: #e0e8ee;
+        --muted: #a0adbb;
+        --line: #34404d;
+        --accent: #7ad5b3;
+        --soft: #233c33;
+        --code: #222e39;
+      }
+      a {
+        color: var(--accent);
+      }
+      button,
+      input {
+        font: inherit;
+      }
+      button {
+        cursor: pointer;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: var(--surface);
+        color: var(--text);
+        padding: 7px 13px;
+      }
+      button:hover {
+        background: var(--soft);
+      }
+      button:focus-visible,
+      a:focus-visible,
+      input:focus-visible,
+      summary:focus-visible {
+        outline: 3px solid #69b5a0;
+        outline-offset: 3px;
+      }
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: var(--surface);
+        border-bottom: 1px solid var(--line);
+        height: 70px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 0 32px;
+      }
+      .brand {
+        font-size: 17px;
+        font-weight: 750;
+        letter-spacing: -0.4px;
+      }
+      .brand span {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 400;
+        display: block;
+        line-height: 1.3;
+      }
+      .search {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        width: min(450px, 40vw);
+      }
+      .search input {
+        width: 100%;
+        padding: 8px 13px;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        color: var(--text);
+        border-radius: 9px;
+        min-width: 0;
+      }
+      .shell {
+        max-width: 1470px;
+        margin: auto;
+        display: grid;
+        grid-template-columns: 255px minmax(0, 1fr);
+        gap: 40px;
+        padding: 34px 32px 70px;
+      }
+      .sidebar {
+        position: sticky;
+        top: 100px;
+        height: calc(100vh - 125px);
+        overflow: auto;
+        scrollbar-width: thin;
+        padding-right: 12px;
+      }
+      .sidehead {
+        font-size: 11px;
+        color: var(--muted);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        padding: 0 10px 16px;
+      }
+      .sidebar a {
+        display: flex;
+        gap: 10px;
+        align-items: baseline;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.5;
+        text-decoration: none;
+        padding: 8px 9px;
+        margin: 2px 0;
+        border-radius: 7px;
+      }
+      .sidebar a.active {
+        background: var(--soft);
+        color: var(--accent);
+        font-weight: 650;
+      }
+      .sidebar a:hover {
+        color: var(--accent);
+        background: var(--soft);
+      }
+      .sidebar a span {
+        font-size: 10px;
+        opacity: 0.65;
+        width: 20px;
+        flex: none;
+      }
+      .hero {
+        padding: 24px 0 35px;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 26px;
+      }
+      .eyebrow {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: var(--accent);
+      }
+      h1 {
+        font-size: clamp(32px, 4vw, 48px);
+        line-height: 1.3;
+        letter-spacing: -1.5px;
+        margin: 13px 0 16px;
+      }
+      h1 span {
+        color: var(--muted);
+        font-weight: 400;
+      }
+      .hero p {
+        max-width: 740px;
+        color: var(--muted);
+        margin: 0 0 20px;
+      }
+      .pills {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .pill {
+        font-size: 12px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 30px;
+        padding: 4px 12px;
+      }
+      .intro-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin: 24px 0;
+      }
+      .intro-card {
+        padding: 19px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 13px;
+      }
+      .intro-card strong {
+        display: block;
+        font-size: 19px;
+      }
+      .intro-card p {
+        font-size: 12px;
+        color: var(--muted);
+        margin: 5px 0 0;
+      }
+      .section {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 30px 34px;
+        margin: 18px 0;
+        scroll-margin-top: 92px;
+        overflow: hidden;
+      }
+      .section-title {
+        display: flex;
+        gap: 14px;
+        align-items: baseline;
+      }
+      .section-number {
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 700;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.45;
+        letter-spacing: -0.4px;
+        margin: 0;
+      }
+      .desc {
+        color: var(--muted);
+        font-size: 13px;
+        margin: 6px 0 23px;
+      }
+      h3 {
+        font-size: 17px;
+        margin: 27px 0 9px;
+      }
+      p {
+        margin: 12px 0;
+      }
+      code {
+        font:
+          12.5px/1.7 Consolas,
+          monospace;
+        background: var(--code);
+        padding: 2px 5px;
+        border-radius: 4px;
+        overflow-wrap: anywhere;
+      }
+      pre {
+        padding: 17px 19px;
+        background: var(--code);
+        border-radius: 10px;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+      pre code {
+        padding: 0;
+        background: none;
+      }
+      kbd {
+        display: inline-block;
+        font:
+          11px/1.6 Consolas,
+          monospace;
+        padding: 1px 6px;
+        border: 1px solid var(--line);
+        border-bottom-width: 2px;
+        border-radius: 4px;
+        white-space: nowrap;
+        background: var(--code);
+      }
+      .table-wrap {
+        width: 100%;
+        overflow: auto;
+        margin: 18px 0;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        line-height: 1.75;
+      }
+      th {
+        background: var(--bg);
+        font-weight: 650;
+        color: var(--muted);
+        text-align: left;
+      }
+      th,
+      td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+      }
+      tr:last-child td {
+        border-bottom: 0;
+      }
+      td:first-child {
+        min-width: 120px;
+        font-weight: 550;
+      }
+      td code {
+        font-size: 11.5px;
+      }
+      .steps {
+        padding-left: 26px;
+      }
+      .steps li {
+        padding: 5px 0 8px 5px;
+      }
+      .steps li::marker {
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .note {
+        border-left: 3px solid var(--accent);
+        background: var(--soft);
+        padding: 13px 17px;
+        border-radius: 0 9px 9px 0;
+        font-size: 13px;
+        margin: 20px 0;
+      }
+      .faq {
+        border-top: 1px solid var(--line);
+        padding: 12px 0;
+      }
+      .faq summary {
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .faq p {
+        font-size: 13px;
+        color: var(--muted);
+        margin: 11px 0 3px;
+        padding-left: 16px;
+      }
+      .small {
+        font-size: 12px;
+      }
+      .faq-actions {
+        margin-bottom: 14px;
+      }
+      .footer {
+        font-size: 12px;
+        color: var(--muted);
+        padding: 22px 5px;
+      }
+      .searchstatus {
+        font-size: 12px;
+        color: var(--accent);
+        margin-bottom: 14px;
+      }
+      .noresults {
+        padding: 50px;
+        text-align: center;
+        color: var(--muted);
+      }
+      [hidden] {
+        display: none !important;
+      }
+      .backtop {
+        position: fixed;
+        bottom: 22px;
+        right: 22px;
+        z-index: 10;
+        font-size: 12px;
+      }
+      .progress {
+        height: 2px;
+        position: fixed;
+        top: 68px;
+        left: 0;
+        background: var(--accent);
+        z-index: 30;
+        width: 0;
+      }
+      .mobiletoc {
+        display: none;
+      }
+      @media (max-width: 980px) {
+        .shell {
+          grid-template-columns: 210px minmax(0, 1fr);
+          gap: 20px;
+          padding: 24px 20px;
+        }
+        .section {
+          padding: 25px 23px;
+        }
+        .topbar {
+          padding: 0 20px;
+          gap: 10px;
+        }
+        .topbar button {
+          font-size: 12px;
+          padding: 7px 9px;
+        }
+      }
+      @media (max-width: 720px) {
+        .topbar {
+          height: auto;
+          min-height: 70px;
+          flex-wrap: wrap;
+          padding: 13px 16px;
+          gap: 8px;
+        }
+        .brand {
+          flex: 1;
+          font-size: 15px;
+        }
+        .search {
+          width: 100%;
+          order: 5;
+          margin: 0;
+        }
+        .shell {
+          display: block;
+          padding: 20px 14px 50px;
+        }
+        .sidebar {
+          position: relative;
+          top: 0;
+          height: auto;
+          max-height: 280px;
+          background: var(--surface);
+          border: 1px solid var(--line);
+          border-radius: 12px;
+          padding: 12px;
+          display: none;
+        }
+        .sidebar.open {
+          display: block;
+        }
+        .mobiletoc {
+          display: block;
+        }
+        .hero {
+          padding-top: 14px;
+        }
+        h1 {
+          font-size: 32px;
+        }
+        .section {
+          padding: 24px 19px;
+        }
+        h2 {
+          font-size: 21px;
+        }
+        .intro-grid {
+          gap: 7px;
+        }
+        .intro-card {
+          padding: 12px;
+        }
+        .intro-card strong {
+          font-size: 15px;
+        }
+        .section-title {
+          gap: 9px;
+        }
+        .progress {
+          display: none;
+        }
+        html {
+          scroll-padding-top: 140px;
+        }
+        .section {
+          scroll-margin-top: 140px;
+        }
+        td:first-child {
+          min-width: 100px;
+        }
+        .backtop {
+          bottom: 10px;
+          right: 10px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+      }
+      @media print {
+        body,
+        body.dark {
+          --bg: #fff;
+          --surface: #fff;
+          --text: #111;
+          --muted: #555;
+          --line: #ccc;
+          --accent: #205c4c;
+          --soft: #f4f6f4;
+          --code: #f5f5f5;
+          font-size: 11pt;
+        }
+        .topbar,
+        .sidebar,
+        .backtop,
+        .intro-grid,
+        .progress,
+        .faq-actions,
+        .searchstatus {
+          display: none !important;
+        }
+        .shell {
+          display: block;
+          padding: 0;
+          max-width: none;
+        }
+        .hero {
+          padding: 0 0 15px;
+        }
+        h1 {
+          font-size: 30pt;
+        }
+        .section {
+          border: none;
+          border-radius: 0;
+          padding: 15px 0;
+          margin: 0;
+          overflow: visible;
+          break-inside: auto;
+        }
+        h2,
+        h3 {
+          break-after: avoid;
+        }
+        .note,
+        tr,
+        pre {
+          break-inside: avoid;
+        }
+        .table-wrap {
+          overflow: visible;
+        }
+        table {
+          font-size: 9pt;
+        }
+        a {
+          color: inherit;
+          text-decoration: none;
+        }
+        details p {
+          display: block;
+        }
+        @page {
+          size: A4;
+          margin: 18mm;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">AutoTable 工具集<span>V7.20.0 · 使用说明书</span></div>
+      <div class="search">
+        <input
+          type="search"
+          id="docSearch"
+          aria-label="搜索说明书章节"
+          placeholder="搜索功能、操作或问题…"
+        /><button id="clearSearch" aria-label="清空说明书搜索">清空</button>
+      </div>
+      <button
+        id="toc"
+        class="mobiletoc"
+        aria-expanded="false"
+        aria-controls="manualToc"
+      >
+        目录</button
+      ><button id="theme" aria-label="切换说明书主题">深色</button
+      ><button id="print">打印 / PDF</button>
+    </header>
+    <div class="progress"></div>
+    <div class="shell">
+      <nav class="sidebar" id="manualToc" aria-label="说明书目录">
+        <div class="sidehead">Contents / 功能目录</div>
+        <a href="#start"><span>01</span>工具概览与快速上手</a
+        ><a href="#navigation"><span>02</span>悬浮球与四区菜单</a
+        ><a href="#copy"><span>03</span>智能复制与行列聚焦</a
+        ><a href="#combos"><span>04</span>字段组合与当前表绑定</a
+        ><a href="#pin"><span>05</span>左右列置顶与列宽记忆</a
+        ><a href="#visual"><span>06</span>联系信息、外观与显示优化</a
+        ><a href="#highlight"><span>07</span>字段条件高亮与规则组</a
+        ><a href="#highlight-code"><span>08</span>条件高亮高级表达式</a
+        ><a href="#bulk"><span>09</span>批量追加进展</a
+        ><a href="#phrases"><span>10</span>统一快捷短语中心</a
+        ><a href="#templates"><span>11</span>快捷短语模板参考</a
+        ><a href="#search"><span>12</span>全视图搜索记录与清空</a
+        ><a href="#pagination"><span>13</span>分页与滚轮导航</a
+        ><a href="#doc-nav"><span>14</span>文档大纲、阅读记忆与书签</a
+        ><a href="#doc-chapter"><span>15</span>章节复制与导出</a
+        ><a href="#doc-find"><span>16</span>文档查找、正则与替换预览</a
+        ><a href="#doc-table-select"><span>17</span>文档表格：选择与保护</a
+        ><a href="#doc-table-edit"><span>18</span>文档表格：行列、合并与排序</a
+        ><a href="#doc-table-clipboard"
+          ><span>19</span>文档表格：区域复制与矩形粘贴</a
+        ><a href="#doc-table-style"
+          ><span>20</span>文档表格：宽度、表头与健康检查</a
+        ><a href="#backup"><span>21</span>全部设置备份、导入与重置</a
+        ><a href="#hotkeys"><span>22</span>完整默认快捷键速查</a
+        ><a href="#workflow"><span>23</span>典型工作流程</a
+        ><a href="#faq"><span>24</span>常见问题与排查</a
+        ><a href="#boundaries"><span>25</span>默认设置、能力边界与诊断</a>
+      </nav>
+      <main>
+        <div class="hero">
+          <div class="eyebrow">MIUYI / AUTOTABLE TOOLBOX</div>
+          <h1>让日常操作更顺手。<br /><span>一份完整的工具使用说明书</span></h1>
+          <p>
+            从复制一条商业信息，到整理一整份长文档。按工作场景查找入口，了解每项功能的操作、设置与生效条件。
+          </p>
+          <div class="pills">
+            <span class="pill">脚本版本 V7.20.0</span
+            ><span class="pill">25 个功能章节</span
+            ><span class="pill">独立 HTML · 无外部依赖</span
+            ><span class="pill">编写日期 2026.09.17</span>
+          </div>
+        </div>
+        <div class="intro-grid">
+          <div class="intro-card">
+            <strong>表格与记录</strong>
+            <p>复制 · 组合 · 置顶 · 批量进展</p>
+          </div>
+          <div class="intro-card">
+            <strong>规则与搜索</strong>
+            <p>条件高亮 · 短语 · 搜索记忆</p>
+          </div>
+          <div class="intro-card">
+            <strong>文档与排版</strong>
+            <p>导航 · 书签 · 替换 · 表格编辑</p>
+          </div>
+          
+        </div>
+
+        <style>
+            /* 样式限定在安装卡片内部 */
+            .att-install-card {
+              --att-install-bg: #ffffff;
+              --att-install-text: #253247;
+              --att-install-muted: #707c8f;
+              --att-install-line: #e5e9ef;
+              --att-install-soft: #edf5f1;
+              --att-install-accent: #236c58;
+            
+              box-sizing: border-box;
+              margin: 24px 0;
+              padding: 28px;
+              color: var(--att-install-text);
+              background: var(--att-install-bg);
+              border: 1px solid var(--att-install-line);
+              border-radius: 16px;
+              font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+              line-height: 1.75;
+            }
+          
+            .att-install-card *,
+            .att-install-card *::before,
+            .att-install-card *::after {
+              box-sizing: border-box;
+            }
+          
+            /* 适配说明书原有的 body.dark */
+            body.dark .att-install-card {
+              --att-install-bg: #1c242d;
+              --att-install-text: #e0e8ee;
+              --att-install-muted: #a0adbb;
+              --att-install-line: #34404d;
+              --att-install-soft: #233c33;
+              --att-install-accent: #7ad5b3;
+            }
+          
+            .att-install-card .att-install-tag {
+              display: inline-block;
+              padding: 3px 10px;
+              color: var(--att-install-accent);
+              background: var(--att-install-soft);
+              border-radius: 20px;
+              font-size: 12px;
+              font-weight: 600;
+            }
+          
+            .att-install-card h2 {
+              margin: 12px 0 8px;
+              color: var(--att-install-text);
+              font-size: 25px;
+              line-height: 1.4;
+            }
+          
+            .att-install-card .att-install-description {
+              margin: 0;
+              color: var(--att-install-muted);
+              font-size: 14px;
+            }
+          
+            .att-install-card .att-install-step {
+              display: grid;
+              grid-template-columns: 32px minmax(0, 1fr);
+              gap: 14px;
+              margin-top: 24px;
+            }
+          
+            .att-install-card .att-install-number {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 32px;
+              height: 32px;
+              color: var(--att-install-accent);
+              background: var(--att-install-soft);
+              border-radius: 50%;
+              font-size: 14px;
+              font-weight: 700;
+            }
+          
+            .att-install-card h3 {
+              margin: 0 0 5px;
+              color: var(--att-install-text);
+              font-size: 16px;
+              line-height: 2;
+            }
+          
+            .att-install-card .att-install-help {
+              margin: 0;
+              color: var(--att-install-muted);
+              font-size: 13px;
+            }
+          
+            .att-install-card .att-install-actions {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 10px;
+              margin-top: 13px;
+            }
+          
+            .att-install-card .att-install-button {
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              min-height: 42px;
+              padding: 9px 16px;
+              color: var(--att-install-text);
+              background: var(--att-install-bg);
+              border: 1px solid var(--att-install-line);
+              border-radius: 9px;
+              font: inherit;
+              font-size: 13px;
+              font-weight: 600;
+              line-height: 1.5;
+              text-decoration: none;
+              cursor: pointer;
+              transition:
+                background-color 0.18s ease,
+                border-color 0.18s ease;
+            }
+          
+            .att-install-card .att-install-button:hover {
+              background: var(--att-install-soft);
+              border-color: var(--att-install-accent);
+            }
+          
+            .att-install-card .att-install-button-primary {
+              padding: 11px 22px;
+              color: #ffffff;
+              background: #236c58;
+              border-color: #236c58;
+            }
+          
+            .att-install-card .att-install-button-primary:hover {
+              background: #1c5949;
+              border-color: #1c5949;
+            }
+          
+            .att-install-card a:focus-visible,
+            .att-install-card button:focus-visible,
+            .att-install-card input:focus-visible,
+            .att-install-card summary:focus-visible {
+              outline: 3px solid #69b5a0;
+              outline-offset: 3px;
+            }
+          
+            .att-install-card .att-install-note {
+              margin-top: 22px;
+              padding: 14px 16px;
+              background: var(--att-install-soft);
+              border-left: 3px solid var(--att-install-accent);
+              border-radius: 0 9px 9px 0;
+              font-size: 13px;
+            }
+          
+            .att-install-card .att-install-note p {
+              margin: 0;
+            }
+          
+            .att-install-card .att-install-note p + p {
+              margin-top: 8px;
+            }
+          
+            .att-install-card .att-install-troubleshooting {
+              margin-top: 18px;
+              padding-top: 16px;
+              border-top: 1px solid var(--att-install-line);
+              font-size: 13px;
+            }
+          
+            .att-install-card .att-install-troubleshooting summary {
+              color: var(--att-install-muted);
+              cursor: pointer;
+            }
+          
+            .att-install-card .att-install-troubleshooting ul {
+              margin: 12px 0;
+              padding-left: 20px;
+              color: var(--att-install-muted);
+            }
+          
+            .att-install-card .att-install-troubleshooting li {
+              margin: 7px 0;
+            }
+          
+            .att-install-card .att-install-link-label {
+              display: block;
+              margin: 14px 0 7px;
+              color: var(--att-install-muted);
+            }
+          
+            .att-install-card .att-install-url {
+              width: 100%;
+              padding: 10px 12px;
+              color: var(--att-install-text);
+              background: var(--att-install-bg);
+              border: 1px solid var(--att-install-line);
+              border-radius: 8px;
+              font: 12px/1.6 Consolas, monospace;
+            }
+          
+            .att-install-card .att-install-copy-status {
+              min-height: 22px;
+              margin-top: 7px;
+              color: var(--att-install-accent);
+              font-size: 12px;
+            }
+          
+            @media (max-width: 600px) {
+              .att-install-card {
+                padding: 22px 18px;
+              }
+            
+              .att-install-card h2 {
+                font-size: 22px;
+              }
+            
+              .att-install-card .att-install-step {
+                grid-template-columns: 28px minmax(0, 1fr);
+                gap: 10px;
+              }
+            
+              .att-install-card .att-install-number {
+                width: 28px;
+                height: 28px;
+              }
+            
+              .att-install-card .att-install-button {
+                flex: 1 1 135px;
+              }
+            }
+          
+            @media (prefers-reduced-motion: reduce) {
+              .att-install-card .att-install-button {
+                transition: none;
+              }
+            }
+          </style>
+
+          <section class="att-install-card" aria-label="安装 AutoTable 工具集">
+            <span class="att-install-tag">安装指南</span>
+          
+            <h2>安装 AutoTable 工具集</h2>
+          
+            <p class="att-install-description">
+              首次使用请先安装 Tampermonkey（油猴），再安装工具脚本。
+              已装好油猴的用户可直接进行第二步。
+            </p>
+          
+            <!-- 第一步：安装油猴 -->
+            <div class="att-install-step">
+              <span class="att-install-number" aria-hidden="true">1</span>
+            
+              <div>
+                <h3>安装 Tampermonkey</h3>
+              
+                <p class="att-install-help">
+                  按浏览器选择安装渠道，安装完成后确认扩展已启用。
+                </p>
+              
+                <div class="att-install-actions">
+                  <a
+                    class="att-install-button"
+                    href="https://www.tampermonkey.net/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    官网 · 选择浏览器
+                  </a>
+                
+                  <a
+                    class="att-install-button"
+                    href="https://microsoftedge.microsoft.com/addons/detail/iikmkjmpaadaobahmlepeloendndfphd"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Edge 扩展商店
+                  </a>
+                
+                  <a
+                    class="att-install-button"
+                    href="https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Chrome 扩展商店
+                  </a>
+                </div>
+              </div>
+            </div>
+          
+            <!-- 第二步：安装脚本 -->
+            <div class="att-install-step">
+              <span class="att-install-number" aria-hidden="true">2</span>
+            
+              <div>
+                <h3>安装工具脚本</h3>
+              
+                <p class="att-install-help">
+                  点击下方按钮，在油猴打开的安装页面中确认脚本名称，
+                  然后点击“安装”；已安装时按页面提示更新或重新安装。
+                </p>
+              
+                <div class="att-install-actions">
+                  <!-- 使用原始 .user.js 地址，不添加 download 属性 -->
+                   <a
+                    class="att-install-button att-install-button-primary"
+                    href="http://att.miuyi.xyz/down//AutoTabletools.user.js"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    安装 AutoTable 工具集↗
+                  </a>
+                  <a
+                    class="att-install-button att-install-button-primary"
+                    href="https://raw.githubusercontent.com/Mr-MiuYi1/T-Scripts-C-of-U/main/AutoTableToolsTest/AutoTabletools.user.js"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    安装 AutoTable 工具集(从GitHub获取)↗
+                  </a>
+                
+                  <button
+                    class="att-install-button"
+                    type="button"
+                    data-att-install-copy
+                  >
+                    复制安装链接
+                  </button>
+                </div>
+              
+                <div
+                  class="att-install-copy-status"
+                  data-att-install-status
+                  role="status"
+                  aria-live="polite"
+                ></div>
+              </div>
+            </div>
+          
+            <!-- 第三步：开始使用 -->
+            <div class="att-install-step">
+              <span class="att-install-number" aria-hidden="true">3</span>
+            
+              <div>
+                <h3>刷新 AutoTable 页面</h3>
+              
+                <p class="att-install-help">
+                  安装完成后回到脚本支持的 AutoTable 页面并刷新。
+                  页面出现工具悬浮球后，点击打开菜单即可开始使用。
+                </p>
+              </div>
+            </div>
+          
+            <div class="att-install-note">
+              <p>
+                <strong>安装需要确认：</strong>
+                按钮用于打开安装链接，网页不会自动完成安装，
+                也无法可靠判断你是否已安装油猴。
+              </p>
+            
+              <p>
+                <strong>360 浏览器：</strong>
+                请使用极速模式；扩展安装渠道和兼容性，
+                以你的浏览器版本实际支持情况为准。
+              </p>
+            </div>
+          
+            <details class="att-install-troubleshooting">
+              <summary>没有打开安装页面？查看排查方法</summary>
+            
+              <ul>
+                <li>
+                  如果看到脚本源码，先检查 Tampermonkey 是否已安装并启用，
+                  然后复制下方链接，在浏览器地址栏打开。
+                </li>
+              
+                <li>
+                  如果链接无法访问，请检查网络能否访问 GitHub Raw 地址。
+                  复制链接不会绕过网络访问问题。
+                </li>
+              
+                <li>
+                  安装成功但工具没有出现时，请确认当前网址在脚本支持范围内，
+                  并检查扩展的站点访问权限及用户脚本执行权限。
+                </li>
+              </ul>
+            
+              <label class="att-install-link-label">
+                脚本安装链接（可手动选择并复制）
+                <input
+                  class="att-install-url"
+                  data-att-install-url
+                  type="text"
+                  readonly
+                  spellcheck="false"
+                  value="http://att.miuyi.xyz/down//AutoTabletools.user.js"
+                >
+              </label>
+            </details>
+          </section>
+
+          <script>
+            (() => {
+              document.querySelectorAll(".att-install-card").forEach(card => {
+                const button = card.querySelector("[data-att-install-copy]");
+                const input = card.querySelector("[data-att-install-url]");
+                const status = card.querySelector("[data-att-install-status]");
+                const troubleshooting = card.querySelector("details");
+              
+                if (!button || !input || !status) return;
+              
+                // 避免重复执行本段代码时重复绑定。
+                if (button.dataset.bound === "true") return;
+                button.dataset.bound = "true";
+              
+                input.addEventListener("click", () => input.select());
+              
+                button.addEventListener("click", async () => {
+                  const url = input.value;
+                
+                  try {
+                    if (!navigator.clipboard?.writeText) {
+                      throw new Error("Clipboard unavailable");
+                    }
+                  
+                    await navigator.clipboard.writeText(url);
+                    status.textContent = "安装链接已复制，可粘贴到浏览器地址栏打开。";
+                  } catch {
+                    // 本地 HTML 或权限不足时，提供手动复制。
+                    if (troubleshooting) troubleshooting.open = true;
+                  
+                    input.focus();
+                    input.select();
+                    input.setSelectionRange(0, url.length);
+                  
+                    status.textContent =
+                      "无法自动复制，已选中安装链接，请按 Ctrl+C（Mac：⌘C）复制。";
+                  }
+                });
+              });
+            })();
+          </script>
+
+
+
+
+
+
+        <div
+          class="searchstatus"
+          id="status"
+          role="status"
+          aria-live="polite"
+        ></div>
+        <div class="noresults" id="noresults" hidden>
+          没有找到相关章节，请换一个关键词。
+        </div>
+        <section class="section" id="start">
+          <div class="section-title">
+            <span class="section-number">01</span>
+            <h2>工具概览与快速上手</h2>
+          </div>
+          <p class="desc">先了解工具适用范围，再完成第一次操作。</p>
+          <p>
+            AutoTable 工具集是运行在 AutoTable
+            页面上的油猴用户脚本，集中增强表格复制、字段组合、左右列置顶、工单进展、文本编辑、搜索历史和文档操作。作者为
+            MiuYi。本说明书依据附件
+            <code>AutoTabletools.user(5).js</code>
+            的实际实现编写，脚本元数据与核心版本均为 <strong>V7.20.0</strong>。
+          </p>
+          <p>
+            它依赖 AutoTable
+            原页面、已登录会话和当前账号权限。表格视图与文档视图的功能分别出现；没有识别到表格、未选择单元格或没有已选记录时，相关入口可能不可用。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>适用条件</th>
+                  <th>说明</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>运行地址</td>
+                  <td>
+                    <code>http / https://115.190.74.246/*</code> 与
+                    <code>http / https://106.54.31.31/*</code
+                    >。附件未配置其它域名。
+                  </td>
+                </tr>
+                <tr>
+                  <td>安装方式</td>
+                  <td>
+                    在支持用户脚本的浏览器和脚本管理器中安装该
+                    <code>.user.js</code> 文件，保存并启用，然后刷新匹配的
+                    AutoTable 页面。
+                  </td>
+                </tr>
+                <tr>
+                  <td>更新配置</td>
+                  <td>
+                    脚本声明了 GitHub raw 的 <code>@updateURL</code> 与
+                    <code>@downloadURL</code
+                    >；更新检测由脚本管理器处理，取决于网络与管理器设置。
+                  </td>
+                </tr>
+                <tr>
+                  <td>本地记忆</td>
+                  <td>
+                    设置主要通过用户脚本存储保存。切换浏览器或脚本管理器后，使用
+                    JSON 设置备份迁移；不是账号云同步。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ol class="steps">
+            <li>
+              打开 AutoTable 表格，点击悬浮球，或按
+              <kbd>Alt+T</kbd> 打开工具菜单。
+            </li>
+            <li>普通单击一格建立聚焦；按住 <kbd>Alt</kbd> 单击复制该格。</li>
+            <li>
+              进入“表格 →
+              字段组合”，检查默认“商业常用信息”的字段是否对应当前表。
+            </li>
+            <li>按住 <kbd>Ctrl</kbd> 单击一格，复制同一行的当前字段组合。</li>
+            <li>
+              需要固定字段时，进入“表格 →
+              列置顶”开启总开关，并选择字段的左侧或右侧。
+            </li>
+            <li>
+              配置完成后，在“设置 → 备份”导出全部设置，留存一份可恢复的 JSON。
+            </li>
+          </ol>
+          <aside class="note">
+            版本判断以附件顶部 @version 和核心 APP.version
+            为准。脚本中存在较早的模块版本与历史注释，它们不表示整个工具仍是旧版本。
+          </aside>
+        </section>
+        <section class="section" id="navigation">
+          <div class="section-title">
+            <span class="section-number">02</span>
+            <h2>悬浮球与四区菜单</h2>
+          </div>
+          <p class="desc">用一个入口完成高频工作，并按场景进入不同工具。</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>区域</th>
+                  <th>内容</th>
+                  <th>出现条件</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>快捷</td>
+                  <td>
+                    当前工作上下文、复制当前格、复制字段组合、复制整行、批量追加进展、聚焦和高亮状态、规则组切换、短语与搜索记录入口。
+                  </td>
+                  <td>一般页面；具体动作按上下文启用。</td>
+                </tr>
+                <tr>
+                  <td>表格</td>
+                  <td>
+                    二级入口为字段组合与列置顶；负责当前表绑定、字段管理和全部表字段管理。
+                  </td>
+                  <td>需要识别到表格才可配置实际字段。</td>
+                </tr>
+                <tr>
+                  <td>文档</td>
+                  <td>
+                    导航与书签、查找替换开关、文档表格增强和健康检查。真正查找操作在文档页内。
+                  </td>
+                  <td>AutoTable 文档视图。</td>
+                </tr>
+                <tr>
+                  <td>设置</td>
+                  <td>
+                    悬浮球、表格、外观、编辑、备份、快捷键等分区及独立模块设置。
+                  </td>
+                  <td>通用设置入口。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>移动、尺寸与定位</h3>
+          <p>
+            悬浮球可自由拖动，松手后吸附到最近的左右边缘并记住位置；5
+            秒无操作后变为半透明，鼠标靠近恢复。默认大小 48 px，可在 38–72 px
+            范围调整，也可恢复默认位置。
+          </p>
+          <p>
+            菜单弹出方向支持自动、向左、向右、向上和向下。自动模式依据真实菜单尺寸与视口余量选择位置；窗口较小时面板限制高度并内部滚动。打开菜单后按四区任务导航，设置页可用顶部快速导航跳转。
+          </p>
+          <h3>当前工作上下文</h3>
+          <p>
+            快捷页显示当前表、当前字段与内容摘要，以及正在使用的字段组合。切换表、视图或单元格时会同步更新；长内容只在摘要中截短，不代表实际复制值被截短。页面加载期间会合并刷新，编辑字段组合时保留会话草稿，降低重绘打断输入的可能。
+          </p>
+        </section>
+        <section class="section" id="copy">
+          <div class="section-title">
+            <span class="section-number">03</span>
+            <h2>智能复制与行列聚焦</h2>
+          </div>
+          <p class="desc">普通点击定位，修饰键点击复制，双击保留原生编辑。</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>操作</th>
+                  <th>结果</th>
+                  <th>前提</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>普通单击单元格</td>
+                  <td>
+                    聚焦当前格，可同时强调所在行、列和列表头；不自动复制。
+                  </td>
+                  <td>聚焦模式已开启。</td>
+                </tr>
+                <tr>
+                  <td>Alt + 单击</td>
+                  <td>复制当前单元格内容。</td>
+                  <td>智能复制已开启。</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + 单击</td>
+                  <td>复制当前行的指定字段组合。</td>
+                  <td>智能复制已开启，并已设置当前字段组合。</td>
+                </tr>
+                <tr>
+                  <td>Alt+R</td>
+                  <td>复制当前整行。</td>
+                  <td>已选择当前行单元格。</td>
+                </tr>
+                <tr>
+                  <td>Alt+V</td>
+                  <td>复制“字段名：内容”。</td>
+                  <td>已选择单元格。</td>
+                </tr>
+                <tr>
+                  <td>双击</td>
+                  <td>
+                    保留原页面单元格编辑流程；第二次 click 不再执行 Alt / Ctrl
+                    复制。
+                  </td>
+                  <td>字段有编辑权限。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>聚焦子开关</h3>
+          <p>
+            可单独关闭行高亮或列高亮，仅保留当前格突出显示；快捷页提供清除聚焦入口。<kbd
+              >Alt+F</kbd
+            >
+            切换聚焦模式，<kbd>Alt+C</kbd> 切换智能复制。
+          </p>
+          <h3>虚拟滚动中的表现</h3>
+          <p>
+            工具分别记忆记录身份和字段
+            ID。原行离开可见区域又返回时恢复聚焦；视图或路由变化后丢弃旧身份，避免误高亮同号记录。横向滚动使字段暂时不可见时，不会改为聚焦其它字段。左右置顶列使用不透明底层，防止后方内容透出。
+          </p>
+          <aside class="note">
+            “复制整行”受当前页面可识别字段与单元格影响，不等同于后台全字段导出。空白格、未加载或隐藏字段不能据此推断后台一定没有值。
+          </aside>
+        </section>
+        <section class="section" id="combos">
+          <div class="section-title">
+            <span class="section-number">04</span>
+            <h2>字段组合与当前表绑定</h2>
+          </div>
+          <p class="desc">
+            一次选择多字段，输出适合聊天、通知或 Excel 的内容。
+          </p>
+          <ol class="steps">
+            <li>进入“表格 → 字段组合”，新建或编辑组合，填写名称。</li>
+            <li>
+              选择“当前表字段”或“通用模板”。当前表字段使用稳定字段
+              ID；通用模板使用字段名称及常见别名匹配。
+            </li>
+            <li>
+              搜索并勾选需要的字段，支持全选和清空；检查所选字段与当前表是否兼容。
+            </li>
+            <li>
+              选择输出格式并保存。把组合设为 Ctrl +
+              单击使用的组合，或为它录制专属快捷键。
+            </li>
+            <li>回到数据表点击某行，再执行 Ctrl + 单击或“复制字段组合”。</li>
+          </ol>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>格式</th>
+                  <th>输出特点</th>
+                  <th>适合场景</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>竖线</td>
+                  <td>值之间使用 <code> | </code>。</td>
+                  <td>聊天中转发多个字段。</td>
+                </tr>
+                <tr>
+                  <td>空格</td>
+                  <td>以空格分隔。</td>
+                  <td>简短通知。</td>
+                </tr>
+                <tr>
+                  <td>Tab</td>
+                  <td>字段之间为制表符。</td>
+                  <td>粘贴到 Excel / WPS 的多列。</td>
+                </tr>
+                <tr>
+                  <td>自定义</td>
+                  <td>自定义分隔符，如 <code> / </code>、<code> → </code>。</td>
+                  <td>按工作话术组织内容。</td>
+                </tr>
+                <tr>
+                  <td>分行</td>
+                  <td>每行输出“字段名：内容”。</td>
+                  <td>正式说明或完整信息卡。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>绑定优先级与兼容提示</h3>
+          <p>
+            当前实际表专用配置优先于通用模板。没有专用配置时，按模板名称和常见别名匹配字段；面板显示当前表、自动匹配、部分匹配或不兼容等状态。不同表有同名字段也不会串用当前表的字段
+            ID 配置。清除当前表配置后可回到通用模板匹配。
+          </p>
+          <p>
+            默认组合为“商业常用信息”：商业编码、商业名称、商务、商业采购联系方式，默认用竖线分隔。实际表缺少这些列时应自行调整。
+          </p>
+          <h3>快速切换</h3>
+          <p>
+            <kbd>Alt+Q</kbd> 下一组合，<kbd>Alt+Shift+Q</kbd> 上一组合，<kbd
+              >Alt+X</kbd
+            >
+            打开选择器。选择器中可按 1–9 选择前九个组合，按 Esc
+            关闭。当前表的活动组合可独立记忆。
+          </p>
+          <p>
+            编辑器在切换“当前表字段 /
+            通用模板”、重新读取字段时同步会话草稿，保留名称、格式、勾选与搜索内容。最终以保存配置为准；草稿保护不等于永久自动保存。
+          </p>
+        </section>
+        <section class="section" id="pin">
+          <div class="section-title">
+            <span class="section-number">05</span>
+            <h2>左右列置顶与列宽记忆</h2>
+          </div>
+          <p class="desc">把关键字段固定在两边，并按实际表独立保存。</p>
+          <ol class="steps">
+            <li>进入“表格 → 列置顶”，打开“表列置顶”。</li>
+            <li>
+              在字段列表搜索名称，对字段选择“左 / — /
+              右”。左固定到最左侧，右固定到最右侧，—取消置顶。
+            </li>
+            <li>
+              横向滚动验证关键字段始终可见。需要时拖动原生列表头边界调整宽度。
+            </li>
+            <li>
+              保留“记住置顶列列宽”开启状态，拖动结束后记录最终宽度；再次打开同表、切视图或重新置顶时恢复。
+            </li>
+          </ol>
+          <h3>按表保存，按视图显示</h3>
+          <p>
+            置顶方向与列宽按“实际表 + 字段
+            ID”保存，不按视图另存一套。切换另一张表自动使用另一张表配置；同表某个视图隐藏已置顶字段时，该列不会强行显示，面板可提示当前视图隐藏数量。编辑和虚拟滚动重绘后工具会恢复置顶层级与偏移。
+          </p>
+          <h3>快捷表头置顶</h3>
+          <p>
+            开启独立开关后，单击表头执行左置顶 / 取消，Shift + 单击执行右置顶 /
+            取消。筛选按钮、字段菜单、排序控件和原生列宽拖动仍保留各自操作。<kbd
+              >Alt+Shift+K</kbd
+            >
+            切换此功能；<kbd>Alt+P</kbd> 切换置顶显示；<kbd>Alt+Shift+P</kbd>
+            打开置顶设置。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>维护入口</th>
+                  <th>作用</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>重新应用</td>
+                  <td>重新计算并应用当前表置顶。</td>
+                </tr>
+                <tr>
+                  <td>清除列宽记忆</td>
+                  <td>清除当前表保存的宽度，让列宽回到原页面当前状态。</td>
+                </tr>
+                <tr>
+                  <td>清空当前表</td>
+                  <td>清理当前表置顶配置。执行前检查确认内容。</td>
+                </tr>
+                <tr>
+                  <td>管理全部表字段</td>
+                  <td>
+                    集中查看已记忆表、字段与配置；支持查找、调整置顶、宽度及清理配置。已读取字段不必先置顶才纳入目录。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <aside class="note">
+            全部表字段管理可按表名称 / ID
+            查找；字段按全部、左置顶、未置顶、右置顶、有列宽记忆筛选，支持单字段“清宽”、左
+            / — /
+            右切换。当前表可同步字段和重新应用；每表可全部设为不置顶、清除列宽或删除整份配置。删除整份配置会丢弃目录与设置，不会删除后台业务表。<br /><br />全部表字段管理是脚本已记忆的字段目录，不是对所有后台表进行完整扫描。“+
+            添加列”仍位于原生字段末端，随表头滚动，不作为置顶字段。
+          </aside>
+        </section>
+        <section class="section" id="visual">
+          <div class="section-title">
+            <span class="section-number">06</span>
+            <h2>联系信息、外观与显示优化</h2>
+          </div>
+          <p class="desc">按需要优化可读性，保留原始业务值。</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>功能</th>
+                  <th>行为</th>
+                  <th>初始设置</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>联系信息显示优化</td>
+                  <td>
+                    将识别到的手机号按
+                    <code>1xx xxxx xxxx</code>
+                    分组显示。编辑、复制与保存仍使用原值。
+                  </td>
+                  <td>关闭。</td>
+                </tr>
+                <tr>
+                  <td>隐藏表格关联复制按钮</td>
+                  <td>
+                    隐藏关系字段自带的复制按钮并释放它的预留空间；保留关联文字、关系图标、编辑、聚焦与置顶。
+                  </td>
+                  <td>开启。</td>
+                </tr>
+                <tr>
+                  <td>收起侧边栏识别增强</td>
+                  <td>
+                    原生侧栏收起为约 64 px 的图标栏时，补充 1–3
+                    字智能微标签；当前页面标签更明显，展开后恢复原布局。
+                  </td>
+                  <td>开启。</td>
+                </tr>
+                <tr>
+                  <td>Edge / Fluent 深色优化</td>
+                  <td>
+                    在 AutoTable
+                    原生深色模式中接管配色，覆盖表格、记录详情、表单、菜单、日历、图表、文档与工具面板等界面。
+                  </td>
+                  <td>关闭；浅色模式不改变。</td>
+                </tr>
+                <tr>
+                  <td>丝滑高级交互动效</td>
+                  <td>
+                    增强按钮、菜单、Tab、弹窗、抽屉、编辑器与视图切换；记录详情仅动画抽屉，避免扰动底层页面。
+                  </td>
+                  <td>关闭。</td>
+                </tr>
+                <tr>
+                  <td>忽略系统 Reduce Motion</td>
+                  <td>在完整动效开启时，可选择忽略系统减少动态效果偏好。</td>
+                  <td>关闭；默认尊重系统偏好。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>表格视觉样式中心</h3>
+          <p>
+            设置页可独立自定义置顶边界、当前格、行高亮和列高亮。各组自定义初始关闭；开启某组后调整颜色、透明度、线宽与柔光强度，实时预览。置顶边界采用边缘与阴影，当前格采用轮廓和柔光，行列使用独立叠色，减少互相覆盖。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>样式组</th>
+                  <th>可调整内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>置顶边界</td>
+                  <td>颜色、边界宽度、阴影强度。</td>
+                </tr>
+                <tr>
+                  <td>当前格</td>
+                  <td>颜色、填充透明度、轮廓宽度、柔光强度。</td>
+                </tr>
+                <tr>
+                  <td>行高亮</td>
+                  <td>颜色、透明度、边缘宽度、柔光强度。</td>
+                </tr>
+                <tr>
+                  <td>列高亮</td>
+                  <td>颜色、透明度、边缘宽度、柔光强度，列表头同步处理。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <aside class="note">
+            这些界面样式和联系信息分组不会改写业务字段。文档表格里的“对齐 / 背景
+            / 列宽 / 首行转表头”属于文档内容编辑，见后面的文档表格章节。
+          </aside>
+        </section>
+        <section class="section" id="highlight">
+          <div class="section-title">
+            <span class="section-number">07</span>
+            <h2>字段条件高亮与规则组</h2>
+          </div>
+          <p class="desc">按状态、数量和日期识别记录，支持单元格或整行强调。</p>
+          <ol class="steps">
+            <li>在快捷页打开条件高亮规则入口，或进入设置页的规则中心。</li>
+            <li>新建规则组，例如“协议跟进”“数据验证”；新建规则并命名。</li>
+            <li>
+              选择当前表或全部表范围，指定目标字段，设置标准条件或高级表达式。
+            </li>
+            <li>
+              选择只高亮该单元格或整行；调整底色、透明度、边缘颜色 / 强度 /
+              宽度与文字加粗。整行可独立控制上、下强调边缘。
+            </li>
+            <li>查看当前可见行匹配提示，按需调整优先级，点击“保存全部”。</li>
+            <li>
+              开启总开关，确认规则所属组是当前生效组。用快捷页或 Alt+Shift+H
+              循环切换组。
+            </li>
+          </ol>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>条件类型</th>
+                  <th>支持项</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>文字</td>
+                  <td>
+                    包含、不包含、等于、不等于、开头是、结尾是、正则表达式；可选择区分大小写。
+                  </td>
+                </tr>
+                <tr>
+                  <td>空值</td>
+                  <td>为空、非空。</td>
+                </tr>
+                <tr>
+                  <td>数值</td>
+                  <td>大于、大于等于、小于、小于等于；比较时移除千位逗号。</td>
+                </tr>
+                <tr>
+                  <td>日期</td>
+                  <td>
+                    今天、昨天、明天、早于今天、晚于今天、未来 N 天内、过去 N
+                    天内、指定日期。
+                  </td>
+                </tr>
+                <tr>
+                  <td>高级</td>
+                  <td>
+                    用受限表达式组合目标格和同行字段、文字、日期、数值与逻辑条件。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>规则组、保存与优先级</h3>
+          <p>
+            同一时间只激活一个规则组，组内启用规则才参与高亮。管理器将规则组与规则列表分层呈现，支持组的创建、重命名、复制
+            /
+            删除以及规则的新建、复制、删除、分组和次序调整。修改在“保存全部”后统一生效，取消可放弃当前草稿。
+          </p>
+          <p>
+            组内规则从上到下判断，同一目标优先使用先命中的规则。聚焦模式优先于条件高亮。整行强调线在左置顶、主体和右置顶之间连续绘制，置顶底层保持不透明。
+          </p>
+          <h3>日期语义</h3>
+          <p>
+            日期按本机当天的本地午夜比较，忽略时分秒。可识别年-月-日、年/月/日、年.月.日及中文年月日；只有月日时使用当年。无效日期不命中日期规则。未来
+            N 天与过去 N 天条件均包含今天和第 N 天边界。
+          </p>
+          <p>
+            <kbd>Alt+H</kbd> 开关条件高亮；<kbd>Alt+Shift+H</kbd>
+            下一组；上一组默认无快捷键，可自行设置。停用总开关保留规则。旧版规则会迁移到默认规则组。
+          </p>
+          <aside class="note">
+            匹配数量反映当前可见虚拟行，不是后台所有记录统计。目标字段隐藏或尚未加载时，规则可能无法读取该值，应先显示字段再验证。
+          </aside>
+        </section>
+        <section class="section" id="highlight-code">
+          <div class="section-title">
+            <span class="section-number">08</span>
+            <h2>条件高亮高级表达式</h2>
+          </div>
+          <p class="desc">用多字段条件表达更复杂的跟进场景。</p>
+          <p>
+            高级高亮输入的是<strong>表达式本身</strong>，不加
+            <code>{{= }}</code>
+            包裹。结果转换为真假，真则命中；非法表达式可通过验证入口发现。解析器不执行任意
+            JavaScript，不支持访问 window、document、网络或存储。
+          </p>
+          <pre><code>contains(field(&quot;进展描述&quot;), &quot;待验证&quot;) &amp;&amp; field(&quot;二级阶段&quot;) != &quot;已完成&quot;
+
+isPast(field(&quot;计划完成日期&quot;)) &amp;&amp; !contains(field(&quot;一级阶段&quot;), &quot;完成&quot;)
+
+num(value) &gt; 0 &amp;&amp; withinNextDays(field(&quot;有效期&quot;), 7)</code></pre>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>变量 / 函数</th>
+                  <th>作用</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>value / fieldName / table</code></td>
+                  <td>目标格内容、规则字段名、当前表名。</td>
+                </tr>
+                <tr>
+                  <td><code>today / yesterday / tomorrow / now</code></td>
+                  <td>日期午夜时间戳与当前时间戳。</td>
+                </tr>
+                <tr>
+                  <td><code>field("名称") / row("名称")</code></td>
+                  <td>读取同行字段。</td>
+                </tr>
+                <tr>
+                  <td><code>contains / startsWith / endsWith / regex</code></td>
+                  <td>文本包含、开头、结尾与正则检测。</td>
+                </tr>
+                <tr>
+                  <td><code>lower / upper / trim / len / num / str</code></td>
+                  <td>大小写、去空格、长度、数值与字符串转换。</td>
+                </tr>
+                <tr>
+                  <td><code>empty / notEmpty</code></td>
+                  <td>判断空值。</td>
+                </tr>
+                <tr>
+                  <td><code>date / daysFromToday</code></td>
+                  <td>日期转时间戳，与今天相差天数。</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code
+                      >isToday / isYesterday / isTomorrow / isPast /
+                      isFuture</code
+                    >
+                  </td>
+                  <td>相对日期判断。</td>
+                </tr>
+                <tr>
+                  <td><code>withinNextDays / withinPastDays</code></td>
+                  <td>是否在未来 / 过去 N 天内，包含今天。</td>
+                </tr>
+                <tr>
+                  <td><code>between / choose / coalesce</code></td>
+                  <td>范围判断、条件分支、第一个非空值。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            支持括号、字符串、数字、真假与空值，以及
+            <code
+              >== != === !== &gt; &gt;= &lt; &lt;= &amp;&amp; || ! + - * / %
+              ?:</code
+            >。这里的日期函数与快捷短语模板中的日期函数不同：高亮
+            <code>date(value)</code> 解析日期，短语
+            <code>date(offset, format)</code> 输出日期文字。
+          </p>
+        </section>
+        <section class="section" id="bulk">
+          <div class="section-title">
+            <span class="section-number">09</span>
+            <h2>批量追加进展</h2>
+          </div>
+          <p class="desc">在已选记录前添加新进展，保留原有历史。</p>
+          <ol class="steps">
+            <li>
+              在当前表勾选需要处理的记录，确保系统已选数量等于当前可处理数量。
+            </li>
+            <li>
+              点击快捷页“批量追加进展”，或按
+              Alt+B。当前表必须识别到“进展描述”字段。
+            </li>
+            <li>
+              输入本次新增进展，支持多行；使用“插入今日日期”或快捷短语补充内容。
+            </li>
+            <li>检查第一条记录效果预览：新内容在最前面，后面换行接原历史。</li>
+            <li>
+              点击“开始保存 N 条”，查看阶段、进度和成功 / 失败 / 跳过数量。
+            </li>
+            <li>
+              结束后核对结果；部分失败时先检查已保存记录，避免未经检查直接重跑。
+            </li>
+          </ol>
+          <h3>保存方式与重复处理</h3>
+          <p>
+            当前实现复用 AutoTable
+            的原生记录保存接口，带记录版本校验逐条提交；不是模拟每条记录的双击、输入与失焦。运行前刷新已捕获的当前页记录，读取服务器原进展，再将新内容插到顶部。版本冲突时刷新并重试一次，避免用旧版本直接覆盖。
+          </p>
+          <p>
+            若新进展与原进展开头已一致，工具可跳过重复追加。运行过程中出现无法匹配记录、无权限、接口失败等情况，会计入失败并按当前流程停止或显示结果。
+          </p>
+          <h3>停止与范围限制</h3>
+          <p>
+            点击“停止后续”会等待当前记录保存完成，再停止后面的处理；已经保存的记录不会回滚。批量任务不是一笔整体事务，也没有全部撤销按钮。
+          </p>
+          <aside class="note">
+            如果系统已选 30 条，但当前页面只能定位 20
+            条，工具禁止开始，避免只处理部分记录。把记录移到当前页 /
+            可见范围，取消跨页或隐藏选择，必要时调整每页条数后重新勾选。
+          </aside>
+        </section>
+        <section class="section" id="phrases">
+          <div class="section-title">
+            <span class="section-number">10</span>
+            <h2>统一快捷短语中心</h2>
+          </div>
+          <p class="desc">文本编辑和批量进展共用一套规则。</p>
+          <p>
+            快捷页“快捷短语 →
+            规则中心”集中管理系统和自定义短语。表格多行单元格与记录详情中的多行字段共用快捷面板。开启编辑快捷短语后，进入可识别的多行编辑器即可看到适用短语。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>配置页</th>
+                  <th>可设置内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>内容</td>
+                  <td>
+                    启停、按钮显示名、实际插入模板、变量快捷插入、实时预览、高级模板验证。
+                  </td>
+                </tr>
+                <tr>
+                  <td>显示规则</td>
+                  <td>
+                    始终显示或满足条件才显示；多条件选择全部满足 /
+                    任一满足；构建和测试当前规则。
+                  </td>
+                </tr>
+                <tr>
+                  <td>插入规则</td>
+                  <td>
+                    智能、当前光标 /
+                    选区、文本顶部或底部；单独配置编辑进展与批量进展的日期前缀。
+                  </td>
+                </tr>
+                <tr>
+                  <td>高级</td>
+                  <td>
+                    用于文本编辑或批量进展的场景开关，默认日期 /
+                    时间格式、排序、来源及恢复系统默认 / 删除自定义。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>条件来源与插入方式</h3>
+          <p>
+            显示条件可读取当前字段名、同行其它字段、当前表格、当前内容、当前选中文本、星期和当前小时。只有同行字段需要指定目标字段名称。条件运算支持包含、不包含、等于、不等于、正则匹配、为空、非空、≥
+            和
+            ≤。测试结果会显示实际值与每条条件是否通过；测试上下文取决于当前编辑位置。
+          </p>
+          <p>
+            智能插入对“进展描述”优先放到顶部，对其它字段在光标处插入；可强制顶部、底部或替换当前选区。模板里的
+            <code>{{cursor}}</code>
+            可进一步指定插入后光标位置。编辑功能另有“编辑时自动预留首行”开关，默认开启：进入已有多行文字的编辑框时预留顶部空行并将光标放到开头；若没有实际编辑，离开时恢复原文。预留空行与日期前缀是两个独立功能。
+          </p>
+          <h3>系统短语与维护</h3>
+          <p>
+            默认系统短语包括：已确认该商业上线、已联系商业跟进、商业反馈处理中、商业暂未回复，已催促、已收到协议、协议已寄出、等待商业反馈、数据已回传，待验证、数据验证完成。系统规则可编辑、停用或恢复整条默认配置，不能直接删除；自定义规则可删除。
+          </p>
+          <p>
+            管理器支持搜索 /
+            筛选、批量选择、批量启停及批量编辑。批量编辑仅修改草稿，仍需主窗口“保存全部”。支持应用启用状态、使用场景、插入位置、编辑
+            /
+            批量日期前缀、日期时间格式与显示规则；显示条件可追加或替换，排序按现有值统一增减。还可在名称、模板或两者中执行批量文本替换，支持正则与区分大小写。只有勾选“应用”的属性才覆盖选中规则。规则数值越小越靠前；旧配置自动迁移到统一规则模型。
+          </p>
+          <aside class="note">
+            短语点击负责向编辑框插入内容；普通单条字段仍按 AutoTable
+            原生保存方式提交。“保存全部”保存的是短语配置，不是批量更新业务记录。
+          </aside>
+        </section>
+        <section class="section" id="templates">
+          <div class="section-title">
+            <span class="section-number">11</span>
+            <h2>快捷短语模板参考</h2>
+          </div>
+          <p class="desc">从日期变量到同行字段与条件分支。</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>变量</th>
+                  <th>作用</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>{{today}} / {{yesterday}} / {{tomorrow}}</code></td>
+                  <td>今天、昨天、明天，按规则默认日期格式输出。</td>
+                </tr>
+                <tr>
+                  <td><code>{{date:-7|YYYY-MM-DD}}</code></td>
+                  <td>按天偏移日期，示例为七天前。</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>{{time|HH:mm}} / {{now|YYYY-MM-DD HH:mm}}</code>
+                  </td>
+                  <td>当前时间或日期时间。</td>
+                </tr>
+                <tr>
+                  <td><code>{{weekday}}</code></td>
+                  <td>星期文字。</td>
+                </tr>
+                <tr>
+                  <td><code>{{field}} / {{table}}</code></td>
+                  <td>当前字段名与表名。</td>
+                </tr>
+                <tr>
+                  <td><code>{{content}} / {{selection}}</code></td>
+                  <td>编辑框已有全文或当前选中文本。</td>
+                </tr>
+                <tr>
+                  <td><code>{{newline}}</code></td>
+                  <td>换行。</td>
+                </tr>
+                <tr>
+                  <td><code>{{cursor}}</code></td>
+                  <td>插入后光标位置，不产生可见文字。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>可直接参考的模板</h3>
+          <pre><code>{{today|M.D号：}}已联系商业，等待反馈{{cursor}}
+
+{{today|YYYY-MM-DD}} {{time|HH:mm}}
+{{= row(&quot;商业名称&quot;) }}：数据已回传，待验证
+
+{{#if row(&quot;二级阶段&quot;) == &quot;待沟通&quot;}}
+已联系商业跟进，等待回复
+{{else}}
+持续跟进当前阶段
+{{/if}}
+
+{{= choose(contains(content, &quot;已催促&quot;), &quot;继续跟进&quot;, &quot;首次跟进&quot;) }}
+{{= date(-7, &quot;YYYY-MM-DD&quot;) }}</code></pre>
+          <h3>高级表达式</h3>
+          <p>
+            <code>{{= 表达式 }}</code> 输出结果，<code
+              >{{#if 条件}}…{{else}}…{{/if}}</code
+            >
+            控制内容分支。模板可混合普通变量和表达式；条件块必须闭合，嵌套最多
+            12 层。表达式报错时插入会被阻止并提示。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>类别</th>
+                  <th>可用项</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>变量</td>
+                  <td>
+                    <code
+                      >field, table, content, selection, weekday, hour, bulk,
+                      progress, today, yesterday, tomorrow, true, false,
+                      null</code
+                    >。
+                  </td>
+                </tr>
+                <tr>
+                  <td>同行字段</td>
+                  <td>
+                    <code>row("字段名")</code
+                    >，需当前上下文能够读取；批量模式不应假设有逐行单元格上下文。
+                  </td>
+                </tr>
+                <tr>
+                  <td>文字</td>
+                  <td>
+                    <code
+                      >contains, startsWith, endsWith, regex, replace, lower,
+                      upper, trim, len</code
+                    >。
+                  </td>
+                </tr>
+                <tr>
+                  <td>转换与逻辑</td>
+                  <td>
+                    <code>num, str, coalesce, choose</code
+                    >；支持比较、逻辑、算术与三元运算。
+                  </td>
+                </tr>
+                <tr>
+                  <td>日期</td>
+                  <td>
+                    <code>date(offset, format), time(format), now(format)</code
+                    >。
+                  </td>
+                </tr>
+                <tr>
+                  <td>格式</td>
+                  <td>
+                    支持 <code>YYYY / YY</code> 年、<code>MM / M</code>
+                    月、<code>DD / D</code> 日、<code>HH / H</code> 小时、<code
+                      >mm / m</code
+                    >
+                    分钟、<code>ss / s</code> 秒、<code>W</code>
+                    星期；大小写有意义。常用
+                    <code>YYYY-MM-DD</code
+                    >、<code>M.D号：</code>、<code>HH:mm</code>。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <aside class="note">
+            模板已使用 {{today}}
+            时，通常将对应日期前缀设为“不额外添加”，避免重复。高级模式是受限语法，不是可运行任意脚本的
+            JavaScript 编辑器。
+          </aside>
+        </section>
+        <section class="section" id="search">
+          <div class="section-title">
+            <span class="section-number">12</span>
+            <h2>全视图搜索记录与清空</h2>
+          </div>
+          <p class="desc">保留真正用过的搜索词，按视图或表复用。</p>
+          <ol class="steps">
+            <li>在 AutoTable 全视图模糊搜索框输入关键词并执行搜索。</li>
+            <li>
+              下次聚焦搜索框时，在紧凑历史层点击记录复用关键词；是否实际触发搜索由原页面搜索行为决定。
+            </li>
+            <li>
+              点击“查看全部视图搜索记录”在原位展开更多历史，再次点击收起。
+            </li>
+            <li>
+              需要维护时打开“搜索记录管理”，按视图或关键词筛选、删除或清空记录。
+            </li>
+            <li>在“设置 → 全视图搜索增强”调整正式记录条件、展示和尺寸。</li>
+          </ol>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>设置</th>
+                  <th>行为 / 范围</th>
+                  <th>默认</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>启用搜索记录</td>
+                  <td>关闭后停止记录并隐藏历史层。</td>
+                  <td>开启。</td>
+                </tr>
+                <tr>
+                  <td>按视图显示</td>
+                  <td>开启以当前视图为基础，关闭混合全部视图。</td>
+                  <td>开启。</td>
+                </tr>
+                <tr>
+                  <td>同表视图互通</td>
+                  <td>
+                    仅在按视图显示开启时生效；合并展示同一表其它视图历史，不复制存储。
+                  </td>
+                  <td>关闭。</td>
+                </tr>
+                <tr>
+                  <td>正式记录条件</td>
+                  <td>
+                    搜索实际生效、Enter、失焦、停止输入四种条件为“或”关系，同词短时重复去重。
+                  </td>
+                  <td>实际生效 + Enter 开启；失焦与停止输入关闭。</td>
+                </tr>
+                <tr>
+                  <td>停止输入延迟</td>
+                  <td>300–3000 ms。</td>
+                  <td>900 ms；条件关闭时不生效。</td>
+                </tr>
+                <tr>
+                  <td>展示布局</td>
+                  <td>
+                    列表或胶囊自动填充，胶囊按时间顺序智能分配每行剩余宽度。
+                  </td>
+                  <td>列表。</td>
+                </tr>
+                <tr>
+                  <td>胶囊删除按钮</td>
+                  <td>只控制胶囊内 ×；其它删除入口继续有效。</td>
+                  <td>开启。</td>
+                </tr>
+                <tr>
+                  <td>紧凑显示全部</td>
+                  <td>
+                    关闭显示列表前 8 条 / 胶囊前 14
+                    条；开启在原历史区滚动全部记录。
+                  </td>
+                  <td>关闭。</td>
+                </tr>
+                <tr>
+                  <td>文字大小</td>
+                  <td>10–16 px。</td>
+                  <td>12 px。</td>
+                </tr>
+                <tr>
+                  <td>模块最大宽度</td>
+                  <td>280–900 px，不突破实际视口空间。</td>
+                  <td>580 px。</td>
+                </tr>
+                <tr>
+                  <td>模块最大高度</td>
+                  <td>220–900 px，紧凑层与原位展开共用，超出后内部滚动。</td>
+                  <td>600 px。</td>
+                </tr>
+                <tr>
+                  <td>每视图保存条数</td>
+                  <td>3–100 条，超限按历史维护规则裁剪。</td>
+                  <td>20 条。</td>
+                </tr>
+                <tr>
+                  <td>搜索栏清空优化</td>
+                  <td>
+                    隐藏原生“搜索：…”状态块，在输入框内增加
+                    X，并复用原生清除搜索动作。筛选与排序状态保留。
+                  </td>
+                  <td>关闭。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <aside class="note">
+            搜索记录增强不创建新的搜索引擎，也不改变 AutoTable
+            模糊搜索匹配规则。失焦和停止输入条件会把未执行的输入草稿纳入历史，按需要开启。
+          </aside>
+        </section>
+        <section class="section" id="pagination">
+          <div class="section-title">
+            <span class="section-number">13</span>
+            <h2>分页与滚轮导航</h2>
+          </div>
+          <p class="desc">在大表里减少翻页和横向拖动。</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>功能</th>
+                  <th>操作与范围</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>分页增强</td>
+                  <td>
+                    原生 25 / 50 / 100 条之外，默认增加 150 / 200 / 300 /
+                    500。可输入逗号分隔的附加条数，支持
+                    10–2000，自动排除重复原生值。
+                  </td>
+                </tr>
+                <tr>
+                  <td>滚轮轴反转</td>
+                  <td>
+                    开启后，鼠标位于 AutoTable
+                    表格滚动区域时，普通滚轮横向滚动，Shift +
+                    滚轮纵向滚动。Alt+W 开关。
+                  </td>
+                </tr>
+                <tr>
+                  <td>排除场景</td>
+                  <td>
+                    记录详情、抽屉、弹窗、输入控件、独立滚动面板及文档视图不会穿透到背后的表格。Ctrl
+                    / Meta / Alt 等修饰滚轮保留浏览器行为。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            分页增强初始开启，滚轮反转初始关闭。每页数量越大，接口数据量与浏览器处理负担通常越高；源码建议常用不超过
+            500。增加分页条数不能直接使所有虚拟行始终存在于页面。
+          </p>
+        </section>
+        <section class="section" id="doc-nav">
+          <div class="section-title">
+            <span class="section-number">14</span>
+            <h2>文档大纲、阅读记忆与书签</h2>
+          </div>
+          <p class="desc">按章节和表格定位长文档，并保存常用位置。</p>
+          <h3>大纲与两种导航模式</h3>
+          <p>
+            在文档设置开启自动文档大纲，左侧按 H1–H6
+            标题建立层级，标题与内容变化时更新。点击标题定位，点击箭头展开 /
+            折叠子章节。表格内标题不纳入普通章节大纲。无真实标题的加粗段落不会自动成为章节。
+          </p>
+          <p>
+            启用表格导航和合并层级后，表格入口归入所属标题；关闭合并层级后，表格单独显示，标题仍保留层级、折叠与标题标识。合并模式依赖自动大纲、表格导航及层级开关同时开启。
+          </p>
+          <p>
+            导航有搜索筛选、标题与表格 / 只看标题 /
+            只看表格三种显示范围；只看表格仍保留标题路径。支持全部展开、全部折叠和按标题层级折叠。大纲搜索只筛导航节点，不等同于正文查找。侧栏支持收起，大纲与书签使用分页式切换。
+          </p>
+          <h3>滑动跟随与记忆</h3>
+          <p>
+            开启大纲滑动跟随后，正文滚动会让当前章节在大纲可见区域中保持可见，已折叠章节保持收起。跳转仅滚动文档内部容器，减少整个页面抬升。可分别开启阅读位置与章节折叠记忆；两种导航模式共用章节折叠记忆。
+          </p>
+          <h3>自定义书签</h3>
+          <ol class="steps">
+            <li>先点击或选中文档中的目标内容。</li>
+            <li>在左侧“书签”页选择“＋书签”，填写名称并保存。</li>
+            <li>点击书签定位，使用修改名称、更新位置和删除入口维护。</li>
+            <li>
+              正文结构改变、内容匹配不明确时，点击新的正确位置，再更新该书签锚点。
+            </li>
+          </ol>
+          <aside class="note">
+            书签独立开关关闭后保留已有书签。每个文档最多 200 个书签，名称最多
+            120
+            字符。书签基于内容和位置定位，正文被删除或大幅修改后可能需要重新锚定。
+          </aside>
+        </section>
+        <section class="section" id="doc-chapter">
+          <div class="section-title">
+            <span class="section-number">15</span>
+            <h2>章节复制与导出</h2>
+          </div>
+          <p class="desc">从整篇文档中取出一个完整章节。</p>
+          <p>
+            在大纲标题的章节菜单中，可复制整章内容、复制章节内表格、导出章节为文本、导出章节为
+            HTML，以及为章节添加书签。章节范围由当前标题和后续同级或更高层级标题划定，包含其下级内容。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>操作</th>
+                  <th>输出</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>复制整章</td>
+                  <td>同时准备普通文本与 HTML，接收软件选择支持的格式。</td>
+                </tr>
+                <tr>
+                  <td>复制章节内表格</td>
+                  <td>
+                    复制该章节的顶层表格；多个表格在输出中分隔。没有表格时提示。
+                  </td>
+                </tr>
+                <tr>
+                  <td>导出文本</td>
+                  <td>生成章节标题命名的 .txt，便于纯文本归档。</td>
+                </tr>
+                <tr>
+                  <td>导出 HTML</td>
+                  <td>
+                    生成章节标题命名的独立
+                    .html，含基础文字、表格与图片布局样式。
+                  </td>
+                </tr>
+                <tr>
+                  <td>章节书签</td>
+                  <td>以该章节标题作为目标添加书签。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            导出是章节内容快照，不包含整个工具设置，也不是原文档完整编辑项目。HTML
+            中原内容的外部图片地址仍可能依赖网络访问，不能据此认为所有图片已内嵌。
+          </p>
+        </section>
+        <section class="section" id="doc-find">
+          <div class="section-title">
+            <span class="section-number">16</span>
+            <h2>文档查找、正则与替换预览</h2>
+          </div>
+          <p class="desc">在全文或锁定范围内查找，并在批量修改前确认结果。</p>
+          <ol class="steps">
+            <li>
+              在文档原生工具栏点击“查找”，展开紧凑查找栏；替换输入默认折叠，需要时展开。
+            </li>
+            <li>输入关键词，按需开启 Aa 区分大小写或 .* 正则模式。</li>
+            <li>
+              使用上一个 / 下一个 /
+              定位查看匹配项；浏览器支持时正文高亮全部匹配和当前匹配。
+            </li>
+            <li>
+              选择全文、当前章节、当前表格或选区。先在正文定位或选择，再点“更新范围”锁定正确区域。
+            </li>
+            <li>
+              单次替换处理当前匹配；批量替换打开预览，检查旧值、新值、范围和处数后确认。
+            </li>
+          </ol>
+          <h3>锁定范围</h3>
+          <p>
+            除全文之外，范围取自当前章节 / 表格 /
+            选区并锁定。之后点击别处不会自动把范围换成新的位置；使用“更新范围”重新选择。出现“范围为空”时先点击正文、目标表格或选择文本，再更新范围。
+          </p>
+          <h3>正则替换</h3>
+          <p>
+            查找表达式填入输入框，不需要加 JavaScript 的外层斜杠。替换支持
+            <code>$1…$99</code> 数字捕获组、<code>$&amp;</code> 整个匹配、<code
+              >$&lt;name&gt;</code
+            >
+            命名捕获和
+            <code>$$</code>
+            字面美元符。语法错误即时提示并阻止执行；可匹配空字符串的正则禁用全部替换，避免异常插入。
+          </p>
+          <pre><code>查找：(BRL)(\d{6})
+替换：$1-$2
+示例：BRL000621 → BRL-000621</code></pre>
+          <h3>预览和撤销</h3>
+          <p>
+            批量替换单次最多收集 5000
+            处，预览分批显示，可点“显示更多”。确认前若正文、文档或锁定范围已变化，会要求重新预览；重叠匹配不能批量提交。可用模型事务提交时，统一替换可通过一次原生撤销恢复。缺少可用编辑器或
+            schema 能力时入口会提示不可执行。
+          </p>
+          <aside class="note">
+            匹配数量正确但没有颜色时，可能是浏览器不支持 CSS Custom Highlight
+            API。只读文档可以定位与查找；替换仍受编辑权限和原编辑器能力限制。
+          </aside>
+        </section>
+        <section class="section" id="doc-table-select">
+          <div class="section-title">
+            <span class="section-number">17</span>
+            <h2>文档表格：选择与保护</h2>
+          </div>
+          <p class="desc">这是文档正文表格，操作方式与业务数据表不同。</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>选择方式</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>跨格拖选</td>
+                  <td>
+                    同一格内拖动选择文字；跨单元格拖动时建立原生矩形多格选区，松手结束，拖选期间
+                    Esc 停止扩展。
+                  </td>
+                </tr>
+                <tr>
+                  <td>Shift 点击</td>
+                  <td>先点击起点格，按住 Shift 点击同表终点格。</td>
+                </tr>
+                <tr>
+                  <td>选区域</td>
+                  <td>
+                    点击当前格，点迷你工具栏“选区域”，再点击终点，不必一直按住鼠标；Esc
+                    取消。
+                  </td>
+                </tr>
+                <tr>
+                  <td>整行 / 整列 / 整表</td>
+                  <td>通过更多菜单、右键菜单或边缘数字选择柄操作。</td>
+                </tr>
+                <tr>
+                  <td>合并格选择</td>
+                  <td>
+                    按实际 rowspan / colspan
+                    跨度参与矩形区域，不把合并格误作单一普通格。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>上下文工具栏与右键</h3>
+          <p>
+            点击单元格后，表格边缘显示迷你工具栏，提供区域选择、四方向插入和行列删除；更多菜单呈现复制、样式、宽度、合并拆分、移动与删除。拖选或调整列宽期间工具栏暂时隐藏。工具栏、行列浮层和冻结表头随文档内部滚动调整位置，并尽量保持在视口边界内。
+          </p>
+          <p>
+            右键打开工具的表格菜单；按住 Shift
+            右键保留浏览器菜单。命令根据当前编辑器、schema
+            与选区判断是否支持，不支持时禁用或提示。
+          </p>
+          <h3>防误操作</h3>
+          <p>
+            防止单元格误移动默认开启，拦截误拖整表或单元格，但保留文字选择、矩形选区和列宽调整。按住
+            Alt
+            开始拖动或关闭此项可放行。防止误插嵌套表格开启时，在现有表格内插入新表格会先确认；确认面板提供“在当前表格之前
+            / 之后插入”，会在表格外创建 3×3
+            新表格，首行使用可用的表头类型，避免误建嵌套表。
+          </p>
+        </section>
+        <section class="section" id="doc-table-edit">
+          <div class="section-title">
+            <span class="section-number">18</span>
+            <h2>文档表格：行列、合并与排序</h2>
+          </div>
+          <p class="desc">通过原生命令或经过跨度校验的文档模型修改结构。</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>操作</th>
+                  <th>说明</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>四方向插入</td>
+                  <td>
+                    当前行上方 / 下方插入行，当前列左侧 /
+                    右侧插入列；末尾加号快速扩展。
+                  </td>
+                </tr>
+                <tr>
+                  <td>删除行 / 列</td>
+                  <td>
+                    按当前选择调用原生能力；合并格跨度同步校验，不支持的结构提示。
+                  </td>
+                </tr>
+                <tr>
+                  <td>合并单元格</td>
+                  <td>
+                    对符合要求的连续矩形选区合并，优先原生命令，不可用时使用跨度校验的模型适配。
+                  </td>
+                </tr>
+                <tr>
+                  <td>拆分单元格</td>
+                  <td>将当前合并格按模型跨度恢复为相应结构。</td>
+                </tr>
+                <tr>
+                  <td>清空选区内容</td>
+                  <td>清除选区单元格内容，保留表格区域结构。</td>
+                </tr>
+                <tr>
+                  <td>行列排序</td>
+                  <td>
+                    拖动行 / 列数字柄；也可通过当前行上移 / 下移、当前列左移 /
+                    右移入口移动。
+                  </td>
+                </tr>
+                <tr>
+                  <td>合并格分组移动</td>
+                  <td>
+                    与合并格跨度相连的行或列作为一组移动，避免拆坏合并结构。
+                  </td>
+                </tr>
+                <tr>
+                  <td>删除整个表格</td>
+                  <td>需要短时间内再次点击确认。确认针对当前表格与入口。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            所有内容修改通过原生 commands 或 schema 校验后的 transaction
+            进行，不靠直接改表格 DOM
+            冒充保存。模型适配会检查尺寸、跨度和结构；超过处理范围或结构异常时停止并提示。操作是否可用以当前选区和原编辑器的能力为准。
+          </p>
+          <aside class="note">
+            文档表格结构操作会修改文档。优先用编辑器的原生撤销恢复误操作；撤销只覆盖原编辑器中的文档变更，不会回滚业务表的批量进展。
+          </aside>
+        </section>
+        <section class="section" id="doc-table-clipboard">
+          <div class="section-title">
+            <span class="section-number">19</span>
+            <h2>文档表格：区域复制与矩形粘贴</h2>
+          </div>
+          <p class="desc">在 AutoTable 文档与 Excel / WPS 之间交换二维区域。</p>
+          <ol class="steps">
+            <li>
+              在文档表格内选择矩形多格区域，使用原生复制或“复制区域（TSV /
+              HTML）”。
+            </li>
+            <li>
+              在 Excel / WPS
+              中粘贴，可按接收软件支持使用二维文字；复制到富文本软件可保留 HTML
+              表格结构。
+            </li>
+            <li>从 Excel / WPS 复制矩形区域，在文档目标格或多格选区粘贴。</li>
+            <li>
+              如果内容超出表格边界，确认是否扩行 /
+              扩列；如果覆盖已有合并格，确认是否拆分。
+            </li>
+            <li>粘贴完成检查区域、合并跨度和周围旧内容，必要时原生撤销。</li>
+          </ol>
+          <h3>合并格与限制</h3>
+          <p>
+            区域复制同时提供 TSV 与 HTML。TSV 使用制表符和换行表达二维数据；HTML
+            可表达合并格结构。粘贴根据剪贴板数据与编辑器能力进行矩形写入、扩展与跨度校验，支持合并格粘贴及后续行列编辑。
+          </p>
+          <p>
+            单次表格处理的单元格上限为 10000，用于限制模型 /
+            粘贴范围；并不是建议把一万个格一次性写入。结构异常、跨度越界、尺寸过大或能力不可用会提示停止。浏览器剪贴板权限和接收软件支持会影响格式保留。
+          </p>
+          <aside class="note">
+            业务表的字段组合 Tab
+            复制只是同行字段文字输出，不带文档表格的合并结构；文档矩形粘贴也不会直接导入业务数据表。
+          </aside>
+        </section>
+        <section class="section" id="doc-table-style">
+          <div class="section-title">
+            <span class="section-number">20</span>
+            <h2>文档表格：宽度、表头与健康检查</h2>
+          </div>
+          <p class="desc">调整正文表格排版，区分内容样式和编辑辅助。</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>能力</th>
+                  <th>行为</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>选区对齐</td>
+                  <td>左对齐、居中、右对齐；仅 schema 支持的属性生效。</td>
+                </tr>
+                <tr>
+                  <td>选区背景</td>
+                  <td>浅黄背景或清除背景；属于文档内容样式。</td>
+                </tr>
+                <tr>
+                  <td>列宽方案</td>
+                  <td>
+                    适应页面、列宽适应内容、平均列宽、重置列宽；依编辑器模型支持执行。
+                  </td>
+                </tr>
+                <tr>
+                  <td>拖动列宽</td>
+                  <td>
+                    边界附近 2 px 指示线与 12 px
+                    命中热区；拖动预览，松手保存，Esc 取消。
+                  </td>
+                </tr>
+                <tr>
+                  <td>首行转表头</td>
+                  <td>切换首行表头 / 取消表头；改变文档表格头部结构。</td>
+                </tr>
+                <tr>
+                  <td>冻结首行</td>
+                  <td>
+                    把首行作为滚动时可见的编辑辅助；可再次取消。冻结浮层不是新增正文行。
+                  </td>
+                </tr>
+                <tr>
+                  <td>当前行列辅助高亮</td>
+                  <td>只作为编辑视觉辅助，不写入正文。</td>
+                </tr>
+                <tr>
+                  <td>表格导航</td>
+                  <td>左侧大纲显示表格入口，点击定位当前表格。</td>
+                </tr>
+                <tr>
+                  <td>健康检查</td>
+                  <td>
+                    显示顶层、嵌套、空表、窄表数量；刷新重新检测，定位问题依次找到异常项。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>独立开关清单</h3>
+          <p>
+            文档表格增强总开关初始开启。子项包括单元格迷你工具栏、区域复制与矩形粘贴、行列选择柄与边缘加号、表格右键菜单、跨单元格拖选、防止单元格误移动、当前行列辅助高亮、扩大列宽拖拽热区、防止误插嵌套表格、在文档导航中显示表格，以及标题与表格合并成层级导航；附件中的这些子项初始均开启。
+          </p>
+          <p>
+            关闭总开关停止该模块的工具栏、高亮、保护和导航增强，不删除已有表格内容。健康检查负责检测和定位，不会自动修复或删除异常表格。
+          </p>
+        </section>
+        <section class="section" id="backup">
+          <div class="section-title">
+            <span class="section-number">21</span>
+            <h2>全部设置备份、导入与重置</h2>
+          </div>
+          <p class="desc">迁移偏好前先导出，清理时检查影响范围。</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>动作</th>
+                  <th>效果</th>
+                  <th>使用建议</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>导出全部设置</td>
+                  <td>下载可读 JSON，包含工具持久化设置及备份元信息。</td>
+                  <td>配置完成、换浏览器、升级前各留一份。</td>
+                </tr>
+                <tr>
+                  <td>导入全部设置</td>
+                  <td>
+                    验证备份格式，显示备份版本、时间等信息并确认；覆盖恢复工具配置，完成后统一刷新。
+                  </td>
+                  <td>使用本工具导出的 JSON，勿当作业务数据导入。</td>
+                </tr>
+                <tr>
+                  <td>一键重置全部设置</td>
+                  <td>
+                    清理脚本设置与指定工具页面存储，刷新后各模块重新使用默认值。
+                  </td>
+                  <td>
+                    先导出；确认会清除自定义组合、短语规则、置顶、历史及其它工具记忆。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            备份范围覆盖字段组合和表绑定、置顶与列宽、快捷键、短语与规则、条件高亮组、搜索历史、文档工具与记忆、视觉样式、主题、动效、滚轮、分页、悬浮球等已持久化配置。跨版本导入会按当前模块的兼容
+            / 迁移逻辑恢复；新版本才支持的能力无法保证被旧版本完整理解。
+          </p>
+          <p>
+            JSON
+            是工具设置，不包含业务表所有记录或完整文档正文，不能替代项目数据备份。导入
+            /
+            重置刷新前应完成原页面的未保存编辑；含工作搜索词和书签等个人内容的备份应按实际需要分享。
+          </p>
+        </section>
+        <section class="section" id="hotkeys">
+          <div class="section-title">
+            <span class="section-number">22</span>
+            <h2>完整默认快捷键速查</h2>
+          </div>
+          <p class="desc">快捷键可重新录制，组合也可配置专属键。</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>快捷键</th>
+                  <th>动作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Alt+T</td>
+                  <td>打开 / 关闭工具菜单</td>
+                </tr>
+                <tr>
+                  <td>Alt+C</td>
+                  <td>开关智能复制</td>
+                </tr>
+                <tr>
+                  <td>Alt+R</td>
+                  <td>复制当前整行</td>
+                </tr>
+                <tr>
+                  <td>Alt+V</td>
+                  <td>复制字段名：内容</td>
+                </tr>
+                <tr>
+                  <td>Alt+F</td>
+                  <td>开关聚焦模式</td>
+                </tr>
+                <tr>
+                  <td>Alt+Q</td>
+                  <td>下一个字段组合</td>
+                </tr>
+                <tr>
+                  <td>Alt+Shift+Q</td>
+                  <td>上一个字段组合</td>
+                </tr>
+                <tr>
+                  <td>Alt+X</td>
+                  <td>字段组合快速选择器</td>
+                </tr>
+                <tr>
+                  <td>Alt+P</td>
+                  <td>开关置顶列显示</td>
+                </tr>
+                <tr>
+                  <td>Alt+Shift+P</td>
+                  <td>打开列置顶设置</td>
+                </tr>
+                <tr>
+                  <td>Alt+Shift+K</td>
+                  <td>开关快捷表头置顶</td>
+                </tr>
+                <tr>
+                  <td>Alt+B</td>
+                  <td>打开批量追加进展，需勾选记录</td>
+                </tr>
+                <tr>
+                  <td>Alt+W</td>
+                  <td>开关表格滚轮轴反转</td>
+                </tr>
+                <tr>
+                  <td>Alt+H</td>
+                  <td>开关字段条件高亮</td>
+                </tr>
+                <tr>
+                  <td>Alt+Shift+H</td>
+                  <td>下一个高亮规则组</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>默认未分配的动作</h3>
+          <p>
+            复制当前单元格、复制当前字段组合、清除聚焦、开关行高亮、开关列高亮、开关
+            Edge
+            深色优化、上一个高亮规则组默认留空；可自行录制。字段组合专属快捷键在组合页配置。
+          </p>
+          <h3>录制方法</h3>
+          <ol class="steps">
+            <li>打开“设置 → 功能快捷键”，点击目标动作旁“设置”。</li>
+            <li>直接按想使用的组合键。工具检测内部占用冲突，已占用会提示。</li>
+            <li>录制时 Esc 取消，Backspace / Delete 清空。</li>
+            <li>
+              回到实际操作场景测试；浏览器或系统占用的键可能先被拦截，必要时换一组。
+            </li>
+          </ol>
+          <aside class="note">
+            输入框编辑期间的快捷键行为由工具的输入场景保护和浏览器共同决定。Alt
+            / Ctrl 单击、Shift 表头点击、Shift 右键、Esc
+            取消文档选区属于交互手势，不是这里全部都能重新录制的功能键。
+          </aside>
+        </section>
+        <section class="section" id="workflow">
+          <div class="section-title">
+            <span class="section-number">23</span>
+            <h2>典型工作流程</h2>
+          </div>
+          <p class="desc">按真实任务串联功能，减少重复操作。</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>任务</th>
+                  <th>推荐操作链</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>转发商业联系信息</td>
+                  <td>
+                    普通点击选中记录 → 选择商业信息组合 → Ctrl + 单击 →
+                    粘贴到聊天；需要字段说明则改为分行格式。
+                  </td>
+                </tr>
+                <tr>
+                  <td>验证大量记录</td>
+                  <td>
+                    显示关键字段 → 左置顶商业编码 / 名称 → 右置顶进展字段 →
+                    开启聚焦 → 使用条件高亮组标出待验证记录。
+                  </td>
+                </tr>
+                <tr>
+                  <td>批量跟进</td>
+                  <td>
+                    调整分页 → 当前可处理记录内勾选 → Alt+B → 短语插入 →
+                    查看预览 → 保存 → 核对成功 / 失败 / 跳过结果。
+                  </td>
+                </tr>
+                <tr>
+                  <td>维护正式进展文字</td>
+                  <td>
+                    进入进展描述多行编辑 → 点击条件匹配的短语 → 检查日期 / 光标
+                    / 文本 → 按原页面方式保存。
+                  </td>
+                </tr>
+                <tr>
+                  <td>在长文档中工作</td>
+                  <td>
+                    大纲筛章节 → 点击标题或表格 → 添加书签 → 复制 /
+                    导出该章节；下次打开恢复阅读位置。
+                  </td>
+                </tr>
+                <tr>
+                  <td>批量修改文档词语</td>
+                  <td>
+                    点击目标章节 → 打开查找 → 选择当前章节并更新范围 → 查找 /
+                    正则 → 打开替换预览 → 确认 → 必要时撤销。
+                  </td>
+                </tr>
+                <tr>
+                  <td>整理文档报表</td>
+                  <td>
+                    Shift 点击选矩形 → 区域复制 / Excel 粘贴 → 确认扩展或拆分 →
+                    平均列宽 → 首行表头 → 按需冻结首行。
+                  </td>
+                </tr>
+                <tr>
+                  <td>迁移到新环境</td>
+                  <td>
+                    旧环境导出全部设置 → 新环境安装并打开匹配站点 → 导入 JSON →
+                    刷新 → 检查组合、置顶、规则与文档记忆。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="section" id="faq">
+          <div class="section-title">
+            <span class="section-number">24</span>
+            <h2>常见问题与排查</h2>
+          </div>
+          <p class="desc">从前提、开关、上下文到原页面能力逐项检查。</p>
+          <div class="faq-actions">
+            <button class="small" id="expandFaq">展开全部问题</button>
+          </div>
+          <details class="faq">
+            <summary>页面上没有悬浮球？</summary>
+            <p>
+              检查脚本已安装并启用，页面地址匹配附件的两个
+              IP，且刷新后的页面正常加载。自定义域名不在附件匹配范围。确认没有同时启用多个版本。
+            </p>
+          </details>
+          <details class="faq">
+            <summary>普通点击为什么没有复制？</summary>
+            <p>
+              当前设计为普通点击仅聚焦。复制当前格用 Alt + 单击，字段组合用 Ctrl
+              + 单击，并确保智能复制已开启。
+            </p>
+          </details>
+          <details class="faq">
+            <summary>字段组合少了一项或复制错字段？</summary>
+            <p>
+              查看组合兼容提示；检查当前表字段 ID
+              绑定和通用模板名称匹配，字段是否隐藏 /
+              未加载。为当前实际表重新保存专用配置通常更可靠。
+            </p>
+          </details>
+          <details class="faq">
+            <summary>置顶没有生效或位置异常？</summary>
+            <p>
+              检查总开关、当前表配置与当前视图字段可见性，点击重新应用。宽度不合理时清除列宽记忆再拖动；左右置顶过多会压缩中间区域。
+            </p>
+          </details>
+          <details class="faq">
+            <summary>高亮规则已启用却没有颜色？</summary>
+            <p>
+              检查总开关、当前生效规则组、目标表范围、字段读取和条件值。聚焦视觉优先；匹配数量仅针对可见行。修改草稿后需要保存全部。
+            </p>
+          </details>
+          <details class="faq">
+            <summary>批量保存按钮灰色或拒绝开始？</summary>
+            <p>
+              检查“进展描述”字段与权限，确认有勾选记录；系统已选与可处理数量不同会禁止开始。将选择限制在当前页可处理记录，再试。
+            </p>
+          </details>
+          <details class="faq">
+            <summary>批量停止后已修改记录会恢复吗？</summary>
+            <p>
+              不会。停止仅停止后续处理，已保存记录保留。先核对成功记录与结果，再决定怎样修正剩余记录。
+            </p>
+          </details>
+          <details class="faq">
+            <summary>快捷短语没有出现？</summary>
+            <p>
+              检查快捷短语总开关、目标是否为可识别的多行编辑字段、规则启用和使用场景、显示条件及保存状态。普通单行字段不保证出现多行快捷面板。
+            </p>
+          </details>
+          <details class="faq">
+            <summary>插入了两次日期？</summary>
+            <p>
+              检查模板是否已有 {{today}}，同时是否开启编辑 /
+              批量日期前缀或其它模板内日期变量。按任务取消额外前缀，避免叠加。
+            </p>
+          </details>
+          <details class="faq">
+            <summary>搜索词为什么没被记录？</summary>
+            <p>
+              默认只在原生搜索实际生效或 Enter
+              时记录。仅输入后离开不会默认保留；需要草稿历史可开启失焦或停止输入条件。
+            </p>
+          </details>
+          <details class="faq">
+            <summary>胶囊没有删除按钮，还能删除吗？</summary>
+            <p>
+              胶囊 ×
+              可独立关闭；列表、原位展开的全部记录和搜索记录管理仍保留删除能力。
+            </p>
+          </details>
+          <details class="faq">
+            <summary>文档大纲没有标题或跳转不正确？</summary>
+            <p>
+              正文需要真实 H1–H6
+              标题，不是仅加粗段落。检查自动大纲与对应导航开关；标题 /
+              内容大幅修改后刷新大纲并重新定位。
+            </p>
+          </details>
+          <details class="faq">
+            <summary>书签找不到原位置？</summary>
+            <p>
+              正文可能被移动、删除或多处重复。点击正确的新位置，再使用书签更新位置入口重新锚定。
+            </p>
+          </details>
+          <details class="faq">
+            <summary>查找显示“范围为空”或只搜到部分内容？</summary>
+            <p>
+              非全文范围会锁定。先点击章节、表格或选中文本，再更新范围；想搜整篇请切换全文。
+            </p>
+          </details>
+          <details class="faq">
+            <summary>正则替换按钮不能点？</summary>
+            <p>
+              检查正则语法，是否匹配空字符串、文档是否只读，以及当前编辑器是否支持模型提交。正文或范围在预览后变化需重新预览。
+            </p>
+          </details>
+          <details class="faq">
+            <summary>文档表格合并、排序或粘贴失败？</summary>
+            <p>
+              检查选区是否为同表矩形、合并跨度是否一致、处理尺寸是否超过上限，以及原编辑器命令
+              / schema 是否支持。结构异常时工具会阻止提交。
+            </p>
+          </details>
+          <details class="faq">
+            <summary>右键菜单与浏览器菜单怎样切换？</summary>
+            <p>
+              表格右键增强开启时直接右键显示工具菜单；Shift +
+              右键使用浏览器菜单，也可关闭右键子开关。
+            </p>
+          </details>
+          <details class="faq">
+            <summary>打开深色优化后界面没变化？</summary>
+            <p>
+              先检查 AutoTable
+              原生是否处于深色模式。工具只在原生深色模式接管配色，浅色模式保持原主题。
+            </p>
+          </details>
+          <details class="faq">
+            <summary>导入备份后为什么刷新？</summary>
+            <p>
+              各模块独立读入持久化配置，统一刷新使它们同时使用恢复的设置。导入前应完成原页面未保存内容。
+            </p>
+          </details>
+        </section>
+        <section class="section" id="boundaries">
+          <div class="section-title">
+            <span class="section-number">25</span>
+            <h2>默认设置、能力边界与诊断</h2>
+          </div>
+          <p class="desc">便于管理员交接，也避免混淆显示增强和内容修改。</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>分类</th>
+                  <th>附件初始状态</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>默认开启</td>
+                  <td>
+                    智能复制、聚焦、行高亮、列高亮、列宽记忆、分页增强、编辑快捷短语、编辑自动预留首行、收起侧栏微标签、隐藏关联复制按钮、搜索记录与按视图模式、文档表格增强及其列出的子开关、自动文档大纲、大纲滑动跟随、阅读位置记忆、章节折叠记忆、文档书签、文档查找替换。
+                  </td>
+                </tr>
+                <tr>
+                  <td>默认关闭</td>
+                  <td>
+                    联系信息分组显示、表列置顶、快捷表头置顶、滚轮轴反转、Edge
+                    深色优化、丝滑动效、忽略 Reduce
+                    Motion、条件高亮、自定义视觉样式各组、搜索栏清空优化、同表搜索记录互通、紧凑历史显示全部。
+                  </td>
+                </tr>
+                <tr>
+                  <td>已有安装</td>
+                  <td>
+                    已有持久化配置优先；上述默认只表示没有该配置时的初始值，并不是升级会强制改为此状态。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>能力类别</th>
+                  <th>是否修改业务 / 正文</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    聚焦、条件高亮、列置顶、主题、联系信息显示、微标签、悬浮球
+                  </td>
+                  <td>主要为本地显示和交互增强。</td>
+                </tr>
+                <tr>
+                  <td>复制、搜索记录、阅读 / 折叠记忆、书签</td>
+                  <td>读取内容或保存工具记忆；不批量改写业务字段。</td>
+                </tr>
+                <tr>
+                  <td>短语插入</td>
+                  <td>改变当前编辑框草稿，最终随原页面保存。</td>
+                </tr>
+                <tr>
+                  <td>批量追加进展</td>
+                  <td>实际逐条提交业务记录修改。</td>
+                </tr>
+                <tr>
+                  <td>
+                    文档替换、行列 / 合并 / 排序、粘贴、对齐 / 背景 / 宽度 /
+                    表头
+                  </td>
+                  <td>实际修改文档模型；依赖权限与 schema。</td>
+                </tr>
+                <tr>
+                  <td>文档辅助高亮、边缘柄、工具栏、冻结浮层</td>
+                  <td>编辑辅助，不把辅助 UI 写进文档正文。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>性能与技术排查</h3>
+          <p>
+            工具对虚拟行采用增量处理，菜单按可见分区刷新，字段与上下文做缓存。文档表格使用事件委托与逐帧合并，不增加持续轮询。这些是工作机制，不代表在任何数据规模或浏览器下都没有开销。
+          </p>
+          <p>
+            高级排查可在页面控制台读取以下诊断对象。默认诊断完全不可见，不增加普通用户菜单；部分模块版本仍保留历史标记。
+          </p>
+          <pre><code>__attPerfStats.summary()   // 简要统计
+__attPerfStats.snapshot()  // 完整计数与耗时
+__attPerfStats.reset()     // 重置后重新比较</code></pre>
+          <p>
+            统计包括面板重绘、上下文刷新合并、缓存命中、置顶应用、条件高亮处理量与批次耗时。它是本页诊断，不是服务器监控。排查前记录页面、场景、脚本版本和可复现操作，比只提供“卡顿”更便于定位。
+          </p>
+          <h3>说明书依据</h3>
+          <p>
+            编写日期：2026-09-17。依据附件脚本元数据、默认配置、用户界面和实际命令
+            /
+            提交流程整理；未连接真实业务平台执行修改。原平台升级、权限变化、浏览器能力或后续脚本版本可能改变界面与可用能力，应以当前页面提示为准。
+          </p>
+        </section>
+        <footer class="footer">
+          AutoTable 工具集 / MiuYi ·
+          本页为功能说明文档。主题、目录和章节搜索仅用于阅读说明书，不会执行工具的业务操作。
+        </footer>
+      </main>
+    </div>
+    <button class="backtop" id="backtop" aria-label="回到说明书顶部">
+      ↑ 回到顶部
+    </button>
+    <script>
+      const q = document.querySelector("#docSearch"),
+        sections = [...document.querySelectorAll(".section")],
+        links = [...document.querySelectorAll(".sidebar a")],
+        status = document.querySelector("#status");
+      let currentSearch = "";
+      function filter() {
+        currentSearch = q.value.trim().toLocaleLowerCase();
+        let n = 0;
+        sections.forEach((s, i) => {
+          let visible =
+            !currentSearch ||
+            s.textContent.toLocaleLowerCase().includes(currentSearch);
+          s.hidden = !visible;
+          links[i].hidden = !visible;
+          if (visible) n++;
+        });
+        status.textContent = currentSearch
+          ? "找到 " +
+            n +
+            " 个相关章节。点击目录进入，或使用浏览器 Ctrl+F 查找具体词句。"
+          : "";
+        document.querySelector("#noresults").hidden = n > 0;
+        document.querySelector(".hero").hidden = !!currentSearch;
+        document.querySelector(".intro-grid").hidden = !!currentSearch;
+      }
+      q.addEventListener("input", filter);
+      q.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          q.value = "";
+          filter();
+        }
+        if (e.key === "Enter") {
+          let s = sections.find((x) => !x.hidden);
+          s?.scrollIntoView({ behavior: "smooth" });
+        }
+      });
+      document.querySelector("#clearSearch").onclick = () => {
+        q.value = "";
+        filter();
+        q.focus();
+      };
+      document.querySelector("#theme").onclick = () => {
+        document.body.classList.toggle("dark");
+        try {
+          localStorage.setItem(
+            "att-manual-theme",
+            document.body.classList.contains("dark") ? "dark" : "light",
+          );
+        } catch {}
+        updateTheme();
+      };
+      function updateTheme() {
+        let dark = document.body.classList.contains("dark");
+        document.querySelector("#theme").textContent = dark ? "浅色" : "深色";
+        document
+          .querySelector("#theme")
+          .setAttribute("aria-pressed", String(dark));
+      }
+      try {
+        if (localStorage.getItem("att-manual-theme") === "dark")
+          document.body.classList.add("dark");
+      } catch {}
+      updateTheme();
+      document.querySelector("#print").onclick = () => {
+        q.value = "";
+        filter();
+        document
+          .querySelectorAll("details.faq")
+          .forEach((x) => (x.open = true));
+        window.print();
+      };
+      document.querySelector("#expandFaq").onclick = () => {
+        let faqs = [...document.querySelectorAll("details.faq")],
+          open = faqs.some((x) => !x.open);
+        faqs.forEach((x) => (x.open = open));
+        document.querySelector("#expandFaq").textContent = open
+          ? "收起全部问题"
+          : "展开全部问题";
+      };
+      document.querySelector("#toc").onclick = () => {
+        let s = document.querySelector(".sidebar");
+        s.classList.toggle("open");
+        document
+          .querySelector("#toc")
+          .setAttribute("aria-expanded", String(s.classList.contains("open")));
+      };
+      links.forEach(
+        (a) =>
+          (a.onclick = () => {
+            if (innerWidth <= 720)
+              document.querySelector(".sidebar").classList.remove("open");
+          }),
+      );
+      document.querySelector("#backtop").onclick = () =>
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      let scheduled = false;
+      function updateScroll() {
+        let active = sections
+          .filter((s) => !s.hidden && s.getBoundingClientRect().top < 180)
+          .at(-1);
+        links.forEach((a) => {
+          let on = a.hash === "#" + active?.id;
+          a.classList.toggle("active", on);
+          if (on) a.setAttribute("aria-current", "location");
+          else a.removeAttribute("aria-current");
+        });
+        let d = document.documentElement,
+          den = d.scrollHeight - d.clientHeight;
+        document.querySelector(".progress").style.width =
+          (den > 0 ? (d.scrollTop / den) * 100 : 0) + "%";
+        scheduled = false;
+      }
+      addEventListener(
+        "scroll",
+        () => {
+          if (!scheduled) {
+            scheduled = true;
+            requestAnimationFrame(updateScroll);
+          }
+        },
+        { passive: true },
+      );
+      updateScroll();
+    </script>
+  </body>
+</html>
