@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.6.0
-// @description  AutoTable 一体化效率增强工具：智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆、自定义表格视觉样式、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.20.1
+// @description  AutoTable 一体化效率增强工具：菜单常驻使用说明书入口、表格联系信息显示优化与独立开关（手机号分组显示，原始值保持不变）、文档表格增强（大纲可见高度与底部滚动修复 / 查找范围同行布局 / 书签独立开关 / 导航与书签分栏切换及侧栏收起 / 查找替换布局修复 / 大纲搜索筛选 / 批量展开折叠 / 文档阅读与折叠记忆 / 自定义书签 / 章节复制与导出 / 范围查找与替换预览 / 两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,26 +23,199 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.6.0
+ * AutoTable 工具集 V7.19.0
  * 当前整合能力：
- * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、可自定义置顶边界/当前格/行列高亮视觉样式、快捷表头置顶、分页增强、滚轮横纵轴反转
+ * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，规则组/规则分层管理，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
- * - 编辑：统一快捷短语中心；双栏独立滚动、固定页头/页脚、批量选择、批量启停、批量编辑与安全高级模板表达式
+ * - 编辑：统一快捷短语中心；表格多行单元格与记录详情多行字段共用快捷面板；双栏独立滚动、固定页头/页脚、批量选择、批量启停、批量编辑与安全高级模板表达式
  * - 规则：支持可视化条件 + 代码式 {{=表达式}} / {{#if}} 条件内容；系统规则可恢复默认；旧配置自动迁移
  * - 主题：可回退 Edge / Fluent 深色优化；可选丝滑高级全局交互动效；记录详情只动画抽屉、不扰动底层页面，并可选择是否忽略系统 Reduce Motion
- * - 文档：原生风格大纲、滚动跟随、查找/替换/定位、正则表达式与高亮
- * - 界面：可隐藏关联字段复制按钮，并释放按钮原先占用的文字空间
- * - 设置：支持全部工具配置 JSON 备份、跨版本导入恢复与全部重置；导入/重置后统一刷新确保各独立模块同步生效
+ * - 文档：原生风格大纲、滚动跟随、查找/替换/定位、正则表达式与高亮；V7.17 增加文档表格增强（上下文工具栏、原生命令适配、CellSelection 识别、防误嵌套、表格导航与健康检查）
+ * - 界面：可隐藏关联字段复制按钮，并释放按钮原先占用的文字空间；收起侧边栏可显示智能微标签，快速区分大量重复业务图标
+ * - 悬浮菜单：V7.16 重构为“快捷 / 表格 / 文档 / 设置”四区；字段组合与列置顶归入表格二级导航，快捷页按工作流 / 视图状态 / 复制行为 / 工具入口重新分层
+ * - 搜索：全视图模糊搜索支持可配置正式记录条件、紧凑历史层、列表/胶囊智能补位、胶囊删除按钮显示开关、字体大小、同表视图互通、原位丝滑展开全部记录、可自定义搜索记录模块宽度/高度上限、独立搜索记录管理面板及搜索栏内置 X 清空优化
+ * - 设置：支持字段条件高亮规则中心；全部工具配置 JSON 备份、跨版本导入恢复与全部重置；导入/重置后统一刷新确保各独立模块同步生效
  * - 渲染：按真实行号稳定斑马纹；虚拟滚动增量渲染；聚焦行/字段分别保存稳定身份；横向虚拟化时绝不回退到其它字段；编辑与置顶表头保持稳定层级；置顶表头高亮使用不透明底层防止滚动表头穿透
  * - 置顶：右置顶严格镜像；“+ 添加列”保持 AutoTable 原生末端位置，不参与置顶 sticky/offset
- * - 面板：分区式导航、统一卡片层级、紧凑间距和当前页说明；原功能与设置项完整保留
+ * - 面板：V7.16 采用主导航 + 表格二级导航；减少顶部分类数量，按任务频率分布内容，保留原功能与设置项
+ * - 性能：V7.16.7 完成 P8 性能回归与诊断层；V7.17 文档表格增强继续采用事件委托、RAF 合并与单一结构 Observer，不引入轮询
  * ========================================================================== */
+
+
+/* ============================================================================
+ * AutoTable P8 性能诊断与回归监测 V7.16.7
+ * --------------------------------------------------------------------------
+ * - 默认完全不可见：不增加菜单、设置项、Observer、Timer 或控制台刷屏。
+ * - 只做轻量计数与少量批次级耗时统计，用于确认性能优化是否真正生效。
+ * - 控制台可读取 __attPerfStats.snapshot() / __attPerfStats.summary()；
+ *   如需重新开始一次对比，可执行 __attPerfStats.reset()。
+ * ========================================================================== */
+(function () {
+    'use strict';
+
+    const KEY = '__attPerfStats';
+    const VERSION = 'V7.18.1';
+    const makeCounters = () => ({
+        panelFullRenders: 0,
+        panelSectionRenderCalls: 0,
+        panelSectionRenderDeferred: 0,
+        panelSectionRenders: { features: 0, combos: 0, pinning: 0, settings: 0, other: 0 },
+        panelContextRefreshRequests: 0,
+        panelContextRefreshQueued: 0,
+        panelContextRefreshCoalesced: 0,
+        panelContextRefreshFlushes: 0,
+        panelAnchorLayouts: 0,
+        panelStableClamps: 0,
+        mainObserverCallbacks: 0,
+        virtualObserverFastSkips: 0,
+        tableContextCacheHits: 0,
+        tableContextCacheMisses: 0,
+        gridFieldDefsCacheHits: 0,
+        gridFieldDefsCacheMisses: 0,
+        pinApplyCalls: 0,
+        pinFullLayouts: 0,
+        pinVirtualObserverCallbacks: 0,
+        pinVirtualHeaderRelayoutRequests: 0,
+        conditionalRowsProcessed: 0,
+        conditionalRuleEvaluations: 0,
+        conditionalFlushes: 0,
+        conditionalBodyObserverCallbacks: 0,
+        rulePlanCacheHits: 0,
+        rulePlanCacheMisses: 0
+    });
+    const makeTiming = () => ({ count: 0, totalMs: 0, maxMs: 0, lastMs: 0 });
+    const makeTimings = () => ({
+        panelFullRenderMs: makeTiming(),
+        panelSectionRenderMs: makeTiming(),
+        conditionalFlushMs: makeTiming()
+    });
+
+    let startedPerf = performance.now();
+    let startedAt = Date.now();
+
+    const api = {
+        version: VERSION,
+        startedAt,
+        counters: makeCounters(),
+        timings: makeTimings(),
+        recordTiming(name, ms) {
+            const timing = this.timings?.[name];
+            const value = Number(ms);
+            if (!timing || !Number.isFinite(value) || value < 0) return;
+            timing.count += 1;
+            timing.totalMs += value;
+            timing.lastMs = value;
+            if (value > timing.maxMs) timing.maxMs = value;
+        },
+        reset() {
+            this.counters = makeCounters();
+            this.timings = makeTimings();
+            startedPerf = performance.now();
+            startedAt = Date.now();
+            this.startedAt = startedAt;
+            return this.snapshot();
+        },
+        snapshot() {
+            const c = this.counters;
+            const ratio = (hit, total) => total > 0 ? Math.round((hit / total) * 10000) / 100 : null;
+            const timingSnapshot = {};
+            for (const [name, t] of Object.entries(this.timings)) {
+                timingSnapshot[name] = {
+                    count: t.count,
+                    totalMs: Math.round(t.totalMs * 1000) / 1000,
+                    avgMs: t.count ? Math.round((t.totalMs / t.count) * 1000) / 1000 : 0,
+                    maxMs: Math.round(t.maxMs * 1000) / 1000,
+                    lastMs: Math.round(t.lastMs * 1000) / 1000
+                };
+            }
+            return {
+                version: this.version,
+                startedAt: new Date(startedAt).toISOString(),
+                uptimeMs: Math.round(performance.now() - startedPerf),
+                counters: {
+                    ...c,
+                    panelSectionRenders: { ...c.panelSectionRenders }
+                },
+                timings: timingSnapshot,
+                rates: {
+                    mainObserverFastSkipPct: ratio(c.virtualObserverFastSkips, c.mainObserverCallbacks),
+                    tableContextFrameCacheHitPct: ratio(c.tableContextCacheHits, c.tableContextCacheHits + c.tableContextCacheMisses),
+                    gridFieldDefsFrameCacheHitPct: ratio(c.gridFieldDefsCacheHits, c.gridFieldDefsCacheHits + c.gridFieldDefsCacheMisses),
+                    rulePlanCacheHitPct: ratio(c.rulePlanCacheHits, c.rulePlanCacheHits + c.rulePlanCacheMisses),
+                    panelContextCoalescePct: ratio(c.panelContextRefreshCoalesced, c.panelContextRefreshRequests)
+                }
+            };
+        },
+        summary() {
+            const s = this.snapshot();
+            return {
+                version: s.version,
+                uptimeMs: s.uptimeMs,
+                panel: {
+                    fullRenders: s.counters.panelFullRenders,
+                    sectionRenders: s.counters.panelSectionRenders,
+                    refreshRequests: s.counters.panelContextRefreshRequests,
+                    coalesced: s.counters.panelContextRefreshCoalesced,
+                    flushes: s.counters.panelContextRefreshFlushes,
+                    anchorLayouts: s.counters.panelAnchorLayouts,
+                    stableClamps: s.counters.panelStableClamps,
+                    avgFullRenderMs: s.timings.panelFullRenderMs.avgMs,
+                    avgSectionRenderMs: s.timings.panelSectionRenderMs.avgMs
+                },
+                observer: {
+                    mainCallbacks: s.counters.mainObserverCallbacks,
+                    virtualFastSkips: s.counters.virtualObserverFastSkips,
+                    fastSkipPct: s.rates.mainObserverFastSkipPct
+                },
+                cache: {
+                    tableContextHitPct: s.rates.tableContextFrameCacheHitPct,
+                    gridFieldDefsHitPct: s.rates.gridFieldDefsFrameCacheHitPct,
+                    rulePlanHitPct: s.rates.rulePlanCacheHitPct
+                },
+                pinning: {
+                    applyCalls: s.counters.pinApplyCalls,
+                    fullLayouts: s.counters.pinFullLayouts,
+                    virtualCallbacks: s.counters.pinVirtualObserverCallbacks,
+                    headerRelayoutRequests: s.counters.pinVirtualHeaderRelayoutRequests
+                },
+                conditionalHighlight: {
+                    rows: s.counters.conditionalRowsProcessed,
+                    ruleEvaluations: s.counters.conditionalRuleEvaluations,
+                    flushes: s.counters.conditionalFlushes,
+                    avgFlushMs: s.timings.conditionalFlushMs.avgMs,
+                    maxFlushMs: s.timings.conditionalFlushMs.maxMs
+                }
+            };
+        }
+    };
+
+    const expose = target => {
+        if (!target) return;
+        try {
+            Object.defineProperty(target, KEY, {
+                configurable: true,
+                enumerable: false,
+                writable: false,
+                value: api
+            });
+        } catch {
+            try { target[KEY] = api; } catch {}
+        }
+    };
+
+    expose(globalThis);
+    try {
+        if (typeof unsafeWindow !== 'undefined' && unsafeWindow && unsafeWindow !== globalThis) expose(unsafeWindow);
+    } catch {}
+})();
 
 (function () {
     'use strict';
 
+    const PERF = globalThis.__attPerfStats || null;
+
     const APP = {
-        version: 'V7.6.0',
+        version: 'V7.20.1',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -51,6 +224,7 @@
     };
 
     const DEFAULTS = {
+        contactDisplayEnabled: false,
         clickCopyEnabled: true,
         focusEnabled: true,
         darkModeOptimized: false,
@@ -65,6 +239,8 @@
         silkMotionEnabled: false,
         // V7.4.1：默认仍遵循系统 Reduce Motion；用户可显式选择忽略。
         silkMotionIgnoreReducedMotionEnabled: false,
+        // V7.14：收起侧边栏识别增强。仅在原生侧栏收起到约 64px 时显示智能微标签。
+        sidebarCollapsedEnhanceEnabled: true,
         // V7.5：表格视觉样式中心。每组默认关闭自定义，保证升级后视觉完全沿用原样式。
         visualStyleConfig: {
             pin: {
@@ -124,6 +300,11 @@
             openBulkProgress: 'Alt+B',
             // V7.2：滚轮横纵轴反转。W = Wheel，默认快捷键可在设置页修改。
             toggleTableWheelReverse: 'Alt+W',
+            // V7.8.1：字段条件高亮总开关。H = Highlight，可在功能快捷键中重新录制。
+            toggleConditionalHighlight: 'Alt+H',
+            // V7.15：高亮规则组快捷切换。Alt+Shift+H 默认切换到下一组；上一组默认留空。
+            nextConditionalHighlightGroup: 'Alt+Shift+H',
+            prevConditionalHighlightGroup: '',
 
             // 以下功能提供快捷键入口，但默认留空，避免一次占用过多按键。
             copyCurrentCell: '',
@@ -159,6 +340,7 @@
     };
 
     const state = {
+        contactDisplayEnabled: false,
         clickCopyEnabled: true,
         focusEnabled: true,
         darkModeOptimized: false,
@@ -170,6 +352,7 @@
         tableWheelReverseEnabled: false,
         silkMotionEnabled: false,
         silkMotionIgnoreReducedMotionEnabled: false,
+        sidebarCollapsedEnhanceEnabled: true,
         visualStyleConfig: null,
         paginationEnhancedEnabled: true,
         editorQuickPhraseEnabled: true,
@@ -188,6 +371,7 @@
         combos: [],
         panelOpen: false,
         activeTab: 'features',
+        lastTableToolsTab: 'combos',
         recordingHotkeyTarget: null,
         focusedCell: null,
         // V7.5.3：虚拟列表会销毁/复用 focusedCell DOM，必须独立保存逻辑聚焦身份。
@@ -239,6 +423,41 @@
 
     let lastPinContextKey = '';
     let lastComboContextKey = '';
+
+
+    // V7.16.6：悬浮菜单“无感性能加固 + 定位稳定”。
+    // - 页面变化只设置 dirty；用户正在交互时不做循环 retry；
+    // - 交互结束 / 稳定窗口结束后只合并刷新一次；
+    // - 普通上下文同步只重绘当前可见 section，完整 renderPanel 仅保留给显式全量场景；
+    // - 打开时按未 transform 的 layout 尺寸锚定一次，后续内容变化只做视口越界校正。
+    let panelContextRefreshTimer = 0;
+    let panelContextRefreshRaf = 0;
+    let panelInteractionUntil = 0;
+    let panelPointerActive = false;
+    let panelOpenedAt = 0;
+    let panelContextRefreshPending = false;
+    const panelDirtySections = new Set();
+
+    // V7.16.6：菜单定位分成“重新锚定”和“稳定校正”两条路径。
+    // 打开/拖动/明确改变方向时才重新围绕悬浮球计算位置；
+    // 页面加载、section 重绘、内容高度变化只做越界夹紧，避免菜单在打开后继续漂移。
+    let panelStabilizeRaf = 0;
+
+    // 条件高亮快捷页只读快照。首次仍从 GM 读取保证兼容，之后由条件高亮模块事件同步，
+    // 避免每次快捷页重绘重复读取 4 份 GM Storage。
+    let conditionalHighlightSnapshot = null;
+
+    // 同一 animation frame 内复用表格上下文 / 表头字段定义。
+    // 下一帧自动失效，既减少同帧重复 DOM 扫描，也不形成跨页面的陈旧长期缓存。
+    let tableContextFrameCache = null;
+    let tableContextFrameCacheRaf = 0;
+    let gridFieldDefsFrameCache = new WeakMap();
+    let gridFieldDefsFrameCacheRaf = 0;
+
+    // V7.16.3：字段组合编辑器属于“长生命周期编辑会话”。
+    // 以前页面加载稳定刷新、Tab 重绘或重新读取字段都会 renderCombosSection()，
+    // 从而直接销毁 #att-combo-editor。现在编辑会话拥有独立草稿，后台刷新不得覆盖它。
+    let comboEditorDraftState = null;
 
     // V5.6：分页条数增强。
     // 通过当前页面 React Select 的 onChange 回调设置任意 pageSize，
@@ -508,6 +727,84 @@
         }
 
 
+        /* ==========================================================
+           V7.14 收起侧边栏识别增强
+           ----------------------------------------------------------
+           只在脚本确认 AutoTable 原生侧栏已收起时生效。
+           不替换原图标，不删除 title；只给大量同图标业务入口补充
+           1~3 字智能微标签，展开后完全恢复 AutoTable 原样。
+           ========================================================== */
+        body.att-sidebar-collapsed-enhanced .app-shell-sidebar.att-sidebar-is-collapsed .sidebar-menu-item[data-att-sidebar-mini] {
+            width: 52px !important;
+            min-width: 52px !important;
+            min-height: 42px !important;
+            height: 42px !important;
+            box-sizing: border-box !important;
+            padding: 5px 4px 4px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 1px !important;
+            overflow: visible !important;
+        }
+
+        body.att-sidebar-collapsed-enhanced .app-shell-sidebar.att-sidebar-is-collapsed .sidebar-menu-item[data-att-sidebar-mini]::after {
+            content: attr(data-att-sidebar-mini);
+            display: block;
+            max-width: 46px;
+            height: 11px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            color: #8f98a3;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+            font-size: 9px;
+            font-weight: 600;
+            line-height: 11px;
+            letter-spacing: -.15px;
+            text-align: center;
+            pointer-events: none;
+            opacity: .92;
+            transition: color .14s ease, opacity .14s ease;
+        }
+
+        body.att-sidebar-collapsed-enhanced .app-shell-sidebar.att-sidebar-is-collapsed .sidebar-menu-item[data-att-sidebar-mini] > .sidebar-menu-icon {
+            flex: 0 0 auto !important;
+            margin: 0 !important;
+            line-height: 14px !important;
+        }
+
+        body.att-sidebar-collapsed-enhanced .app-shell-sidebar.att-sidebar-is-collapsed .sidebar-menu-item[data-att-sidebar-mini]:hover::after {
+            color: #d9e6f5;
+            opacity: 1;
+        }
+
+        body.att-sidebar-collapsed-enhanced .app-shell-sidebar.att-sidebar-is-collapsed .sidebar-menu-item[data-att-sidebar-mini].is-active::after,
+        body.att-sidebar-collapsed-enhanced .app-shell-sidebar.att-sidebar-is-collapsed .sidebar-menu-entry.is-active > .sidebar-menu-item[data-att-sidebar-mini]::after {
+            color: #69adf2;
+            font-weight: 750;
+            opacity: 1;
+        }
+
+        /* Edge 深色模式下沿用 Fluent 层级，不额外制造彩色块。 */
+        body.att-native-dark.att-dark-optimized.att-sidebar-collapsed-enhanced
+        .app-shell-sidebar.att-sidebar-is-collapsed .sidebar-menu-item[data-att-sidebar-mini]::after {
+            color: #929aa3 !important;
+        }
+        body.att-native-dark.att-dark-optimized.att-sidebar-collapsed-enhanced
+        .app-shell-sidebar.att-sidebar-is-collapsed .sidebar-menu-item[data-att-sidebar-mini]:hover::after {
+            color: #d7e8f8 !important;
+        }
+        body.att-native-dark.att-dark-optimized.att-sidebar-collapsed-enhanced
+        .app-shell-sidebar.att-sidebar-is-collapsed .sidebar-menu-item[data-att-sidebar-mini].is-active::after,
+        body.att-native-dark.att-dark-optimized.att-sidebar-collapsed-enhanced
+        .app-shell-sidebar.att-sidebar-is-collapsed .sidebar-menu-entry.is-active > .sidebar-menu-item[data-att-sidebar-mini]::after {
+            color: #60cdff !important;
+        }
+
         .att-page-size-extra {
             padding: 5px 4px 4px;
             margin-top: 4px;
@@ -689,6 +986,15 @@
         }
 
         #${APP.rootId}.att-open[data-direction="up"] #${APP.panelId} {
+            transform: translateY(0) scale(1);
+        }
+
+        #${APP.rootId}[data-direction="down"] #${APP.panelId} {
+            transform: translateY(-10px) scale(.97);
+            transform-origin: center top;
+        }
+
+        #${APP.rootId}.att-open[data-direction="down"] #${APP.panelId} {
             transform: translateY(0) scale(1);
         }
 
@@ -2004,6 +2310,27 @@
         }
 
         /* AutoTable 实际使用的是 div 虚拟表格，不是 table/tr/td。 */
+        /* Generated text is visual only; native DOM text and clipboard stay raw.
+           Editing falls back to the original content immediately, without waiting
+           for an observer or touching the native editor input. */
+        .grid-root .grid-cell:not(.editing):not(.editing-textarea):not(.editing-multiselect) :is(.cell-text,.cell-textarea)[data-att-contact-display-v7200] {
+            font-size:0!important;
+            line-height:var(--att-contact-line-height-v7200,normal)!important;
+            letter-spacing:0!important;
+        }
+        .grid-root .grid-cell:not(.editing):not(.editing-textarea):not(.editing-multiselect) :is(.cell-text,.cell-textarea)[data-att-contact-display-v7200]::after {
+            content:attr(data-att-contact-display-v7200);
+            font-size:var(--att-contact-font-size-v7200,12px);
+            line-height:var(--att-contact-line-height-v7200,normal);
+            letter-spacing:var(--att-contact-letter-spacing-v7200,normal);
+            white-space:inherit;
+            pointer-events:none;
+        }
+        @media print {
+            .grid-root .grid-cell :is(.cell-text,.cell-textarea)[data-att-contact-display-v7200] {font-size:var(--att-contact-font-size-v7200,12px)!important;}
+            .grid-root .grid-cell :is(.cell-text,.cell-textarea)[data-att-contact-display-v7200]::after {content:none!important;}
+        }
+
         .grid-root .grid-cell.att-focus-row-cell {
             background-color: rgba(59,130,246,.095) !important;
         }
@@ -7931,6 +8258,7 @@
     }
 
     function loadState() {
+        state.contactDisplayEnabled = Boolean(store.get('contactDisplayEnabled',DEFAULTS.contactDisplayEnabled));
         state.clickCopyEnabled = store.get('clickCopyEnabled', DEFAULTS.clickCopyEnabled);
         state.focusEnabled = store.get('focusEnabled', DEFAULTS.focusEnabled);
         state.darkModeOptimized = store.get('darkModeOptimized', DEFAULTS.darkModeOptimized);
@@ -7945,6 +8273,7 @@
         state.tableWheelReverseEnabled = store.get('tableWheelReverseEnabled', DEFAULTS.tableWheelReverseEnabled);
         state.silkMotionEnabled = store.get('silkMotionEnabled', DEFAULTS.silkMotionEnabled);
         state.silkMotionIgnoreReducedMotionEnabled = store.get('silkMotionIgnoreReducedMotionEnabled', DEFAULTS.silkMotionIgnoreReducedMotionEnabled);
+        state.sidebarCollapsedEnhanceEnabled = store.get('sidebarCollapsedEnhanceEnabled', DEFAULTS.sidebarCollapsedEnhanceEnabled);
         state.visualStyleConfig = normalizeVisualStyleConfig(
             store.get('visualStyleConfig', DEFAULTS.visualStyleConfig)
         );
@@ -8048,6 +8377,7 @@
     }
 
     function persistCore() {
+        store.set('contactDisplayEnabled',state.contactDisplayEnabled);
         store.set('clickCopyEnabled', state.clickCopyEnabled);
         store.set('focusEnabled', state.focusEnabled);
         store.set('darkModeOptimized', state.darkModeOptimized);
@@ -8059,6 +8389,7 @@
         store.set('tableWheelReverseEnabled', state.tableWheelReverseEnabled);
         store.set('silkMotionEnabled', state.silkMotionEnabled);
         store.set('silkMotionIgnoreReducedMotionEnabled', state.silkMotionIgnoreReducedMotionEnabled);
+        store.set('sidebarCollapsedEnhanceEnabled', state.sidebarCollapsedEnhanceEnabled);
         state.visualStyleConfig = normalizeVisualStyleConfig(state.visualStyleConfig);
         store.set('visualStyleConfig', state.visualStyleConfig);
         store.set('paginationEnhancedEnabled', state.paginationEnhancedEnabled);
@@ -8082,6 +8413,132 @@
         store.set('bulkProgressPhrases', state.bulkProgressPhrases);
         store.set('systemQuickPhraseConfigs', normalizeSystemQuickPhraseConfigs(state.systemQuickPhraseConfigs));
         store.set('customBulkProgressPhrases', state.customBulkProgressPhrases);
+    }
+
+    // Presentation only: retain native text nodes, titles, links and field values.
+    // CSS generated content supplies the spaced display in readonly contact cells.
+    const CONTACT = {
+        attribute: 'data-att-contact-display-v7200',
+        tracked: new Set(), dirty: new Set(), raf: 0, fields: new WeakMap()
+    };
+    function contactFieldName(name) {
+        const text = String(name || '').trim();
+        return /电话|手机|联系方式|联系信息|通讯|(?:^|[^a-z])(?:phone|mobile|tel|telephone|contact)(?:$|[^a-z])/i.test(text) ||
+            /^(?:商务|商业采购|商业信息|采购联系人|商务联系人|商业联系人|联系人|对接人)$/.test(text);
+    }
+    function formatContactPhones(value) {
+        const text = String(value ?? '');
+        return text.replace(/(^|[^\dA-Za-z_])((?:\+86|0086)[ \u00a0\u202f-]*)?(1[3-9]\d)[ \u00a0\u202f-]*(\d{4})[ \u00a0\u202f-]*(\d{4})(?![\dA-Za-z_])/g,
+            (match, before, country, first, middle, last, offset) => {
+                const prefix = text.slice(Math.max(0, offset - 24), offset + before.length);
+                if (/(?:QQ|微信|WeChat|账号|帐号|编号|订单|ID)[ \t:：=\-]*$/i.test(prefix)) return match;
+                return before + (country || '') + first + ' ' + middle + ' ' + last;
+            });
+    }
+    function clearContactLeaf(leaf) {
+        leaf.removeAttribute(CONTACT.attribute);
+        for (const key of ['--att-contact-font-size-v7200','--att-contact-line-height-v7200','--att-contact-letter-spacing-v7200']) leaf.style.removeProperty(key);
+        CONTACT.tracked.delete(leaf);
+    }
+    function clearContactCell(cell) {
+        cell.querySelectorAll('[' + CONTACT.attribute + ']').forEach(clearContactLeaf);
+    }
+    function contactFields(root) {
+        let fields = CONTACT.fields.get(root);
+        if (!fields) {
+            fields = new Set();
+            root.querySelectorAll('.grid-header-cell[data-grid-field-id]').forEach(header => {
+                if (contactFieldName(extractHeaderText(header))) fields.add(header.getAttribute('data-grid-field-id'));
+            });
+            CONTACT.fields.set(root,fields);
+        }
+        return fields;
+    }
+    function renderContactCell(cell) {
+        const root = cell.closest('.grid-root');
+        if (!state.contactDisplayEnabled || !root || !contactFields(root).has(cell.getAttribute('data-grid-field-id')) ||
+            cell.matches('.editing,.editing-textarea,.editing-multiselect') || cell.querySelector('input,textarea,select,[contenteditable="true"]')) {
+            clearContactCell(cell); return;
+        }
+        const leaves = cell.querySelectorAll('.cell-text,.cell-textarea');
+        const kept = new Set();
+        for (const leaf of leaves) {
+            // Rich relation/member widgets retain their native presentation.
+            if (leaf.children.length || leaf.closest('.cell-relation-copy-shell') || leaf.matches('.cell-relation,[contenteditable="true"]')) continue;
+            const raw = leaf.textContent || '', display = formatContactPhones(raw);
+            if (display === raw) continue;
+            kept.add(leaf);
+            if (leaf.getAttribute(CONTACT.attribute) === display) continue;
+            // Read typography before applying the zero-size source-text rule.
+            clearContactLeaf(leaf);
+            const style = getComputedStyle(leaf);
+            leaf.style.setProperty('--att-contact-font-size-v7200',style.fontSize || '12px');
+            leaf.style.setProperty('--att-contact-line-height-v7200',style.lineHeight || 'normal');
+            leaf.style.setProperty('--att-contact-letter-spacing-v7200',style.letterSpacing || 'normal');
+            leaf.setAttribute(CONTACT.attribute,display);
+            CONTACT.tracked.add(leaf);
+        }
+        cell.querySelectorAll('[' + CONTACT.attribute + ']').forEach(leaf => {if (!kept.has(leaf)) clearContactLeaf(leaf);});
+    }
+    function contactQueue(node) {
+        if (!state.contactDisplayEnabled || !(node instanceof Element)) return;
+        if (node.matches('.grid-cell[data-grid-field-id]')) CONTACT.dirty.add(node);
+        node.querySelectorAll('.grid-cell[data-grid-field-id]').forEach(cell => CONTACT.dirty.add(cell));
+        if (CONTACT.dirty.size && !CONTACT.raf) CONTACT.raf = requestAnimationFrame(contactFlush);
+    }
+    function contactFlush() {
+        CONTACT.raf = 0;
+        const dirty = [...CONTACT.dirty]; CONTACT.dirty.clear();
+        CONTACT.fields = new WeakMap();
+        for (const leaf of [...CONTACT.tracked]) if (!leaf.isConnected) clearContactLeaf(leaf);
+        if (!state.contactDisplayEnabled) return;
+        dirty.forEach(cell => {if (cell.isConnected) renderContactCell(cell);});
+    }
+    function contactBodyMutations(records) {
+        if (!state.contactDisplayEnabled) return;
+        for (const record of records) {
+            const target = record.target instanceof Element ? record.target : record.target.parentElement;
+            const cell = target?.closest('.grid-cell[data-grid-field-id]');
+            if (cell) {clearContactCell(cell); contactQueue(cell);}
+            else if (target?.closest('.grid-header-wrap,.grid-header-cell')) contactQueue(target.closest('.grid-root'));
+            for (const node of record.addedNodes || []) if (node instanceof Element) contactQueue(node);
+        }
+    }
+    function contactPageMutations(records) {
+        if (!state.contactDisplayEnabled) return;
+        // Existing virtual-grid observers handle all changes inside mounted roots.
+        for (const record of records) for (const node of record.addedNodes || []) {
+            if (!(node instanceof Element) || node.closest('.grid-virtual-body')) continue;
+            if (node.matches('.grid-root')) contactQueue(node);
+            node.querySelectorAll('.grid-root').forEach(contactQueue);
+        }
+    }
+    function syncContactSettingControls() {
+        document.querySelectorAll('[data-setting="contactDisplayEnabled"]').forEach(input => {input.checked = state.contactDisplayEnabled;});
+    }
+    function setContactDisplayEnabled(enabled) {
+        state.contactDisplayEnabled = Boolean(enabled);
+        store.set('contactDisplayEnabled',state.contactDisplayEnabled);
+        CONTACT.fields = new WeakMap(); CONTACT.dirty.clear();
+        if (!state.contactDisplayEnabled) {
+            if (CONTACT.raf) cancelAnimationFrame(CONTACT.raf);
+            CONTACT.raf = 0; [...CONTACT.tracked].forEach(clearContactLeaf);
+        } else document.querySelectorAll('.grid-root').forEach(contactQueue);
+        syncContactSettingControls();
+    }
+    function renderContactSettings(section) {
+        let card = section.querySelector('[data-att-contact-card-v7200]');
+        if (!card) {
+            card = document.createElement('div'); card.className = 'att-card';
+            card.setAttribute('data-att-contact-card-v7200','');
+            card.innerHTML = `<div class="att-row"><div style="min-width:0"><div class="att-card-title">联系信息显示优化</div><div class="att-sub-label">联系信息中的手机号按 1xx xxxx xxxx 显示。仅优化显示，编辑、复制和保存保持原值。</div></div><label class="att-switch" title="联系信息显示优化"><input type="checkbox" data-setting="contactDisplayEnabled" ${state.contactDisplayEnabled ? 'checked' : ''}><span class="att-slider"></span></label></div>`;
+            section.prepend(card);
+        }
+        card.querySelector('input').checked = state.contactDisplayEnabled;
+    }
+    function initContactDisplay() {
+        window.__attContactDisplayV7200 = {queue:contactQueue,mutations:contactBodyMutations};
+        if (state.contactDisplayEnabled) document.querySelectorAll('.grid-root').forEach(contactQueue);
     }
 
     function sanitizeText(value) {
@@ -8378,6 +8835,13 @@
     function getGridFieldDefs(root) {
         if (!root?.querySelectorAll) return [];
 
+        const cached = gridFieldDefsFrameCache.get(root);
+        if (cached) {
+            if (PERF) PERF.counters.gridFieldDefsCacheHits++;
+            return cached;
+        }
+        if (PERF) PERF.counters.gridFieldDefsCacheMisses++;
+
         const defs = [];
         const seenIds = new Set();
 
@@ -8397,6 +8861,13 @@
             });
         });
 
+        gridFieldDefsFrameCache.set(root, defs);
+        if (!gridFieldDefsFrameCacheRaf) {
+            gridFieldDefsFrameCacheRaf = requestAnimationFrame(() => {
+                gridFieldDefsFrameCacheRaf = 0;
+                gridFieldDefsFrameCache = new WeakMap();
+            });
+        }
         return defs;
     }
 
@@ -8529,12 +9000,28 @@
                 }
             }
 
+            const fieldOrder = Array.isArray(raw.fieldOrder)
+                ? raw.fieldOrder.map(v => String(v || '')).filter(Boolean)
+                : [];
+            const knownFieldIds = Array.from(new Set([
+                ...fieldOrder,
+                ...left,
+                ...right,
+                ...Object.keys(widths),
+                ...Object.keys(fieldNames)
+            ].map(v => String(v || '')).filter(Boolean)));
+
             result[key] = {
                 tableId: String(raw.tableId || ''),
                 tableName: String(raw.tableName || ''),
                 left: Array.from(new Set(left)),
                 right: Array.from(new Set(right)).filter(id => !left.includes(id)),
                 fieldNames,
+                // V7.9.2：保存完整字段目录。旧配置会先收拢历史已知字段；
+                // 当用户重新打开该表后再由真实表头补齐所有未置顶字段。
+                fieldOrder: knownFieldIds,
+                catalogComplete: raw.catalogComplete === true,
+                catalogUpdatedAt: Number(raw.catalogUpdatedAt || 0),
                 widths,
                 updatedAt: Number(raw.updatedAt || 0)
             };
@@ -8544,10 +9031,17 @@
     }
 
     function getCurrentTableContext() {
+        const path = location.pathname || '';
+        const cached = tableContextFrameCache;
+        if (cached && cached.path === path && cached.value?.root?.isConnected) {
+            if (PERF) PERF.counters.tableContextCacheHits++;
+            return cached.value;
+        }
+        if (PERF) PERF.counters.tableContextCacheMisses++;
+
         const root = getVisibleGridRoot();
         if (!root) return null;
 
-        const path = location.pathname || '';
         const tableMatch = path.match(/\/t\/(tbl_[^/]+)/i);
         const baseMatch = path.match(/\/b\/([^/]+)/i);
         const tableId = tableMatch?.[1] || '';
@@ -8571,7 +9065,15 @@
             key = `path::${normalizedPath || '/'}`;
         }
 
-        return { key, tableId, baseId, tableName, root };
+        const value = { key, tableId, baseId, tableName, root };
+        tableContextFrameCache = { path, value };
+        if (!tableContextFrameCacheRaf) {
+            tableContextFrameCacheRaf = requestAnimationFrame(() => {
+                tableContextFrameCacheRaf = 0;
+                tableContextFrameCache = null;
+            });
+        }
+        return value;
     }
 
     function getPinnedTableProfile(context, create = false) {
@@ -8585,6 +9087,9 @@
                 left: [],
                 right: [],
                 fieldNames: {},
+                fieldOrder: [],
+                catalogComplete: false,
+                catalogUpdatedAt: 0,
                 widths: {},
                 updatedAt: Date.now()
             };
@@ -8595,11 +9100,71 @@
         if (!Array.isArray(profile.left)) profile.left = [];
         if (!Array.isArray(profile.right)) profile.right = [];
         if (!profile.fieldNames || typeof profile.fieldNames !== 'object') profile.fieldNames = {};
+        if (!Array.isArray(profile.fieldOrder)) profile.fieldOrder = [];
+        if (typeof profile.catalogComplete !== 'boolean') profile.catalogComplete = false;
+        if (!Number.isFinite(Number(profile.catalogUpdatedAt))) profile.catalogUpdatedAt = 0;
         if (!profile.widths || typeof profile.widths !== 'object' || Array.isArray(profile.widths)) profile.widths = {};
 
         profile.tableId = context.tableId || profile.tableId || '';
         profile.tableName = context.tableName || profile.tableName || '';
         return profile;
+    }
+
+    function syncPinnedProfileFieldCatalog(context, defs = null, create = true, persist = true) {
+        if (!context?.key || !context?.root) return null;
+        const fields = Array.isArray(defs) ? defs : getGridFieldDefs(context.root);
+        const profile = getPinnedTableProfile(context, create);
+        if (!profile) return null;
+
+        const liveIds = [];
+        let changed = false;
+        for (const def of fields) {
+            const fieldId = String(def?.fieldId || '');
+            const name = sanitizeText(def?.name || '');
+            if (!fieldId || !name) continue;
+            liveIds.push(fieldId);
+            if (profile.fieldNames[fieldId] !== name) {
+                profile.fieldNames[fieldId] = name;
+                changed = true;
+            }
+        }
+
+        // 当前表头是最可靠的顺序；保留当前视图未出现但历史已知的字段在末尾。
+        const previous = Array.isArray(profile.fieldOrder) ? profile.fieldOrder : [];
+        const mergedOrder = Array.from(new Set([
+            ...liveIds,
+            ...previous,
+            ...(profile.left || []),
+            ...(profile.right || []),
+            ...Object.keys(profile.widths || {}),
+            ...Object.keys(profile.fieldNames || {})
+        ].map(v => String(v || '')).filter(Boolean)));
+        if (mergedOrder.length !== previous.length || mergedOrder.some((id, i) => id !== previous[i])) {
+            profile.fieldOrder = mergedOrder;
+            changed = true;
+        }
+
+        if (liveIds.length && profile.catalogComplete !== true) {
+            profile.catalogComplete = true;
+            changed = true;
+        }
+        if (liveIds.length && changed) profile.catalogUpdatedAt = Date.now();
+
+        profile.tableId = context.tableId || profile.tableId || '';
+        profile.tableName = context.tableName || profile.tableName || '';
+        if (changed && persist) persistCore();
+        return profile;
+    }
+
+    function getPinnedProfileKnownFieldIds(profile) {
+        if (!profile) return [];
+        return Array.from(new Set([
+            ...(Array.isArray(profile.fieldOrder) ? profile.fieldOrder : []),
+            ...(Array.isArray(profile.left) ? profile.left : []),
+            ...(Array.isArray(profile.right) ? profile.right : []),
+            ...Object.keys(profile.widths || {}),
+            ...Object.keys(profile.fieldNames || {})
+        ].map(v => String(v || '')).filter(Boolean)));
     }
 
     function getPinnedFieldSide(profile, fieldId) {
@@ -8624,6 +9189,7 @@
         if (side === 'right') profile.right.push(fieldId);
 
         if (fieldName) profile.fieldNames[fieldId] = fieldName;
+        if (!profile.fieldOrder.includes(fieldId)) profile.fieldOrder.push(fieldId);
         profile.updatedAt = Date.now();
         persistCore();
         scheduleApplyPinnedColumns();
@@ -8881,6 +9447,7 @@
 
         if (!pinVirtualObserver) {
             pinVirtualObserver = new MutationObserver(records => {
+                if (PERF) PERF.counters.pinVirtualObserverCallbacks++;
                 const cache = pinLayoutCache;
                 if (!state.columnPinEnabled || !cache?.root?.isConnected) return;
                 if (cache.root !== pinVirtualObservedRoot) return;
@@ -8921,6 +9488,7 @@
                 // 只有表头结构真的发生变化时才重新测量列宽 / offset。
                 // 普通纵向虚拟滚动绝不触发全表重算。
                 if (headerStructureChanged) {
+                    if (PERF) PERF.counters.pinVirtualHeaderRelayoutRequests++;
                     scheduleApplyPinnedColumns(0);
                 }
             });
@@ -8964,6 +9532,7 @@
     }
 
     function applyPinnedColumns() {
+        if (PERF) PERF.counters.pinApplyCalls++;
         clearTimeout(pinApplyTimer);
         pinApplyTimer = null;
 
@@ -9125,6 +9694,7 @@
         // 2) 切换表 / 置顶配置改变；
         // 3) 列宽改变；
         // 普通快速滚动只走专用 MutationObserver 的增量路径。
+        if (PERF) PERF.counters.pinFullLayouts++;
         syncVisiblePinnedCells(pinLayoutCache);
 
         updatePinResizeObserver(root, [...leftDefs, ...rightDefs]);
@@ -10329,6 +10899,9 @@
             { type: 'action', id: 'openPinSettings', label: '打开列置顶设置', hotkey: state.hotkeys.openPinSettings },
             { type: 'action', id: 'openBulkProgress', label: '打开批量追加进展', hotkey: state.hotkeys.openBulkProgress },
             { type: 'action', id: 'toggleTableWheelReverse', label: '开关表格滚轮轴反转', hotkey: state.hotkeys.toggleTableWheelReverse },
+            { type: 'action', id: 'toggleConditionalHighlight', label: '开关字段条件高亮', hotkey: state.hotkeys.toggleConditionalHighlight },
+            { type: 'action', id: 'nextConditionalHighlightGroup', label: '切换下一个高亮规则组', hotkey: state.hotkeys.nextConditionalHighlightGroup },
+            { type: 'action', id: 'prevConditionalHighlightGroup', label: '切换上一个高亮规则组', hotkey: state.hotkeys.prevConditionalHighlightGroup },
             { type: 'action', id: 'toggleEdgeTheme', label: '开关 Edge 深色优化', hotkey: state.hotkeys.toggleEdgeTheme },
 
             { type: 'action', id: 'nextCombo', label: '切换下一个字段组合', hotkey: state.hotkeys.nextCombo },
@@ -10464,7 +11037,6 @@
             case 'openPinSettings':
                 state.activeTab = 'pinning';
                 setPanelOpen(true);
-                renderPanel();
                 showToast('已打开列置顶设置');
                 break;
 
@@ -10481,6 +11053,27 @@
                         ? '表格滚轮反转已开启：滚轮=横向，Shift+滚轮=纵向'
                         : '表格滚轮反转已关闭：恢复浏览器 / AutoTable 原生滚轮'
                 );
+                break;
+
+            case 'toggleConditionalHighlight': {
+                // 条件高亮是独立模块，使用其 GM 总开关作为唯一真值；
+                // 同时派发事件，让模块无需刷新即可立即应用 / 清理。
+                const storageKey = 'att_v3_conditionalHighlightEnabled';
+                const nextEnabled = !Boolean(GM_getValue(storageKey, false));
+                GM_setValue(storageKey, nextEnabled);
+                window.dispatchEvent(new CustomEvent('att:conditional-highlight:set', {
+                    detail: { enabled: nextEnabled, source: 'hotkey' }
+                }));
+                renderPanel();
+                showToast(`字段条件高亮：已${nextEnabled ? '开启' : '关闭'}`);
+                break;
+            }
+
+            case 'nextConditionalHighlightGroup':
+            case 'prevConditionalHighlightGroup':
+                window.dispatchEvent(new CustomEvent('att:conditional-highlight:cycle-group', {
+                    detail: { direction: entry.id === 'prevConditionalHighlightGroup' ? -1 : 1, source: 'hotkey' }
+                }));
                 break;
 
             case 'toggleEdgeTheme':
@@ -10516,20 +11109,24 @@
         const root = document.createElement('div');
         root.id = APP.rootId;
         root.dataset.direction = 'left';
+        // V7.8.2：主版本作为 UI 唯一版本源，后续视觉模块不再维护重复版本号。
+        root.dataset.appVersion = APP.version;
         root.innerHTML = `
             <div id="${APP.panelId}">
                 <div class="att-head">
                     <div>
-                        <div class="att-head-title">AutoTable 工具集</div>
+                        <div class="att-head-title" data-att-version="${APP.version}">AutoTable 工具集</div>
                         <div class="att-head-sub" id="att-panel-context">${APP.version} · 常用功能</div>
                     </div>
-                    <button type="button" class="att-icon-btn" data-act="close-panel" title="关闭">×</button>
+                    <div style="display:flex;align-items:center;gap:6px;flex:none;">
+                        <a class="att-btn" href="http://att.miuyi.xyz/" target="_blank" rel="noopener noreferrer" title="在新标签页打开使用说明书" aria-label="使用说明书（在新标签页打开）" style="text-decoration:none;white-space:nowrap;font-size:12px;">使用说明书 ↗</a>
+                        <button type="button" class="att-icon-btn" data-act="close-panel" title="关闭">×</button>
+                    </div>
                 </div>
 
                 <div class="att-tabs">
-                    <button type="button" class="att-tab" data-tab="features">功能</button>
-                    <button type="button" class="att-tab" data-tab="combos">字段组合</button>
-                    <button type="button" class="att-tab" data-tab="pinning">列置顶</button>
+                    <button type="button" class="att-tab" data-tab="features">快捷</button>
+                    <button type="button" class="att-tab" data-tab="table-tools">表格</button>
                     <button type="button" class="att-tab" data-tab="settings">设置</button>
                 </div>
 
@@ -10568,6 +11165,42 @@
         root.addEventListener('pointerenter', resetIdleTimer);
         root.addEventListener('pointermove', resetIdleTimer);
         root.addEventListener('pointerleave', resetIdleTimer);
+
+        // V7.16.4：用户正在菜单内操作时，页面加载造成的 DOM/context 变化只能排队，
+        // 不能立即 innerHTML 重建当前 section。
+        root.addEventListener('pointerdown', event => {
+            if (!event.target.closest?.(`#${APP.panelId}`)) return;
+            panelPointerActive = true;
+            markPanelInteraction(1100);
+        }, true);
+        root.addEventListener('pointerup', event => {
+            if (!event.target.closest?.(`#${APP.panelId}`)) return;
+            panelPointerActive = false;
+            markPanelInteraction(520);
+            if (panelContextRefreshPending) schedulePanelContextRefresh(560);
+        }, true);
+        root.addEventListener('pointercancel', () => {
+            panelPointerActive = false;
+            markPanelInteraction(320);
+            if (panelContextRefreshPending) schedulePanelContextRefresh(360);
+        }, true);
+        root.addEventListener('focusin', event => {
+            if (!event.target.closest?.(`#${APP.panelId}`)) return;
+            markPanelInteraction(1400);
+        }, true);
+        root.addEventListener('focusout', event => {
+            if (!event.target.closest?.(`#${APP.panelId}`)) return;
+            markPanelInteraction(260);
+            if (panelContextRefreshPending) schedulePanelContextRefresh(320);
+        }, true);
+        root.addEventListener('input', event => {
+            if (event.target.closest?.(`#${APP.panelId}`)) markPanelInteraction(1200);
+        }, true);
+        root.addEventListener('change', event => {
+            if (!event.target.closest?.(`#${APP.panelId}`)) return;
+            markPanelInteraction(800);
+            if (panelContextRefreshPending) schedulePanelContextRefresh(840);
+        }, true);
 
         setupFabDrag();
         applyFabSettings();
@@ -10737,27 +11370,264 @@
         state.comboPickerOpen = true;
     }
 
-    function renderPanel() {
+    function readConditionalHighlightSnapshotFromGM() {
+        const rules = GM_getValue('att_v3_conditionalHighlightRules', []);
+        const rawGroups = GM_getValue('att_v3_conditionalHighlightGroups', []);
+        const groups = Array.isArray(rawGroups) && rawGroups.length
+            ? rawGroups.filter(g => g && g.id).map(g => ({ id:String(g.id), name:String(g.name || '未命名规则组') }))
+            : [{ id:'group_default', name:'默认规则组' }];
+        const activeIdRaw = String(GM_getValue('att_v3_conditionalHighlightActiveGroup', '') || '');
+        const activeGroup = groups.find(g => g.id === activeIdRaw) || groups[0];
+        const activeRuleCount = Array.isArray(rules)
+            ? rules.filter(r => r && r.enabled !== false && String(r.groupId || 'group_default') === activeGroup.id).length
+            : 0;
+        return {
+            enabled: Boolean(GM_getValue('att_v3_conditionalHighlightEnabled', false)),
+            activeGroupId: activeGroup.id,
+            activeGroupName: activeGroup.name,
+            activeRuleCount,
+            groupCount: groups.length
+        };
+    }
+
+    function getConditionalHighlightSnapshot() {
+        if (!conditionalHighlightSnapshot) {
+            conditionalHighlightSnapshot = readConditionalHighlightSnapshotFromGM();
+        }
+        return conditionalHighlightSnapshot;
+    }
+
+    function applyConditionalHighlightSnapshot(detail) {
+        if (!detail || typeof detail !== 'object') return;
+        const previous = getConditionalHighlightSnapshot();
+        conditionalHighlightSnapshot = {
+            enabled: detail.enabled != null ? Boolean(detail.enabled) : previous.enabled,
+            activeGroupId: String(detail.activeGroupId ?? detail.id ?? previous.activeGroupId ?? 'group_default'),
+            activeGroupName: String(detail.activeGroupName ?? detail.name ?? previous.activeGroupName ?? '默认规则组'),
+            activeRuleCount: Number.isFinite(Number(detail.activeRuleCount ?? detail.activeCount))
+                ? Number(detail.activeRuleCount ?? detail.activeCount)
+                : previous.activeRuleCount,
+            groupCount: Number.isFinite(Number(detail.groupCount)) ? Number(detail.groupCount) : previous.groupCount
+        };
+        if (state.panelOpen && state.activeTab === 'features') {
+            invalidatePanelSections('features');
+            schedulePanelContextRefresh(0);
+        }
+    }
+
+    window.addEventListener('att:conditional-highlight:state', event => {
+        applyConditionalHighlightSnapshot(event?.detail);
+    });
+
+    function markPanelInteraction(holdMs = 700) {
+        panelInteractionUntil = Math.max(panelInteractionUntil, performance.now() + Math.max(80, Number(holdMs) || 0));
+    }
+
+    function getPanelInteractionState() {
+        const panel = document.getElementById(APP.panelId);
+        const active = document.activeElement;
+        const focusedEditor = Boolean(
+            panel &&
+            active instanceof Element &&
+            panel.contains(active) &&
+            active.matches('input:not([type="button"]):not([type="submit"]),select,textarea,[contenteditable="true"]')
+        );
+        return {
+            pointer: panelPointerActive,
+            focusedEditor,
+            cooldownMs: Math.max(0, panelInteractionUntil - performance.now())
+        };
+    }
+
+    function isPanelInteractionBusy() {
+        const s = getPanelInteractionState();
+        return Boolean(s.pointer || s.focusedEditor || s.cooldownMs > 0);
+    }
+
+    function invalidatePanelSections(...sectionIds) {
+        const ids = sectionIds.flat().filter(Boolean);
+        if (!ids.length) ids.push(state.activeTab || 'features');
+        ids.forEach(id => panelDirtySections.add(id));
+    }
+
+    function renderPanelShellState() {
         const root = document.getElementById(APP.rootId);
         if (!root) return;
-
         root.querySelectorAll('.att-tab').forEach(tab => {
-            tab.classList.toggle('att-active', tab.dataset.tab === state.activeTab);
+            const tabId = tab.dataset.tab;
+            const isTableTools = tabId === 'table-tools' && (state.activeTab === 'combos' || state.activeTab === 'pinning');
+            tab.classList.toggle('att-active', isTableTools || tabId === state.activeTab);
         });
         root.querySelectorAll('.att-section').forEach(section => {
             section.classList.toggle('att-active', section.dataset.section === state.activeTab);
         });
+    }
 
-        renderFeaturesSection();
-        renderCombosSection();
-        renderPinningSection();
-        renderSettingsSection();
-
-        updateActiveComboBadge();
-
-        if (state.panelOpen) {
-            requestAnimationFrame(positionPanelInsideViewport);
+    function renderPanelSection(sectionId) {
+        const perfStarted = PERF ? performance.now() : 0;
+        if (PERF) {
+            PERF.counters.panelSectionRenderCalls++;
+            const key = Object.prototype.hasOwnProperty.call(PERF.counters.panelSectionRenders, sectionId) ? sectionId : 'other';
+            PERF.counters.panelSectionRenders[key]++;
         }
+        try {
+            if (sectionId === 'features') renderFeaturesSection();
+            else if (sectionId === 'combos') {
+                if (isComboEditorOpen()) {
+                    if (PERF) PERF.counters.panelSectionRenderDeferred++;
+                    panelContextRefreshPending = true;
+                    panelDirtySections.add('combos');
+                    return false;
+                }
+                renderCombosSection();
+            } else if (sectionId === 'pinning') renderPinningSection();
+            else if (sectionId === 'settings') renderSettingsSection();
+            panelDirtySections.delete(sectionId);
+            return true;
+        } finally {
+            if (PERF) PERF.recordTiming('panelSectionRenderMs', performance.now() - perfStarted);
+        }
+    }
+
+    function flushPanelDirtySections(forceCurrent = false) {
+        if (!state.panelOpen) return;
+        if (forceCurrent) panelDirtySections.add(state.activeTab || 'features');
+        const current = state.activeTab || 'features';
+        if (panelDirtySections.has(current)) renderPanelSection(current);
+        updateActiveComboBadge();
+        injectTableToolsSubnav();
+        if (!panelContextRefreshRaf) {
+            panelContextRefreshRaf = requestAnimationFrame(() => {
+                panelContextRefreshRaf = 0;
+                if (state.panelOpen) stabilizePanelInsideViewport();
+            });
+        }
+    }
+
+    function refreshPanelContextSafely() {
+        if (!state.panelOpen) return;
+        if (PERF) PERF.counters.panelContextRefreshFlushes++;
+        invalidatePanelSections(state.activeTab || 'features');
+        panelContextRefreshPending = false;
+        flushPanelDirtySections();
+    }
+
+    function flushPendingPanelContextRefresh() {
+        if (!panelContextRefreshPending || !state.panelOpen) return;
+        if (isComboEditorOpen()) return;
+
+        // 首次打开仍保留原来的稳定窗口，但只安排一次“到点刷新”，不循环轮询。
+        const sinceOpen = performance.now() - panelOpenedAt;
+        if (sinceOpen >= 0 && sinceOpen < 850) {
+            schedulePanelContextRefresh(Math.ceil(850 - sinceOpen) + 20);
+            return;
+        }
+
+        const interaction = getPanelInteractionState();
+        if (interaction.pointer || interaction.focusedEditor) {
+            // 真正的编辑/按压会由 pointerup / focusout / change 再触发一次；此处保持 dirty 即可。
+            return;
+        }
+        if (interaction.cooldownMs > 0) {
+            // 仅等待当前交互保护窗口结束一次，不再 220ms 轮询。
+            schedulePanelContextRefresh(Math.ceil(interaction.cooldownMs) + 20);
+            return;
+        }
+
+        panelContextRefreshPending = false;
+        refreshPanelContextSafely();
+    }
+
+    function schedulePanelContextRefresh(delay = 180) {
+        if (PERF) {
+            PERF.counters.panelContextRefreshRequests++;
+            if (panelContextRefreshPending) PERF.counters.panelContextRefreshCoalesced++;
+            else PERF.counters.panelContextRefreshQueued++;
+        }
+        panelContextRefreshPending = true;
+        invalidatePanelSections(state.activeTab || 'features');
+        if (!state.panelOpen) return;
+
+        clearTimeout(panelContextRefreshTimer);
+        panelContextRefreshTimer = setTimeout(() => {
+            panelContextRefreshTimer = 0;
+            flushPendingPanelContextRefresh();
+        }, Math.max(0, Number(delay) || 0));
+    }
+
+    function renderPanel() {
+        const root = document.getElementById(APP.rootId);
+        if (!root) return;
+        const perfStarted = PERF ? performance.now() : 0;
+        if (PERF) PERF.counters.panelFullRenders++;
+
+        try {
+            renderPanelShellState();
+            renderFeaturesSection();
+            // 字段组合编辑器是会话型 UI。完整 render 也不得覆盖正在编辑的 DOM。
+            if (!isComboEditorOpen()) renderCombosSection();
+            renderPinningSection();
+            renderSettingsSection();
+            panelDirtySections.clear();
+            injectTableToolsSubnav();
+            updateActiveComboBadge();
+
+            if (state.panelOpen && !panelContextRefreshRaf) {
+                panelContextRefreshRaf = requestAnimationFrame(() => {
+                    panelContextRefreshRaf = 0;
+                    if (state.panelOpen) stabilizePanelInsideViewport();
+                });
+            }
+        } finally {
+            if (PERF) PERF.recordTiming('panelFullRenderMs', performance.now() - perfStarted);
+        }
+    }
+
+    // V7.16.1：必须复用现有 getPinnedTableProfile()。
+    // V7.16.0 误调用了不存在的 getPinnedProfile()，renderPanel() 在打开菜单时抛 ReferenceError，
+    // 导致 setPanelOpen() 尚未执行 att-open class 切换，表现为“悬浮球点不开”。
+    function getPinnedCountsForCurrentTable() {
+        const context = getCurrentTableContext();
+        if (!context?.key) return { left: 0, right: 0, total: 0 };
+        const profile = getPinnedTableProfile(context, false);
+        const left = Array.isArray(profile?.left) ? profile.left.length : 0;
+        const right = Array.isArray(profile?.right) ? profile.right.length : 0;
+        return { left, right, total: left + right };
+    }
+
+    function injectTableToolsSubnav() {
+        const context = getCurrentTableContext();
+        const pins = getPinnedCountsForCurrentTable();
+        const comboCount = state.combos.length;
+        ['combos', 'pinning'].forEach(sectionId => {
+            const section = document.querySelector(`[data-section="${sectionId}"]`);
+            if (!section) return;
+            renderContactSettings(section);
+            if (section.querySelector('.att-table-tools-nav-v7160')) return;
+            const nav = document.createElement('div');
+            nav.className = 'att-table-tools-nav-v7160';
+            nav.innerHTML = `
+                <div class="att-table-tools-context-v7160">
+                    <div>
+                        <b>表格工具</b>
+                        <span>${escapeHtml(context?.tableName || '当前页面')}</span>
+                    </div>
+                    <div class="att-table-tools-stats-v7160">
+                        <span>${comboCount} 个组合</span>
+                        <span>左 ${pins.left} · 右 ${pins.right}</span>
+                    </div>
+                </div>
+                <div class="att-table-tools-segment-v7160" role="tablist" aria-label="表格工具">
+                    <button type="button" role="tab" data-act="switch-table-tool" data-target="combos" class="${sectionId === 'combos' ? 'is-active' : ''}">
+                        字段组合
+                    </button>
+                    <button type="button" role="tab" data-act="switch-table-tool" data-target="pinning" class="${sectionId === 'pinning' ? 'is-active' : ''}">
+                        列置顶
+                    </button>
+                </div>
+            `;
+            section.prepend(nav);
+        });
     }
 
     function renderFeaturesSection() {
@@ -10765,10 +11635,28 @@
         if (!section) return;
 
         const activeComboId = getActiveComboIdForCurrentTable();
+        const activeCombo = getActiveCombo();
+        const context = getCurrentTableContext();
+        const activeCell = getActiveRowCell();
+        const selectedRows = getSelectedGridRowsForBulkProgress();
+        const selectedCount = selectedRows.length;
+        const currentHeader = activeCell ? (getHeaderTextForCell(activeCell) || '未知字段') : '未选择单元格';
+        const currentValueRaw = activeCell ? (getCellText(activeCell) || '（空）') : '点击表格中的任意单元格即可开始';
+        const currentValue = currentValueRaw.length > 64 ? currentValueRaw.slice(0, 64) + '…' : currentValueRaw;
+
+        const conditionSnapshot = getConditionalHighlightSnapshot();
+        const conditionEnabled = conditionSnapshot.enabled;
+        const conditionActiveGroup = {
+            id: conditionSnapshot.activeGroupId,
+            name: conditionSnapshot.activeGroupName
+        };
+        const conditionRuleCount = conditionSnapshot.activeRuleCount;
+        const conditionGroupCount = conditionSnapshot.groupCount;
+
         const comboOptions = state.combos.map(combo => {
             const status = getComboCompatibility(combo);
             const suffix = status.context
-                ? (status.binding ? ' · 当前表已配置' : status.missing.length ? ' · 部分匹配' : ' · 自动匹配')
+                ? (status.binding ? ' · 当前表' : status.missing.length ? ' · 部分匹配' : ' · 自动匹配')
                 : '';
             return `
                 <option value="${escapeAttr(combo.id)}" ${combo.id === activeComboId ? 'selected' : ''}>
@@ -10778,112 +11666,117 @@
         }).join('');
 
         section.innerHTML = `
-            <div class="att-card">
-                <div class="att-row">
-                    <div>
-                        <div class="att-card-title">智能复制增强</div>
-                        <div class="att-card-desc">
-                            普通单击只负责聚焦；Alt + 单击复制当前单元格；Ctrl + 单击复制当前行设定的字段组合。
-                        </div>
+            <div class="att-quick-context-v7160">
+                <div class="att-quick-context-main-v7160">
+                    <div class="att-quick-context-eyebrow-v7160">当前工作上下文</div>
+                    <div class="att-quick-context-title-v7160">${escapeHtml(context?.tableName || '当前页面')}</div>
+                    <div class="att-quick-context-cell-v7160" title="${escapeAttr(currentValueRaw)}">
+                        <b>${escapeHtml(currentHeader)}</b>
+                        <span>${escapeHtml(currentValue)}</span>
                     </div>
+                </div>
+                <button type="button" class="att-quick-combo-button-v7160" data-act="quick-combo-picker" ${state.combos.length ? '' : 'disabled'} title="切换当前字段组合">
+                    <span>字段组合</span>
+                    <b>${escapeHtml(activeCombo?.name || '未配置')}</b>
+                    <i>⌄</i>
+                </button>
+            </div>
+
+            <div class="att-quick-section-v7160">
+                <div class="att-quick-section-head-v7160">
+                    <div><b>立即操作</b><span>围绕当前单元格和已选记录的高频动作</span></div>
+                    ${selectedCount ? `<em>${selectedCount} 条已选</em>` : ''}
+                </div>
+                <div class="att-quick-action-grid-v7160">
+                    <button type="button" class="att-quick-action-v7160" data-act="copy-current-cell" ${activeCell ? '' : 'disabled'}>
+                        <span class="att-quick-action-icon-v7160">格</span>
+                        <span><b>复制当前格</b><small>Alt + 单击</small></span>
+                    </button>
+                    <button type="button" class="att-quick-action-v7160" data-act="copy-ctrl-combo" ${activeCell && activeCombo ? '' : 'disabled'}>
+                        <span class="att-quick-action-icon-v7160">组</span>
+                        <span><b>复制字段组合</b><small>${escapeHtml(activeCombo?.name || '未配置')}</small></span>
+                    </button>
+                    <button type="button" class="att-quick-action-v7160" data-act="copy-current-row" ${activeCell ? '' : 'disabled'}>
+                        <span class="att-quick-action-icon-v7160">行</span>
+                        <span><b>复制整行</b><small>Alt + R</small></span>
+                    </button>
+                    <button type="button" class="att-quick-action-v7160 ${selectedCount ? 'is-accent' : ''}" data-act="open-bulk-progress-quick" ${selectedCount ? '' : 'disabled'}>
+                        <span class="att-quick-action-icon-v7160">批</span>
+                        <span><b>批量追加进展</b><small>${selectedCount ? `${selectedCount} 条记录` : '先勾选记录'}</small></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="att-quick-section-v7160">
+                <div class="att-quick-section-head-v7160">
+                    <div><b>视图状态</b><span>只保留工作时经常切换的表格增强</span></div>
+                </div>
+                <div class="att-quick-mode-grid-v7160">
+                    <label class="att-quick-mode-v7160 ${state.focusEnabled ? 'is-on' : ''}">
+                        <span><b>聚焦模式</b><small>${state.rowHighlightEnabled ? '行' : ''}${state.rowHighlightEnabled && state.columnHighlightEnabled ? ' + ' : ''}${state.columnHighlightEnabled ? '列' : ''}${!state.rowHighlightEnabled && !state.columnHighlightEnabled ? '当前格' : ''}</small></span>
+                        <span class="att-switch"><input type="checkbox" data-setting="focusEnabled" ${state.focusEnabled ? 'checked' : ''}><span class="att-slider"></span></span>
+                    </label>
+
+                    <button type="button" class="att-quick-mode-v7160 att-quick-condition-v7162 ${conditionEnabled ? 'is-on' : ''}" data-act="toggle-conditional-highlight-quick" aria-pressed="${conditionEnabled ? 'true' : 'false'}" title="点击${conditionEnabled ? '关闭' : '开启'}字段条件高亮">
+                        <span><b>条件高亮</b><small>${escapeHtml(conditionActiveGroup.name)} · ${conditionRuleCount} 条规则</small></span>
+                        <span class="att-quick-status-v7162 ${conditionEnabled ? 'is-enabled' : 'is-disabled'}">
+                            <i></i>${conditionEnabled ? '已开启' : '已关闭'}
+                        </span>
+                    </button>
+
+                    <label class="att-quick-mode-v7160 ${state.tableWheelReverseEnabled ? 'is-on' : ''}">
+                        <span><b>滚轮横向</b><small>${escapeHtml(state.hotkeys.toggleTableWheelReverse || 'Alt+W')}</small></span>
+                        <span class="att-switch"><input type="checkbox" data-setting="tableWheelReverseEnabled" ${state.tableWheelReverseEnabled ? 'checked' : ''}><span class="att-slider"></span></span>
+                    </label>
+
+                    <label class="att-quick-mode-v7160 ${state.quickPinHeaderEnabled ? 'is-on' : ''}">
+                        <span><b>快捷表头置顶</b><small>单击左置顶 · Shift 右置顶</small></span>
+                        <span class="att-switch"><input type="checkbox" data-setting="quickPinHeaderEnabled" ${state.quickPinHeaderEnabled ? 'checked' : ''}><span class="att-slider"></span></span>
+                    </label>
+                </div>
+
+                <div class="att-quick-detail-groups-v7160">
+                    <div class="att-quick-detail-v7160 ${state.focusEnabled ? '' : 'is-disabled'}">
+                        <span class="att-quick-detail-label-v7160">聚焦</span>
+                        <label><input type="checkbox" data-setting="rowHighlightEnabled" ${state.rowHighlightEnabled ? 'checked' : ''} ${state.focusEnabled ? '' : 'disabled'}> 行</label>
+                        <label><input type="checkbox" data-setting="columnHighlightEnabled" ${state.columnHighlightEnabled ? 'checked' : ''} ${state.focusEnabled ? '' : 'disabled'}> 列</label>
+                        <button type="button" data-act="clear-focus" ${activeCell ? '' : 'disabled'}>清除</button>
+                    </div>
+                    <div class="att-quick-detail-v7160 att-quick-highlight-detail-v7162 ${conditionEnabled ? 'is-enabled' : 'is-disabled'}">
+                        <span class="att-quick-detail-label-v7160">高亮组</span>
+                        <button type="button" data-act="cycle-conditional-highlight-group" ${conditionGroupCount > 1 ? '' : 'disabled'} title="切换条件高亮规则组">${escapeHtml(conditionActiveGroup.name)}</button>
+                        <span class="att-quick-detail-status-v7162">${conditionEnabled ? '生效中' : '已停用'}</span>
+                        <button type="button" data-act="open-conditional-highlight-manager">规则</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="att-quick-section-v7160">
+                <div class="att-quick-section-head-v7160">
+                    <div><b>复制行为</b><span>一次设置，日常直接点击表格使用</span></div>
                     <label class="att-switch">
                         <input type="checkbox" data-setting="clickCopyEnabled" ${state.clickCopyEnabled ? 'checked' : ''}>
                         <span class="att-slider"></span>
                     </label>
                 </div>
-
-                <div class="att-actions">
-                    <span class="att-kbd">单击：仅聚焦</span>
-                    <span class="att-kbd">Alt + 单击：单元格</span>
-                    <span class="att-kbd">Ctrl + 单击：字段组合</span>
-                    <span class="att-kbd">Alt + R：整行</span>
+                <div class="att-quick-copy-row-v7160">
+                    <select class="att-select" data-setting="ctrlClickComboId">
+                        ${comboOptions || '<option value="">暂无字段组合</option>'}
+                    </select>
+                    <button type="button" class="att-btn" data-act="go-tab" data-tab-target="combos">字段管理</button>
                 </div>
-
-                <div class="att-divider"></div>
-
-                <div class="att-label">Ctrl + 单击使用的字段组合</div>
-                <select class="att-select" data-setting="ctrlClickComboId" style="margin-top:7px;">
-                    ${comboOptions || '<option value="">暂无字段组合</option>'}
-                </select>
-                <div class="att-card-desc">
-                    字段组合会按当前实际表保存字段映射；同一个组合在不同表可以使用完全不同的表头。
+                <div class="att-quick-hint-v7160">
+                    <span><kbd>普通单击</kbd> 聚焦</span>
+                    <span><kbd>Alt + 单击</kbd> 当前格</span>
+                    <span><kbd>Ctrl + 单击</kbd> 字段组合</span>
                 </div>
             </div>
 
-            <div class="att-card">
-                <div class="att-row">
-                    <div>
-                        <div class="att-card-title">Edge 风格深色主题</div>
-                        <div class="att-card-desc">
-                            完全重构 AutoTable 深色模式为 Edge / Fluent 风格：中性灰黑底、低对比边框、蓝色强调和统一浮层。
-                            仅在 AutoTable 原生深色模式下生效；关闭后立即恢复 AutoTable 原版深色配色。
-                        </div>
-                    </div>
-                    <label class="att-switch">
-                        <input type="checkbox" data-setting="darkModeOptimized" ${state.darkModeOptimized ? 'checked' : ''}>
-                        <span class="att-slider"></span>
-                    </label>
-                </div>
-
-                <div class="att-actions">
-                    <span class="att-kbd">当前：${state.nativeThemeMode === 'dark' ? '深色模式' : state.nativeThemeMode === 'light' ? '浅色模式' : '识别中'}</span>
-                    <span class="att-kbd">${state.darkModeOptimized && state.nativeThemeMode === 'dark' ? 'Edge 配色生效中' : state.darkModeOptimized ? '等待进入深色模式' : 'AutoTable 原版配色'}</span>
-                    <button type="button"
-                            class="att-btn ${state.darkModeOptimized ? '' : 'att-primary'}"
-                            data-act="toggle-edge-dark">
-                        ${state.darkModeOptimized ? '恢复原版深色' : '启用 Edge 配色'}
-                    </button>
-                </div>
-            </div>
-
-            <div class="att-card">
-                <div class="att-row">
-                    <div>
-                        <div class="att-card-title">表格聚焦模式</div>
-                        <div class="att-card-desc">当前单元格边框始终突出；行、列高亮可分别控制。</div>
-                    </div>
-                    <label class="att-switch">
-                        <input type="checkbox" data-setting="focusEnabled" ${state.focusEnabled ? 'checked' : ''}>
-                        <span class="att-slider"></span>
-                    </label>
-                </div>
-
-                <div class="att-divider"></div>
-
-                <div class="att-row">
-                    <div>
-                        <div class="att-label">高亮当前行</div>
-                        <div class="att-sub-label">整行使用淡蓝色背景</div>
-                    </div>
-                    <label class="att-switch">
-                        <input type="checkbox" data-setting="rowHighlightEnabled" ${state.rowHighlightEnabled ? 'checked' : ''}>
-                        <span class="att-slider"></span>
-                    </label>
-                </div>
-
-                <div class="att-row">
-                    <div>
-                        <div class="att-label">高亮当前列</div>
-                        <div class="att-sub-label">按字段 ID 精确匹配整列</div>
-                    </div>
-                    <label class="att-switch">
-                        <input type="checkbox" data-setting="columnHighlightEnabled" ${state.columnHighlightEnabled ? 'checked' : ''}>
-                        <span class="att-slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="att-card">
-                <div class="att-card-title">当前聚焦位置</div>
-                <div class="att-card-desc" id="att-current-cell-info">
-                    ${currentCellInfoHtml()}
-                </div>
-                <div class="att-actions">
-                    <button type="button" class="att-btn" data-act="copy-current-cell">复制当前单元格</button>
-                    <button type="button" class="att-btn" data-act="copy-current-row">复制当前整行</button>
-                    <button type="button" class="att-btn" data-act="copy-ctrl-combo">复制 Ctrl 字段组合</button>
-                    <button type="button" class="att-btn" data-act="clear-focus">清除聚焦</button>
-                </div>
+            <div class="att-quick-tools-v7160" aria-label="工具入口">
+                <button type="button" data-act="go-tab" data-tab-target="combos"><b>表格工具</b><span>字段组合 / 列置顶</span></button>
+                <button type="button" data-act="open-editor-phrase-manager"><b>快捷短语</b><span>规则中心</span></button>
+                <button type="button" data-act="open-search-history-manager"><b>搜索记录</b><span>跨视图管理</span></button>
+                <button type="button" data-act="go-tab" data-tab-target="settings"><b>设置</b><span>全部参数</span></button>
             </div>
         `;
     }
@@ -11000,37 +11893,98 @@
         `;
     }
 
-    function renderComboEditor(combo = null, editMode = 'table') {
+    function isComboEditorOpen() {
+        const editor = document.getElementById('att-combo-editor');
+        return Boolean(editor?.classList.contains('att-show'));
+    }
+
+    function makeComboEditorDraft(combo = null) {
+        const context = getCurrentTableContext();
+        const editing = combo || {
+            id: '', name: '', fields: [], format: 'pipe', customDelimiter: '', hotkey: '', tableBindings: {}
+        };
+        const binding = context ? getComboTableBinding(editing, context) : null;
+        const autoPreview = combo ? resolveComboForCurrentTable(combo) : null;
+        const tableFields = binding
+            ? binding.fields.map(item => ({ fieldId:String(item.fieldId || ''), name:sanitizeText(item.name || item.label || '') })).filter(item => item.name)
+            : (autoPreview?.resolved || []).map(item => ({ fieldId:String(item.fieldId || ''), name:sanitizeText(item.name || '') })).filter(item => item.name);
+
+        return {
+            editId: editing.id || '',
+            contextKey: context?.key || '',
+            contextTableName: context?.tableName || '',
+            name: editing.name || '',
+            format: editing.format || 'pipe',
+            customDelimiter: editing.customDelimiter || '',
+            tableFields,
+            templateNames: Array.isArray(editing.fields) ? editing.fields.map(sanitizeText).filter(Boolean) : [],
+            searchByMode: { table:'', template:'' }
+        };
+    }
+
+    function syncComboEditorDraftFromDom() {
+        const editor = document.getElementById('att-combo-editor');
+        const draft = comboEditorDraftState;
+        if (!editor?.classList.contains('att-show') || !draft) return draft;
+
+        draft.name = document.getElementById('att-combo-name')?.value ?? draft.name;
+        draft.format = document.getElementById('att-combo-format')?.value || draft.format || 'pipe';
+        draft.customDelimiter = document.getElementById('att-combo-custom-delimiter')?.value ?? draft.customDelimiter;
+
+        const mode = editor.dataset.editMode === 'template' ? 'template' : 'table';
+        const selected = Array.from(editor.querySelectorAll('[data-combo-field]:checked')).map(el => ({
+            fieldId: String(el.dataset.comboFieldId || ''),
+            name: sanitizeText(el.dataset.comboFieldName || el.dataset.comboField || '')
+        })).filter(item => item.name);
+
+        if (mode === 'table') draft.tableFields = selected;
+        else draft.templateNames = selected.map(item => item.name);
+
+        const search = editor.querySelector('[data-setting="comboFieldSearch"]');
+        if (search) draft.searchByMode[mode] = search.value || '';
+        return draft;
+    }
+
+    function resetComboEditorDraft(combo = null) {
+        comboEditorDraftState = makeComboEditorDraft(combo);
+        return comboEditorDraftState;
+    }
+
+    function clearComboEditorDraft() {
+        comboEditorDraftState = null;
+    }
+
+    function renderComboEditor(combo = null, editMode = 'table', options = {}) {
         const editor = document.getElementById('att-combo-editor');
         if (!editor) return;
+
+        // 切换编辑模式 / 重新读取字段之前，先把当前 DOM 中尚未保存的内容写入会话草稿。
+        if (!options.resetDraft) syncComboEditorDraftFromDom();
 
         const context = getCurrentTableContext();
         const defs = getCurrentComboFieldDefs();
         if (!context && editMode === 'table') editMode = 'template';
 
-        const editing = combo || {
-            id: '',
-            name: '',
-            fields: [],
-            format: 'pipe',
-            customDelimiter: '',
-            hotkey: '',
-            tableBindings: {}
+        const comboId = combo?.id || '';
+        const contextKey = context?.key || '';
+        const draftIdentityChanged = !comboEditorDraftState ||
+            comboEditorDraftState.editId !== comboId ||
+            comboEditorDraftState.contextKey !== contextKey;
+        if (options.resetDraft || draftIdentityChanged) resetComboEditorDraft(combo);
+
+        const draft = comboEditorDraftState || resetComboEditorDraft(combo);
+        const editing = {
+            ...(combo || { id:'', fields:[], hotkey:'', tableBindings:{} }),
+            id: comboId,
+            name: draft.name,
+            format: draft.format,
+            customDelimiter: draft.customDelimiter,
+            fields: draft.templateNames
         };
 
-        const binding = context ? getComboTableBinding(editing, context) : null;
-        const autoPreview = combo ? resolveComboForCurrentTable(combo) : null;
-
-        let selectedIds = new Set();
-        let selectedNames = new Set(editing.fields || []);
-
-        if (editMode === 'table') {
-            if (binding) {
-                selectedIds = new Set(binding.fields.map(item => item.fieldId).filter(Boolean));
-            } else if (autoPreview) {
-                selectedIds = new Set(autoPreview.resolved.map(item => item.fieldId));
-            }
-        }
+        const binding = context ? getComboTableBinding(combo || editing, context) : null;
+        const selectedIds = new Set((draft.tableFields || []).map(item => item.fieldId).filter(Boolean));
+        const selectedNames = new Set(draft.templateNames || []);
 
         editor.dataset.editId = editing.id || '';
         editor.dataset.editMode = editMode;
@@ -11120,6 +12074,507 @@
                 <button type="button" class="att-btn" data-act="cancel-combo-editor">取消</button>
             </div>
         `;
+
+        const searchInput = editor.querySelector('[data-setting="comboFieldSearch"]');
+        const rememberedSearch = draft.searchByMode?.[editMode] || '';
+        if (searchInput && rememberedSearch) {
+            searchInput.value = rememberedSearch;
+            const q = sanitizeText(rememberedSearch).toLowerCase();
+            editor.querySelectorAll('.att-field-item').forEach(item => {
+                const name = sanitizeText(item.textContent || '').toLowerCase();
+                item.style.display = !q || name.includes(q) ? 'flex' : 'none';
+            });
+        }
+    }
+
+    // =====================================================================
+    // V7.9.2：全部置顶表管理中心
+    // =====================================================================
+    const pinTableManagerState = {
+        search: '',
+        // V7.9.2：管理中心默认显示全部已知表，而不是只显示已有置顶的表。
+        filter: 'all',
+        selectedKey: '',
+        fieldSearch: '',
+        fieldFilter: 'all'
+    };
+
+    function getPinnedProfileStats(profile) {
+        const left = Array.isArray(profile?.left) ? profile.left.length : 0;
+        const right = Array.isArray(profile?.right) ? profile.right.length : 0;
+        const widths = Object.values(profile?.widths || {})
+            .map(normalizePinnedColumnWidth)
+            .filter(Boolean).length;
+        const fields = getPinnedProfileKnownFieldIds(profile).length;
+        const pinned = left + right;
+        return {
+            left, right, pinned, widths, fields,
+            unpinned: Math.max(0, fields - pinned),
+            catalogComplete: profile?.catalogComplete === true
+        };
+    }
+
+    function getPinnedProfileBaseId(profileKey) {
+        const key = String(profileKey || '');
+        if (key.includes('::') && !key.startsWith('path::')) return key.split('::')[0] || '';
+        return '';
+    }
+
+    function getPinnedProfileDisplayName(profileKey, profile) {
+        return sanitizeText(profile?.tableName || profile?.tableId || profileKey || '未知表格');
+    }
+
+    function formatPinnedProfileTime(value) {
+        const ts = Number(value || 0);
+        if (!ts) return '未知时间';
+        try {
+            const d = new Date(ts);
+            const pad = n => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        } catch (_) {
+            return '未知时间';
+        }
+    }
+
+    function getManagedPinnedProfiles() {
+        const currentKey = getCurrentTableContext()?.key || '';
+        const q = sanitizeText(pinTableManagerState.search || '').toLowerCase();
+        const filter = pinTableManagerState.filter || 'pinned';
+
+        return Object.entries(state.pinnedTableProfiles || {})
+            .map(([key, profile]) => {
+                const stats = getPinnedProfileStats(profile);
+                return { key, profile, stats, current: key === currentKey };
+            })
+            .filter(item => {
+                if (filter === 'pinned' && item.stats.pinned <= 0) return false;
+                if (filter === 'unpinned' && item.stats.unpinned <= 0) return false;
+                if (filter === 'widths' && !(item.stats.pinned <= 0 && item.stats.widths > 0)) return false;
+                if (filter === 'current' && !item.current) return false;
+                if (!q) return true;
+                const names = Object.values(item.profile?.fieldNames || {}).join(' ');
+                const haystack = `${getPinnedProfileDisplayName(item.key, item.profile)} ${item.profile?.tableId || ''} ${item.key} ${names}`.toLowerCase();
+                return haystack.includes(q);
+            })
+            .sort((a, b) => {
+                if (a.current !== b.current) return a.current ? -1 : 1;
+                const at = Number(a.profile?.updatedAt || 0);
+                const bt = Number(b.profile?.updatedAt || 0);
+                if (at !== bt) return bt - at;
+                return getPinnedProfileDisplayName(a.key, a.profile).localeCompare(getPinnedProfileDisplayName(b.key, b.profile), 'zh-CN');
+            });
+    }
+
+    function getAllPinnedProfileSummary() {
+        let tables = 0, pinnedTables = 0, pinnedColumns = 0, widthOnlyTables = 0, widthEntries = 0, knownFields = 0;
+        for (const profile of Object.values(state.pinnedTableProfiles || {})) {
+            const stats = getPinnedProfileStats(profile);
+            if (stats.pinned <= 0 && stats.widths <= 0 && stats.fields <= 0) continue;
+            tables += 1;
+            pinnedColumns += stats.pinned;
+            widthEntries += stats.widths;
+            knownFields += stats.fields;
+            if (stats.pinned > 0) pinnedTables += 1;
+            else if (stats.widths > 0) widthOnlyTables += 1;
+        }
+        return { tables, pinnedTables, pinnedColumns, widthOnlyTables, widthEntries, knownFields };
+    }
+
+    function ensurePinTableManagerStyles() {
+        if (document.getElementById('att-pin-table-manager-style-v791')) return;
+        const style = document.createElement('style');
+        style.id = 'att-pin-table-manager-style-v791';
+        style.textContent = `
+            #att-pin-table-manager-v791 { position:fixed;inset:0;z-index:2147483200;display:none;align-items:center;justify-content:center;padding:22px;background:rgba(0,0,0,.58);backdrop-filter:blur(4px); }
+            #att-pin-table-manager-v791.att-show { display:flex; }
+            #att-pin-table-manager-v791 .att-ptm-shell { width:min(1040px,calc(100vw - 36px));height:min(720px,calc(100vh - 36px));min-height:520px;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;background:#fff;border:1px solid #d7dee8;border-radius:15px;box-shadow:0 28px 80px rgba(15,23,42,.28);overflow:hidden;color:#1f2937; }
+            #att-pin-table-manager-v791 .att-ptm-head,#att-pin-table-manager-v791 .att-ptm-foot { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px; }
+            #att-pin-table-manager-v791 .att-ptm-head { border-bottom:1px solid #e2e8f0; }
+            #att-pin-table-manager-v791 .att-ptm-foot { border-top:1px solid #e2e8f0; }
+            #att-pin-table-manager-v791 .att-ptm-title { font-size:16px;font-weight:750; }
+            #att-pin-table-manager-v791 .att-ptm-sub { margin-top:3px;color:#64748b;font-size:11px; }
+            #att-pin-table-manager-v791 .att-ptm-toolbar { display:grid;grid-template-columns:minmax(220px,1fr) 180px auto;gap:8px;padding:10px 16px;border-bottom:1px solid #eef2f7;background:#f8fafc; }
+            #att-pin-table-manager-v791 .att-ptm-toolbar input,#att-pin-table-manager-v791 .att-ptm-toolbar select { width:100%;box-sizing:border-box;height:34px;border:1px solid #d4dce7;border-radius:8px;background:#fff;color:#1f2937;padding:0 10px;outline:none; }
+            #att-pin-table-manager-v791 .att-ptm-summary { display:flex;align-items:center;justify-content:flex-end;gap:5px;flex-wrap:wrap; }
+            #att-pin-table-manager-v791 .att-ptm-badge { display:inline-flex;align-items:center;min-height:23px;padding:2px 7px;border-radius:999px;border:1px solid #dbe4ef;background:#f8fafc;color:#475569;font-size:10px;white-space:nowrap; }
+            #att-pin-table-manager-v791 .att-ptm-badge.blue { border-color:#bfdbfe;background:#eff6ff;color:#1d4ed8; }
+            #att-pin-table-manager-v791 .att-ptm-main { min-height:0;display:grid;grid-template-columns:330px minmax(0,1fr); }
+            #att-pin-table-manager-v791 .att-ptm-list { min-height:0;overflow:auto;padding:9px;border-right:1px solid #e2e8f0;background:#fbfcfe;scrollbar-gutter:stable; }
+            #att-pin-table-manager-v791 .att-ptm-item { display:block;width:100%;box-sizing:border-box;text-align:left;padding:10px;margin:0 0 6px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:inherit;cursor:pointer; }
+            #att-pin-table-manager-v791 .att-ptm-item:hover { border-color:#bfdbfe;background:#f8fbff; }
+            #att-pin-table-manager-v791 .att-ptm-item.att-active { border-color:#60a5fa;background:#eff6ff;box-shadow:0 0 0 1px rgba(59,130,246,.08); }
+            #att-pin-table-manager-v791 .att-ptm-item-name { display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;min-width:0; }
+            #att-pin-table-manager-v791 .att-ptm-item-name span:first-child { min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+            #att-pin-table-manager-v791 .att-ptm-item-id { margin-top:3px;color:#94a3b8;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+            #att-pin-table-manager-v791 .att-ptm-item-meta { display:flex;gap:5px;flex-wrap:wrap;margin-top:7px; }
+            #att-pin-table-manager-v791 .att-ptm-detail { min-width:0;min-height:0;overflow:auto;padding:16px 18px 24px;scrollbar-gutter:stable; }
+            #att-pin-table-manager-v791 .att-ptm-empty { min-height:260px;display:grid;place-items:center;text-align:center;color:#94a3b8;padding:24px; }
+            #att-pin-table-manager-v791 .att-ptm-detail-head { display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px; }
+            #att-pin-table-manager-v791 .att-ptm-detail-title { font-size:16px;font-weight:750; }
+            #att-pin-table-manager-v791 .att-ptm-card { padding:12px;margin-bottom:10px;border:1px solid #e2e8f0;border-radius:10px;background:#fff; }
+            #att-pin-table-manager-v791 .att-ptm-card-title { display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;font-size:12px;font-weight:700; }
+            #att-pin-table-manager-v791 .att-ptm-fields { display:grid;gap:6px; }
+            #att-pin-table-manager-v791 .att-ptm-field-toolbar { display:grid;grid-template-columns:minmax(180px,1fr) 150px;gap:8px;margin-bottom:9px; }
+            #att-pin-table-manager-v791 .att-ptm-field-toolbar input,#att-pin-table-manager-v791 .att-ptm-field-toolbar select { width:100%;box-sizing:border-box;height:32px;border:1px solid #d4dce7;border-radius:7px;background:#fff;color:#1f2937;padding:0 9px;outline:none; }
+            #att-pin-table-manager-v791 .att-ptm-field-status { min-width:42px;color:#64748b;font-size:9px;text-align:right;white-space:nowrap; }
+            #att-pin-table-manager-v791 .att-ptm-field-width-clear { height:27px;padding:0 7px;border:1px solid #d8e0ea;border-radius:7px;background:#fff;color:#64748b;font-size:9px;cursor:pointer; }
+            #att-pin-table-manager-v791 .att-ptm-field-width-clear:hover { border-color:#93c5fd;color:#1d4ed8;background:#eff6ff; }
+            #att-pin-table-manager-v791 .att-ptm-warning { padding:9px 10px;margin-bottom:9px;border:1px solid #f6d48b;border-radius:8px;background:#fff8e7;color:#8a5a00;font-size:10px;line-height:1.55; }
+
+            #att-pin-table-manager-v791 .att-ptm-field { display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;padding:7px 8px;border:1px solid #edf1f5;border-radius:8px;background:#fafbfc; }
+            #att-pin-table-manager-v791 .att-ptm-field-main { min-width:0; }
+            #att-pin-table-manager-v791 .att-ptm-field-name { font-size:11px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+            #att-pin-table-manager-v791 .att-ptm-field-id { margin-top:2px;color:#94a3b8;font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+            #att-pin-table-manager-v791 .att-ptm-side { display:flex;border:1px solid #d8e0ea;border-radius:7px;overflow:hidden; }
+            #att-pin-table-manager-v791 .att-ptm-side button { width:30px;height:27px;border:0;border-right:1px solid #e2e8f0;background:#fff;color:#64748b;cursor:pointer; }
+            #att-pin-table-manager-v791 .att-ptm-side button:last-child { border-right:0; }
+            #att-pin-table-manager-v791 .att-ptm-side button.att-active { background:#0f6cbd;color:#fff; }
+            #att-pin-table-manager-v791 .att-ptm-actions { display:flex;flex-wrap:wrap;gap:7px; }
+            #att-pin-table-manager-v791 button.att-ptm-btn { height:32px;padding:0 11px;border:1px solid #d7dee8;border-radius:8px;background:#fff;color:#334155;cursor:pointer; }
+            #att-pin-table-manager-v791 button.att-ptm-btn:hover { background:#f8fafc;border-color:#b9c7d8; }
+            #att-pin-table-manager-v791 button.att-ptm-btn.primary { background:#0f6cbd;border-color:#0f6cbd;color:#fff; }
+            #att-pin-table-manager-v791 button.att-ptm-btn.danger { color:#dc2626;border-color:#fecaca;background:#fff7f7; }
+            body.att-native-dark #att-pin-table-manager-v791 .att-ptm-shell { background:#202124;border-color:#3b3d40;color:#e8eaed; }
+            body.att-native-dark #att-pin-table-manager-v791 .att-ptm-head,body.att-native-dark #att-pin-table-manager-v791 .att-ptm-foot,body.att-native-dark #att-pin-table-manager-v791 .att-ptm-toolbar,body.att-native-dark #att-pin-table-manager-v791 .att-ptm-list { border-color:#34363a;background:#202124; }
+            body.att-native-dark #att-pin-table-manager-v791 .att-ptm-item,body.att-native-dark #att-pin-table-manager-v791 .att-ptm-card,body.att-native-dark #att-pin-table-manager-v791 .att-ptm-field,body.att-native-dark #att-pin-table-manager-v791 .att-ptm-toolbar input,body.att-native-dark #att-pin-table-manager-v791 .att-ptm-toolbar select,body.att-native-dark #att-pin-table-manager-v791 .att-ptm-field-toolbar input,body.att-native-dark #att-pin-table-manager-v791 .att-ptm-field-toolbar select,body.att-native-dark #att-pin-table-manager-v791 button.att-ptm-btn,body.att-native-dark #att-pin-table-manager-v791 .att-ptm-side button,body.att-native-dark #att-pin-table-manager-v791 .att-ptm-field-width-clear { background:#292a2d;border-color:#414348;color:#e8eaed; }
+            body.att-native-dark #att-pin-table-manager-v791 .att-ptm-warning { background:#352c18;border-color:#665327;color:#f2cf83; }
+            body.att-native-dark #att-pin-table-manager-v791 .att-ptm-item.att-active { background:#26354a;border-color:#315b91; }
+            body.att-native-dark #att-pin-table-manager-v791 .att-ptm-badge { background:#2c2d30;border-color:#45474c;color:#c7cbd0; }
+            body.att-native-dark #att-pin-table-manager-v791 .att-ptm-badge.blue { background:#173759;border-color:#315d88;color:#d9ecff; }
+            body.att-native-dark #att-pin-table-manager-v791 .att-ptm-side button.att-active { background:#0f6cbd;color:#fff; }
+            @media(max-width:760px){#att-pin-table-manager-v791 .att-ptm-main{grid-template-columns:260px minmax(0,1fr)}#att-pin-table-manager-v791 .att-ptm-toolbar{grid-template-columns:1fr 150px}.att-ptm-summary{grid-column:1/-1!important;justify-content:flex-start!important;}}
+        `;
+        document.documentElement.appendChild(style);
+    }
+
+    function ensurePinTableManager() {
+        let overlay = document.getElementById('att-pin-table-manager-v791');
+        if (overlay) return overlay;
+        ensurePinTableManagerStyles();
+        overlay = document.createElement('div');
+        overlay.id = 'att-pin-table-manager-v791';
+        overlay.innerHTML = `
+            <div class="att-ptm-shell" role="dialog" aria-modal="true" aria-label="置顶表管理">
+                <div class="att-ptm-head">
+                    <div><div class="att-ptm-title">置顶表管理</div><div class="att-ptm-sub">集中查看每张表的全部字段，并统一管理左置顶 / 不置顶 / 右置顶与列宽记忆</div></div>
+                    <button type="button" class="att-ptm-btn" data-ptm-act="close">×</button>
+                </div>
+                <div class="att-ptm-toolbar">
+                    <input type="search" data-ptm-search placeholder="搜索表名 / 表ID / 字段…">
+                    <select data-ptm-filter>
+                        <option value="all">全部已知表</option>
+                        <option value="pinned">有置顶列的表</option>
+                        <option value="unpinned">含未置顶字段</option>
+                        <option value="widths">仅有列宽记忆</option>
+                        <option value="current">当前表</option>
+                    </select>
+                    <div class="att-ptm-summary" data-ptm-summary></div>
+                </div>
+                <div class="att-ptm-main">
+                    <div class="att-ptm-list" data-ptm-list></div>
+                    <div class="att-ptm-detail" data-ptm-detail></div>
+                </div>
+                <div class="att-ptm-foot">
+                    <div class="att-ptm-actions">
+                        <button type="button" class="att-ptm-btn" data-ptm-act="clear-all-pins">清除所有表置顶方向</button>
+                        <button type="button" class="att-ptm-btn danger" data-ptm-act="delete-all-profiles">删除全部置顶配置</button>
+                    </div>
+                    <button type="button" class="att-ptm-btn primary" data-ptm-act="close">完成</button>
+                </div>
+            </div>`;
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', onPinTableManagerClick);
+        overlay.addEventListener('input', onPinTableManagerInput);
+        overlay.addEventListener('change', onPinTableManagerChange);
+        return overlay;
+    }
+
+    function renderPinTableManager() {
+        const overlay = ensurePinTableManager();
+        const currentContext = getCurrentTableContext();
+        if (currentContext) syncPinnedProfileFieldCatalog(currentContext, getGridFieldDefs(currentContext.root), true, true);
+        const profiles = getManagedPinnedProfiles();
+        const summary = getAllPinnedProfileSummary();
+        const currentKey = getCurrentTableContext()?.key || '';
+        if (!profiles.some(item => item.key === pinTableManagerState.selectedKey)) {
+            pinTableManagerState.selectedKey = profiles[0]?.key || '';
+        }
+
+        const search = overlay.querySelector('[data-ptm-search]');
+        const filter = overlay.querySelector('[data-ptm-filter]');
+        if (search && document.activeElement !== search) search.value = pinTableManagerState.search;
+        if (filter) filter.value = pinTableManagerState.filter;
+
+        const sumEl = overlay.querySelector('[data-ptm-summary]');
+        if (sumEl) sumEl.innerHTML = `
+            <span class="att-ptm-badge blue">已知表 ${summary.tables}</span>
+            <span class="att-ptm-badge">置顶表 ${summary.pinnedTables}</span>
+            <span class="att-ptm-badge">字段 ${summary.knownFields}</span>`;
+
+        const list = overlay.querySelector('[data-ptm-list]');
+        if (list) {
+            list.innerHTML = profiles.length ? profiles.map(item => {
+                const name = getPinnedProfileDisplayName(item.key, item.profile);
+                return `<button type="button" class="att-ptm-item ${item.key === pinTableManagerState.selectedKey ? 'att-active' : ''}" data-ptm-key="${escapeAttr(item.key)}">
+                    <div class="att-ptm-item-name"><span>${escapeHtml(name)}</span>${item.current ? '<span class="att-ptm-badge blue">当前</span>' : ''}</div>
+                    <div class="att-ptm-item-id">${escapeHtml(item.profile?.tableId || item.key)}</div>
+                    <div class="att-ptm-item-meta">
+                        <span class="att-ptm-badge">字段 ${item.stats.fields}</span>
+                        <span class="att-ptm-badge">左 ${item.stats.left}</span><span class="att-ptm-badge">未置顶 ${item.stats.unpinned}</span><span class="att-ptm-badge">右 ${item.stats.right}</span>
+                    </div>
+                </button>`;
+            }).join('') : '<div class="att-ptm-empty">当前筛选条件下没有已知表。</div>';
+        }
+
+        const detail = overlay.querySelector('[data-ptm-detail]');
+        if (!detail) return;
+        const selected = profiles.find(item => item.key === pinTableManagerState.selectedKey);
+        if (!selected) {
+            detail.innerHTML = '<div class="att-ptm-empty"><div><b>没有可管理的表字段</b><br><span>进入任意表格后打开置顶页或本管理中心，即会自动同步该表全部字段。</span></div></div>';
+            return;
+        }
+
+        const { key, profile, stats } = selected;
+        const name = getPinnedProfileDisplayName(key, profile);
+        const allFieldIds = getPinnedProfileKnownFieldIds(profile);
+        const qField = sanitizeText(pinTableManagerState.fieldSearch || '').toLowerCase();
+        const fieldFilter = pinTableManagerState.fieldFilter || 'all';
+        const managedFields = allFieldIds.map((fieldId, index) => {
+            const side = getPinnedFieldSide(profile, fieldId);
+            const width = normalizePinnedColumnWidth(profile.widths?.[fieldId]);
+            return {
+                fieldId,
+                index,
+                name: sanitizeText(profile.fieldNames?.[fieldId] || fieldId),
+                side,
+                width
+            };
+        }).filter(field => {
+            if (fieldFilter === 'left' && field.side !== 'left') return false;
+            if (fieldFilter === 'none' && field.side !== 'none') return false;
+            if (fieldFilter === 'right' && field.side !== 'right') return false;
+            if (fieldFilter === 'width' && !field.width) return false;
+            if (!qField) return true;
+            return `${field.name} ${field.fieldId}`.toLowerCase().includes(qField);
+        });
+
+        const fieldRows = managedFields.map(field => {
+            const sideLabel = field.side === 'left' ? '左置顶' : field.side === 'right' ? '右置顶' : '未置顶';
+            return `<div class="att-ptm-field">
+                <div class="att-ptm-field-main">
+                    <div class="att-ptm-field-name">${escapeHtml(field.name)}</div>
+                    <div class="att-ptm-field-id">${escapeHtml(field.fieldId)}${field.width ? ` · 记忆宽度 ${field.width}px` : ''}</div>
+                </div>
+                <div class="att-ptm-field-status">${escapeHtml(sideLabel)}</div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                    ${field.width ? `<button type="button" class="att-ptm-field-width-clear" data-ptm-act="clear-field-width" data-ptm-key="${escapeAttr(key)}" data-field-id="${escapeAttr(field.fieldId)}" title="清除该字段列宽记忆">清宽</button>` : ''}
+                    <div class="att-ptm-side">
+                        <button type="button" class="${field.side === 'left' ? 'att-active' : ''}" data-ptm-act="field-side" data-ptm-key="${escapeAttr(key)}" data-field-id="${escapeAttr(field.fieldId)}" data-side="left" title="左置顶">左</button>
+                        <button type="button" class="${field.side === 'none' ? 'att-active' : ''}" data-ptm-act="field-side" data-ptm-key="${escapeAttr(key)}" data-field-id="${escapeAttr(field.fieldId)}" data-side="none" title="不置顶">—</button>
+                        <button type="button" class="${field.side === 'right' ? 'att-active' : ''}" data-ptm-act="field-side" data-ptm-key="${escapeAttr(key)}" data-field-id="${escapeAttr(field.fieldId)}" data-side="right" title="右置顶">右</button>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+
+        const catalogWarning = profile.catalogComplete === true ? '' : `
+            <div class="att-ptm-warning">
+                这是一份旧版历史配置，目前只知道曾经置顶、记过列宽或保存过名称的字段。<br>
+                打开这张表一次后，V7.9.2 会自动同步它的全部字段，届时所有未置顶列都可以在这里直接管理。
+            </div>`;
+
+        detail.innerHTML = `
+            <div class="att-ptm-detail-head">
+                <div><div class="att-ptm-detail-title">${escapeHtml(name)} ${key === currentKey ? '<span class="att-ptm-badge blue">当前表</span>' : ''}</div><div class="att-ptm-sub">${escapeHtml(profile.tableId || key)} · 更新 ${escapeHtml(formatPinnedProfileTime(profile.updatedAt))}${profile.catalogUpdatedAt ? ` · 字段同步 ${escapeHtml(formatPinnedProfileTime(profile.catalogUpdatedAt))}` : ''}</div></div>
+                <div class="att-ptm-summary"><span class="att-ptm-badge blue">字段 ${stats.fields}</span><span class="att-ptm-badge">左 ${stats.left}</span><span class="att-ptm-badge">未置顶 ${stats.unpinned}</span><span class="att-ptm-badge">右 ${stats.right}</span></div>
+            </div>
+            ${catalogWarning}
+            <div class="att-ptm-card">
+                <div class="att-ptm-card-title"><span>全部字段</span><span class="att-ptm-badge">显示 ${managedFields.length} / ${stats.fields}</span></div>
+                <div class="att-ptm-field-toolbar">
+                    <input type="search" data-ptm-field-search placeholder="搜索当前表字段…" value="${escapeAttr(pinTableManagerState.fieldSearch)}">
+                    <select data-ptm-field-filter>
+                        <option value="all" ${fieldFilter === 'all' ? 'selected' : ''}>全部字段</option>
+                        <option value="left" ${fieldFilter === 'left' ? 'selected' : ''}>左置顶</option>
+                        <option value="none" ${fieldFilter === 'none' ? 'selected' : ''}>未置顶</option>
+                        <option value="right" ${fieldFilter === 'right' ? 'selected' : ''}>右置顶</option>
+                        <option value="width" ${fieldFilter === 'width' ? 'selected' : ''}>有列宽记忆</option>
+                    </select>
+                </div>
+                <div class="att-ptm-fields">${fieldRows || '<div class="att-ptm-sub">当前筛选条件下没有字段。</div>'}</div>
+            </div>
+            <div class="att-ptm-card"><div class="att-ptm-card-title"><span>管理此表</span></div><div class="att-ptm-actions">
+                ${key === currentKey ? '<button type="button" class="att-ptm-btn primary" data-ptm-act="sync-current-fields">同步当前表字段</button><button type="button" class="att-ptm-btn" data-ptm-act="reapply-current">重新应用当前表</button>' : ''}
+                <button type="button" class="att-ptm-btn" data-ptm-act="clear-profile-pins" data-ptm-key="${escapeAttr(key)}">全部设为不置顶</button>
+                <button type="button" class="att-ptm-btn" data-ptm-act="clear-profile-widths" data-ptm-key="${escapeAttr(key)}">清除列宽记忆</button>
+                <button type="button" class="att-ptm-btn danger" data-ptm-act="delete-profile" data-ptm-key="${escapeAttr(key)}">删除整份配置</button>
+            </div></div>`;
+    }
+
+    function refreshPinnedManagerCurrentTable(profileKey) {
+        const context = getCurrentTableContext();
+        if (!context || context.key !== profileKey) return;
+        clearPinnedColumns(context.root);
+        scheduleApplyPinnedColumns(0);
+        if (state.panelOpen && state.activeTab === 'pinning') renderPinningSection();
+    }
+
+    function mutateManagedPinnedProfile(profileKey, mutator) {
+        const profile = state.pinnedTableProfiles?.[profileKey];
+        if (!profile) return false;
+        mutator(profile);
+        profile.updatedAt = Date.now();
+        const stats = getPinnedProfileStats(profile);
+        // V7.9.2：字段目录本身也是可管理数据。即使全部“不置顶”且无列宽，也保留该表目录。
+        if (stats.pinned <= 0 && stats.widths <= 0 && stats.fields <= 0) delete state.pinnedTableProfiles[profileKey];
+        persistCore();
+        refreshPinnedManagerCurrentTable(profileKey);
+        renderPinTableManager();
+        return true;
+    }
+
+    function onPinTableManagerInput(event) {
+        if (event.target?.matches?.('[data-ptm-search]')) {
+            pinTableManagerState.search = event.target.value || '';
+            renderPinTableManager();
+            requestAnimationFrame(() => {
+                const input = document.querySelector('#att-pin-table-manager-v791 [data-ptm-search]');
+                if (input) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); }
+            });
+            return;
+        }
+        if (event.target?.matches?.('[data-ptm-field-search]')) {
+            pinTableManagerState.fieldSearch = event.target.value || '';
+            renderPinTableManager();
+            requestAnimationFrame(() => {
+                const input = document.querySelector('#att-pin-table-manager-v791 [data-ptm-field-search]');
+                if (input) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); }
+            });
+        }
+    }
+
+    function onPinTableManagerChange(event) {
+        if (event.target?.matches?.('[data-ptm-filter]')) {
+            pinTableManagerState.filter = event.target.value || 'all';
+            renderPinTableManager();
+            return;
+        }
+        if (event.target?.matches?.('[data-ptm-field-filter]')) {
+            pinTableManagerState.fieldFilter = event.target.value || 'all';
+            renderPinTableManager();
+        }
+    }
+
+    function onPinTableManagerClick(event) {
+        const overlay = event.currentTarget;
+        if (event.target === overlay) { overlay.classList.remove('att-show'); return; }
+        const item = event.target.closest?.('[data-ptm-key].att-ptm-item');
+        if (item) {
+            pinTableManagerState.selectedKey = item.dataset.ptmKey || '';
+            pinTableManagerState.fieldSearch = '';
+            pinTableManagerState.fieldFilter = 'all';
+            renderPinTableManager();
+            return;
+        }
+        const btn = event.target.closest?.('[data-ptm-act]');
+        if (!btn) return;
+        const action = btn.dataset.ptmAct || '';
+        const key = btn.dataset.ptmKey || pinTableManagerState.selectedKey || '';
+        if (action === 'close') { overlay.classList.remove('att-show'); return; }
+        if (action === 'sync-current-fields') {
+            const context = getCurrentTableContext();
+            if (!context || context.key !== key) { showToast('当前页面不是这张表'); return; }
+            const defs = getGridFieldDefs(context.root);
+            syncPinnedProfileFieldCatalog(context, defs, true, true);
+            renderPinTableManager();
+            showToast(`已同步当前表 ${defs.length} 个字段`);
+            return;
+        }
+        if (action === 'reapply-current') { scheduleApplyPinnedColumns(0); showToast('已重新应用当前表置顶设置'); return; }
+        if (action === 'field-side') {
+            const fieldId = btn.dataset.fieldId || '';
+            const side = btn.dataset.side || 'none';
+            if (!fieldId || !['left','right','none'].includes(side)) return;
+            mutateManagedPinnedProfile(key, profile => {
+                profile.left = (profile.left || []).filter(id => id !== fieldId);
+                profile.right = (profile.right || []).filter(id => id !== fieldId);
+                if (!Array.isArray(profile.fieldOrder)) profile.fieldOrder = [];
+                if (!profile.fieldOrder.includes(fieldId)) profile.fieldOrder.push(fieldId);
+                if (side === 'left') profile.left.push(fieldId);
+                if (side === 'right') profile.right.push(fieldId);
+            });
+            if (side !== 'none' && !state.columnPinEnabled) {
+                state.columnPinEnabled = true;
+                persistCore();
+                setBodyModes();
+            }
+            return;
+        }
+        if (action === 'clear-field-width') {
+            const fieldId = btn.dataset.fieldId || '';
+            if (!fieldId) return;
+            mutateManagedPinnedProfile(key, profile => { if (profile.widths) delete profile.widths[fieldId]; });
+            return;
+        }
+        if (action === 'clear-profile-pins') {
+            if (!confirm('清除这张表保存的全部左 / 右置顶方向吗？\n列宽记忆会保留。')) return;
+            mutateManagedPinnedProfile(key, profile => { profile.left = []; profile.right = []; });
+            showToast('已清除该表置顶方向');
+            return;
+        }
+        if (action === 'clear-profile-widths') {
+            if (!confirm('清除这张表全部置顶列列宽记忆吗？\n置顶方向会保留。')) return;
+            mutateManagedPinnedProfile(key, profile => { profile.widths = {}; });
+            showToast('已清除该表列宽记忆');
+            return;
+        }
+        if (action === 'delete-profile') {
+            if (!confirm('删除这张表整份置顶配置吗？\n左右置顶方向和列宽记忆都会删除。')) return;
+            delete state.pinnedTableProfiles[key];
+            persistCore();
+            refreshPinnedManagerCurrentTable(key);
+            renderPinTableManager();
+            showToast('该表置顶配置已删除');
+            return;
+        }
+        if (action === 'clear-all-pins') {
+            const count = Object.values(state.pinnedTableProfiles || {}).filter(p => getPinnedProfileStats(p).pinned > 0).length;
+            if (!count) { showToast('当前没有保存的置顶方向'); return; }
+            if (!confirm(`确定清除 ${count} 张表的全部左 / 右置顶方向吗？\n所有列宽记忆将保留。`)) return;
+            Object.values(state.pinnedTableProfiles || {}).forEach(profile => { profile.left = []; profile.right = []; profile.updatedAt = Date.now(); });
+            for (const [profileKey, profile] of Object.entries(state.pinnedTableProfiles || {})) {
+                const stats = getPinnedProfileStats(profile); if (stats.pinned <= 0 && stats.widths <= 0 && stats.fields <= 0) delete state.pinnedTableProfiles[profileKey];
+            }
+            persistCore();
+            const context = getCurrentTableContext(); if (context) { clearPinnedColumns(context.root); scheduleApplyPinnedColumns(0); }
+            renderPinTableManager(); if (state.panelOpen && state.activeTab === 'pinning') renderPinningSection();
+            showToast('已清除所有表的置顶方向');
+            return;
+        }
+        if (action === 'delete-all-profiles') {
+            const count = Object.keys(state.pinnedTableProfiles || {}).length;
+            if (!count) { showToast('当前没有保存的置顶配置'); return; }
+            if (!confirm(`确定删除全部 ${count} 张表的置顶配置吗？\n左右置顶方向和列宽记忆都会删除。`)) return;
+            if (!confirm('最后确认：删除后只能通过之前导出的全部设置备份恢复。继续吗？')) return;
+            state.pinnedTableProfiles = {};
+            persistCore();
+            const context = getCurrentTableContext(); if (context) clearPinnedColumns(context.root);
+            renderPinTableManager(); if (state.panelOpen && state.activeTab === 'pinning') renderPinningSection();
+            showToast('已删除全部置顶表配置');
+        }
+    }
+
+    function openPinTableManager() {
+        const overlay = ensurePinTableManager();
+        const context = getCurrentTableContext();
+        const currentKey = context?.key || '';
+        if (context) syncPinnedProfileFieldCatalog(context, getGridFieldDefs(context.root), true, true);
+        const currentProfile = currentKey ? state.pinnedTableProfiles?.[currentKey] : null;
+        if (currentProfile) pinTableManagerState.selectedKey = currentKey;
+        pinTableManagerState.fieldSearch = '';
+        pinTableManagerState.fieldFilter = 'all';
+        renderPinTableManager();
+        overlay.classList.add('att-show');
     }
 
     function renderPinningSection() {
@@ -11144,6 +12599,7 @@
                         <div class="att-actions" style="margin-top:7px;">
                             <span class="att-kbd">开关：${escapeHtml(state.hotkeys.toggleColumnPin || '未设置')}</span>
                             <span class="att-kbd">打开设置：${escapeHtml(state.hotkeys.openPinSettings || '未设置')}</span>
+                            <button type="button" class="att-btn" data-act="open-pin-table-manager">管理全部表字段</button>
                         </div>
                         </div>
                         <label class="att-switch">
@@ -11187,8 +12643,9 @@
         }
 
         const defs = getGridFieldDefs(context.root);
-        const profile = getPinnedTableProfile(context, false) || {
-            left: [], right: [], fieldNames: {}, widths: {}
+        // V7.9.2：只要进入置顶页就同步当前表全部字段，不要求字段先被置顶。
+        const profile = syncPinnedProfileFieldCatalog(context, defs, true, true) || {
+            left: [], right: [], fieldNames: {}, fieldOrder: [], widths: {}
         };
         const visibleIds = new Set(defs.map(def => def.fieldId));
         const hiddenPinned = [...profile.left, ...profile.right]
@@ -11286,6 +12743,8 @@
                     <button type="button" class="att-btn" data-act="reapply-pins">重新应用</button>
                     <button type="button" class="att-btn" data-act="clear-pin-width-memory">清除列宽记忆</button>
                     <button type="button" class="att-btn" data-act="clear-table-pins">清空当前表</button>
+                    <button type="button" class="att-btn att-primary" data-act="open-pin-table-manager">管理全部表字段</button>
+                    <span class="att-kbd">已置顶 ${getAllPinnedProfileSummary().pinnedTables} 表</span>
                 </div>
             </div>
 
@@ -11378,6 +12837,14 @@
                 ]
             },
             {
+                title: '条件高亮',
+                rows: [
+                    ['toggleConditionalHighlight', '开关字段条件高亮', '默认 Alt+H；立即显示 / 隐藏当前规则组高亮'],
+                    ['nextConditionalHighlightGroup', '切换下一个高亮规则组', '默认 Alt+Shift+H；循环切换并立即重算'],
+                    ['prevConditionalHighlightGroup', '切换上一个高亮规则组', '默认留空，可自行录制']
+                ]
+            },
+            {
                 title: '字段组合',
                 rows: [
                     ['nextCombo', '切换下一个字段组合'],
@@ -11403,6 +12870,16 @@
         `).join('');
 
         section.innerHTML = `
+            <div class="att-settings-nav-v790" aria-label="设置快速导航">
+                <button type="button" data-act="settings-jump" data-target="floating">悬浮球</button>
+                <button type="button" data-act="settings-jump" data-target="table">表格</button>
+                <button type="button" data-act="settings-jump" data-target="visual">外观</button>
+                <button type="button" data-act="settings-jump" data-target="editor">编辑</button>
+                <button type="button" data-act="settings-jump" data-target="data">备份</button>
+                <button type="button" data-act="settings-jump" data-target="hotkeys">快捷键</button>
+            </div>
+
+            <div class="att-settings-category-v790" data-settings-anchor="floating"><b>悬浮球与菜单</b><span>尺寸、位置和弹出方式</span></div>
             <div class="att-card">
                 <div class="att-card-title">悬浮球大小</div>
                 <div class="att-card-desc">可在 38–72 px 之间调整。</div>
@@ -11414,12 +12891,13 @@
 
             <div class="att-card">
                 <div class="att-card-title">菜单弹出方向</div>
-                <div class="att-card-desc">“自动”会根据悬浮球所在位置，在左 / 右 / 上方中自动选择最合适的位置。</div>
+                <div class="att-card-desc">“自动”会按菜单真实尺寸与当前视口空间，在左 / 右 / 上 / 下中选择最合适的位置。</div>
                 <select class="att-select" data-setting="menuDirection" style="margin-top:8px;">
                     <option value="auto" ${state.menuDirection === 'auto' ? 'selected' : ''}>自动</option>
                     <option value="left" ${state.menuDirection === 'left' ? 'selected' : ''}>向左</option>
                     <option value="right" ${state.menuDirection === 'right' ? 'selected' : ''}>向右</option>
                     <option value="up" ${state.menuDirection === 'up' ? 'selected' : ''}>向上</option>
+                    <option value="down" ${state.menuDirection === 'down' ? 'selected' : ''}>向下</option>
                 </select>
             </div>
 
@@ -11433,6 +12911,7 @@
                 </div>
             </div>
 
+            <div class="att-settings-category-v790" data-settings-anchor="table"><b>表格交互</b><span>分页、滚轮与表格操作方式</span></div>
             <div class="att-card">
                 <div class="att-row">
                     <div>
@@ -11478,6 +12957,18 @@
                 </div>
             </div>
 
+            <div class="att-settings-category-v790" data-settings-anchor="visual"><b>外观与高亮</b><span>主题、动效、聚焦和条件高亮视觉</span></div>
+            <div class="att-card">
+                <div class="att-row">
+                    <div style="min-width:0;">
+                        <div class="att-card-title">Edge / Fluent 深色优化</div>
+                        <div class="att-card-desc">仅在 AutoTable 原生深色模式下接管配色；浅色模式不会被改变。</div>
+                    </div>
+                    <label class="att-switch"><input type="checkbox" data-setting="darkModeOptimized" ${state.darkModeOptimized ? 'checked' : ''}><span class="att-slider"></span></label>
+                </div>
+                <div class="att-sub-label" style="margin-top:8px;">当前：${state.nativeThemeMode === 'dark' ? (state.darkModeOptimized ? 'Edge 配色生效中' : 'AutoTable 原版深色') : state.nativeThemeMode === 'light' ? '浅色模式' : '主题识别中'}</div>
+            </div>
+
             <div class="att-card">
                 <div class="att-row">
                     <div style="min-width:0;">
@@ -11509,6 +13000,25 @@
                                ${state.silkMotionEnabled ? '' : 'disabled'}>
                         <span class="att-slider"></span>
                     </label>
+                </div>
+            </div>
+
+            <div class="att-card">
+                <div class="att-row">
+                    <div style="min-width:0;">
+                        <div class="att-card-title">收起侧边栏识别增强</div>
+                        <div class="att-card-desc">
+                            当 AutoTable 左侧栏收起为窄图标栏时，在大量重复业务图标下自动补充 1–3 字智能微标签，例如“项目 / 商务 / 产品 / 文档 / 经销 / DDI / 运维”。当前页面标签会加强显示；侧栏展开后完全恢复原生布局。
+                        </div>
+                    </div>
+                    <label class="att-switch" title="收起侧边栏识别增强">
+                        <input type="checkbox" data-setting="sidebarCollapsedEnhanceEnabled"
+                               ${state.sidebarCollapsedEnhanceEnabled ? 'checked' : ''}>
+                        <span class="att-slider"></span>
+                    </label>
+                </div>
+                <div class="att-sub-label" style="margin-top:8px;">
+                    只增强收起状态，不改变原菜单点击、原生 title 悬浮提示、分组结构和展开侧栏。
                 </div>
             </div>
 
@@ -11606,16 +13116,17 @@
                 </div>
             </div>
 
+            <div class="att-settings-category-v790" data-settings-anchor="editor"><b>编辑效率</b><span>文本编辑与快捷语句</span></div>
             <div class="att-card">
                 <div class="att-card-title">文本编辑快捷语句</div>
                 <div class="att-card-desc">
-                    多行文本进入编辑状态时显示快捷面板。V7 统一规则中心中，系统与自定义短语均可配置内容模板、显示条件、插入位置、使用场景和日期时间变量。
+                    多行文本进入编辑状态时显示快捷面板。表格单元格与记录详情中的多行字段共用 V7 统一规则中心；系统与自定义短语均可配置内容模板、显示条件、插入位置、使用场景和日期时间变量。
                 </div>
                 <div class="att-divider"></div>
                 <div class="att-row">
                     <div>
                         <div class="att-label">启用快捷语句面板</div>
-                        <div class="att-sub-label">仅在 AutoTable 多行文本编辑器中显示。</div>
+                        <div class="att-sub-label">在表格多行单元格和记录详情多行字段编辑器中显示。</div>
                     </div>
                     <label class="att-switch">
                         <input type="checkbox" data-setting="editorQuickPhraseEnabled"
@@ -11642,6 +13153,7 @@
                 </div>
             </div>
 
+            <div class="att-settings-category-v790" data-settings-anchor="data"><b>数据与维护</b><span>完整备份、导入和恢复默认</span></div>
             <div class="att-card">
                 <div class="att-card-title">全部设置备份与恢复</div>
                 <div class="att-card-desc">
@@ -11659,9 +13171,10 @@
                 </div>
             </div>
 
+            <div class="att-settings-category-v790" data-settings-anchor="hotkeys"><b>快捷键</b><span>集中管理所有键盘操作</span></div>
             <div class="att-card">
                 <div class="att-card-title">功能快捷键</div>
-                <div class="att-card-desc">已补齐列置顶、表格滚轮反转、批量进展、行列高亮、Edge 主题等高频功能。点击“设置”后直接按组合键；Esc 取消，Backspace / Delete 清空。字段组合仍可在“字段组合”页单独设置专属快捷键。</div>
+                <div class="att-card-desc">已补齐列置顶、表格滚轮反转、字段条件高亮、批量进展、行列高亮、Edge 主题等高频功能。点击“设置”后直接按组合键；Esc 取消，Backspace / Delete 清空。字段组合仍可在“字段组合”页单独设置专属快捷键。</div>
                 <div class="att-divider"></div>
                 ${actionRows}
             </div>
@@ -11674,11 +13187,35 @@
             state.recordingHotkeyTarget.id === id;
     }
 
+    function switchPanelTab(tabId) {
+        const root = document.getElementById(APP.rootId);
+        const content = root?.querySelector('.att-content');
+        state.panelTabScrollPositions ||= {};
+        if (content && state.activeTab) {
+            state.panelTabScrollPositions[state.activeTab] = content.scrollTop;
+        }
+
+        if (tabId === 'table-tools') {
+            tabId = state.lastTableToolsTab === 'pinning' ? 'pinning' : 'combos';
+        }
+        if (tabId === 'combos' || tabId === 'pinning') {
+            state.lastTableToolsTab = tabId;
+        }
+
+        state.activeTab = tabId;
+        renderPanelShellState();
+        invalidatePanelSections(tabId);
+        flushPanelDirtySections();
+        requestAnimationFrame(() => {
+            const nextContent = document.querySelector(`#${APP.panelId} .att-content`);
+            if (nextContent) nextContent.scrollTop = state.panelTabScrollPositions?.[tabId] || 0;
+        });
+    }
+
     function onPanelClick(event) {
         const tab = event.target.closest('[data-tab]');
         if (tab) {
-            state.activeTab = tab.dataset.tab;
-            renderPanel();
+            switchPanelTab(tab.dataset.tab);
             resetIdleTimer();
             return;
         }
@@ -11690,6 +13227,78 @@
         const id = action.dataset.id;
 
         switch (act) {
+            case 'go-tab': {
+                const targetTab = action.dataset.tabTarget || 'features';
+                const normalizedTopTab = (targetTab === 'combos' || targetTab === 'pinning') ? 'table-tools' : targetTab;
+                const tabButton = document.querySelector(`#${APP.panelId} .att-tab[data-tab="${normalizedTopTab}"]`);
+                if (tabButton || targetTab === 'combos' || targetTab === 'pinning') {
+                    switchPanelTab(targetTab);
+                }
+                break;
+            }
+
+            case 'switch-table-tool': {
+                const target = action.dataset.target === 'pinning' ? 'pinning' : 'combos';
+                switchPanelTab(target);
+                break;
+            }
+
+            case 'open-bulk-progress-quick':
+                openBulkProgressDialog();
+                break;
+
+            case 'open-search-history-manager':
+                window.dispatchEvent(new CustomEvent('att:search-history:open-manager', {
+                    detail: { source: 'floating-menu' }
+                }));
+                break;
+
+            case 'quick-combo-picker':
+                if (state.comboPickerOpen) closeQuickComboPicker();
+                else openQuickComboPicker();
+                break;
+
+            case 'toggle-conditional-highlight-quick': {
+                const storageKey = 'att_v3_conditionalHighlightEnabled';
+                const nextEnabled = !Boolean(GM_getValue(storageKey, false));
+                GM_setValue(storageKey, nextEnabled);
+                window.dispatchEvent(new CustomEvent('att:conditional-highlight:set', {
+                    detail: { enabled: nextEnabled, source: 'floating-menu' }
+                }));
+                markPanelInteraction(520);
+                renderFeaturesSection();
+                showToast(`字段条件高亮：已${nextEnabled ? '开启' : '关闭'}`);
+                break;
+            }
+
+            case 'cycle-conditional-highlight-group':
+                window.dispatchEvent(new CustomEvent('att:conditional-highlight:cycle-group', {
+                    detail: { direction: 1, source: 'floating-menu' }
+                }));
+                break;
+
+            case 'open-conditional-highlight-manager': {
+                let manage = document.querySelector('#att-cond-highlight-card-v770 [data-cond-act="manage"]');
+                if (!manage) {
+                    state.activeTab = 'settings';
+                    renderPanel();
+                    manage = document.querySelector('#att-cond-highlight-card-v770 [data-cond-act="manage"]');
+                }
+                if (manage) manage.click();
+                else showToast('条件高亮规则中心尚未初始化，请稍后再试');
+                break;
+            }
+
+            case 'settings-jump': {
+                const target = document.querySelector(`[data-settings-anchor="${action.dataset.target || ''}"]`);
+                const content = document.querySelector(`#${APP.panelId} .att-content`);
+                if (target && content) {
+                    const top = target.getBoundingClientRect().top - content.getBoundingClientRect().top + content.scrollTop - 8;
+                    content.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+                }
+                break;
+            }
+
             case 'close-panel':
                 setPanelOpen(false);
                 break;
@@ -11746,7 +13355,7 @@
             }
 
             case 'new-combo':
-                renderComboEditor(null, getCurrentTableContext() ? 'table' : 'template');
+                renderComboEditor(null, getCurrentTableContext() ? 'table' : 'template', { resetDraft:true });
                 break;
 
             case 'set-ctrl-combo':
@@ -11756,13 +13365,13 @@
             case 'edit-combo':
             case 'configure-combo-table': {
                 const combo = state.combos.find(c => c.id === id);
-                if (combo) renderComboEditor(combo, 'table');
+                if (combo) renderComboEditor(combo, 'table', { resetDraft:true });
                 break;
             }
 
             case 'edit-combo-template': {
                 const combo = state.combos.find(c => c.id === id);
-                if (combo) renderComboEditor(combo, 'template');
+                if (combo) renderComboEditor(combo, 'template', { resetDraft:true });
                 break;
             }
 
@@ -11846,6 +13455,8 @@
                     editor.classList.remove('att-show');
                     editor.innerHTML = '';
                 }
+                clearComboEditorDraft();
+                if (panelContextRefreshPending) schedulePanelContextRefresh(80);
                 break;
             }
 
@@ -11857,12 +13468,14 @@
                 document.querySelectorAll('#att-combo-editor [data-combo-field]').forEach(el => {
                     if (el.closest('.att-field-item')?.style.display !== 'none') el.checked = true;
                 });
+                syncComboEditorDraftFromDom();
                 break;
 
             case 'combo-clear-fields':
                 document.querySelectorAll('#att-combo-editor [data-combo-field]').forEach(el => {
                     if (el.closest('.att-field-item')?.style.display !== 'none') el.checked = false;
                 });
+                syncComboEditorDraftFromDom();
                 break;
 
             case 'record-hotkey':
@@ -11891,6 +13504,10 @@
                 }
                 break;
             }
+
+            case 'open-pin-table-manager':
+                openPinTableManager();
+                break;
 
             case 'reapply-pins':
                 scheduleApplyPinnedColumns(0);
@@ -11951,6 +13568,9 @@
 
     function onPanelChange(event) {
         const setting = event.target.dataset.setting;
+        if (event.target.closest?.('#att-combo-editor')) {
+            syncComboEditorDraftFromDom();
+        }
         if (!setting) return;
 
         if (setting === 'comboFormat') {
@@ -11961,11 +13581,18 @@
             return;
         }
 
+        if (setting === 'contactDisplayEnabled') {
+            setContactDisplayEnabled(event.target.checked);
+            showToast(`联系信息显示优化：已${state.contactDisplayEnabled ? '开启' : '关闭'}`);
+            return;
+        }
+
         if (setting === 'clickCopyEnabled') {
             state.clickCopyEnabled = event.target.checked;
             persistCore();
             setBodyModes();
             showToast(`单击复制：已${state.clickCopyEnabled ? '开启' : '关闭'}`);
+            if (state.activeTab === 'features') renderFeaturesSection();
         }
 
         if (setting === 'darkModeOptimized') {
@@ -11991,6 +13618,7 @@
             setBodyModes();
             if (state.focusEnabled && getActiveRowCell()) applyFocus(getActiveRowCell());
             showToast(`聚焦模式：已${state.focusEnabled ? '开启' : '关闭'}`);
+            if (state.activeTab === 'features') renderFeaturesSection();
         }
 
         if (setting === 'rowHighlightEnabled') {
@@ -11998,6 +13626,7 @@
             persistCore();
             if (state.focusEnabled && getActiveRowCell()) applyFocus(getActiveRowCell());
             showToast(`行高亮：已${state.rowHighlightEnabled ? '开启' : '关闭'}`);
+            if (state.activeTab === 'features') renderFeaturesSection();
         }
 
         if (setting === 'columnHighlightEnabled') {
@@ -12005,6 +13634,7 @@
             persistCore();
             if (state.focusEnabled && getActiveRowCell()) applyFocus(getActiveRowCell());
             showToast(`列高亮：已${state.columnHighlightEnabled ? '开启' : '关闭'}`);
+            if (state.activeTab === 'features') renderFeaturesSection();
         }
 
 
@@ -12016,6 +13646,7 @@
                     ? '表格滚轮反转已开启：滚轮=横向，Shift+滚轮=纵向'
                     : '表格滚轮反转已关闭'
             );
+            if (state.activeTab === 'features') renderFeaturesSection();
         }
 
         if (setting === 'silkMotionEnabled') {
@@ -12039,6 +13670,13 @@
                     ? '已忽略系统 Reduce Motion：始终保持完整动画'
                     : '已恢复遵循系统 Reduce Motion'
             );
+        }
+
+        if (setting === 'sidebarCollapsedEnhanceEnabled') {
+            state.sidebarCollapsedEnhanceEnabled = event.target.checked;
+            persistCore();
+            applySidebarCollapsedEnhanceState(true);
+            showToast(`收起侧边栏识别增强：已${state.sidebarCollapsedEnhanceEnabled ? '开启' : '关闭'}`);
         }
 
         const visualToggleMap = {
@@ -12155,6 +13793,7 @@
             setBodyModes();
             scheduleApplyPinnedColumns(0);
             renderPinningSection();
+            if (state.activeTab === 'features') renderFeaturesSection();
             showToast(
                 state.quickPinHeaderEnabled
                     ? '快捷表头置顶已开启：单击=左置顶，Shift+单击=右置顶'
@@ -12169,7 +13808,8 @@
         if (setting === 'menuDirection') {
             state.menuDirection = event.target.value;
             persistCore();
-            updateMenuDirection();
+            updateMenuDirection(false);
+            if (state.panelOpen) requestAnimationFrame(positionPanelInsideViewport);
         }
 
         resetIdleTimer();
@@ -12226,6 +13866,13 @@
     function onPanelInput(event) {
         const setting = event.target.dataset.setting;
 
+        if (event.target.closest?.('#att-combo-editor')) {
+            // 只更新轻量草稿对象，不触发任何 section 重绘。
+            if (event.target.id === 'att-combo-name' || event.target.id === 'att-combo-custom-delimiter') {
+                syncComboEditorDraftFromDom();
+            }
+        }
+
         if (setting === 'comboFieldSearch') {
             const q = sanitizeText(event.target.value || '').toLowerCase();
             document.querySelectorAll('#att-combo-editor .att-field-item').forEach(item => {
@@ -12264,9 +13911,11 @@
         const editor = document.getElementById('att-combo-editor');
         if (!editor) return;
 
-        const name = sanitizeText(document.getElementById('att-combo-name')?.value || '');
-        const format = document.getElementById('att-combo-format')?.value || 'pipe';
-        const customDelimiterRaw = document.getElementById('att-combo-custom-delimiter')?.value ?? '';
+        syncComboEditorDraftFromDom();
+        const draft = comboEditorDraftState;
+        const name = sanitizeText(draft?.name ?? document.getElementById('att-combo-name')?.value ?? '');
+        const format = draft?.format || document.getElementById('att-combo-format')?.value || 'pipe';
+        const customDelimiterRaw = draft?.customDelimiter ?? document.getElementById('att-combo-custom-delimiter')?.value ?? '';
         const customDelimiter = String(customDelimiterRaw)
             .replace(/[\u200B-\u200D\u2060\uFEFF]/g, '');
         const editMode = editor.dataset.editMode === 'template' ? 'template' : 'table';
@@ -12350,6 +13999,11 @@
         }
 
         persistCore();
+        clearComboEditorDraft();
+        panelContextRefreshPending = false;
+        clearTimeout(panelContextRefreshTimer);
+        panelContextRefreshTimer = 0;
+        panelDirtySections.clear();
         renderPanel();
         showToast(editMode === 'table'
             ? `已保存 ${context.tableName} 的字段配置`
@@ -12468,7 +14122,7 @@
 
             root.style.left = `${pos.x}px`;
             root.style.top = `${pos.y}px`;
-            updateMenuDirection();
+            updateMenuDirection(false);
             if (state.panelOpen) positionPanelInsideViewport();
         });
 
@@ -12504,7 +14158,47 @@
         });
     }
 
-    function updateMenuDirection() {
+    function getPanelLayoutSize(panel, margin = 12) {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        // 关键：不能使用 getBoundingClientRect().width/height 作为主尺寸来源。
+        // 菜单关闭态存在 scale(.97) / translate 入场准备动画，rect 会把 transform 算进去，
+        // 从而导致刚打开和动画结束后得到两套尺寸，重新定位时就会出现肉眼可见的漂移。
+        const css = panel ? getComputedStyle(panel) : null;
+        const cssWidth = Number.parseFloat(css?.width || '');
+        const cssHeight = Number.parseFloat(css?.height || '');
+        const width = Math.min(
+            panel?.offsetWidth || (Number.isFinite(cssWidth) ? cssWidth : 448),
+            Math.max(1, vw - margin * 2)
+        );
+        const height = Math.min(
+            panel?.offsetHeight || (Number.isFinite(cssHeight) ? cssHeight : 520),
+            Math.max(1, vh - margin * 2)
+        );
+        return { width, height };
+    }
+
+    function applyPanelViewportHeightLimits(panel, margin = 12) {
+        if (!panel) return;
+        const vh = window.innerHeight;
+        panel.style.maxHeight = `${Math.max(180, vh - margin * 2)}px`;
+        const content = panel.querySelector('.att-content');
+        if (content) {
+            // 头部 + Tab 大约 100px，留一点安全余量。
+            content.style.maxHeight = `${Math.max(120, vh - margin * 2 - 104)}px`;
+        }
+    }
+
+    function schedulePanelStableClamp() {
+        if (!state.panelOpen || panelStabilizeRaf) return;
+        panelStabilizeRaf = requestAnimationFrame(() => {
+            panelStabilizeRaf = 0;
+            if (state.panelOpen) stabilizePanelInsideViewport();
+        });
+    }
+
+    function updateMenuDirection(reposition = true) {
         const root = document.getElementById(APP.rootId);
         if (!root) return;
 
@@ -12512,34 +14206,43 @@
 
         if (direction === 'auto') {
             const fab = document.getElementById(APP.fabId);
+            const panel = document.getElementById(APP.panelId);
             const rect = fab?.getBoundingClientRect() || root.getBoundingClientRect();
-            const panelWidth = Math.min(360, window.innerWidth - 24);
+
+            // V7.16.6：按未经过 transform 的布局尺寸选方向。
+            // 关闭态 scale(.97) 不再影响方向判断，因此打开前后不会因为尺寸变化切换方向。
+            const { width: panelWidth, height: panelHeight } = getPanelLayoutSize(panel);
             const gap = 12;
 
             const rightSpace = window.innerWidth - rect.right;
             const leftSpace = rect.left;
             const upSpace = rect.top;
+            const downSpace = window.innerHeight - rect.bottom;
 
-            // 先保证水平方向能完整放下；否则优先向上。
             if (rightSpace >= panelWidth + gap) {
                 direction = 'right';
             } else if (leftSpace >= panelWidth + gap) {
                 direction = 'left';
-            } else if (upSpace >= 220) {
+            } else if (upSpace >= panelHeight + gap) {
+                direction = 'up';
+            } else if (downSpace >= panelHeight + gap) {
+                direction = 'down';
+            } else if (upSpace >= downSpace) {
                 direction = 'up';
             } else {
-                direction = leftSpace >= rightSpace ? 'left' : 'right';
+                direction = 'down';
             }
         }
 
         root.dataset.direction = direction;
 
-        if (state.panelOpen) {
+        if (state.panelOpen && reposition) {
             requestAnimationFrame(positionPanelInsideViewport);
         }
     }
 
     function positionPanelInsideViewport() {
+        if (PERF) PERF.counters.panelAnchorLayouts++;
         const root = document.getElementById(APP.rootId);
         const fab = document.getElementById(APP.fabId);
         const panel = document.getElementById(APP.panelId);
@@ -12550,27 +14253,13 @@
         const vw = window.innerWidth;
         const vh = window.innerHeight;
 
-        // 每次都先清掉旧定位，防止切换方向后残留。
-        panel.style.left = '0px';
-        panel.style.top = '0px';
+        // fixed 菜单始终只使用 left/top；不再为了测量把可见菜单临时写回 (0,0)。
         panel.style.right = 'auto';
         panel.style.bottom = 'auto';
-
-        // 保证菜单永远不高于当前浏览器可视区域。
-        panel.style.maxHeight = `${Math.max(180, vh - margin * 2)}px`;
-
-        const content = panel.querySelector('.att-content');
-        if (content) {
-            // 头部 + Tab 大约 100px，留一点安全余量。
-            content.style.maxHeight = `${Math.max(120, vh - margin * 2 - 104)}px`;
-        }
+        applyPanelViewportHeightLimits(panel, margin);
 
         const fabRect = fab.getBoundingClientRect();
-
-        // 面板即使 opacity=0 也能正常测量。
-        const panelRect = panel.getBoundingClientRect();
-        const panelWidth = Math.min(panelRect.width || 360, vw - margin * 2);
-        const panelHeight = Math.min(panelRect.height || 500, vh - margin * 2);
+        const { width: panelWidth, height: panelHeight } = getPanelLayoutSize(panel, margin);
 
         let left;
         let top;
@@ -12578,22 +14267,66 @@
 
         if (direction === 'right') {
             left = fabRect.right + gap;
-            // 左右弹出时尽量让菜单和悬浮球垂直居中。
             top = fabRect.top + fabRect.height / 2 - panelHeight / 2;
         } else if (direction === 'up') {
             left = fabRect.left + fabRect.width / 2 - panelWidth / 2;
             top = fabRect.top - gap - panelHeight;
+        } else if (direction === 'down') {
+            left = fabRect.left + fabRect.width / 2 - panelWidth / 2;
+            top = fabRect.bottom + gap;
         } else {
             left = fabRect.left - gap - panelWidth;
             top = fabRect.top + fabRect.height / 2 - panelHeight / 2;
         }
 
-        // 核心：最终无条件夹在视口范围内。
+        // 真正“重新锚定”时才围绕悬浮球计算；结果仍无条件夹在视口内。
         left = Math.max(margin, Math.min(left, vw - panelWidth - margin));
         top = Math.max(margin, Math.min(top, vh - panelHeight - margin));
 
-        panel.style.left = `${Math.round(left)}px`;
-        panel.style.top = `${Math.round(top)}px`;
+        const nextLeft = Math.round(left);
+        const nextTop = Math.round(top);
+        if (Math.abs((Number.parseFloat(panel.style.left) || 0) - nextLeft) > .5) {
+            panel.style.left = `${nextLeft}px`;
+        }
+        if (Math.abs((Number.parseFloat(panel.style.top) || 0) - nextTop) > .5) {
+            panel.style.top = `${nextTop}px`;
+        }
+    }
+
+    function stabilizePanelInsideViewport() {
+        if (PERF) PERF.counters.panelStableClamps++;
+        const panel = document.getElementById(APP.panelId);
+        if (!panel) return;
+
+        const margin = 12;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        applyPanelViewportHeightLimits(panel, margin);
+        const { width: panelWidth, height: panelHeight } = getPanelLayoutSize(panel, margin);
+
+        // 优先读取 layout left/top，而不是 getBoundingClientRect()。
+        // rect 会受到菜单入场 transform 影响；layout 坐标在动画前后保持稳定。
+        let left = Number.parseFloat(panel.style.left);
+        let top = Number.parseFloat(panel.style.top);
+
+        if (!Number.isFinite(left) || !Number.isFinite(top)) {
+            const rect = panel.getBoundingClientRect();
+            if (!Number.isFinite(left)) left = rect.left;
+            if (!Number.isFinite(top)) top = rect.top;
+        }
+
+        const nextLeft = Math.round(
+            Math.max(margin, Math.min(left, vw - panelWidth - margin))
+        );
+        const nextTop = Math.round(
+            Math.max(margin, Math.min(top, vh - panelHeight - margin))
+        );
+
+        // 页面加载导致内容尺寸改变时，位置只在真正越界的轴上做最小修正，
+        // 不再重新围绕悬浮球居中，因此不会出现“打开几秒后菜单自己挪一下”。
+        if (Math.abs(left - nextLeft) > .5) panel.style.left = `${nextLeft}px`;
+        if (Math.abs(top - nextTop) > .5) panel.style.top = `${nextTop}px`;
     }
 
     function setPanelOpen(open) {
@@ -12602,19 +14335,34 @@
 
         state.panelOpen = open;
         if (open) {
-            updateMenuDirection();
+            panelOpenedAt = performance.now();
+            markPanelInteraction(900);
+
+            // 先生成最终内容，再按“未 transform 的布局尺寸”计算方向和位置。
+            // 此时 att-open 尚未加上，用户看不到任何中间位置。
             renderPanel();
+            updateMenuDirection(false);
+            positionPanelInsideViewport();
+
+            root.classList.add('att-open');
+
+            // 页面仍在加载时只在稳定窗口结束后补一次上下文；
+            // 后续 section 变化只做越界校正，不重新围绕悬浮球居中。
+            schedulePanelContextRefresh(900);
+            schedulePanelStableClamp();
         } else {
             state.recordingHotkeyTarget = null;
-        }
-
-        root.classList.toggle('att-open', open);
-
-        if (open) {
-            requestAnimationFrame(() => {
-                updateMenuDirection();
-                positionPanelInsideViewport();
-            });
+            panelPointerActive = false;
+            panelInteractionUntil = 0;
+            clearTimeout(panelContextRefreshTimer);
+            panelContextRefreshTimer = 0;
+            if (panelContextRefreshRaf) cancelAnimationFrame(panelContextRefreshRaf);
+            panelContextRefreshRaf = 0;
+            if (panelStabilizeRaf) cancelAnimationFrame(panelStabilizeRaf);
+            panelStabilizeRaf = 0;
+            panelContextRefreshPending = false;
+            panelDirtySections.clear();
+            root.classList.remove('att-open');
         }
 
         resetIdleTimer();
@@ -14070,7 +15818,11 @@
             case 'field': return context?.fieldName || '';
             case 'row_field': {
                 const targetName = sanitizeText(condition.target || '');
-                if (!targetName || !context?.root || !context?.cell) return '';
+                if (!targetName) return '';
+                if (context?.isRecordDetail) {
+                    return getRecordDetailQuickPhraseFieldValue(context, targetName);
+                }
+                if (!context?.root || !context?.cell) return '';
                 const defs = getGridFieldDefs(context.root);
                 const def = defs.find(item => sanitizeText(item.name).toLowerCase() === targetName.toLowerCase()) ||
                     defs.find(item => sanitizeText(item.name).toLowerCase().includes(targetName.toLowerCase()));
@@ -14674,7 +16426,8 @@
             textarea: null, cell: null, root: getVisibleGridRoot(), fieldId:'',
             fieldName: phraseCenterV7PreferredContext === 'bulk' ? '进展描述' : '',
             tableName: tableContext?.tableName || '',
-            isProgress: phraseCenterV7PreferredContext === 'bulk', bulkMode: phraseCenterV7PreferredContext === 'bulk'
+            isProgress: phraseCenterV7PreferredContext === 'bulk', bulkMode: phraseCenterV7PreferredContext === 'bulk',
+            isRecordDetail: false, drawer: null, detailField: null, anchor: null
         };
     }
 
@@ -15027,8 +16780,100 @@
         });
     }
 
+    // V7.14.1：统一识别表格多行编辑器与记录详情抽屉多行编辑器。
+    // 记录详情真实 DOM（诊断抓取）：aside.record-drawer.is-open 内 textarea.drawer-input.cm-textarea。
+    function isEditorQuickPhraseTextarea(textarea) {
+        return textarea instanceof HTMLTextAreaElement && textarea.matches(
+            'textarea.cell-input.cell-input-textarea, aside.record-drawer.is-open textarea.drawer-input.cm-textarea'
+        );
+    }
+
+    function getRecordDetailQuickPhraseFieldValue(context, targetName) {
+        const drawer = context?.drawer || context?.textarea?.closest('aside.record-drawer.is-open');
+        const wanted = sanitizeText(targetName || '').toLowerCase();
+        if (!drawer || !wanted) return '';
+
+        const fields = Array.from(drawer.querySelectorAll('.drawer-field.record-detail-form-field'));
+        let targetField = fields.find(field =>
+            sanitizeText(field.querySelector(':scope > .drawer-label')?.textContent || '').toLowerCase() === wanted
+        );
+        if (!targetField) {
+            targetField = fields.find(field =>
+                sanitizeText(field.querySelector(':scope > .drawer-label')?.textContent || '').toLowerCase().includes(wanted)
+            );
+        }
+        if (!targetField) return '';
+
+        // 当前正在编辑的字段优先取真实编辑器 value；这样显示规则能即时响应尚未保存的内容。
+        const textarea = targetField.querySelector('textarea.drawer-input.cm-textarea');
+        if (textarea instanceof HTMLTextAreaElement) return String(textarea.value ?? '');
+
+        const input = targetField.querySelector('input.drawer-input:not([type="file"]), input.cm-input:not([type="file"])');
+        if (input instanceof HTMLInputElement) return String(input.value ?? '');
+
+        // 非编辑状态只读取值容器，排除“编辑 / 管理附件”等动作文字。
+        const content = targetField.querySelector('.drawer-value-shell__content');
+        if (content) {
+            const value = sanitizeText(content.textContent || '');
+            return value === '—' ? '' : value;
+        }
+
+        const valueShell = targetField.querySelector('.drawer-value-shell');
+        if (valueShell) {
+            const clone = valueShell.cloneNode(true);
+            clone.querySelectorAll('.drawer-value-shell__edit,.drawer-value-shell__action').forEach(node => node.remove());
+            const value = sanitizeText(clone.textContent || '');
+            return value === '—' ? '' : value;
+        }
+        return '';
+    }
+
+    function getRecordDetailQuickPhraseFieldContext(textarea) {
+        if (!(textarea instanceof HTMLTextAreaElement)) return null;
+        const drawer = textarea.closest('aside.record-drawer.is-open');
+        const detailField = textarea.closest('.drawer-field.record-detail-form-field');
+        if (!drawer || !detailField) return null;
+
+        let fieldName = sanitizeText(detailField.querySelector(':scope > .drawer-label')?.textContent || '');
+        if (!fieldName) {
+            fieldName = sanitizeText(String(textarea.getAttribute('placeholder') || '').replace(/^请输入/, '')) || '多行文本';
+        }
+
+        const normalized = String(fieldName).replace(/\s+/g, '');
+        const isProgress = normalized.includes('进展描述');
+        const tableContext = getCurrentTableContext();
+        const tableName = tableContext?.tableName || '';
+        const gridRoot = drawer.closest('.grid-root') || getVisibleGridRoot();
+        let fieldId = '';
+        if (gridRoot) {
+            const wanted = sanitizeText(fieldName).toLowerCase();
+            const def = getGridFieldDefs(gridRoot).find(item => sanitizeText(item.name).toLowerCase() === wanted)
+                || getGridFieldDefs(gridRoot).find(item => sanitizeText(item.name).toLowerCase().includes(wanted));
+            fieldId = def?.fieldId || '';
+        }
+
+        return {
+            textarea,
+            cell: null,
+            root: gridRoot,
+            fieldId,
+            fieldName,
+            tableName,
+            isProgress,
+            isRecordDetail: true,
+            drawer,
+            detailField,
+            anchor: detailField
+        };
+    }
+
     function getEditorQuickPhraseFieldContext(textarea) {
         if (!(textarea instanceof HTMLTextAreaElement)) return null;
+
+        // 记录详情优先：抽屉编辑器没有 grid-cell，需要从 drawer-field / drawer-label 建立字段上下文。
+        if (textarea.matches('aside.record-drawer.is-open textarea.drawer-input.cm-textarea')) {
+            return getRecordDetailQuickPhraseFieldContext(textarea);
+        }
 
         const cell = textarea.closest('.grid-cell[data-grid-field-id]');
         if (!cell) return null;
@@ -15047,7 +16892,13 @@
         const tableContext = getCurrentTableContext();
         const tableName = tableContext?.tableName || '';
 
-        return { textarea, cell, root, fieldId, fieldName, tableName, isProgress };
+        return {
+            textarea, cell, root, fieldId, fieldName, tableName, isProgress,
+            isRecordDetail: false,
+            drawer: null,
+            detailField: null,
+            anchor: cell
+        };
     }
 
     function getEditorQuickPhrasePanel() {
@@ -15132,11 +16983,19 @@
         const hint = panel.querySelector('#att-editor-phrase-hint');
         const list = panel.querySelector('#att-editor-phrase-list');
 
-        if (title) title.textContent = `${context.fieldName} · 快捷语句`;
+        if (title) title.textContent = context.isRecordDetail
+            ? `记录详情 · ${context.fieldName} · 快捷语句`
+            : `${context.fieldName} · 快捷语句`;
         if (hint) {
-            hint.textContent = context.isProgress
-                ? '快捷短语按统一规则执行：模板、显示条件、插入位置均可配置'
-                : '仅显示当前字段 / 表格 / 内容条件满足的快捷短语';
+            if (context.isProgress) {
+                hint.textContent = context.isRecordDetail
+                    ? '记录详情进展描述 · 与表格编辑共用统一规则、日期前缀和插入策略'
+                    : '快捷短语按统一规则执行：模板、显示条件、插入位置均可配置';
+            } else {
+                hint.textContent = context.isRecordDetail
+                    ? '记录详情字段 · 仅显示当前字段 / 表格 / 内容条件满足的快捷短语'
+                    : '仅显示当前字段 / 表格 / 内容条件满足的快捷短语';
+            }
         }
 
         if (!list) return;
@@ -15221,25 +17080,25 @@
         panel.style.top = `${Math.round(Math.max(margin, top))}px`;
     }
 
-    function bindEditorQuickPhraseCellObserver(cell) {
+    function bindEditorQuickPhraseCellObserver(host) {
         editorQuickPhraseCellObserver?.disconnect();
         editorQuickPhraseCellObserver = null;
 
-        if (!(cell instanceof Element)) return;
+        if (!(host instanceof Element)) return;
 
         editorQuickPhraseCellObserver = new MutationObserver(() => {
             if (!editorQuickPhraseTarget?.isConnected ||
-                !cell.contains(editorQuickPhraseTarget)) {
+                !host.contains(editorQuickPhraseTarget)) {
                 hideEditorQuickPhrasePanel(true);
             }
         });
-        editorQuickPhraseCellObserver.observe(cell, { childList: true, subtree: true });
+        editorQuickPhraseCellObserver.observe(host, { childList: true, subtree: true });
     }
 
     function showEditorQuickPhrasePanel(textarea) {
         if (!state.editorQuickPhraseEnabled) return;
         if (!(textarea instanceof HTMLTextAreaElement)) return;
-        if (!textarea.matches('textarea.cell-input.cell-input-textarea')) return;
+        if (!isEditorQuickPhraseTextarea(textarea)) return;
         if (!isElementVisible(textarea)) return;
 
         const context = getEditorQuickPhraseFieldContext(textarea);
@@ -15255,7 +17114,7 @@
 
         renderEditorQuickPhrasePanel();
         panel.hidden = false;
-        bindEditorQuickPhraseCellObserver(context.cell);
+        bindEditorQuickPhraseCellObserver(context.anchor || context.cell || context.detailField);
         scheduleEditorQuickPhrasePosition();
     }
 
@@ -15350,7 +17209,7 @@
         document.addEventListener('focusin', event => {
             const textarea = event.target;
             if (!(textarea instanceof HTMLTextAreaElement)) return;
-            if (!textarea.matches('textarea.cell-input.cell-input-textarea')) return;
+            if (!isEditorQuickPhraseTextarea(textarea)) return;
             prepareEditorQuickPhraseTopLine(textarea);
             showEditorQuickPhrasePanel(textarea);
         }, true);
@@ -15358,7 +17217,7 @@
         document.addEventListener('input', event => {
             const textarea = event.target;
             if (!(textarea instanceof HTMLTextAreaElement)) return;
-            if (!textarea.matches('textarea.cell-input.cell-input-textarea')) return;
+            if (!isEditorQuickPhraseTextarea(textarea)) return;
             if (!editorQuickPhraseInternalWrite) markEditorQuickPhraseSessionTouched(textarea);
             if (textarea === editorQuickPhraseTarget && !editorQuickPhraseInternalWrite) {
                 scheduleEditorQuickPhraseRender();
@@ -15368,7 +17227,7 @@
         document.addEventListener('focusout', event => {
             const textarea = event.target;
             if (!(textarea instanceof HTMLTextAreaElement)) return;
-            if (!textarea.matches('textarea.cell-input.cell-input-textarea')) return;
+            if (!isEditorQuickPhraseTextarea(textarea)) return;
 
             restoreUnusedEditorQuickPhraseTopLine(textarea);
             if (textarea !== editorQuickPhraseTarget) return;
@@ -16688,7 +18547,7 @@
                 store.set('position', bounded);
             }
             applyFabPosition(false);
-            updateMenuDirection();
+            updateMenuDirection(false);
             scheduleApplyPinnedColumns(0);
             if (state.panelOpen) {
                 requestAnimationFrame(positionPanelInsideViewport);
@@ -16722,6 +18581,125 @@
         });
     }
 
+    /* ========================================================================
+     * V7.14：收起侧边栏识别增强
+     * ------------------------------------------------------------------------
+     * AutoTable 收起侧栏后宽度约 64px，大量业务表入口复用同一个 table 图标。
+     * 本模块不篡改 React 菜单结构，只给按钮补 data 属性，再通过 ::after 显示
+     * 智能微标签；ResizeObserver 只观察 aside 尺寸，MutationObserver 只观察
+     * sidebar-scroll-region 的 childList，避免全页面扫描。
+     * ====================================================================== */
+    let sidebarEnhanceAside = null;
+    let sidebarEnhanceResizeObserver = null;
+    let sidebarEnhanceMutationObserver = null;
+    let sidebarEnhanceRaf = 0;
+
+    function makeSidebarMiniLabel(title) {
+        const full = sanitizeText(title || '');
+        if (!full) return '';
+        const leaf = sanitizeText(full.split('/').pop() || full);
+        if (!leaf) return '';
+
+        const exact = [
+            [/^DDI实施工单表$/i, 'DDI'],
+            [/^bug\s*&?\s*功能需求表$/i, 'BUG'],
+            [/^公用文档$/, '文档'],
+            [/^经销商主数据表$/, '经销'],
+            [/^项目表$/, '项目'],
+            [/^商务表$/, '商务'],
+            [/^产品表$/, '产品'],
+            [/^协议邮寄表$/, '协议'],
+            [/^运维工单表$/, '运维'],
+            [/^二次维护名单$/, '二次'],
+            [/^工作交接文档$/, '交接']
+        ];
+        for (const [re, label] of exact) if (re.test(leaf)) return label;
+
+        if (/^[A-Za-z][A-Za-z0-9 _&-]*$/.test(leaf)) {
+            const ascii = leaf.replace(/[^A-Za-z0-9]/g, '');
+            return ascii.slice(0, 3).toUpperCase();
+        }
+
+        let base = leaf
+            .replace(/(?:主数据表|数据表|实施工单表|工单表|功能需求表|文档|名单|中心|表)$/g, '')
+            .replace(/^(基础资料|项目协作|交接文档)[\s·：:-]*/g, '')
+            .trim();
+        if (!base) base = leaf;
+        return Array.from(base).slice(0, 2).join('');
+    }
+
+    function isAutoTableSidebarCollapsed(aside) {
+        if (!(aside instanceof HTMLElement) || !aside.isConnected) return false;
+        const expandBtn = aside.querySelector('.sidebar-top-actions button[aria-label*="展开侧边栏"], .sidebar-top-actions button[title*="展开侧边栏"]');
+        if (expandBtn) return true;
+        const width = aside.getBoundingClientRect().width;
+        return width > 0 && width <= 82;
+    }
+
+    function decorateCollapsedSidebarItems(aside) {
+        if (!(aside instanceof HTMLElement)) return;
+        const buttons = aside.querySelectorAll('.sidebar-menu-item[title]');
+        buttons.forEach(btn => {
+            // 首页 / AI 等原本就有强辨识度的 primary 图标不额外加文字，避免视觉噪声。
+            if (btn.classList.contains('sidebar-menu-item--primary')) {
+                btn.removeAttribute('data-att-sidebar-mini');
+                return;
+            }
+            const title = btn.getAttribute('title') || '';
+            const label = makeSidebarMiniLabel(title);
+            if (label) btn.setAttribute('data-att-sidebar-mini', label);
+            else btn.removeAttribute('data-att-sidebar-mini');
+        });
+    }
+
+    function scheduleSidebarCollapsedEnhance() {
+        if (sidebarEnhanceRaf) return;
+        sidebarEnhanceRaf = requestAnimationFrame(() => {
+            sidebarEnhanceRaf = 0;
+            applySidebarCollapsedEnhanceState(false);
+        });
+    }
+
+    function bindSidebarEnhanceObservers(aside) {
+        if (sidebarEnhanceAside === aside && sidebarEnhanceResizeObserver && sidebarEnhanceMutationObserver) return;
+        sidebarEnhanceResizeObserver?.disconnect();
+        sidebarEnhanceMutationObserver?.disconnect();
+        sidebarEnhanceAside = aside || null;
+        if (!(aside instanceof HTMLElement)) return;
+
+        sidebarEnhanceResizeObserver = new ResizeObserver(() => scheduleSidebarCollapsedEnhance());
+        sidebarEnhanceResizeObserver.observe(aside);
+
+        const scrollRegion = aside.querySelector('.sidebar-scroll-region') || aside;
+        sidebarEnhanceMutationObserver = new MutationObserver(records => {
+            if (!state.sidebarCollapsedEnhanceEnabled) return;
+            // 只要菜单子树发生新增/替换，就在下一帧补齐 data 标签；不监听 style/class 高频属性。
+            if (records.some(r => r.type === 'childList' && (r.addedNodes.length || r.removedNodes.length))) {
+                scheduleSidebarCollapsedEnhance();
+            }
+        });
+        sidebarEnhanceMutationObserver.observe(scrollRegion, { childList: true, subtree: true });
+    }
+
+    function applySidebarCollapsedEnhanceState(force = false) {
+        const aside = document.querySelector('aside.app-shell-sidebar');
+        document.body.classList.toggle('att-sidebar-collapsed-enhanced', Boolean(state.sidebarCollapsedEnhanceEnabled));
+
+        if (!(aside instanceof HTMLElement)) {
+            sidebarEnhanceAside?.classList.remove('att-sidebar-is-collapsed');
+            if (force) bindSidebarEnhanceObservers(null);
+            return;
+        }
+
+        bindSidebarEnhanceObservers(aside);
+        const collapsed = Boolean(state.sidebarCollapsedEnhanceEnabled) && isAutoTableSidebarCollapsed(aside);
+        aside.classList.toggle('att-sidebar-is-collapsed', collapsed);
+        if (collapsed) decorateCollapsedSidebarItems(aside);
+        else if (!state.sidebarCollapsedEnhanceEnabled) {
+            aside.querySelectorAll('[data-att-sidebar-mini]').forEach(el => el.removeAttribute('data-att-sidebar-mini'));
+        }
+    }
+
     function init() {
         loadState();
 
@@ -16731,7 +18709,9 @@
         ensureRoot();
         ensureBulkProgressButton();
         setBodyModes();
+        applySidebarCollapsedEnhanceState(true);
         bindGlobalEvents();
+        initContactDisplay();
         bindEditorQuickPhraseEvents();
         scheduleApplyPinnedColumns(0);
         schedulePaginationEnhance();
@@ -16740,16 +18720,22 @@
         let themeRefreshTimer = null;
 
         const observer = new MutationObserver(mutations => {
+            if (PERF) PERF.counters.mainObserverCallbacks++;
+            contactPageMutations(mutations);
             /*
              * V6.6 关键性能路径：
              * 虚拟滚动时 .grid-virtual-body 会频繁增删/复用行。
              * 置顶列已有专用 pinVirtualObserver，斑马纹也有专用增量 observer；
              * 因此这里直接跳过主题检测、Ant Select 全文扫描、分页增强、表上下文识别等全局工作。
              */
-            if (isVirtualGridOnlyMutationBatch(mutations)) return;
+            if (isVirtualGridOnlyMutationBatch(mutations)) {
+                if (PERF) PERF.counters.virtualObserverFastSkips++;
+                return;
+            }
 
             ensureRoot();
             ensureBulkProgressButton();
+            scheduleSidebarCollapsedEnhance();
 
             clearTimeout(themeRefreshTimer);
             themeRefreshTimer = setTimeout(refreshNativeThemeFromDom, 80);
@@ -16806,8 +18792,9 @@
                 lastComboContextKey = comboContextKey;
                 updateActiveComboBadge();
                 if (state.panelOpen) {
-                    if (state.activeTab === 'combos') renderCombosSection();
-                    if (state.activeTab === 'features') renderFeaturesSection();
+                    // V7.16.4：SPA / 首屏加载中的上下文变化只排队刷新。
+                    // 直接 renderFeaturesSection 会销毁当前聚焦的 select / input / button。
+                    schedulePanelContextRefresh(180);
                 }
             }
 
@@ -16840,7 +18827,16 @@
             restore: restoreFocusedRowIfVisible
         };
 
+        // V7.15：条件高亮规则组切换后，快捷页立即同步当前组名称与命中规则数。
+        window.addEventListener('att:conditional-highlight:group-changed', event => {
+            if (state.panelOpen && state.activeTab === 'features') schedulePanelContextRefresh(80);
+            const name = String(event?.detail?.name || '高亮规则组');
+            const count = Number(event?.detail?.activeCount || 0);
+            showToast(`高亮规则组：${name}${Number.isFinite(count) ? ` · ${count} 条启用规则` : ''}`);
+        });
+
         console.log(`[AutoTable 工具集] ${APP.version} 已加载`);
+        console.log('[AutoTable 工具集] V7.16.6：保留 V7.16.5 性能加固；菜单改为布局尺寸测量 + 打开后位置稳定，仅在越界时最小校正。');
         console.log('[AutoTable 工具集] V6.8：基于 V6.6 稳定渲染版升级规则化快捷短语、日期时间模板、条件显示与编辑首行自动预留。');
     }
 
@@ -16855,7 +18851,7 @@
  * AutoTable 虚拟表格稳定行渲染 V6.6
  * --------------------------------------------------------------------------
  * 真实行号 -> data-att-row-parity，彻底替代 nth-child 斑马纹。
- * 只观察 grid-virtual-body 内新增行与行号文字变化，不监听 scroll/style，不做全表轮询。
+ * 局部观察虚拟表格行、内容和字段标题变化；联系信息显示复用此观察器。不监听 scroll/style，不做全表轮询。
  * ========================================================================== */
 (function () {
     'use strict';
@@ -16908,6 +18904,7 @@
         try { window.__attFocusRestoreV753?.schedule?.(); } catch {}
 
         const observer = new MutationObserver(records => {
+            window.__attContactDisplayV7200?.mutations?.(records);
             const rows = new Set();
             for (const record of records) {
                 if (record.type === 'characterData') {
@@ -16936,7 +18933,8 @@
             try { window.__attFocusRestoreV753?.schedule?.(); } catch {}
         });
 
-        observer.observe(body, { childList: true, subtree: true, characterData: true });
+        observer.observe(body.closest('.grid-root') || body, {childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['data-grid-field-id','title']});
+        window.__attContactDisplayV7200?.queue?.(body);
         observedBodies.set(body, observer);
     }
 
@@ -17002,7 +19000,7 @@
     const DOC_TOOLS = {
         version: 'V5',
         tabId: 'document-tools',
-        tabLabel: '文档工具',
+        tabLabel: '文档',
         sectionId: 'att-document-tools-section',
         outlineId: 'att-document-outline',
         outlineListId: 'att-document-outline-list',
@@ -17022,8 +19020,14 @@
     const docState = {
         outlineEnabled: readOutlineEnabled(),
         outlineFollowEnabled: readOutlineFollowEnabled(),
+        rememberReading: workspaceReadMemorySetting('reading'),
+        rememberFold: workspaceReadMemorySetting('fold'),
+        bookmarksEnabled: Boolean(workspaceRead('att_doc_tools_bookmarks_enabled_v7191',true)),
         editor: null,
         headings: [],
+        navigationMerged: readMergedNavigationEnabled(),
+        navigationTables: [],
+        navigationCollapsed: new WeakSet(),
         headingObserver: null,
         pageObserver: null,
         rebuildTimer: 0,
@@ -17031,6 +19035,970 @@
         activeRaf: 0,
         jumpToken: 0
     };
+
+    // Headings and top-level tables share one outline, in document order.
+    // This module owns rendering; Table Plus retains its internal-scroll locator.
+    const DOCUMENT_NAV_EVENTS = {
+        settings: 'att-document-navigation-settings-v7184',
+        rendered: 'att-document-navigation-rendered-v7184',
+        navigate: 'att-document-table-navigate-v7184',
+        active: 'att-document-table-active-v7184'
+    };
+
+    // V7.19.0: UI state belongs to the document; editor content is read only here.
+    const WS_KEY = 'att_doc_workspace_state_v7190';
+    const W = {
+        key: '', editor: null, record: null, query: '', mode: 'all', fullRoots: [], roots: [],
+        tables: [], tableMatches: new Set(), filterCollapsed: new WeakSet(), appliedFolds: new WeakSet(),
+        contextTarget: null, selectionRanges: [], selectionEditor: null, scope: 'document', scopeRanges: [],
+        scopeToken: 0, saveTimer: 0, restoreTimer: 0, restoreAttempts: 0, readingPending: null,
+        userNavigated: false, restoringUntil: 0, dialog: null, menu: null, view: null, initialized: false,
+        pane: workspaceRead('att_doc_tools_nav_pane_v7191','outline') === 'bookmarks' ? 'bookmarks' : 'outline',
+        panelCollapsed: Boolean(workspaceRead('att_doc_tools_nav_collapsed_v7191',false))
+    };
+
+    function workspaceSetPane(pane) {
+        W.pane = pane === 'bookmarks' && docState.bookmarksEnabled !== false ? 'bookmarks' : 'outline';
+        try {GM_setValue('att_doc_tools_nav_pane_v7191', W.pane);} catch (_) {}
+        workspaceUpdatePane(document.getElementById(DOC_TOOLS.outlineId));
+    }
+    function workspaceUpdatePane(panel) {
+        if (!panel) return;
+        if (docState.bookmarksEnabled === false) W.pane = 'outline';
+        panel.dataset.attWsPane = W.pane;
+        panel.dataset.attWsCollapsed = W.panelCollapsed ? '1' : '0';
+        const bookmarks = panel.querySelector('#att-doc-workspace-bookmarks-v7190');
+        const list = panel.querySelector(`#${DOC_TOOLS.outlineListId}`);
+        const controls = panel.querySelector('#att-doc-workspace-controls-v7190');
+        if (list) list.hidden = W.pane !== 'outline' || W.panelCollapsed;
+        if (controls) controls.hidden = W.pane !== 'outline' || W.panelCollapsed;
+        if (bookmarks) bookmarks.hidden = W.pane !== 'bookmarks' || W.panelCollapsed;
+        const tableList = panel.querySelector('#att-doc-table-nav-v7170');
+        if (tableList) tableList.style.display = W.pane !== 'outline' || W.panelCollapsed || W.mode === 'headings' ? 'none' : '';
+        panel.querySelectorAll('button[data-att-ws-pane]').forEach(button => {
+            const active = button.dataset.attWsPane === W.pane;
+            button.setAttribute('aria-selected',String(active));
+            button.classList.toggle('is-active',active); button.tabIndex = active ? 0 : -1;
+            if (button.dataset.attWsPane === 'bookmarks') {
+                button.hidden = docState.bookmarksEnabled === false;
+                button.textContent = `☆ 书签 ${W.record?.bookmarks.length || 0}`;
+            }
+        });
+        const collapse = panel.querySelector('[data-att-ws-panel-collapse]');
+        if (collapse) {
+            collapse.textContent = W.panelCollapsed ? '☰' : '‹';
+            collapse.title = W.panelCollapsed ? '展开文档导航' : '收起文档导航';
+            collapse.setAttribute('aria-label',collapse.title);
+            collapse.setAttribute('aria-expanded',String(!W.panelCollapsed));
+        }
+        scheduleActiveHeadingUpdate();
+    }
+    function workspaceEnsurePaneControls(panel) {
+        const head = panel.querySelector('.att-doc-outline-head');
+        if (head && !head.querySelector('[data-att-ws-panel-collapse]')) {
+            const button = document.createElement('button'); button.type = 'button';
+            button.setAttribute('data-att-ws-panel-collapse','');
+            button.addEventListener('click',event => {
+                event.preventDefault(); W.panelCollapsed = !W.panelCollapsed;
+                try {GM_setValue('att_doc_tools_nav_collapsed_v7191',W.panelCollapsed);} catch (_) {}
+                workspaceUpdatePane(panel);
+                window.dispatchEvent(new Event('resize'));
+            });
+            head.appendChild(button);
+        }
+        let tabs = panel.querySelector('#att-doc-workspace-tabs-v7191');
+        if (!tabs) {
+            tabs = document.createElement('div'); tabs.id = 'att-doc-workspace-tabs-v7191';
+            tabs.setAttribute('role','tablist'); tabs.setAttribute('aria-label','文档导航面板');
+            tabs.innerHTML = `<button type="button" role="tab" id="att-doc-ws-outline-tab-v7191" data-att-ws-pane="outline" aria-controls="${DOC_TOOLS.outlineListId}">☷ 大纲</button><button type="button" role="tab" id="att-doc-ws-bookmark-tab-v7191" data-att-ws-pane="bookmarks" aria-controls="att-doc-workspace-bookmarks-v7190">☆ 书签</button>`;
+            tabs.addEventListener('click',event => {
+                const button = event.target?.closest?.('button[data-att-ws-pane]');
+                if (button) {event.preventDefault(); workspaceSetPane(button.dataset.attWsPane);}
+            });
+            tabs.addEventListener('keydown',event => {
+                if (!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+                const buttons = Array.from(tabs.querySelectorAll('button')).filter(button => !button.hidden);
+                if (!buttons.length) return;
+                event.preventDefault();
+                const index = buttons.findIndex(button => button === document.activeElement);
+                const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length-1 : (Math.max(0,index)+(event.key === 'ArrowRight' ? 1 : -1)+buttons.length)%buttons.length;
+                workspaceSetPane(buttons[next].dataset.attWsPane);
+                buttons[next].focus({preventScroll:true});
+            });
+            panel.insertBefore(tabs,panel.querySelector(`#${DOC_TOOLS.outlineListId}`));
+        }
+        const list = panel.querySelector(`#${DOC_TOOLS.outlineListId}`);
+        if (list) {list.setAttribute('role','tabpanel');list.setAttribute('aria-labelledby','att-doc-ws-outline-tab-v7191');}
+        workspaceUpdatePane(panel);
+    }
+
+    // Use the real visible document viewport, including clipped application
+    // ancestors and CSS zoom. A fixed offset cannot describe this layout.
+    function workspaceLayoutScale(element, rect) {
+        const scale = element.offsetWidth > 0 ? rect.width / element.offsetWidth : 1;
+        return Number.isFinite(scale) && scale > 0 ? scale : 1;
+    }
+    function workspaceUpdateLayout() {
+        const panel = document.getElementById(DOC_TOOLS.outlineId);
+        if (panel?.isConnected && panel.getClientRects().length) {
+            const rect = panel.getBoundingClientRect();
+            const scale = workspaceLayoutScale(panel, rect);
+            const viewport = window.visualViewport;
+            let top = Math.max(0, viewport?.offsetTop || 0);
+            let bottom = Math.min(window.innerHeight,
+                viewport ? top + viewport.height : window.innerHeight);
+            for (let parent = panel.parentElement;
+                parent && parent !== document.body && parent !== document.documentElement;
+                parent = parent.parentElement) {
+                const style = getComputedStyle(parent);
+                if (!/^(auto|scroll|overlay|hidden|clip)$/.test(style.overflowY || style.overflow || '') || parent.clientHeight <= 0) continue;
+                const parentRect = parent.getBoundingClientRect();
+                const parentScale = workspaceLayoutScale(parent, parentRect);
+                const clientTop = parentRect.top + parent.clientTop * parentScale;
+                top = Math.max(top, clientTop);
+                bottom = Math.min(bottom, clientTop + parent.clientHeight * parentScale);
+            }
+            const height = Math.max(0, Math.floor((bottom - Math.max(top, rect.top) - 8) / scale));
+            const value = height + 'px';
+            if (panel.style.getPropertyValue('--att-doc-outline-height-v7192') !== value) {
+                panel.style.setProperty('--att-doc-outline-height-v7192', value);
+            }
+        }
+        const bar = document.getElementById('att-doc-page-search-bar-v62');
+        if (bar?.getClientRects().length) {
+            const rect = bar.getBoundingClientRect();
+            if (rect.width > 0) {
+                // Measure the available document column rather than the whole
+                // browser window, since both native and plugin sidebars vary.
+                const inline = rect.width / workspaceLayoutScale(bar, rect) >= 880;
+                const value = inline ? '1' : '0';
+                if (bar.getAttribute('data-att-ws-scope-inline') !== value) {
+                    bar.setAttribute('data-att-ws-scope-inline', value);
+                }
+            }
+        }
+    }
+
+    function workspaceRead(key, fallback) {
+        try { return GM_getValue(key, fallback); } catch (_) { return fallback; }
+    }
+    function workspaceReadMemorySetting(kind) {
+        return Boolean(workspaceRead(`att_doc_tools_${kind}_memory_v7190`, true));
+    }
+    function workspaceStore() {
+        const value = workspaceRead(WS_KEY, {});
+        return value && typeof value === 'object' && value.version === 1 && value.documents &&
+            typeof value.documents === 'object' ? value : {version: 1, documents: {}};
+    }
+    function workspaceDocumentKey(editor) {
+        const page = editor?.closest('.document-view-page');
+        const identity = page?.getAttribute('data-document-id') || page?.getAttribute('data-record-id') ||
+            editor?.getAttribute('data-document-id') || '';
+        return `doc:${location.origin || ''}${location.pathname || ''}${location.search || ''}|${identity}`;
+    }
+    function workspaceSyncDocument(editor) {
+        if (!editor) return;
+        const key = workspaceDocumentKey(editor);
+        if (W.key === key && W.editor === editor) return;
+        workspaceFlushMemory();
+        closeWorkspaceDialog(); closeChapterMenu();
+        const stored = workspaceStore().documents[key];
+        W.key = key; W.editor = editor; W.view = null;
+        W.record = stored && typeof stored === 'object' ? {
+            collapsed: Array.isArray(stored.collapsed) ? stored.collapsed : [],
+            bookmarks: Array.isArray(stored.bookmarks) ? stored.bookmarks.slice(0, 200) : [],
+            reading: stored.reading || null, updatedAt: stored.updatedAt || 0
+        } : {collapsed: [], bookmarks: [], reading: null, updatedAt: 0};
+        W.appliedFolds = new WeakSet(); W.filterCollapsed = new WeakSet();
+        docState.navigationCollapsed = new WeakSet();
+        W.query = ''; W.mode = 'all'; W.contextTarget = null;
+        W.selectionRanges = []; W.selectionEditor = null; W.scope = 'document'; W.scopeRanges = [];
+        W.scopeToken++; W.userNavigated = false; W.restoreAttempts = 0;
+        W.readingPending = docState.rememberReading ? W.record.reading : null;
+    }
+    function workspaceNormalize(value) { return String(value || '').replace(/\s+/g, ' ').trim(); }
+    function headingMemoryDescriptor(heading, index, headings = docState.headings) {
+        const occurrence = headings.slice(0, index).filter(item => item.level === heading.level && item.text === heading.text).length;
+        return {text: heading.text, level: heading.level, occurrence};
+    }
+    function workspaceRestoreFolds() {
+        if (!W.record || !docState.rememberFold) return;
+        docState.headings.forEach((heading, index) => {
+            if (W.appliedFolds.has(heading.element)) return;
+            W.appliedFolds.add(heading.element);
+            const key = headingMemoryDescriptor(heading, index);
+            if (W.record.collapsed.some(saved => saved && saved.text === key.text && saved.level === key.level && saved.occurrence === key.occurrence)) {
+                docState.navigationCollapsed.add(heading.element);
+            }
+        });
+    }
+    function workspaceIsFiltering() { return Boolean(W.query.trim() || W.mode !== 'all'); }
+    function workspaceChapterCollapsed(element) {
+        return (workspaceIsFiltering() ? W.filterCollapsed : docState.navigationCollapsed).has(element);
+    }
+    function filterWorkspaceNodes(nodes, query = W.query, mode = W.mode) {
+        const needle = workspaceNormalize(query).toLocaleLowerCase();
+        return nodes.flatMap(node => {
+            const children = filterWorkspaceNodes(node.children || [], query, mode);
+            const allowed = mode === 'all' || (mode === 'headings' ? node.kind === 'heading' : node.kind === 'table');
+            const ownMatch = allowed && (!needle || String(node.text).toLocaleLowerCase().includes(needle));
+            return ownMatch || children.length ? [{...node, children, contextOnly: !ownMatch}] : [];
+        });
+    }
+    function workspaceWithoutTables(nodes) {
+        return nodes.filter(node => node.kind === 'heading').map(node => ({...node, children: workspaceWithoutTables(node.children)}));
+    }
+    function workspaceNavigation(merged) {
+        const full = buildDocumentNavigation(docState.editor, docState.headings, true);
+        W.fullRoots = full.roots; W.tables = full.tables;
+        const filtered = filterWorkspaceNodes(full.roots);
+        W.tableMatches = new Set();
+        const visit = nodes => nodes.forEach(node => {
+            if (node.kind === 'table') W.tableMatches.add(node.element);
+            visit(node.children);
+        });
+        visit(filtered);
+        W.roots = merged ? filtered : workspaceWithoutTables(filtered);
+        return {roots: W.roots, tables: merged ? full.tables : []};
+    }
+    function workspaceBatchFold(action, level = 2) {
+        const apply = (set, heading) => {
+            const collapsed = action === 'collapse' || (action === 'level' && heading.level >= level);
+            if (collapsed) set.add(heading.element); else set.delete(heading.element);
+        };
+        docState.headings.forEach(heading => {
+            apply(docState.navigationCollapsed, heading); apply(W.filterCollapsed, heading);
+        });
+        workspaceRememberFolds(); rebuildOutline();
+    }
+    function workspaceRememberFolds() {
+        if (W.record && docState.rememberFold) {
+            const collapsed = docState.headings.flatMap((heading, index) => docState.navigationCollapsed.has(heading.element)
+                ? [headingMemoryDescriptor(heading, index)] : []);
+            if (JSON.stringify(collapsed) !== JSON.stringify(W.record.collapsed)) {
+                W.record.collapsed = collapsed; workspaceScheduleSave();
+            }
+        }
+    }
+    function workspaceNotice(text, warn = false) {
+        const status = document.getElementById('att-doc-workspace-status-v7190');
+        if (status) {status.textContent = text; status.classList.toggle('is-warning', warn);}
+        const searchStatus = document.getElementById('att-doc-search-scope-status-v7190');
+        if (searchStatus && warn) {searchStatus.textContent = text; searchStatus.classList.add('is-warning');}
+    }
+    function workspaceEnsureControls(panel) {
+        const list = panel.querySelector(`#${DOC_TOOLS.outlineListId}`);
+        if (!list) return;
+        workspaceEnsurePaneControls(panel);
+        let controls = panel.querySelector('#att-doc-workspace-controls-v7190');
+        if (!controls) {
+            controls = document.createElement('div'); controls.id = 'att-doc-workspace-controls-v7190';
+            controls.innerHTML = `<div class="att-doc-ws-search-v7190"><input type="search" data-att-ws-query placeholder="搜索标题或表格名称…" aria-label="搜索标题或表格名称"><button type="button" data-att-ws-action="clear-filter" title="清除导航搜索">×</button></div>
+                <details class="att-doc-ws-options-v7191"><summary>筛选与折叠</summary><select data-att-ws-mode aria-label="导航显示范围"><option value="all">标题与表格</option><option value="headings">只看标题</option><option value="tables">只看表格（保留标题路径）</option></select>
+                <div class="att-doc-ws-actions-v7190"><button type="button" data-att-ws-action="expand">全部展开</button><button type="button" data-att-ws-action="collapse">全部折叠</button><select data-att-ws-level aria-label="展开到指定标题层级"><option value="">展开到…</option>${[1,2,3,4,5,6].map(level => `<option value="${level}">H${level}</option>`).join('')}</select></div></details>
+                <div id="att-doc-workspace-status-v7190" role="status" aria-live="polite"></div>`;
+            controls.addEventListener('input', event => {
+                if (!event.target?.hasAttribute?.('data-att-ws-query')) return;
+                W.query = event.target.value; W.filterCollapsed = new WeakSet(); scheduleOutlineRebuild(80);
+            });
+            controls.addEventListener('change', event => {
+                if (event.target?.hasAttribute?.('data-att-ws-mode')) {
+                    W.mode = ['all','headings','tables'].includes(event.target.value) ? event.target.value : 'all';
+                    W.filterCollapsed = new WeakSet(); rebuildOutline();
+                }
+                if (event.target?.hasAttribute?.('data-att-ws-level') && event.target.value) {
+                    workspaceBatchFold('level', Number(event.target.value)); event.target.value = '';
+                }
+            });
+            controls.addEventListener('click', event => {
+                const action = event.target?.closest?.('button[data-att-ws-action]')?.dataset.attWsAction;
+                if (!action) return;
+                if (action === 'clear-filter') {W.query = ''; W.filterCollapsed = new WeakSet(); rebuildOutline();}
+                else workspaceBatchFold(action);
+            });
+            panel.insertBefore(controls, list);
+        }
+        const input = controls.querySelector('[data-att-ws-query]');
+        if (input && input !== document.activeElement) input.value = W.query;
+        const mode = controls.querySelector('[data-att-ws-mode]'); if (mode) mode.value = W.mode;
+        workspaceRenderBookmarks(panel);
+        workspaceUpdatePane(panel);
+    }
+    function workspaceAnchor(element, selectedQuote = '') {
+        const editor = W.editor;
+        if (!(element instanceof Element) || !editor?.contains(element)) return null;
+        const target = element.closest('p,pre,li,td,th,h1,h2,h3,h4,h5,h6,blockquote') || element;
+        const path = []; for (let node = target; node && node !== editor; node = node.parentElement) {
+            path.unshift(Array.from(node.parentElement?.children || []).indexOf(node));
+        }
+        const quote = workspaceNormalize(target.textContent).slice(0, 240);
+        return {path, tag: target.tagName, quote, selectedQuote: workspaceNormalize(selectedQuote).slice(0, 240)};
+    }
+    function workspaceResolveAnchor(anchor, editor = W.editor) {
+        if (!anchor || !editor?.isConnected || !Array.isArray(anchor.path)) return null;
+        let candidate = editor;
+        for (const index of anchor.path) {candidate = candidate?.children?.[index]; if (!candidate) break;}
+        const matches = node => node instanceof Element && node.tagName === anchor.tag &&
+            (anchor.quote ? workspaceNormalize(node.textContent).startsWith(anchor.quote)
+                : !workspaceNormalize(node.textContent));
+        if (matches(candidate)) return candidate;
+        const candidates = Array.from(editor.querySelectorAll('p,pre,li,td,th,h1,h2,h3,h4,h5,h6,blockquote')).filter(matches);
+        // Ambiguous moved content is left unresolved instead of jumping elsewhere.
+        return candidates.length === 1 ? candidates[0] : null;
+    }
+    function workspaceVisibleTop(host) {
+        const hr = host.getBoundingClientRect(); let top = Math.max(0, hr.top) + 12;
+        const toolbar = W.editor?.closest('.document-view-page')?.querySelector('.document-toolbar');
+        if (toolbar) {
+            const tr = toolbar.getBoundingClientRect();
+            if (tr.height > 0 && tr.bottom > top && tr.top < hr.bottom && tr.bottom < hr.bottom) top = tr.bottom + 12;
+        }
+        return top;
+    }
+    function workspaceReadingSnapshot() {
+        const editor = W.editor, host = findDocumentScrollContainer(editor?.firstElementChild || editor);
+        if (!editor?.isConnected || !host) return null;
+        const top = workspaceVisibleTop(host), bottom = Math.min(window.innerHeight, host.getBoundingClientRect().bottom);
+        const elements = Array.from(editor.querySelectorAll('p,pre,li,td,th,h1,h2,h3,h4,h5,h6,blockquote'));
+        const target = elements.find(el => {const r = el.getBoundingClientRect(); return r.height > 0 && r.bottom > top && r.top < bottom;});
+        const maximum = Math.max(0, host.scrollHeight - host.clientHeight);
+        return {anchor: target ? workspaceAnchor(target) : null, offset: target ? target.getBoundingClientRect().top - top : 0,
+            ratio: maximum ? host.scrollTop / maximum : 0, scrollTop: host.scrollTop};
+    }
+    function workspaceFlushMemory() {
+        clearTimeout(W.saveTimer); W.saveTimer = 0;
+        if (!W.key || !W.record) return;
+        if (docState.rememberReading && performance.now() >= W.restoringUntil && !W.readingPending) {
+            const reading = workspaceReadingSnapshot(); if (reading) W.record.reading = reading;
+        }
+        W.record.updatedAt = Date.now();
+        try {
+            const store = workspaceStore(); store.documents[W.key] = W.record;
+            const keys = Object.keys(store.documents).sort((a,b) => (store.documents[b]?.updatedAt || 0) - (store.documents[a]?.updatedAt || 0));
+            for (const key of keys.slice(100)) delete store.documents[key];
+            GM_setValue(WS_KEY, store);
+        } catch (_) {workspaceNotice('暂时无法保存文档记忆', true);}
+    }
+    function workspaceScheduleSave() {
+        clearTimeout(W.saveTimer); W.saveTimer = window.setTimeout(workspaceFlushMemory, 400);
+    }
+    function workspaceRestoreReading() {
+        if (!W.readingPending || !docState.rememberReading || W.userNavigated || !W.editor?.isConnected) {
+            if (W.userNavigated || !docState.rememberReading) W.readingPending = null;
+            return;
+        }
+        const saved = W.readingPending, target = workspaceResolveAnchor(saved.anchor);
+        const host = findDocumentScrollContainer(target || W.editor.firstElementChild || W.editor);
+        if (!host || host.scrollHeight <= host.clientHeight + 2) {
+            if (W.restoreAttempts++ < 3) {
+                clearTimeout(W.restoreTimer); W.restoreTimer = window.setTimeout(workspaceRestoreReading, 250);
+            } else if (workspaceNormalize(W.editor.textContent)) W.readingPending = null;
+            return;
+        }
+        const max = Math.max(0, host.scrollHeight - host.clientHeight), hr = host.getBoundingClientRect();
+        const scale = host.offsetHeight ? hr.height / host.offsetHeight || 1 : 1;
+        const destination = target ? host.scrollTop + (target.getBoundingClientRect().top - workspaceVisibleTop(host) - (Number(saved.offset) || 0)) / scale
+            : Math.max(0, Math.min(1, Number(saved.ratio) || 0)) * max;
+        W.restoringUntil = performance.now() + 500;
+        host.scrollTop = Math.max(0, Math.min(max, destination));
+        // A toolbar in normal flow may leave the viewport after this scroll.
+        if (target) {
+            const correction = (target.getBoundingClientRect().top - workspaceVisibleTop(host) - (Number(saved.offset) || 0)) / scale;
+            if (Math.abs(correction) > 1) host.scrollTop = Math.max(0, Math.min(max, host.scrollTop + correction));
+        }
+        W.readingPending = null;
+        scheduleActiveHeadingUpdate();
+    }
+    function workspaceNoteTarget(element) {
+        if (!W.editor?.contains(element)) return;
+        W.contextTarget = element; W.userNavigated = true; W.readingPending = null; W.restoringUntil = 0;
+    }
+    function workspaceSafeLocate(element) {
+        if (!W.editor?.contains(element) || !element.isConnected) return false;
+        workspaceNoteTarget(element);
+        const host = findDocumentScrollContainer(element);
+        if (host) {
+            const r = element.getBoundingClientRect(), hr = host.getBoundingClientRect(), top = workspaceVisibleTop(host);
+            if (r.top < top || r.bottom > Math.min(window.innerHeight, hr.bottom) - 12) {
+                const scale = host.offsetHeight ? hr.height / host.offsetHeight || 1 : 1;
+                host.scrollTop = Math.max(0, Math.min(host.scrollHeight - host.clientHeight, host.scrollTop + (r.top - top) / scale));
+            }
+        }
+        element.classList.add('att-doc-outline-target');
+        window.setTimeout(() => element.classList.remove('att-doc-outline-target'), 1300);
+        workspaceScheduleSave(); return true;
+    }
+    function closeWorkspaceDialog() {
+        const dialog = W.dialog; W.dialog = null;
+        if (!dialog) return;
+        dialog.element.remove();
+        if (dialog.previous?.isConnected) {try {dialog.previous.focus({preventScroll:true});} catch (_) {}}
+    }
+    function workspaceDialog(title, content, actions) {
+        closeWorkspaceDialog(); closeChapterMenu();
+        const element = document.createElement('div'); element.id = 'att-doc-workspace-dialog-v7190';
+        element.setAttribute('role', 'dialog'); element.setAttribute('aria-modal', 'true');
+        element.setAttribute('aria-label', title);
+        element.innerHTML = `<div class="att-doc-ws-dialog-shell-v7190"><header><b>${escapeHtml(title)}</b><button type="button" data-att-ws-dialog-action="cancel" aria-label="关闭">×</button></header><div class="att-doc-ws-dialog-body-v7190">${content}</div><footer>${actions}</footer></div>`;
+        W.dialog = {element, previous: document.activeElement}; document.body.appendChild(element);
+        element.addEventListener('click', event => {
+            if (event.target?.closest?.('[data-att-ws-dialog-action="cancel"]')) closeWorkspaceDialog();
+        });
+        element.addEventListener('keydown', event => {
+            if (event.key === 'Escape') {event.preventDefault(); event.stopPropagation(); closeWorkspaceDialog();}
+            if (event.key === 'Tab') {
+                const items = Array.from(element.querySelectorAll('button,input,select,a[href],textarea')).filter(item => !item.disabled);
+                if (!items.length) return;
+                if (event.shiftKey && document.activeElement === items[0]) {event.preventDefault(); items[items.length - 1].focus();}
+                else if (!event.shiftKey && document.activeElement === items[items.length - 1]) {event.preventDefault(); items[0].focus();}
+            }
+        });
+        const focus = element.querySelector('input') || element.querySelector('button');
+        try {focus?.focus({preventScroll:true});} catch (_) {}
+        return element;
+    }
+    function workspaceEditBookmark(id = null) {
+        if (docState.bookmarksEnabled === false) {workspaceNotice('文档书签已关闭，可在“文档”设置中启用',true);return;}
+        const existing = id ? W.record?.bookmarks.find(bookmark => bookmark.id === id) : null;
+        const selected = W.selectionRanges[0];
+        const target = existing ? null : W.contextTarget || docState.headings[0]?.element || W.editor?.firstElementChild;
+        const anchor = existing?.anchor || workspaceAnchor(target, selected?.toString?.() || '');
+        if (!anchor) {workspaceNotice('请先点击或选中文档内容，再添加书签', true); return;}
+        const key = W.key;
+        const name = existing?.name || anchor.selectedQuote.slice(0, 60) || anchor.quote.slice(0, 60) || '新书签';
+        const dialog = workspaceDialog(existing ? '编辑书签名称' : '添加文档书签', `<label>书签名称<input type="text" maxlength="120" data-att-ws-bookmark-name value="${escapeAttr(name)}"></label><p class="att-doc-ws-muted-v7190">定位内容：${escapeHtml(anchor.quote.slice(0, 100) || '空段落')}</p>`, '<button type="button" data-att-ws-dialog-action="cancel">取消</button><button type="button" data-att-ws-bookmark-save>保存书签</button>');
+        const save = () => {
+            const label = dialog.querySelector('[data-att-ws-bookmark-name]')?.value?.trim();
+            if (!label || key !== W.key) return;
+            if (existing) existing.name = label.slice(0, 120);
+            else if (W.record.bookmarks.length < 200) W.record.bookmarks.push({id: `b${Date.now()}-${Math.random().toString(36).slice(2,8)}`, name: label.slice(0, 120), anchor});
+            else {workspaceNotice('当前文档的书签已达到 200 个', true); return;}
+            closeWorkspaceDialog(); workspaceFlushMemory(); workspaceRenderBookmarks(document.getElementById(DOC_TOOLS.outlineId));
+        };
+        dialog.addEventListener('click', event => {if (event.target?.closest?.('[data-att-ws-bookmark-save]')) save();});
+        dialog.addEventListener('keydown', event => {if (event.key === 'Enter' && event.target?.hasAttribute?.('data-att-ws-bookmark-name')) {event.preventDefault(); save();}});
+    }
+    function workspaceRenderBookmarks(panel) {
+        if (!panel || !W.record) return;
+        if (docState.bookmarksEnabled === false) {
+            panel.querySelector('#att-doc-workspace-bookmarks-v7190')?.remove();
+            workspaceUpdatePane(panel); return;
+        }
+        let section = panel.querySelector('#att-doc-workspace-bookmarks-v7190');
+        if (!section) {
+            section = document.createElement('section'); section.id = 'att-doc-workspace-bookmarks-v7190';
+            section.setAttribute('role','tabpanel'); section.setAttribute('aria-labelledby','att-doc-ws-bookmark-tab-v7191');
+            section.addEventListener('click', event => {
+                const button = event.target?.closest?.('button[data-att-ws-bookmark-action]'); if (!button) return;
+                const action = button.dataset.attWsBookmarkAction, id = button.dataset.bookmarkId;
+                const bookmark = W.record.bookmarks.find(item => item.id === id);
+                if (action === 'add' || action === 'rename') workspaceEditBookmark(action === 'rename' ? id : null);
+                if (action === 'locate' && bookmark) {
+                    const target = workspaceResolveAnchor(bookmark.anchor);
+                    if (!target) workspaceNotice('书签内容已变化或位置不明确，可点击 ↻ 更新位置', true);
+                    else workspaceSafeLocate(target);
+                }
+                if (action === 'update' && bookmark) {
+                    const anchor = workspaceAnchor(W.contextTarget, W.selectionRanges[0]?.toString?.() || '');
+                    if (anchor) {bookmark.anchor = anchor; workspaceFlushMemory(); workspaceNotice('书签位置已更新');}
+                    else workspaceNotice('请先点击新的书签位置', true);
+                }
+                if (action === 'delete' && bookmark) {
+                    W.record.bookmarks = W.record.bookmarks.filter(item => item.id !== id);
+                    workspaceFlushMemory(); workspaceRenderBookmarks(panel);
+                }
+            });
+            panel.appendChild(section);
+        }
+        const signature = JSON.stringify(W.record.bookmarks);
+        if (section.dataset.signature === signature) {workspaceUpdatePane(panel);return;}
+        section.dataset.signature = signature;
+        section.innerHTML = `<div class="att-doc-ws-bookmarks-head-v7190"><b>书签 <span>${W.record.bookmarks.length}</span></b><button type="button" data-att-ws-bookmark-action="add" title="为当前内容添加书签">＋书签</button></div><div class="att-doc-ws-bookmarks-list-v7190">${W.record.bookmarks.length ? W.record.bookmarks.map(bookmark => `<div class="att-doc-ws-bookmark-row-v7190"><button type="button" data-att-ws-bookmark-action="locate" data-bookmark-id="${escapeAttr(bookmark.id)}" title="${escapeAttr(bookmark.name)}">☆ ${escapeHtml(bookmark.name)}</button><button type="button" data-att-ws-bookmark-action="rename" data-bookmark-id="${escapeAttr(bookmark.id)}" title="修改名称" aria-label="修改书签名称">✎</button><button type="button" data-att-ws-bookmark-action="update" data-bookmark-id="${escapeAttr(bookmark.id)}" title="更新为当前内容位置" aria-label="更新书签位置">↻</button><button type="button" data-att-ws-bookmark-action="delete" data-bookmark-id="${escapeAttr(bookmark.id)}" title="删除书签" aria-label="删除书签">×</button></div>`).join('') : '<div class="att-doc-ws-muted-v7190">点击正文内容后添加书签</div>'}</div>`;
+        workspaceUpdatePane(panel);
+    }
+    function workspaceHeadingForTarget(target) {
+        const headings = collectHeadings(); let result = null;
+        if (!target || !W.editor?.contains(target)) return null;
+        for (const heading of headings) {
+            if (heading.element === target || heading.element.contains(target) ||
+                (heading.element.compareDocumentPosition(target) & 4)) result = heading;
+            else break;
+        }
+        return result;
+    }
+    function workspaceChapterRange(heading) {
+        const editor = W.editor; if (!editor || !heading?.element?.isConnected || !editor.contains(heading.element)) return null;
+        const headings = collectHeadings(), index = headings.findIndex(item => item.element === heading.element);
+        const boundary = headings.slice(index + 1).find(item => item.level <= heading.level)?.element;
+        const range = document.createRange(); range.setStartBefore(heading.element);
+        if (boundary) range.setEndBefore(boundary); else range.setEnd(editor, editor.childNodes.length);
+        return range;
+    }
+    function workspaceSanitize(fragment) {
+        const box = document.createElement('div'); box.appendChild(fragment);
+        box.querySelectorAll('script,style,iframe,object,embed,form,input,button,svg,math,link,meta,base,video,audio,source,[contenteditable="false"],.ProseMirror-widget').forEach(node => node.remove());
+        box.querySelectorAll('*').forEach(node => {
+            for (const attribute of Array.from(node.attributes)) {
+                const name = attribute.name.toLowerCase(), value = attribute.value;
+                const allowed = ['href','src','alt','title','colspan','rowspan','width','height','style','start','type','scope'];
+                if (!allowed.includes(name) ||
+                    (['href','src'].includes(name) && !/^(https?:|mailto:|tel:|data:image\/(?:png|jpeg|gif|webp);|\/|#)/i.test(value))) node.removeAttribute(attribute.name);
+                if (name === 'style' && /url\s*\(|expression\s*\(|position\s*:|transform\s*:|z-index\s*:/i.test(value)) node.removeAttribute('style');
+            }
+        });
+        return box;
+    }
+    function workspaceTableText(table) {
+        const grid = [];
+        Array.from(table.rows).forEach((row, r) => {
+            grid[r] ||= []; let column = 0;
+            for (const cell of Array.from(row.cells)) {
+                while (grid[r][column] !== undefined) column++;
+                const width = Math.max(1, cell.colSpan || 1), height = Math.max(1, cell.rowSpan || 1);
+                for (let dy = 0; dy < height; dy++) {grid[r+dy] ||= []; for (let dx = 0; dx < width; dx++) grid[r+dy][column+dx] = dy || dx ? '' : workspaceNormalize(cell.innerText || cell.textContent);}
+                column += width;
+            }
+        });
+        const width = Math.max(0, ...grid.map(row => row.length));
+        const quote = value => /[\t\r\n"]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+        return grid.map(row => Array.from({length:width}, (_,i) => quote(row[i] || '')).join('\t')).join('\n');
+    }
+    function workspacePlainText(box) {
+        const parts = [];
+        for (const node of Array.from(box.childNodes)) {
+            if (node.nodeType === 3) {if (node.nodeValue?.trim()) parts.push(node.nodeValue); continue;}
+            if (node.tagName === 'TABLE') parts.push(workspaceTableText(node));
+            else if (node.querySelector?.('table') || node.matches?.('div,section,article,ul,ol,blockquote')) parts.push(workspacePlainText(node));
+            else parts.push(node.innerText || node.textContent || '');
+        }
+        return parts.filter(Boolean).join('\n\n');
+    }
+    async function workspaceCopy(text, html) {
+        if (navigator.clipboard?.write && typeof ClipboardItem === 'function') {
+            try {await navigator.clipboard.write([new ClipboardItem({'text/plain':new Blob([text], {type:'text/plain'}), 'text/html':new Blob([html], {type:'text/html'})})]); return;} catch (_) {}
+        }
+        const previous = document.activeElement;
+        const area = document.createElement('textarea'); area.value = text; area.style.cssText = 'position:fixed;left:-10000px;top:0;';
+        const handler = event => {if (event.clipboardData) {event.preventDefault(); event.clipboardData.setData('text/plain',text); event.clipboardData.setData('text/html',html);}};
+        document.addEventListener('copy',handler); document.body.appendChild(area);
+        let copied = false;
+        try {area.select(); copied = Boolean(document.execCommand('copy'));}
+        finally {document.removeEventListener('copy',handler); area.remove(); try {previous?.focus({preventScroll:true});} catch (_) {}}
+        if (!copied && navigator.clipboard?.writeText) {await navigator.clipboard.writeText(text); return;}
+        if (!copied) throw new Error('无法写入剪贴板，请重试');
+    }
+    function workspaceDownload(name, content, type) {
+        const url = URL.createObjectURL(new Blob(['\ufeff',content], {type})); const link = document.createElement('a');
+        link.href = url; link.download = name; document.body.appendChild(link); link.click(); link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+    async function workspaceChapterAction(heading, action) {
+        const range = workspaceChapterRange(heading); if (!range) {workspaceNotice('章节已变化，请重新打开菜单',true); return;}
+        const box = workspaceSanitize(range.cloneContents()); const name = heading.text.replace(/[<>:"/\\|?*\u0000-\u001f]/g,'_').slice(0,100) || '章节';
+        try {
+            if (action === 'copy-chapter') await workspaceCopy(workspacePlainText(box), box.innerHTML);
+            if (action === 'copy-tables') {
+                const tables = Array.from(box.querySelectorAll('table')).filter(table => !table.parentElement?.closest('table'));
+                if (!tables.length) {workspaceNotice('当前章节没有表格',true); return;}
+                await workspaceCopy(tables.map(workspaceTableText).join('\n\n'), tables.map(table => table.outerHTML).join('<p></p>'));
+            }
+            if (action === 'export-text') workspaceDownload(`${name}.txt`,workspacePlainText(box),'text/plain;charset=utf-8');
+            if (action === 'export-html') workspaceDownload(`${name}.html`, `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>${escapeHtml(heading.text)}</title><style>body{max-width:960px;margin:32px auto;padding:0 20px;font:15px/1.7 sans-serif}table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:8px}pre{white-space:pre-wrap;overflow-wrap:anywhere}img{max-width:100%}</style></head><body>${box.innerHTML}</body></html>`,'text/html;charset=utf-8');
+            workspaceNotice(action.startsWith('copy') ? '章节内容已复制' : '章节文件已导出');
+        } catch (error) {workspaceNotice(error.message || '章节操作失败',true);}
+    }
+    function closeChapterMenu() {W.menu?.remove(); W.menu = null;}
+    function openChapterMenu(event, heading) {
+        closeChapterMenu(); if (!heading?.element?.isConnected) return;
+        workspaceNoteTarget(heading.element);
+        const menu = document.createElement('div'); menu.id = 'att-doc-workspace-chapter-menu-v7190';
+        menu.setAttribute('role','menu'); menu.innerHTML = `<b>${escapeHtml(heading.text)}</b>${[
+            ['copy-chapter','▤','复制整章内容'],['copy-tables','▦','复制章节内表格'],['export-text','↓','导出章节为文本'],['export-html','⌘','导出章节为 HTML'],['bookmark','☆','为章节添加书签']
+        ].filter(([action]) => action !== 'bookmark' || docState.bookmarksEnabled !== false).map(([action,icon,label]) => `<button type="button" role="menuitem" data-att-ws-chapter-action="${action}"><span aria-hidden="true">${icon}</span>${label}</button>`).join('')}`;
+        document.body.appendChild(menu); W.menu = menu;
+        menu.style.maxHeight = `${Math.max(40,window.innerHeight-16)}px`;
+        const rect = menu.getBoundingClientRect();
+        menu.style.left = `${Math.max(8,Math.min(event.clientX,window.innerWidth-rect.width-8))}px`;
+        menu.style.top = `${Math.max(8,Math.min(event.clientY,window.innerHeight-rect.height-8))}px`;
+        menu.addEventListener('click', e => {
+            const action = e.target?.closest?.('button[data-att-ws-chapter-action]')?.dataset.attWsChapterAction;
+            if (!action) return; closeChapterMenu();
+            if (action === 'bookmark') workspaceEditBookmark(); else workspaceChapterAction(heading,action);
+        });
+        try {menu.querySelector('button')?.focus({preventScroll:true});} catch (_) {}
+    }
+
+    function workspaceCaptureSelection() {
+        const selection = window.getSelection();
+        if (!W.editor || !selection?.rangeCount) return;
+        const element = selection.anchorNode instanceof Element ? selection.anchorNode : selection.anchorNode?.parentElement;
+        if (!element || !W.editor.contains(element)) return;
+        W.contextTarget = element;
+        W.selectionEditor = W.editor; W.selectionRanges = [];
+        for (let i = 0; i < selection.rangeCount; i++) {
+            const range = selection.getRangeAt(i);
+            if (!range.collapsed && W.editor.contains(range.startContainer) && W.editor.contains(range.endContainer)) {
+                W.selectionRanges.push(range.cloneRange());
+            }
+        }
+    }
+    function workspaceSetScope(scope) {
+        W.scope = ['document','chapter','table','selection'].includes(scope) ? scope : 'document';
+        W.scopeRanges = []; W.scopeToken++;
+        const target = W.contextTarget;
+        if (W.scope === 'chapter') {
+            const heading = workspaceHeadingForTarget(target);
+            const range = workspaceChapterRange(heading); if (range) W.scopeRanges.push(range);
+        } else if (W.scope === 'table') {
+            const table = target?.closest?.('table');
+            if (table && W.editor?.contains(table)) {const range = document.createRange(); range.selectNodeContents(table); W.scopeRanges.push(range);}
+        } else if (W.scope === 'selection') {
+            const cells = Array.from(W.editor?.querySelectorAll('td.selectedCell,th.selectedCell') || []);
+            if (cells.length) W.scopeRanges = cells.map(cell => {const range = document.createRange(); range.selectNodeContents(cell); return range;});
+            else if (W.selectionEditor === W.editor) W.scopeRanges = W.selectionRanges.map(range => range.cloneRange());
+        }
+        workspaceScopeStatus();
+        document.dispatchEvent(new CustomEvent('att-doc-search-scope-v7190'));
+    }
+    function workspaceScopeStatus() {
+        const status = document.getElementById('att-doc-search-scope-status-v7190');
+        if (!status) return;
+        const labels = {document:'全文',chapter:'当前章节',table:'当前表格',selection:'选区'};
+        status.textContent = W.scope !== 'document' && !W.scopeRanges.length ? '范围为空：先点击正文或选中内容，再点“更新范围”' : `${labels[W.scope]}${W.scope !== 'document' ? ' · 已锁定' : ' · 搜索全部正文'}`;
+        status.title = W.scope !== 'document' ? '范围已锁定。先在正文中点击章节、表格或选择内容，再点“更新范围”重新选取。' : '搜索当前文档的全部正文';
+        const warning = W.scope !== 'document' && !W.scopeRanges.length;
+        status.classList.toggle('is-warning', warning);
+        const controls = status.parentElement;
+        controls?.classList.toggle('is-warning', warning);
+        if (controls) controls.title = warning ? status.textContent : status.title;
+        const select = controls?.querySelector('select');
+        if (select) select.setAttribute('aria-invalid', String(warning));
+    }
+    function workspaceAttachSearchBar(bar) {
+        if (!bar) return;
+        bar.setAttribute('data-att-ws-layout','7191');
+        scheduleActiveHeadingUpdate();
+        const existing = bar.querySelector('#att-doc-search-scope-v7190');
+        if (existing) {existing.querySelector('select').value = W.scope; workspaceScopeStatus(); return;}
+        const controls = document.createElement('div'); controls.id = 'att-doc-search-scope-v7190';
+        controls.innerHTML = '<label>范围 <select data-att-ws-search-scope aria-label="正文查找范围"><option value="document">全文</option><option value="chapter">当前章节</option><option value="table">当前表格</option><option value="selection">选区</option></select></label><button type="button" data-att-ws-refresh-scope>↻ 更新范围</button><span id="att-doc-search-scope-status-v7190" role="status" aria-live="polite"></span>';
+        controls.querySelector('select').value = W.scope;
+        controls.addEventListener('change', event => {if (event.target?.hasAttribute?.('data-att-ws-search-scope')) {event.stopPropagation(); workspaceSetScope(event.target.value);}});
+        controls.addEventListener('click', event => {if (event.target?.closest?.('[data-att-ws-refresh-scope]')) {event.stopPropagation(); workspaceSetScope(W.scope);}});
+        bar.appendChild(controls); workspaceScopeStatus();
+    }
+    function workspaceBuildSearchIndex(editor) {
+        if (editor && (editor !== W.editor || workspaceDocumentKey(editor) !== W.key)) workspaceSyncDocument(editor);
+        const index = {text:'',entries:[],segments:[]};
+        if (!editor || (W.scope !== 'document' && !W.scopeRanges.length)) return index;
+        const ranges = W.scope === 'document' ? null : W.scopeRanges.filter(range => editor.contains(range.startContainer) && editor.contains(range.endContainer));
+        let previousBlock = null, previousNode = null, previousEnd = -1;
+        const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, {acceptNode(node) {
+            if (!node.nodeValue || !node.parentElement || node.parentElement.closest('[contenteditable="false"],.ProseMirror-widget,script,style')) return NodeFilter.FILTER_REJECT;
+            return NodeFilter.FILTER_ACCEPT;
+        }});
+        let node;
+        while ((node = walker.nextNode())) {
+            let pieces = ranges ? ranges.flatMap(range => {
+                try {
+                    if (!range.intersectsNode(node)) return [];
+                    const from = range.startContainer === node ? range.startOffset : 0;
+                    const to = range.endContainer === node ? range.endOffset : node.nodeValue.length;
+                    return to > from ? [{from,to}] : [];
+                } catch (_) {return [];}
+            }) : [{from:0,to:node.nodeValue.length}];
+            pieces.sort((a,b) => a.from - b.from);
+            const merged = [];
+            for (const piece of pieces) {
+                const last = merged[merged.length-1];
+                if (last && piece.from <= last.to) last.to = Math.max(last.to,piece.to); else merged.push({...piece});
+            }
+            for (const piece of merged) {
+                const block = node.parentElement.closest('p,pre,li,h1,h2,h3,h4,h5,h6,td,th,blockquote') || node.parentElement;
+                const start = index.text.length;
+                index.text += node.nodeValue.slice(piece.from,piece.to);
+                index.entries.push({node,start,end:index.text.length,nodeFrom:piece.from,nodeTo:piece.to});
+                const continuous = previousBlock === block && (previousNode !== node || previousEnd === piece.from);
+                if (continuous && index.segments.length) index.segments[index.segments.length-1].end = index.text.length;
+                else index.segments.push({start,end:index.text.length});
+                previousBlock = block; previousNode = node; previousEnd = piece.to;
+            }
+            if (!merged.length) previousBlock = null;
+        }
+        return index;
+    }
+    function workspaceLiteralMatches(index, query, caseSensitive) {
+        if (!query) return [];
+        const matches = [], needle = caseSensitive ? String(query) : String(query).toLowerCase();
+        for (const segment of index.segments || [{start:0,end:index.text.length}]) {
+            const raw = index.text.slice(segment.start,segment.end), text = caseSensitive ? raw : raw.toLowerCase();
+            let offset = 0;
+            while (matches.length < 5000) {
+                const pos = text.indexOf(needle,offset); if (pos < 0) break;
+                matches.push({start:segment.start+pos,end:segment.start+pos+needle.length,text:raw.slice(pos,pos+needle.length)});
+                offset = pos + Math.max(1,needle.length);
+            }
+        }
+        return matches;
+    }
+    function workspaceRegexMatches(index, regex) {
+        const matches = [];
+        for (const segment of index.segments || [{start:0,end:index.text.length}]) {
+            const text = index.text.slice(segment.start,segment.end);
+            const rx = new RegExp(regex.source,regex.flags.includes('g') ? regex.flags : regex.flags+'g');
+            let match;
+            while (matches.length < 5000 && (match = rx.exec(text))) {
+                const value = String(match[0]);
+                matches.push({start:segment.start+match.index,end:segment.start+match.index+value.length,text:value,
+                    captures:Array.from(match),groups:Array.from(match).slice(1),namedGroups:match.groups ? {...match.groups} : null,zeroLength:!value.length});
+                if (!value.length) {const cp = text.codePointAt(rx.lastIndex); rx.lastIndex += cp > 0xFFFF ? 2 : 1;}
+            }
+        }
+        return matches;
+    }
+    function workspacePoint(index, offset, next) {
+        const entry = next ? index.entries.find(item => offset >= item.start && offset < item.end)
+            : index.entries.find(item => offset > item.start && offset <= item.end);
+        return entry ? {node:entry.node,offset:(entry.nodeFrom || 0)+offset-entry.start} : null;
+    }
+    function workspaceRange(index, match) {
+        const start = workspacePoint(index,match.start,true), end = workspacePoint(index,match.end,false);
+        if (!start || !end) return null;
+        try {const range = document.createRange(); range.setStart(start.node,start.offset); range.setEnd(end.node,end.offset); return range;} catch (_) {return null;}
+    }
+    function workspaceReplacement(template, match) {
+        return String(template ?? '').replace(/\$(\$|&|\d{1,2}|<[^>]+>)/g, (token,key) => {
+            if (key === '$') return '$'; if (key === '&') return match.text;
+            if (key[0] === '<') return match.namedGroups ? match.namedGroups[key.slice(1,-1)] ?? '' : token;
+            const number = Number(key);
+            if (number > 0 && number < match.captures.length) return match.captures[number] ?? '';
+            if (key.length === 2 && Number(key[0]) > 0 && Number(key[0]) < match.captures.length) return (match.captures[Number(key[0])] ?? '')+key[1];
+            return token;
+        });
+    }
+    function workspaceEditorView(editor) {
+        if (!editor) return null;
+        const valid = value => value && value.state?.doc && typeof value.dispatch === 'function' && typeof value.posAtDOM === 'function' && value.dom === editor ? value : null;
+        if (valid(W.view)) return W.view;
+        const inspect = value => valid(value) || valid(value?.view) || valid(value?.editorView) || valid(value?.editor?.view);
+        try {
+            let desc = editor.pmViewDesc;
+            for (let depth=0; desc && depth<8; depth++,desc=desc.parent) {const view = inspect(desc); if (view) return W.view = view;}
+            for (const key of Object.getOwnPropertyNames(editor)) {
+                let value; try {value = editor[key];} catch (_) {continue;}
+                const direct = inspect(value); if (direct) return W.view = direct;
+                if (key.startsWith('__react')) {
+                    for (let depth=0,fiber=value; fiber && depth<18; depth++,fiber=fiber.return) {
+                        const view = inspect(fiber.memoizedProps) || inspect(fiber.pendingProps); if (view) return W.view = view;
+                    }
+                }
+            }
+        } catch (_) {}
+        return null;
+    }
+    function workspacePrepareOperations(editor, view, index, matches, replacement, regex) {
+        if (!view || view.dom !== editor) throw new Error('无法连接当前编辑器的事务接口；可以查看预览，暂不能提交批量替换。');
+        const operations = matches.map(match => {
+            const range = workspaceRange(index,match);
+            const expected = index.text.slice(match.start,match.end);
+            if (!range || range.toString() !== expected) throw new Error('匹配内容的位置已变化，请重新查找。');
+            const from = view.posAtDOM(range.startContainer,range.startOffset,-1), to = view.posAtDOM(range.endContainer,range.endOffset,1);
+            if (!Number.isInteger(from) || !Number.isInteger(to) || from >= to || view.state.doc.textBetween(from,to,'','') !== expected) throw new Error('匹配内容与编辑器状态不一致，请重新查找。');
+            if (view.state.doc.resolve(from).parent !== view.state.doc.resolve(to).parent) throw new Error('匹配跨越了正文结构，不能安全批量替换。');
+            return {from,to,text:regex ? workspaceReplacement(replacement,match) : String(replacement ?? ''),match};
+        });
+        operations.sort((a,b) => b.from-a.from || b.to-a.to);
+        for (let i=1;i<operations.length;i++) if (operations[i].to > operations[i-1].from) throw new Error('匹配范围存在重叠，不能批量替换。');
+        return operations;
+    }
+    function workspaceApplyOperations(view, operations, snapshot) {
+        if (W.key !== snapshot.key || W.editor !== snapshot.editor || W.scopeToken !== snapshot.scopeToken || view.state.doc !== snapshot.doc) throw new Error('正文或查找范围已变化，请重新预览。');
+        let transaction = view.state.tr;
+        for (const operation of operations) transaction = transaction.insertText(operation.text,operation.from,operation.to);
+        transaction = transaction.setMeta('addToHistory',true);
+        view.dispatch(transaction);
+        return operations.length;
+    }
+    function workspaceRequestReplaceAll(options) {
+        const editor = options.editor || W.editor;
+        const index = workspaceBuildSearchIndex(editor);
+        let matches;
+        try {matches = options.regex ? workspaceRegexMatches(index,new RegExp(options.query,options.caseSensitive ? 'g':'gi')) : workspaceLiteralMatches(index,options.query,options.caseSensitive);} catch (error) {workspaceNotice(`正则表达式无效：${error.message}`,true); return;}
+        if (!matches.length) {workspaceNotice('所选范围内没有匹配内容',true); return;}
+        if (matches.some(match => match.zeroLength)) {workspaceNotice('正则可匹配空字符串，已禁用批量替换',true); return;}
+        const view = options.view?.dom === editor ? options.view : workspaceEditorView(editor);
+        let operations = [], failure = '';
+        try {operations = workspacePrepareOperations(editor,view,index,matches,options.replacement,options.regex);} catch (error) {failure = error.message;}
+        const snapshot = {key:W.key,editor,scopeToken:W.scopeToken,doc:view?.state.doc};
+        const querySignature = JSON.stringify([options.query,options.replacement,!!options.regex,!!options.caseSensitive]);
+        const labels = {document:'全文',chapter:'当前章节',table:'当前表格',selection:'选区'};
+        const dialog = workspaceDialog('批量替换预览',`<p>范围：${labels[W.scope]} · 共 <b>${matches.length}</b> 处${matches.length === 5000 ? '（达到单次 5000 处上限）' : ''}</p><p class="att-doc-ws-preview-note-v7190" role="status">${escapeHtml(failure || '确认后统一提交，可通过一次撤销恢复。')}</p><div class="att-doc-ws-preview-list-v7190"></div><button type="button" data-att-ws-preview-more>显示更多</button>`, `<button type="button" data-att-ws-dialog-action="cancel">取消</button><button type="button" data-att-ws-preview-apply ${failure ? 'disabled' : ''}>确认替换 ${matches.length} 处</button>`);
+        let visible = 0;
+        const render = () => {
+            visible = Math.min(matches.length,visible+50);
+            dialog.querySelector('.att-doc-ws-preview-list-v7190').innerHTML = matches.slice(0,visible).map((match,i) => {
+                const segment = index.segments.find(part => part.start <= match.start && part.end >= match.end);
+                const prefix = index.text.slice(Math.max(segment?.start || 0,match.start-35),match.start);
+                const suffix = index.text.slice(match.end,Math.min(segment?.end ?? index.text.length,match.end+35));
+                const after = options.regex ? workspaceReplacement(options.replacement,match) : String(options.replacement ?? '');
+                return `<div class="att-doc-ws-preview-item-v7190"><b>${i+1}</b><div><span>修改前</span><pre>${escapeHtml(prefix)}<del>${escapeHtml(index.text.slice(match.start,match.end))}</del>${escapeHtml(suffix)}</pre><span>修改后</span><pre>${escapeHtml(prefix)}<ins>${escapeHtml(after)}</ins>${escapeHtml(suffix)}</pre></div></div>`;
+            }).join('');
+            dialog.querySelector('[data-att-ws-preview-more]').hidden = visible >= matches.length;
+        };
+        render();
+        dialog.addEventListener('click', event => {
+            if (event.target?.closest?.('[data-att-ws-preview-more]')) render();
+            const button = event.target?.closest?.('[data-att-ws-preview-apply]');
+            if (!button || button.disabled) return;
+            try {
+                if (options.getCurrent && JSON.stringify(options.getCurrent()) !== querySignature) throw new Error('查找或替换内容已变化，请重新预览。');
+                const count = workspaceApplyOperations(view,operations,snapshot);
+                button.disabled = true; closeWorkspaceDialog(); workspaceNotice(`已替换 ${count} 处`);
+                options.afterApply?.(count); scheduleOutlineRebuild(60); workspaceScheduleSave();
+            } catch (error) {button.disabled = true; dialog.querySelector('.att-doc-ws-preview-note-v7190').textContent = error.message;}
+        });
+    }
+    function workspaceInit() {
+        if (W.initialized) return; W.initialized = true;
+        globalThis.__attDocumentWorkspaceV7190 = {
+            buildSearchIndex:workspaceBuildSearchIndex,literalMatches:workspaceLiteralMatches,regexMatches:workspaceRegexMatches,
+            requestReplaceAll:workspaceRequestReplaceAll,attachSearchBar:workspaceAttachSearchBar,noteTarget:workspaceNoteTarget,
+            allowStandalone:table => W.mode !== 'headings' && (!W.record || W.tableMatches.has(table)),
+            get navigationMode() {return W.mode;},
+            get navigationPane() {return W.pane;},
+            get navigationCollapsed() {return W.panelCollapsed;}
+        };
+        document.addEventListener('selectionchange',workspaceCaptureSelection);
+        const capture = event => {
+            const target = event.target instanceof Element ? event.target : event.target?.parentElement;
+            if (target && W.editor?.contains(target)) {workspaceNoteTarget(target); if (event.type !== 'pointerdown') workspaceCaptureSelection();}
+            if (event.type === 'focusin' && target?.closest?.('#att-doc-page-search-bar-v62')) scheduleActiveHeadingUpdate();
+            if (event.type === 'pointerdown' && W.menu && !W.menu.contains(target)) closeChapterMenu();
+        };
+        for (const name of ['pointerdown','pointerup','keyup','focusin']) document.addEventListener(name,capture,true);
+        document.addEventListener('scroll',event => {
+            if (W.menu) closeChapterMenu();
+            if (event.target instanceof Element && event.target !== document.body && event.target !== document.documentElement && event.target.contains(W.editor)) workspaceScheduleSave();
+        },true);
+        const readingIntent = event => {const target = event.target instanceof Element ? event.target : null; if (target && (W.editor?.contains(target) || target.contains(W.editor))) {W.userNavigated=true; W.readingPending=null; W.restoringUntil=0;}};
+        document.addEventListener('wheel',readingIntent,{capture:true,passive:true});
+        document.addEventListener('touchmove',readingIntent,{capture:true,passive:true});
+        document.addEventListener(DOCUMENT_NAV_EVENTS.navigate,event => {if (event.detail?.table) workspaceNoteTarget(event.detail.table);});
+        document.addEventListener('keydown',event => {if (event.key === 'Escape' && W.menu) {event.preventDefault();closeChapterMenu();}});
+        window.addEventListener('resize',closeChapterMenu,{passive:true});
+        window.addEventListener('pagehide',workspaceFlushMemory);
+        window.addEventListener('beforeunload',workspaceFlushMemory);
+        document.addEventListener('visibilitychange',() => {if (document.visibilityState === 'hidden') workspaceFlushMemory();});
+    }
+
+
+    function readMergedNavigationEnabled() {
+        try {
+            return Boolean(GM_getValue('att_doc_table_plus_enabled_v7170', true)) &&
+                Boolean(GM_getValue('att_doc_table_plus_navigator_v7170', true)) &&
+                Boolean(GM_getValue('att_doc_table_plus_navigation_hierarchy_v7184', true));
+        } catch (_) { return true; }
+    }
+
+    function dispatchNavigationEvent(type, detail) {
+        if (typeof CustomEvent === 'function') document.dispatchEvent(new CustomEvent(type, {detail}));
+    }
+
+    function navigationTableInfo(table, index) {
+        const labels = Array.from(table.rows[0]?.cells || [])
+            .map(cell => String(cell.innerText || cell.textContent || '').replace(/\s+/g, ' ').trim())
+            .filter(Boolean).slice(0, 2);
+        const columns = Array.from(table.rows).reduce((maximum, row) => Math.max(maximum,
+            Array.from(row.cells).reduce((total, cell) => total + Math.max(1, Number(cell.colSpan) || 1), 0)), 0);
+        return {element: table, text: labels.join(' / ') || `未命名表格 ${index + 1}`,
+            rows: table.rows.length, columns, index, kind: 'table', children: []};
+    }
+
+    function buildDocumentNavigation(editor, headings, includeTables = true) {
+        const roots = [], stack = [], tables = [];
+        const headingMap = new Map(headings.map((heading, index) => [heading.element, {...heading, index}]));
+        if (!editor) return {roots, tables};
+        const elements = includeTables ? editor.querySelectorAll('h1,h2,h3,h4,h5,h6,table')
+            : headings.map(heading => heading.element);
+        for (const element of elements) {
+            // Content inside a table belongs to that table, not to a new chapter.
+            if (element.parentElement?.closest('table')) continue;
+            const heading = headingMap.get(element);
+            let node;
+            if (heading) {
+                node = {...heading, kind: 'heading', children: []};
+                while (stack.length && stack[stack.length - 1].level >= node.level) stack.pop();
+            } else if (includeTables && element.tagName === 'TABLE') {
+                node = navigationTableInfo(element, tables.length);
+                tables.push(node);
+            } else continue;
+            const parent = stack[stack.length - 1];
+            (parent ? parent.children : roots).push(node);
+            if (node.kind === 'heading') stack.push(node);
+        }
+        return {roots, tables};
+    }
+
+    function renderDocumentNavigationNodes(nodes) {
+        return nodes.map(node => {
+            if (node.kind === 'table') {
+                return `<button type="button" class="att-doc-nav-table-v7184"
+                    data-att-nav-table-index="${node.index}" title="${escapeAttr(node.text)} · ${node.rows}行 × ${node.columns}列">
+                    <svg class="att-doc-nav-table-icon-v7184" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="2" y="3" width="12" height="10" rx="1"/><path d="M2 6h12M2 9h12M6 3v10M10 3v10"/></svg>
+                    <span class="att-doc-nav-label-v7184">${escapeHtml(node.text)}</span>
+                    <span class="att-doc-nav-size-v7184">${node.rows}×${node.columns}</span></button>`;
+            }
+            const hasChildren = node.children.length > 0;
+            const collapsed = hasChildren && workspaceChapterCollapsed(node.element);
+            const groupId = `att-doc-nav-group-v7184-${node.index}`;
+            const disclosure = hasChildren
+                ? `<button type="button" class="att-doc-nav-toggle-v7184" data-att-nav-toggle="${node.index}"
+                    aria-expanded="${!collapsed}" aria-controls="${groupId}"
+                    aria-label="${collapsed ? '展开' : '收起'}章节：${escapeAttr(node.text)}"
+                    title="${collapsed ? '展开章节' : '收起章节'}"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="m6 3 5 5-5 5"/></svg></button>`
+                : '<span class="att-doc-nav-toggle-space-v7184" aria-hidden="true"></span>';
+            return `<div class="att-doc-nav-node-v7184"><div class="att-doc-nav-row-v7184">${disclosure}
+                <button type="button" class="att-doc-outline-item" data-index="${node.index}" data-level="${node.level}" title="${escapeAttr(node.text)}">
+                <span class="att-doc-nav-heading-level-v7184" aria-hidden="true">H${node.level}</span><span class="att-doc-nav-label-v7184">${escapeHtml(node.text)}</span></button></div>
+                ${hasChildren ? `<div class="att-doc-nav-group-v7184" id="${groupId}" role="group" aria-label="${escapeAttr(node.text)}" ${collapsed ? 'hidden' : ''}>${renderDocumentNavigationNodes(node.children)}</div>` : ''}</div>`;
+        }).join('');
+    }
+
+    function toggleNavigationChapter(panel, button) {
+        const index = Number(button.dataset.attNavToggle), heading = docState.headings[index];
+        const group = panel.querySelector(`#att-doc-nav-group-v7184-${index}`);
+        if (!heading || !group) return;
+        group.hidden = !group.hidden;
+        const collapsedSet = workspaceIsFiltering() ? W.filterCollapsed : docState.navigationCollapsed;
+        if (group.hidden) collapsedSet.add(heading.element);
+        else collapsedSet.delete(heading.element);
+        if (!workspaceIsFiltering()) workspaceRememberFolds();
+        button.setAttribute('aria-expanded', String(!group.hidden));
+        button.setAttribute('aria-label', `${group.hidden ? '展开' : '收起'}章节：${heading.text}`);
+        button.setAttribute('title', group.hidden ? '展开章节' : '收起章节');
+    }
+
+    function updateMergedTableActive(table) {
+        const panel = document.getElementById(DOC_TOOLS.outlineId);
+        if (!panel || panel.dataset.attNavigationMerged !== '1') return;
+        panel.querySelectorAll('button[data-att-nav-table-index]').forEach(button => {
+            const item = docState.navigationTables[Number(button.dataset.attNavTableIndex)];
+            const active = Boolean(table && item?.element === table);
+            button.classList.toggle('is-active', active);
+            if (active) button.setAttribute('aria-current', 'true');
+            else button.removeAttribute('aria-current');
+        });
+    }
+
+    function bindDocumentNavigationEvents() {
+        document.addEventListener(DOCUMENT_NAV_EVENTS.settings, event => {
+            const enabled = Boolean(event.detail?.enabled);
+            if (docState.navigationMerged === enabled) return;
+            docState.navigationMerged = enabled;
+            scheduleOutlineRebuild(0);
+        });
+        document.addEventListener(DOCUMENT_NAV_EVENTS.active, event => updateMergedTableActive(event.detail?.table || null));
+    }
 
     function readOutlineEnabled() {
         try {
@@ -17068,6 +20036,118 @@
         if (document.getElementById(DOC_TOOLS.styleId)) return;
 
         const css = `
+            /* The two panes use all available height instead of competing for it. */
+            #att-document-outline[data-att-ws-pane] {flex-basis:280px!important;width:280px!important;max-width:32vw;min-height:160px;max-height:none;height:calc(100dvh - 164px);font-size:13px;}
+            #att-document-outline[data-att-ws-pane] .att-doc-outline-head {min-height:44px;padding:0 10px 0 12px;gap:7px;}
+            #att-document-outline[data-att-ws-pane] .att-doc-outline-title {flex:1;font-size:13px;}
+            #att-document-outline [data-att-ws-panel-collapse] {width:27px;height:28px;flex:none;border:0;border-radius:5px;background:transparent;color:inherit;font:22px/1 system-ui;cursor:pointer;}
+            #att-document-outline [data-att-ws-panel-collapse]:hover {background:var(--bg-hover,#94a3b822);}
+            #att-doc-workspace-tabs-v7191 {flex:none;display:flex;gap:4px;padding:8px 10px 0;}
+            #att-doc-workspace-tabs-v7191 button {flex:1;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--text-secondary,#64748b);padding:7px;font-family:inherit;font-size:12px;line-height:1.3;cursor:pointer;}
+            #att-doc-workspace-tabs-v7191 button.is-active {color:var(--primary,#60a5fa);border-color:var(--border-color,#475569);background:var(--primary-bg,#3b82f622);}
+            #att-document-outline[data-att-ws-pane] #att-doc-workspace-controls-v7190 {padding:10px;font-size:12px;border-bottom:0;}
+            #att-document-outline[data-att-ws-pane] .att-doc-ws-search-v7190 input {height:32px;padding:6px 8px;font-size:12px;}
+            #att-document-outline .att-doc-ws-options-v7191 {margin-top:7px;}
+            #att-document-outline .att-doc-ws-options-v7191 summary {cursor:pointer;user-select:none;padding:4px 2px;color:var(--text-muted,#94a3b8);font-size:11px;}
+            #att-document-outline .att-doc-ws-options-v7191 select[data-att-ws-mode] {width:100%;margin-top:7px;height:30px;}
+            #att-document-outline .att-doc-ws-options-v7191 .att-doc-ws-actions-v7190 {margin-top:6px;}
+            #att-document-outline[data-att-ws-pane] .att-doc-outline-item {min-height:34px;font-size:13px!important;line-height:1.5;padding-top:7px!important;padding-bottom:7px!important;}
+            #att-document-outline[data-att-ws-pane] .att-doc-nav-table-v7184 {min-height:34px;font-size:12px;}
+            #att-document-outline[data-att-ws-pane] .att-doc-nav-group-v7184 {margin-left:9px;padding-left:4px;}
+            #att-document-outline[data-att-ws-pane] #att-doc-workspace-bookmarks-v7190 {flex:1 1 auto;max-height:none;min-height:0;padding:10px;border-top:0;font-size:12px;}
+            #att-document-outline .att-doc-ws-bookmark-row-v7190 {gap:4px;margin-top:7px;align-items:center;}
+            #att-document-outline .att-doc-ws-bookmark-row-v7190 button:first-child {padding:8px;min-height:34px;font-size:12px;}
+            #att-document-outline .att-doc-ws-bookmark-row-v7190 button:not(:first-child) {display:none;width:24px;height:28px;flex-basis:24px;padding:2px;}
+            #att-document-outline .att-doc-ws-bookmark-row-v7190:hover button:not(:first-child),#att-document-outline .att-doc-ws-bookmark-row-v7190:focus-within button:not(:first-child) {display:block;}
+            #att-document-outline [hidden] {display:none!important;}
+            #att-document-outline[data-att-ws-collapsed="1"] {flex-basis:36px!important;width:36px!important;max-width:36px;}
+            #att-document-outline[data-att-ws-collapsed="1"] .att-doc-outline-head {justify-content:center;padding:7px 0;}
+            #att-document-outline[data-att-ws-collapsed="1"] .att-doc-outline-title,#att-document-outline[data-att-ws-collapsed="1"] .att-doc-outline-count,
+            #att-document-outline[data-att-ws-collapsed="1"] #att-doc-workspace-tabs-v7191,#att-document-outline[data-att-ws-collapsed="1"] #att-doc-table-nav-v7170 {display:none!important;}
+            #att-document-outline[data-att-ws-collapsed="1"] [data-att-ws-panel-collapse] {font-size:15px;}
+            @media (max-width:1200px) {#att-document-outline[data-att-ws-pane]:not([data-att-ws-collapsed="1"]) {flex-basis:250px!important;width:250px!important;}}
+            @media (max-width:900px) {#att-document-outline[data-att-ws-pane]:not([data-att-ws-collapsed="1"]) {flex-basis:220px!important;width:220px!important;}}
+
+            /* Explicit rows supersede the old compact nowrap rule. Controls keep
+               their original nodes, IDs and handlers in literal and regex modes. */
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 {display:grid!important;grid-template-columns:minmax(140px,1fr) auto auto auto auto 28px;align-items:center!important;gap:7px!important;padding:8px 9px!important;min-width:0;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63.att-doc-search-collapsed-v63 {display:none!important;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-find {grid-row:1;grid-column:1;min-width:0!important;width:100%;gap:5px!important;flex-wrap:nowrap;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-find .att-doc-page-search-input-wrap {min-width:0!important;flex:1 1 auto!important;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-case {grid-row:1;grid-column:2;margin:0;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-regex-toggle-v64 {grid-row:1;grid-column:3;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 :is([data-att-doc-page-search-act="clear"],[data-att-doc-regex-act-v64="clear"]) {grid-row:1;grid-column:4;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-search-replace-toggle-v63 {grid-row:1;grid-column:5;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-search-close-v63 {grid-row:1;grid-column:6;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 #att-doc-search-scope-v7190 {grid-row:2;grid-column:1/-1;min-width:0;gap:7px;flex-wrap:wrap;border-top:1px solid var(--border-color,#94a3b822);padding-top:7px;font-size:12px;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"] #att-doc-search-scope-status-v7190 {flex:1 1 180px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"] #att-doc-search-scope-status-v7190.is-warning {white-space:normal;overflow-wrap:anywhere;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-replace {grid-row:3;grid-column:1/-1;min-width:0!important;gap:6px;flex-wrap:nowrap;border-top:1px solid var(--border-color,#94a3b822);padding-top:7px;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-replace .att-doc-page-search-input-wrap {min-width:0!important;flex:1 1 auto!important;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-message {grid-row:4;grid-column:1/-1;max-width:none!important;margin:0;font-size:11px;white-space:normal;overflow-wrap:anywhere;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-message:empty {display:none!important;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"] button {white-space:nowrap;}
+            @media (max-width:1100px) {
+                #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 {grid-template-columns:repeat(4,auto) minmax(0,1fr) 28px;}
+                #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-find {grid-row:1;grid-column:1/6;}
+                #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-case {grid-row:2;grid-column:1;}
+                #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-regex-toggle-v64 {grid-row:2;grid-column:2;}
+                #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 :is([data-att-doc-page-search-act="clear"],[data-att-doc-regex-act-v64="clear"]) {grid-row:2;grid-column:3;}
+                #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-search-replace-toggle-v63 {grid-row:2;grid-column:4;}
+                #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 #att-doc-search-scope-v7190 {grid-row:3;}
+                #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-replace {grid-row:4;}
+                #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-message {grid-row:5;}
+            }
+            /* Bound the sidebar to the measured viewport, even in a short window. */
+            #att-document-outline[data-att-ws-pane] {min-height:0!important;height:var(--att-doc-outline-height-v7192,calc(100dvh - 164px))!important;max-height:var(--att-doc-outline-height-v7192,calc(100dvh - 164px))!important;}
+            #att-document-outline[data-att-ws-pane] #att-doc-workspace-controls-v7190 {flex:0 1 auto;min-height:0;max-height:40%;overflow-y:auto;box-sizing:border-box;}
+            #att-document-outline[data-att-ws-pane] #att-document-outline-list {flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;}
+            #att-document-outline[data-att-ws-pane] #att-doc-table-nav-v7170 {flex:0 1 auto;min-height:0;max-height:30%;overflow:hidden;box-sizing:border-box;}
+            #att-document-outline[data-att-ws-pane] #att-doc-table-nav-v7170 .att-dtp-nav-head-v7170 {flex:0 0 30px;min-height:0;box-sizing:border-box;}
+            #att-document-outline[data-att-ws-pane] #att-doc-table-nav-v7170 .att-dtp-nav-list-v7170 {flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;}
+
+            /* Wide document columns keep scope controls in the search row. */
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"].att-doc-search-compact-v63 {grid-template-columns:minmax(160px,1fr) auto auto auto auto auto 28px;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"].att-doc-search-compact-v63 .att-doc-page-search-find {grid-row:1;grid-column:1;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"].att-doc-search-compact-v63 #att-doc-search-scope-v7190 {grid-row:1;grid-column:2;flex-wrap:nowrap;position:relative;border:0;padding:0;white-space:nowrap;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"] #att-doc-search-scope-status-v7190 {position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"] #att-doc-search-scope-v7190.is-warning select {border-color:var(--warning,#f59e0b);}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"].att-doc-search-compact-v63 .att-doc-page-search-case {grid-row:1;grid-column:3;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"].att-doc-search-compact-v63 .att-doc-regex-toggle-v64 {grid-row:1;grid-column:4;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"].att-doc-search-compact-v63 :is([data-att-doc-page-search-act="clear"],[data-att-doc-regex-act-v64="clear"]) {grid-row:1;grid-column:5;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"].att-doc-search-compact-v63 .att-doc-search-replace-toggle-v63 {grid-row:1;grid-column:6;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"].att-doc-search-compact-v63 .att-doc-search-close-v63 {grid-row:1;grid-column:7;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"].att-doc-search-compact-v63 .att-doc-page-search-replace {grid-row:2;grid-column:1/-1;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="1"].att-doc-search-compact-v63 .att-doc-page-search-message {grid-row:3;grid-column:1/-1;}
+
+            /* Actual narrow columns can occur in wide browser windows, too. */
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="0"].att-doc-search-compact-v63 {grid-template-columns:repeat(4,auto) minmax(0,1fr) 28px;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="0"].att-doc-search-compact-v63 .att-doc-page-search-find {grid-row:1;grid-column:1/6;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="0"].att-doc-search-compact-v63 .att-doc-search-close-v63 {grid-row:1;grid-column:6;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="0"].att-doc-search-compact-v63 .att-doc-page-search-case {grid-row:2;grid-column:1;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="0"].att-doc-search-compact-v63 .att-doc-regex-toggle-v64 {grid-row:2;grid-column:2;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="0"].att-doc-search-compact-v63 :is([data-att-doc-page-search-act="clear"],[data-att-doc-regex-act-v64="clear"]) {grid-row:2;grid-column:3;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="0"].att-doc-search-compact-v63 .att-doc-search-replace-toggle-v63 {grid-row:2;grid-column:4;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="0"].att-doc-search-compact-v63 #att-doc-search-scope-v7190 {grid-row:3;grid-column:1/-1;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="0"].att-doc-search-compact-v63 .att-doc-page-search-replace {grid-row:4;grid-column:1/-1;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"][data-att-ws-scope-inline="0"].att-doc-search-compact-v63 .att-doc-page-search-message {grid-row:5;grid-column:1/-1;}
+            #att-doc-workspace-controls-v7190 {flex:0 0 auto;padding:7px 8px;border-bottom:1px solid var(--border-color,#3b424b);font-size:11px;}
+            #att-doc-workspace-controls-v7190 input,#att-doc-workspace-controls-v7190 select,#att-doc-workspace-controls-v7190 button,
+            #att-doc-workspace-bookmarks-v7190 button,#att-doc-search-scope-v7190 select,#att-doc-search-scope-v7190 button {box-sizing:border-box;min-width:0;border:1px solid var(--border-color,#475569);border-radius:5px;background:var(--surface-subtle,#27313a);color:var(--text-main,var(--text-primary,#e2e8f0));font:inherit;padding:5px;}
+            .att-doc-ws-search-v7190 {display:flex;gap:4px;margin-bottom:5px;}.att-doc-ws-search-v7190 input {width:100%;}.att-doc-ws-search-v7190 button {flex:0 0 24px;}
+            #att-doc-workspace-controls-v7190>select {width:100%;}.att-doc-ws-actions-v7190 {display:flex;gap:4px;margin-top:5px;}.att-doc-ws-actions-v7190>* {flex:1 1 0;white-space:nowrap;padding:5px 2px!important;}
+            #att-doc-workspace-status-v7190 {color:var(--text-muted,#94a3b8);margin-top:4px;font-size:10px;overflow-wrap:anywhere;}#att-doc-workspace-status-v7190:empty {display:none;}.is-warning {color:#e9aa56!important;}
+            #att-doc-workspace-bookmarks-v7190 {flex:0 1 auto;max-height:26%;min-height:40px;overflow:auto;padding:6px;border-top:1px solid var(--border-color,#3b424b);font-size:11px;overscroll-behavior:contain;}
+            .att-doc-ws-bookmarks-head-v7190 {display:flex;align-items:center;justify-content:space-between;margin:0 2px 5px;}.att-doc-ws-bookmark-row-v7190 {display:flex;gap:3px;margin-top:4px;}.att-doc-ws-bookmark-row-v7190 button:first-child {flex:1 1 auto;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}.att-doc-ws-bookmark-row-v7190 button:not(:first-child) {flex:0 0 22px;}.att-doc-ws-muted-v7190 {color:var(--text-muted,#94a3b8);font-size:11px;line-height:1.5;}
+            #att-doc-search-scope-v7190 {flex:1 0 100%;display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:11px;color:var(--text-main,var(--text-primary,#e2e8f0));}#att-doc-search-scope-status-v7190 {color:var(--text-muted,#94a3b8);font-size:10px;}
+            #att-doc-workspace-dialog-v7190 {position:fixed;inset:0;z-index:2147483610;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);padding:12px;box-sizing:border-box;}
+            .att-doc-ws-dialog-shell-v7190 {width:min(760px,100%);max-height:calc(100vh - 24px);display:flex;flex-direction:column;min-height:0;border:1px solid var(--border-color,#475569);border-radius:10px;background:var(--surface-main,var(--bg-primary,#202830));color:var(--text-main,var(--text-primary,#e2e8f0));box-shadow:0 12px 50px #0008;font:13px/1.5 system-ui,sans-serif;}
+            .att-doc-ws-dialog-shell-v7190 header,.att-doc-ws-dialog-shell-v7190 footer {display:flex;align-items:center;gap:8px;padding:12px;flex:0 0 auto;}.att-doc-ws-dialog-shell-v7190 header {justify-content:space-between;border-bottom:1px solid var(--border-color,#475569);}.att-doc-ws-dialog-shell-v7190 footer {justify-content:flex-end;border-top:1px solid var(--border-color,#475569);flex-wrap:wrap;}
+            .att-doc-ws-dialog-body-v7190 {min-height:0;overflow:auto;padding:12px;overscroll-behavior:contain;}.att-doc-ws-dialog-shell-v7190 button,.att-doc-ws-dialog-shell-v7190 input {background:var(--surface-subtle,#2f3c49);border:1px solid var(--border-color,#536477);color:inherit;border-radius:5px;padding:7px 10px;font:inherit;}.att-doc-ws-dialog-shell-v7190 input {display:block;width:100%;box-sizing:border-box;margin-top:6px;}.att-doc-ws-dialog-shell-v7190 button:disabled {opacity:.45;cursor:not-allowed;}.att-doc-ws-dialog-shell-v7190 [data-att-ws-preview-apply],.att-doc-ws-dialog-shell-v7190 [data-att-ws-bookmark-save] {background:#2563eb;color:#fff;}
+            .att-doc-ws-preview-item-v7190 {display:flex;gap:10px;border-top:1px solid var(--border-color,#475569);padding:10px 0;}.att-doc-ws-preview-item-v7190>b {flex:0 0 30px;color:var(--text-muted,#94a3b8);}.att-doc-ws-preview-item-v7190>div {min-width:0;flex:1;}.att-doc-ws-preview-item-v7190 span {font-size:10px;color:var(--text-muted,#94a3b8);}.att-doc-ws-preview-item-v7190 pre {white-space:pre-wrap;overflow-wrap:anywhere;margin:3px 0 8px;font:12px/1.6 ui-monospace,monospace;}.att-doc-ws-preview-item-v7190 del {color:#ffc3c3;background:#a42a2a55;text-decoration:none;}.att-doc-ws-preview-item-v7190 ins {color:#b4f1c4;background:#167d3c55;text-decoration:none;}
+            #att-doc-workspace-chapter-menu-v7190 {position:fixed;z-index:2147483609;box-sizing:border-box;width:min(230px,calc(100vw - 16px));overflow:auto;overscroll-behavior:contain;background:var(--surface-main,var(--bg-primary,#202830));color:var(--text-main,var(--text-primary,#e2e8f0));border:1px solid var(--border-color,#475569);border-radius:8px;box-shadow:0 8px 30px #0006;padding:6px;font:12px/1.5 system-ui,sans-serif;}
+            #att-doc-workspace-chapter-menu-v7190>b {display:block;padding:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}#att-doc-workspace-chapter-menu-v7190 button {display:block;width:100%;text-align:left;background:transparent;border:0;color:inherit;font:inherit;padding:8px;border-radius:4px;cursor:pointer;}#att-doc-workspace-chapter-menu-v7190 button:hover,#att-doc-workspace-chapter-menu-v7190 button:focus-visible {background:#3b82f633;}#att-doc-workspace-controls-v7190 button:focus-visible,#att-doc-workspace-bookmarks-v7190 button:focus-visible {outline:2px solid #60a5fa;outline-offset:1px;}
+
             #att-toolbox-root.att-doc-tools-present .att-tabs {
                 grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
             }
@@ -17277,6 +20357,27 @@
             #att-document-outline .att-doc-outline-item[data-level="5"] { padding-left: 50px; }
             #att-document-outline .att-doc-outline-item[data-level="6"] { padding-left: 60px; }
 
+            #att-document-outline[data-att-navigation-tree="1"] .att-doc-nav-row-v7184 {display:flex;align-items:center;min-width:0;}
+            #att-document-outline[data-att-navigation-tree="1"] .att-doc-outline-item {display:flex;align-items:center;gap:6px;flex:1;min-width:0;width:auto;padding:6px;}
+            #att-document-outline .att-doc-nav-label-v7184 {flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+            #att-document-outline .att-doc-nav-heading-level-v7184 {flex:none;font-size:9px;font-weight:500;opacity:.65;}
+            #att-document-outline .att-doc-nav-group-v7184 {margin-left:10px;padding-left:5px;border-left:1px solid var(--border-color,rgba(148,163,184,.22));}
+            #att-document-outline .att-doc-nav-group-v7184[hidden] {display:none !important;}
+            #att-document-outline .att-doc-nav-toggle-v7184,#att-document-outline .att-doc-nav-toggle-space-v7184 {flex:0 0 18px;width:18px;height:26px;box-sizing:border-box;}
+            #att-document-outline .att-doc-nav-toggle-v7184 {padding:2px;border:0;border-radius:4px;background:transparent;color:inherit;cursor:pointer;}
+            #att-document-outline .att-doc-nav-toggle-v7184:hover {background:var(--bg-hover,rgba(148,163,184,.12));}
+            #att-document-outline .att-doc-nav-toggle-v7184 svg {display:block;width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.6;transition:transform .12s ease;}
+            #att-document-outline .att-doc-nav-toggle-v7184[aria-expanded="true"] svg {transform:rotate(90deg);}
+            #att-document-outline .att-doc-nav-table-v7184 {display:flex;align-items:center;gap:6px;width:100%;min-width:0;min-height:30px;box-sizing:border-box;margin:1px 0;padding:6px 7px;border:0;border-radius:6px;background:transparent;color:var(--text-secondary,#475569);font-family:inherit;font-size:11px;line-height:1.45;text-align:left;cursor:pointer;}
+            #att-document-outline .att-doc-nav-table-v7184:hover {background:var(--bg-hover,rgba(148,163,184,.10));color:var(--text-main,#1f2937);}
+            #att-document-outline .att-doc-nav-table-v7184.is-active {background:var(--primary-bg,rgba(22,119,255,.10));color:var(--primary,var(--ant-color-primary,#1677ff));}
+            #att-document-outline .att-doc-nav-table-icon-v7184 {flex:none;width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.2;}
+            #att-document-outline .att-doc-nav-size-v7184 {flex:none;font-size:9px;opacity:.65;}
+            #att-document-outline .att-doc-nav-toggle-v7184:focus-visible,#att-document-outline .att-doc-nav-table-v7184:focus-visible {outline:1px solid var(--primary,#1677ff);outline-offset:-1px;}
+            body.att-native-dark #att-document-outline .att-doc-nav-table-v7184 {color:var(--text-secondary,var(--edge-text-2,#d2d2d2));}
+            body.att-native-dark #att-document-outline .att-doc-nav-table-v7184:hover {color:var(--text-main,var(--edge-text,#f3f3f3));}
+            body.att-native-dark #att-document-outline .att-doc-nav-table-v7184.is-active {color:var(--primary,var(--edge-blue,#60cdff));background:var(--primary-bg,rgba(96,205,255,.12));}
+
             /* scrollIntoView 的辅助安全边距；不改变正文尺寸或滚动容器。 */
             .document-editor__content h1,
             .document-editor__content h2,
@@ -17408,7 +20509,9 @@
             tab.className = 'att-tab';
             tab.dataset.tab = DOC_TOOLS.tabId;
             tab.textContent = DOC_TOOLS.tabLabel;
-            tabs.appendChild(tab);
+            const settingsTab = tabs.querySelector('[data-tab="settings"]');
+            if (settingsTab) tabs.insertBefore(tab, settingsTab);
+            else tabs.appendChild(tab);
         }
 
         let section = content.querySelector(`[data-section="${DOC_TOOLS.tabId}"]`);
@@ -17448,6 +20551,19 @@
             if (!(target instanceof HTMLInputElement)) return;
 
             const setting = target.dataset.attDocSetting;
+            if (setting === 'bookmarksEnabled') {
+                docState.bookmarksEnabled = target.checked;
+                GM_setValue('att_doc_tools_bookmarks_enabled_v7191',target.checked);
+                if (!target.checked) {workspaceSetPane('outline');closeWorkspaceDialog();closeChapterMenu();}
+                rebuildOutline(); renderDocumentToolsSection(); return;
+            }
+            if (setting === 'rememberReading' || setting === 'rememberFold') {
+                workspaceFlushMemory(); docState[setting] = target.checked;
+                GM_setValue(`att_doc_tools_${setting === 'rememberReading' ? 'reading' : 'fold'}_memory_v7190`, target.checked);
+                if (setting === 'rememberReading' && !target.checked) W.readingPending = null;
+                if (setting === 'rememberFold' && target.checked) workspaceRememberFolds();
+                renderDocumentToolsSection(); return;
+            }
 
             if (setting === 'outlineEnabled') {
                 docState.outlineEnabled = target.checked;
@@ -17472,16 +20588,28 @@
 
         const headingCount = collectHeadings().length;
 
-        section.innerHTML = `
-            <div class="att-card">
-                <div class="att-card-title">文档大纲</div>
-                <div class="att-card-desc">仅在 AutoTable 文档视图中生效。开启后自动读取正文里的 H1–H6 标题，并随文档内容实时更新。</div>
+        let card = section.querySelector('[data-att-doc-outline-card="7173"]');
+        if (!card) {
+            card = document.createElement('div');
+            card.className = 'att-card';
+            card.dataset.attDocOutlineCard = '7173';
+            section.appendChild(card);
+        }
+        const signature = JSON.stringify([docState.outlineEnabled, docState.outlineFollowEnabled, docState.rememberReading, docState.rememberFold, docState.bookmarksEnabled]);
+        if (card.dataset.renderSignature === signature) {
+            updateHeadingCountInToolbox(headingCount);
+            return;
+        }
+        card.dataset.renderSignature = signature;
+        card.innerHTML = `
+                <div class="att-card-title">文档导航与书签</div>
+                <div class="att-card-desc">仅在 AutoTable 文档视图中生效。H1–H6 标题按章节层级排列，支持展开与折叠，并随正文实时更新。</div>
                 <div class="att-divider"></div>
 
                 <div class="att-row">
                     <div style="min-width:0;">
                         <div class="att-label">自动文档大纲视图</div>
-                        <div class="att-sub-label">在文档区域左侧嵌入原生风格大纲；点击标题可直接定位到正文。</div>
+                        <div class="att-sub-label">在文档左侧显示层级大纲；点击箭头折叠章节，点击标题定位正文。</div>
                     </div>
                     <label class="att-switch" title="自动文档大纲视图">
                         <input type="checkbox"
@@ -17507,13 +20635,16 @@
                     </div>
                 </div>
 
+                <div class="att-divider"></div>
+                <div class="att-row"><div><div class="att-label">启用文档书签</div><div class="att-sub-label">在左侧“书签”页管理常用内容。关闭后保留已有书签。</div></div><label class="att-switch" title="启用文档书签"><input type="checkbox" data-att-doc-setting="bookmarksEnabled" ${docState.bookmarksEnabled ? 'checked' : ''}><span class="att-slider"></span></label></div>
+                <div class="att-row"><div><div class="att-label">记住阅读位置</div><div class="att-sub-label">重新打开当前文档时，恢复上次阅读位置。</div></div><label class="att-switch"><input type="checkbox" data-att-doc-setting="rememberReading" ${docState.rememberReading ? 'checked' : ''}><span class="att-slider"></span></label></div>
+                <div class="att-row"><div><div class="att-label">记住章节折叠</div><div class="att-sub-label">标题大纲和合并导航共用章节折叠记忆。</div></div><label class="att-switch"><input type="checkbox" data-att-doc-setting="rememberFold" ${docState.rememberFold ? 'checked' : ''}><span class="att-slider"></span></label></div>
                 <div class="att-doc-tools-status" id="${DOC_TOOLS.headingCountId}">
                     当前检测到 ${headingCount} 个标题
                 </div>
                 <div class="att-doc-tools-note">
-                    V5 保留 V4 的内部容器定点跳转；开启“大纲滑动跟随”后，正文滚动到新章节时，大纲会自动跟随当前标题。
+                    标题层级与折叠在两种导航模式下均可使用；开启“大纲滑动跟随”后，大纲会跟随当前章节，已折叠的章节保持收起。
                 </div>
-            </div>
         `;
     }
 
@@ -17522,7 +20653,7 @@
         if (!editor) return [];
 
         return Array.from(editor.querySelectorAll('h1,h2,h3,h4,h5,h6'))
-            .filter(heading => isVisibleElement(heading))
+            .filter(heading => isVisibleElement(heading) && !heading.parentElement?.closest('table'))
             .map(heading => ({
                 element: heading,
                 level: Number(heading.tagName.slice(1)) || 1,
@@ -17549,7 +20680,32 @@
                 <div id="${DOC_TOOLS.outlineListId}"></div>
             `;
 
+            panel.addEventListener('pointerdown', event => {
+                if (event.button === 0 && event.target?.closest?.('button')) event.preventDefault();
+            });
+            panel.addEventListener('contextmenu', event => {
+                if (event.shiftKey) return;
+                const button = event.target?.closest?.('.att-doc-outline-item[data-index]');
+                const heading = button && docState.headings[Number(button.dataset.index)];
+                if (!heading?.element?.isConnected) return;
+                event.preventDefault(); event.stopPropagation(); openChapterMenu(event,heading);
+            });
             panel.addEventListener('click', event => {
+                const toggle = event.target?.closest?.('button[data-att-nav-toggle]');
+                if (toggle) {
+                    event.preventDefault(); event.stopPropagation();
+                    toggleNavigationChapter(panel, toggle);
+                    return;
+                }
+                const tableButton = event.target?.closest?.('button[data-att-nav-table-index]');
+                if (tableButton && docState.navigationMerged) {
+                    event.preventDefault(); event.stopPropagation();
+                    const table = docState.navigationTables[Number(tableButton.dataset.attNavTableIndex)]?.element;
+                    if (table?.isConnected && docState.editor?.contains(table)) {
+                        dispatchNavigationEvent(DOCUMENT_NAV_EVENTS.navigate, {table});
+                    } else scheduleOutlineRebuild(0);
+                    return;
+                }
                 const button = event.target.closest('.att-doc-outline-item[data-index]');
                 if (!button) return;
 
@@ -17557,15 +20713,16 @@
                 event.stopPropagation();
 
                 const index = Number(button.dataset.index);
-                const latestHeadings = collectHeadings();
-                const target = latestHeadings[index]?.element || docState.headings[index]?.element;
+                // Indices belong to the rendered snapshot; inserts before a click
+                // must not silently redirect navigation to a different heading.
+                const target = docState.headings[index]?.element;
 
                 if (!target?.isConnected) {
                     scheduleOutlineRebuild(0);
                     return;
                 }
 
-                docState.headings = latestHeadings.length ? latestHeadings : docState.headings;
+                workspaceNoteTarget(target);
                 jumpToHeading(target, index);
             });
         }
@@ -17588,6 +20745,7 @@
         panel?.remove();
         host?.classList.remove('att-doc-outline-layout');
         docState.headings = [];
+        docState.navigationTables = [];
     }
 
     function rebuildOutline() {
@@ -17598,7 +20756,10 @@
         }
 
         docState.editor = findDocumentEditor();
+        workspaceSyncDocument(docState.editor);
         docState.headings = collectHeadings();
+        workspaceRestoreFolds();
+        if (docState.headings.length || workspaceNormalize(docState.editor?.textContent)) workspaceRememberFolds();
 
         const panel = ensureOutlinePanel();
         if (!panel) return;
@@ -17606,30 +20767,37 @@
         const list = panel.querySelector(`#${DOC_TOOLS.outlineListId}`);
         const count = panel.querySelector('.att-doc-outline-count');
 
-        if (count) count.textContent = String(docState.headings.length);
+        workspaceEnsureControls(panel);
+        const merged = docState.navigationMerged;
+        panel.dataset.attNavigationMerged = merged ? '1' : '0';
+        panel.dataset.attNavigationTree = '1';
+        const title = panel.querySelector('.att-doc-outline-title');
+        if (title) title.textContent = merged ? '文档导航' : '文档大纲';
+        panel.setAttribute('aria-label', merged ? '文档导航：标题与表格' : '文档大纲');
         updateHeadingCountInToolbox(docState.headings.length);
-
         if (!list) return;
-
-        if (!docState.headings.length) {
-            list.innerHTML = '<div class="att-doc-outline-empty">当前文档还没有 H1–H6 标题</div>';
-            return;
+        const scrollTop = list.scrollTop;
+        // Both modes use the same heading tree and disclosure controls.
+        // The merge switch only decides where table entries are displayed.
+        const navigation = workspaceNavigation(merged);
+        docState.navigationTables = navigation.tables;
+        list.innerHTML = navigation.roots.length ? renderDocumentNavigationNodes(navigation.roots)
+            : `<div class="att-doc-outline-empty">${workspaceIsFiltering() ? '没有匹配的导航条目' : merged ? '当前文档还没有标题或表格' : '当前文档还没有 H1–H6 标题'}</div>`;
+        if (merged) document.getElementById('att-doc-table-nav-v7170')?.remove();
+        list.scrollTop = scrollTop;
+        if (count) {
+            count.textContent = merged ? `${docState.headings.length} / ${docState.navigationTables.length}` : String(docState.headings.length);
+            count.setAttribute('title', merged ? `${docState.headings.length} 个标题 · ${docState.navigationTables.length} 张表格` : `${docState.headings.length} 个标题`);
         }
-
-        list.innerHTML = docState.headings.map((item, index) => `
-            <button type="button"
-                    class="att-doc-outline-item"
-                    data-index="${index}"
-                    data-level="${item.level}"
-                    title="${escapeAttr(item.text)}">${escapeHtml(item.text)}</button>
-        `).join('');
-
+        dispatchNavigationEvent(DOCUMENT_NAV_EVENTS.rendered, {merged});
+        workspaceRestoreReading();
+        if (workspaceIsFiltering()) workspaceNotice(`筛选中：${W.mode === 'headings' ? '只看标题' : W.mode === 'tables' ? '只看表格' : '标题与表格'}${W.query ? ` · ${W.query}` : ''}`);
         scheduleActiveHeadingUpdate();
     }
 
     function updateHeadingCountInToolbox(count) {
         const status = document.getElementById(DOC_TOOLS.headingCountId);
-        if (status) status.textContent = `当前检测到 ${count} 个标题`;
+        if (status && status.textContent !== `当前检测到 ${count} 个标题`) status.textContent = `当前检测到 ${count} 个标题`;
     }
 
     function scheduleOutlineRebuild(delay = 180) {
@@ -17653,11 +20821,20 @@
         const items = Array.from(panel.querySelectorAll('.att-doc-outline-item[data-index]'));
 
         items.forEach((item, itemIndex) => {
-            item.classList.toggle('att-doc-outline-active', itemIndex === index);
+            item.classList.toggle('att-doc-outline-active', Number(item.dataset.index) === index);
         });
 
-        if (keepItemVisible && list && items[index]) {
-            keepOutlineItemVisible(list, items[index]);
+        const activeItem = items.find(item => Number(item.dataset.index) === index);
+        if (keepItemVisible && !workspaceIsFiltering() && list && !list.hidden && activeItem) {
+            let visibleItem = activeItem;
+            // A collapsed chapter stays collapsed. Follow its visible parent row
+            // rather than measuring a hidden child as a zero-sized rectangle.
+            for (let ancestor = visibleItem.parentElement; ancestor && ancestor !== list; ancestor = ancestor.parentElement) {
+                if (ancestor.classList.contains('att-doc-nav-group-v7184') && ancestor.hidden) {
+                    visibleItem = ancestor.previousElementSibling || visibleItem;
+                }
+            }
+            keepOutlineItemVisible(list, visibleItem);
         }
     }
 
@@ -17722,6 +20899,7 @@
         if (docState.activeRaf) return;
         docState.activeRaf = requestAnimationFrame(() => {
             docState.activeRaf = 0;
+            workspaceUpdateLayout();
             updateActiveHeading();
         });
     }
@@ -17890,6 +21068,8 @@
     }
 
     function bindEditorObserver(editor) {
+        if (editor) workspaceSyncDocument(editor);
+        else {workspaceFlushMemory(); W.editor = null; W.view = null; closeWorkspaceDialog(); closeChapterMenu();}
         if (docState.editor === editor && docState.headingObserver) return;
 
         docState.headingObserver?.disconnect();
@@ -17958,14 +21138,18 @@
     }
 
     function initDocumentTools() {
+        workspaceInit();
+        bindDocumentNavigationEvents();
         addStyles();
         syncDocumentContext();
 
         docState.pageObserver = new MutationObserver(mutations => {
             const hasExternalMutation = mutations.some(record => {
-                const target = record.target;
+                const target = record.target instanceof Element ? record.target : record.target?.parentElement;
+                // V7.16.5：表格虚拟行复用不可能改变文档编辑上下文，直接早退。
+                if (target?.closest?.('.grid-virtual-body')) return false;
                 if (!(target instanceof Element)) return true;
-                return !target.closest('#att-toolbox-root, #att-document-outline');
+                return !target.closest('#att-toolbox-root, #att-document-outline, #att-doc-table-mini-toolbar-v7170, #att-doc-table-nested-guard-v7170, #att-doc-table-toast-v7170, #att-doc-table-assist-overlay-v7172,#att-dtp-edges-v7180,#att-dtp-context-v7180,#att-dtp-dialog-v7180,#att-dtp-frozen-v7180,#att-dtp-column-hit-v7181,#att-dtp-scroll-layer-v7182,#att-dtp-more-popup-v7183,#att-doc-workspace-dialog-v7190,#att-doc-workspace-chapter-menu-v7190');
             });
 
             if (hasExternalMutation) scheduleContextSync(80);
@@ -17982,6 +21166,8 @@
         }, true);
 
         window.addEventListener('resize', scheduleActiveHeadingUpdate, { passive: true });
+        window.visualViewport?.addEventListener('resize', scheduleActiveHeadingUpdate, { passive: true });
+        window.visualViewport?.addEventListener('scroll', scheduleActiveHeadingUpdate, { passive: true });
 
         console.log('[AutoTable 文档工具] V5 已加载：嵌入式大纲 / 大纲滑动跟随 / 内部容器定点跳转 / 锁定外层页面');
     }
@@ -18295,6 +21481,7 @@
     }
 
     function buildTextIndex(editor) {
+        if (globalThis.__attDocumentWorkspaceV7190) return globalThis.__attDocumentWorkspaceV7190.buildSearchIndex(editor);
         const entries = [];
         let text = '';
         if (!editor) return { text, entries };
@@ -18327,6 +21514,7 @@
     }
 
     function computeMatches(index) {
+        if (globalThis.__attDocumentWorkspaceV7190) return globalThis.__attDocumentWorkspaceV7190.literalMatches(index,searchState.query,searchState.caseSensitive);
         const query = String(searchState.query || '');
         if (!query || !index.text) return [];
 
@@ -18358,18 +21546,18 @@
 
             if (offset >= item.start && offset <= item.end) {
                 if (preferNext && offset === item.end && i + 1 < entries.length && entries[i + 1].start === offset) {
-                    return { node: entries[i + 1].node, offset: 0 };
+                    return { node: entries[i + 1].node, offset: entries[i + 1].nodeFrom || 0 };
                 }
                 return {
                     node: item.node,
-                    offset: Math.max(0, Math.min(item.node.nodeValue?.length || 0, offset - item.start))
+                    offset: Math.max(0, Math.min(item.node.nodeValue?.length || 0, offset - item.start + (item.nodeFrom || 0)))
                 };
             }
         }
 
         const last = entries[entries.length - 1];
         if (offset === last.end) {
-            return { node: last.node, offset: last.node.nodeValue?.length || 0 };
+            return { node: last.node, offset: last.nodeTo ?? last.node.nodeValue?.length ?? 0 };
         }
         return null;
     }
@@ -18728,6 +21916,13 @@
     }
 
     function replaceAll() {
+        if (globalThis.__attDocumentWorkspaceV7190) {
+            if (!(!searchState.replacing && searchState.query)) return;
+            const editor = findEditor(); if (!editor) return;
+            globalThis.__attDocumentWorkspaceV7190.requestReplaceAll({editor,query:searchState.query,replacement:searchState.replacement,caseSensitive:searchState.caseSensitive,regex:false,
+                getCurrent:() => [searchState.query,searchState.replacement,false,!!searchState.caseSensitive],
+                afterApply:count => {searchState.currentIndex=0; showMessage(`已替换 ${count} 处。`); scheduleSearch(70,{resetIndex:true});}}); return;
+        }
         if (searchState.replacing) return;
         if (!searchState.query) {
             showMessage('请先输入要查找的内容。', true);
@@ -18887,7 +22082,8 @@
             let editorMayChange = false;
 
             for (const record of mutations) {
-                const target = record.target;
+                const target = record.target instanceof Element ? record.target : record.target?.parentElement;
+                if (target?.closest?.('.grid-virtual-body')) continue;
                 if (target instanceof Element && target.closest?.(`#${SEARCH.cardId}`)) continue;
                 needsEnsure = true;
                 editorMayChange = true;
@@ -19649,6 +22845,7 @@
 
         bindEditor(editor);
         updateUi();
+        globalThis.__attDocumentWorkspaceV7190?.attachSearchBar(bar);
         return bar;
     }
 
@@ -19670,6 +22867,7 @@
     }
 
     function buildTextIndex(editor) {
+        if (globalThis.__attDocumentWorkspaceV7190) return globalThis.__attDocumentWorkspaceV7190.buildSearchIndex(editor);
         const entries = [];
         let text = '';
         if (!editor) return { text, entries };
@@ -19701,6 +22899,7 @@
     }
 
     function computeMatches(index) {
+        if (globalThis.__attDocumentWorkspaceV7190) return globalThis.__attDocumentWorkspaceV7190.literalMatches(index,S.query,S.caseSensitive);
         const needleRaw = String(S.query || '');
         if (!needleRaw || !index.text) return [];
         const haystack = normalize(index.text);
@@ -19726,16 +22925,16 @@
             if (offset < entry.start) break;
             if (offset >= entry.start && offset <= entry.end) {
                 if (preferNext && offset === entry.end && i + 1 < entries.length && entries[i + 1].start === offset) {
-                    return { node: entries[i + 1].node, offset: 0 };
+                    return { node: entries[i + 1].node, offset: entries[i + 1].nodeFrom || 0 };
                 }
                 return {
                     node: entry.node,
-                    offset: Math.max(0, Math.min(entry.node.nodeValue?.length || 0, offset - entry.start))
+                    offset: Math.max(0, Math.min(entry.node.nodeValue?.length || 0, offset - entry.start + (entry.nodeFrom || 0)))
                 };
             }
         }
         const last = entries[entries.length - 1];
-        if (offset === last.end) return { node: last.node, offset: last.node.nodeValue?.length || 0 };
+        if (offset === last.end) return { node: last.node, offset: last.nodeTo ?? last.node.nodeValue?.length ?? 0 };
         return null;
     }
 
@@ -20178,6 +23377,13 @@
     }
 
     function replaceAll() {
+        if (globalThis.__attDocumentWorkspaceV7190) {
+            if (!(!S.replacing && S.query)) return;
+            const editor = findEditor(); if (!editor) return;
+            globalThis.__attDocumentWorkspaceV7190.requestReplaceAll({editor,view:getEditorView(editor),query:S.query,replacement:S.replacement,caseSensitive:S.caseSensitive,regex:false,
+                getCurrent:() => [S.query,S.replacement,false,!!S.caseSensitive],
+                afterApply:count => {S.currentIndex=0; setMessage(`已替换 ${count} 处。`); scheduleSearch(70,{resetIndex:true});}}); return;
+        }
         if (S.replacing || !S.query) return;
         const editor = findEditor();
         if (!editor) return;
@@ -20251,6 +23457,7 @@
     }
 
     function bindEvents() {
+        document.addEventListener('att-doc-search-scope-v7190',() => scheduleSearch(0,{resetIndex:true}));
         if (document.documentElement.dataset.attDocPageSearchV62Bound === '1') return;
         document.documentElement.dataset.attDocPageSearchV62Bound = '1';
 
@@ -20333,7 +23540,8 @@
         S.pageObserver = new MutationObserver(mutations => {
             let external = false;
             for (const record of mutations) {
-                const target = record.target;
+                const target = record.target instanceof Element ? record.target : record.target?.parentElement;
+                if (target?.closest?.('.grid-virtual-body')) continue;
                 if (target instanceof Element && target.closest?.(`#${MOD.barId}, #${MOD.settingsCardId}`)) continue;
                 external = true;
                 break;
@@ -20844,7 +24052,8 @@
             let relevant = false;
 
             for (const record of records) {
-                const target = record.target;
+                const target = record.target instanceof Element ? record.target : record.target?.parentElement;
+                if (target?.closest?.('.grid-virtual-body')) continue;
                 if (target instanceof Element && target.closest?.(`#${UI.barId}, #${UI.launcherId}`)) {
                     continue;
                 }
@@ -21017,6 +24226,7 @@
     }
 
     function buildTextIndex(editor) {
+        if (globalThis.__attDocumentWorkspaceV7190) return globalThis.__attDocumentWorkspaceV7190.buildSearchIndex(editor);
         const entries = [];
         let text = '';
         if (!editor) return { text, entries };
@@ -21049,16 +24259,16 @@
             if (offset < entry.start) break;
             if (offset >= entry.start && offset <= entry.end) {
                 if (preferNext && offset === entry.end && i + 1 < entries.length && entries[i + 1].start === offset) {
-                    return { node: entries[i + 1].node, offset: 0 };
+                    return { node: entries[i + 1].node, offset: entries[i + 1].nodeFrom || 0 };
                 }
                 return {
                     node: entry.node,
-                    offset: Math.max(0, Math.min(entry.node.nodeValue?.length || 0, offset - entry.start))
+                    offset: Math.max(0, Math.min(entry.node.nodeValue?.length || 0, offset - entry.start + (entry.nodeFrom || 0)))
                 };
             }
         }
         const last = entries[entries.length - 1];
-        if (offset === last.end) return { node: last.node, offset: last.node.nodeValue?.length || 0 };
+        if (offset === last.end) return { node: last.node, offset: last.nodeTo ?? last.node.nodeValue?.length ?? 0 };
         return null;
     }
 
@@ -21119,6 +24329,10 @@
         const regex = compileRegex();
         state.zeroLength = false;
         if (!regex || !index.text) return [];
+        if (globalThis.__attDocumentWorkspaceV7190) {
+            const matches = globalThis.__attDocumentWorkspaceV7190.regexMatches(index,regex);
+            state.zeroLength = matches.some(match => match.zeroLength); return matches;
+        }
 
         const matches = [];
         regex.lastIndex = 0;
@@ -21543,6 +24757,13 @@
     }
 
     function replaceAll() {
+        if (globalThis.__attDocumentWorkspaceV7190) {
+            if (!(state.enabled && !state.replacing && state.query)) return;
+            const editor = findEditor(); if (!editor) return;
+            globalThis.__attDocumentWorkspaceV7190.requestReplaceAll({editor,view:getEditorView(editor),query:state.query,replacement:state.replacement,caseSensitive:state.caseSensitive,regex:true,
+                getCurrent:() => [state.query,state.replacement,true,!!state.caseSensitive],
+                afterApply:count => {state.currentIndex=0; setMessage(`已替换 ${count} 处。`); scheduleSearch(70,{resetIndex:true});}}); return;
+        }
         if (!state.enabled || state.replacing || !state.query) return;
         const editor = findEditor();
         if (!editor) return;
@@ -21823,6 +25044,7 @@
     }
 
     function bindEvents() {
+        document.addEventListener('att-doc-search-scope-v7190',() => {if (state.enabled) scheduleSearch(0,{resetIndex:true});});
         document.addEventListener('click', event => {
             const target = event.target instanceof Element ? event.target : null;
             if (!target) return;
@@ -21919,7 +25141,8 @@
         state.observer = new MutationObserver(records => {
             let relevant = false;
             for (const record of records) {
-                const target = record.target;
+                const target = record.target instanceof Element ? record.target : record.target?.parentElement;
+                if (target?.closest?.('.grid-virtual-body')) continue;
                 if (target instanceof Element && target.closest?.(`#${R.barId}`)) continue;
                 relevant = true;
                 break;
@@ -22301,6 +25524,7 @@
             return 0;
         }
 
+        if (globalThis.__attDocumentWorkspaceV7190) return globalThis.__attDocumentWorkspaceV7190.regexMatches(globalThis.__attDocumentWorkspaceV7190.buildSearchIndex(findEditor()),regex).length;
         const text = buildText(findEditor());
         if (!text) return 0;
 
@@ -22497,6 +25721,7 @@
     }
 
     function bindEvents() {
+        document.addEventListener('att-doc-search-scope-v7190',() => refreshComputed(true));
         document.addEventListener('input', event => {
             const target = event.target;
             if (!(target instanceof HTMLInputElement)) return;
@@ -22549,6 +25774,9 @@
                 const target = record.target instanceof Element
                     ? record.target
                     : record.target?.parentElement;
+
+                // V7.16.5：表格虚拟行及聚焦/高亮 class 变化与文档正则 UI 无关。
+                if (target?.closest?.('.grid-virtual-body')) continue;
 
                 if (target?.id === FIX.mirrorCountId || target?.id === FIX.mirrorMessageId || target?.closest?.(`#${FIX.mirrorCountId}, #${FIX.mirrorMessageId}`)) {
                     continue;
@@ -22958,7 +26186,7 @@
     'use strict';
 
     const UI = {
-        version: 'V6.9.1',
+        // 此模块是历史 UI polish 层，业务版本统一读取主 APP.version 渲染出的 data 属性。
         styleId: 'att-toolbox-ui-polish-v690',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -22967,24 +26195,28 @@
 
     const TAB_META = {
         features: {
-            title: '常用功能',
-            desc: '复制、聚焦、主题与当前单元格操作'
+            title: '快捷操作',
+            desc: '当前单元格、复制与高频状态开关'
+        },
+        'table-tools': {
+            title: '表格工具',
+            desc: '字段组合、左右列置顶与当前表配置'
         },
         combos: {
-            title: '字段组合',
-            desc: '通用模板与当前表专用字段映射'
+            title: '表格工具',
+            desc: '字段组合与当前表字段映射'
         },
         pinning: {
-            title: '列置顶',
-            desc: '当前表左右固定、快捷表头置顶与字段配置'
+            title: '表格工具',
+            desc: '左右列置顶、列宽记忆与表管理'
         },
         settings: {
             title: '设置',
-            desc: '悬浮窗、分页、文本编辑、快捷短语与快捷键'
+            desc: '悬浮球、表格交互、外观、编辑、备份与快捷键'
         },
         'document-tools': {
-            title: '文档工具',
-            desc: '文档大纲、跟随、查找、替换、正则与高亮'
+            title: '文档',
+            desc: '大纲、跟随、查找、替换、正则与高亮'
         }
     };
 
@@ -23036,7 +26268,8 @@
             }
 
             #${UI.panelId} .att-head-title::after {
-                content: '${UI.version}';
+                /* V7.8.2：版本徽标直接读取主标题 data-att-version，彻底避免版本号不同步。 */
+                content: attr(data-att-version);
                 display: inline-flex;
                 align-items: center;
                 min-height: 18px;
@@ -23129,11 +26362,11 @@
                 font-size: 10.5px;
                 line-height: 1.4;
             }
-            #${UI.panelId} [data-section="features"].att-active::before { content: '常用功能 · 复制、聚焦、主题和当前操作'; }
-            #${UI.panelId} [data-section="combos"].att-active::before { content: '字段组合 · 通用模板与当前表字段映射'; }
-            #${UI.panelId} [data-section="pinning"].att-active::before { content: '列置顶 · 当前表左右固定与快捷表头配置'; }
-            #${UI.panelId} [data-section="settings"].att-active::before { content: '设置 · 悬浮窗、分页、文本编辑、快捷短语和快捷键'; }
-            #${UI.panelId} [data-section="document-tools"].att-active::before { content: '文档工具 · 大纲、查找、替换、正则和定位'; }
+            #${UI.panelId} [data-section="features"].att-active::before { content: '快捷操作 · 当前上下文、复制与高频状态开关'; }
+            #${UI.panelId} [data-section="combos"].att-active::before { content: '字段组合 · 模板、当前表映射与快速切换'; }
+            #${UI.panelId} [data-section="pinning"].att-active::before { content: '列置顶 · 左右固定、快捷表头与列宽记忆'; }
+            #${UI.panelId} [data-section="settings"].att-active::before { content: '设置 · 分区管理悬浮球、表格、外观、编辑、备份和快捷键'; }
+            #${UI.panelId} [data-section="document-tools"].att-active::before { content: '文档 · 大纲、查找、替换、正则和定位'; }
 
             /* ---------- 内容滚动区 ---------- */
             #${UI.panelId} .att-content {
@@ -23407,7 +26640,8 @@
         const sub = document.getElementById(UI.contextId) || root.querySelector('.att-head-sub');
         if (sub) {
             sub.textContent = `${meta.title} · ${meta.desc}`;
-            sub.title = `${UI.version} · ${meta.title} · ${meta.desc}`;
+            const appVersion = root.dataset.appVersion || root.querySelector('.att-head-title')?.getAttribute('data-att-version') || '';
+            sub.title = `${appVersion ? appVersion + ' · ' : ''}${meta.title} · ${meta.desc}`;
         }
 
         root.querySelectorAll('.att-tab[data-tab]').forEach(tab => {
@@ -23418,9 +26652,16 @@
 
     function install() {
         addStyles();
-        updatePanelContext();
 
         const root = document.getElementById(UI.rootId);
+        if (root) {
+            const title = root.querySelector('.att-head-title');
+            // 老 DOM 或热更新场景：优先沿用主根节点版本，保证徽标仍能自动同步。
+            const appVersion = root.dataset.appVersion || title?.getAttribute('data-att-version') || '';
+            if (title && appVersion) title.setAttribute('data-att-version', appVersion);
+        }
+        updatePanelContext();
+
         if (!root || root.dataset.attUiPolishV690 === '1') return;
         root.dataset.attUiPolishV690 = '1';
 
@@ -23449,6 +26690,595 @@
 
     if (document.body) boot();
     else window.addEventListener('DOMContentLoaded', boot, { once: true });
+})();
+
+
+
+/* ============================================================================
+ * AutoTable 悬浮球菜单 V7.16.0 · 信息架构重构
+ * --------------------------------------------------------------------------
+ * 1) 主导航收敛为“快捷 / 表格 / 文档 / 设置”；
+ * 2) 字段组合与列置顶归入“表格”二级导航；
+ * 3) 快捷页按“工作上下文 → 立即操作 → 视图状态 → 复制行为 → 工具入口”排列；
+ * 4) 条件高亮与聚焦分别拥有独立次级操作，不再混在同一行；
+ * 5) 不改原业务逻辑，只重排入口与视觉层级。
+ * ========================================================================== */
+(function () {
+    'use strict';
+    const ID = 'att-floating-menu-ia-v7160';
+    if (document.getElementById(ID)) return;
+    const style = document.createElement('style');
+    style.id = ID;
+    style.textContent = `
+        #att-toolbox-panel{
+            width:440px!important;
+        }
+
+        /* 主导航只有 3 个常驻项；文档页动态插入后为 4 个。 */
+        #att-toolbox-panel .att-tabs{
+            gap:5px!important;
+            padding:6px 9px!important;
+        }
+        #att-toolbox-panel .att-tab{
+            min-width:0!important;
+            height:31px!important;
+        }
+
+        /* 新快捷页已经自带信息分层，不再重复显示旧的 section 说明横线。 */
+        #att-toolbox-panel [data-section="features"].att-active::before,
+        #att-toolbox-panel [data-section="combos"].att-active::before,
+        #att-toolbox-panel [data-section="pinning"].att-active::before{
+            display:none!important;
+            content:none!important;
+        }
+
+        #att-toolbox-panel .att-content{
+            padding:9px 10px 11px!important;
+        }
+
+        /* -------- 当前工作上下文 -------- */
+        #att-toolbox-panel .att-quick-context-v7160{
+            display:grid;
+            grid-template-columns:minmax(0,1fr) 150px;
+            gap:9px;
+            align-items:stretch;
+            margin-bottom:9px;
+        }
+        #att-toolbox-panel .att-quick-context-main-v7160{
+            min-width:0;
+            padding:9px 10px;
+            border:1px solid var(--att-ui-border,#e4e7ec);
+            border-radius:10px;
+            background:var(--att-ui-surface,#fff);
+        }
+        #att-toolbox-panel .att-quick-context-eyebrow-v7160{
+            color:var(--att-ui-subtle,#98a2b3);
+            font-size:9px;
+            font-weight:750;
+            letter-spacing:.04em;
+        }
+        #att-toolbox-panel .att-quick-context-title-v7160{
+            margin-top:2px;
+            color:var(--att-ui-text,#101828);
+            font-size:12px;
+            font-weight:800;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-context-cell-v7160{
+            min-width:0;
+            display:flex;
+            align-items:center;
+            gap:6px;
+            margin-top:6px;
+            padding-top:6px;
+            border-top:1px solid var(--att-ui-border-soft,#edf0f3);
+            color:var(--att-ui-muted,#667085);
+            font-size:9.5px;
+        }
+        #att-toolbox-panel .att-quick-context-cell-v7160 b{
+            max-width:90px;
+            flex:0 0 auto;
+            color:var(--att-ui-text-2,#344054);
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-context-cell-v7160 span{
+            min-width:0;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-combo-button-v7160{
+            min-width:0;
+            display:flex;
+            flex-direction:column;
+            align-items:flex-start;
+            justify-content:center;
+            position:relative;
+            padding:9px 28px 9px 10px;
+            border:1px solid rgba(37,99,235,.18);
+            border-radius:10px;
+            background:var(--att-ui-blue-soft,#eff6ff);
+            color:var(--att-ui-blue,#2563eb);
+            text-align:left;
+            cursor:pointer;
+        }
+        #att-toolbox-panel .att-quick-combo-button-v7160:hover:not(:disabled){
+            border-color:rgba(37,99,235,.34);
+        }
+        #att-toolbox-panel .att-quick-combo-button-v7160:disabled{opacity:.45;cursor:not-allowed;}
+        #att-toolbox-panel .att-quick-combo-button-v7160 span{
+            font-size:9px;
+            opacity:.78;
+        }
+        #att-toolbox-panel .att-quick-combo-button-v7160 b{
+            width:100%;
+            margin-top:2px;
+            font-size:10.5px;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-combo-button-v7160 i{
+            position:absolute;
+            right:10px;
+            top:50%;
+            transform:translateY(-50%);
+            font-style:normal;
+            font-size:12px;
+        }
+
+        /* -------- 分区 -------- */
+        #att-toolbox-panel .att-quick-section-v7160{
+            margin-top:8px;
+            padding:10px;
+            border:1px solid var(--att-ui-border,#e4e7ec);
+            border-radius:11px;
+            background:var(--att-ui-surface,#fff);
+        }
+        #att-toolbox-panel .att-quick-section-head-v7160{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:8px;
+            margin-bottom:8px;
+        }
+        #att-toolbox-panel .att-quick-section-head-v7160 > div{
+            min-width:0;
+            display:flex;
+            align-items:baseline;
+            gap:7px;
+        }
+        #att-toolbox-panel .att-quick-section-head-v7160 b{
+            color:var(--att-ui-text,#101828);
+            font-size:11px;
+            font-weight:800;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-section-head-v7160 span{
+            min-width:0;
+            color:var(--att-ui-subtle,#98a2b3);
+            font-size:9px;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-section-head-v7160 em{
+            flex:0 0 auto;
+            padding:2px 6px;
+            border-radius:999px;
+            background:rgba(37,99,235,.10);
+            color:var(--att-ui-blue,#2563eb);
+            font-size:9px;
+            font-style:normal;
+            font-weight:750;
+        }
+
+        /* -------- 高频操作 -------- */
+        #att-toolbox-panel .att-quick-action-grid-v7160{
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:6px;
+        }
+        #att-toolbox-panel .att-quick-action-v7160{
+            min-width:0;
+            min-height:46px;
+            display:grid;
+            grid-template-columns:28px minmax(0,1fr);
+            gap:7px;
+            align-items:center;
+            padding:7px 8px;
+            border:1px solid var(--att-ui-border-soft,#edf0f3);
+            border-radius:9px;
+            background:var(--att-ui-surface-2,#f2f4f7);
+            color:var(--att-ui-text-2,#344054);
+            text-align:left;
+            cursor:pointer;
+            transition:background-color .14s ease,border-color .14s ease,transform .14s ease;
+        }
+        #att-toolbox-panel .att-quick-action-v7160:hover:not(:disabled){
+            border-color:rgba(37,99,235,.24);
+            background:var(--att-ui-blue-soft,#eff6ff);
+            transform:translateY(-1px);
+        }
+        #att-toolbox-panel .att-quick-action-v7160:disabled{opacity:.40;cursor:not-allowed;}
+        #att-toolbox-panel .att-quick-action-v7160.is-accent{
+            border-color:rgba(37,99,235,.22);
+            background:var(--att-ui-blue-soft,#eff6ff);
+        }
+        #att-toolbox-panel .att-quick-action-icon-v7160{
+            width:28px;
+            height:28px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border-radius:8px;
+            background:rgba(37,99,235,.09);
+            color:var(--att-ui-blue,#2563eb);
+            font-size:10px;
+            font-weight:850;
+        }
+        #att-toolbox-panel .att-quick-action-v7160 > span:last-child{
+            min-width:0;
+            display:flex;
+            flex-direction:column;
+            gap:2px;
+        }
+        #att-toolbox-panel .att-quick-action-v7160 b{
+            font-size:10.5px;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-action-v7160 small{
+            color:var(--att-ui-muted,#667085);
+            font-size:8.8px;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+
+        /* -------- 视图状态 -------- */
+        #att-toolbox-panel .att-quick-mode-grid-v7160{
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:6px;
+        }
+        #att-toolbox-panel .att-quick-mode-v7160{
+            min-width:0;
+            min-height:44px;
+            box-sizing:border-box;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:7px;
+            padding:7px 8px;
+            border:1px solid var(--att-ui-border-soft,#edf0f3);
+            border-radius:9px;
+            background:var(--att-ui-surface-2,#f2f4f7);
+            color:var(--att-ui-text-2,#344054);
+            text-align:left;
+            cursor:pointer;
+        }
+        #att-toolbox-panel button.att-quick-mode-v7160{
+            width:100%;
+            font:inherit;
+        }
+        #att-toolbox-panel .att-quick-mode-v7160.is-on{
+            border-color:rgba(37,99,235,.23);
+            background:var(--att-ui-blue-soft,#eff6ff);
+        }
+        #att-toolbox-panel .att-quick-mode-v7160 > span:first-child{
+            min-width:0;
+            display:flex;
+            flex-direction:column;
+            gap:2px;
+        }
+        #att-toolbox-panel .att-quick-mode-v7160 b{font-size:10px;}
+        #att-toolbox-panel .att-quick-mode-v7160 small{
+            max-width:126px;
+            color:var(--att-ui-muted,#667085);
+            font-size:8.5px;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-mode-v7160 .att-switch{
+            transform:scale(.78);
+            transform-origin:right center;
+            margin-right:-5px;
+        }
+        #att-toolbox-panel .att-quick-detail-groups-v7160{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:6px;
+            margin-top:7px;
+        }
+        #att-toolbox-panel .att-quick-detail-v7160{
+            min-width:0;
+            display:flex;
+            align-items:center;
+            gap:4px;
+            padding:5px 6px;
+            border:1px solid var(--att-ui-border-soft,#edf0f3);
+            border-radius:8px;
+            background:rgba(148,163,184,.05);
+        }
+        #att-toolbox-panel .att-quick-detail-v7160.is-disabled{opacity:.52;}
+        #att-toolbox-panel .att-quick-detail-label-v7160{
+            margin-right:auto;
+            color:var(--att-ui-subtle,#98a2b3);
+            font-size:8.5px;
+            font-weight:750;
+        }
+        #att-toolbox-panel .att-quick-detail-v7160 label,
+        #att-toolbox-panel .att-quick-detail-v7160 button{
+            min-height:23px;
+            box-sizing:border-box;
+            display:inline-flex;
+            align-items:center;
+            gap:3px;
+            padding:0 5px;
+            border:1px solid var(--att-ui-border,#e4e7ec);
+            border-radius:6px;
+            background:var(--att-ui-surface,#fff);
+            color:var(--att-ui-text-2,#344054);
+            font-size:8.5px;
+            cursor:pointer;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-detail-v7160 button:disabled{opacity:.45;cursor:not-allowed;}
+
+        /* -------- 复制行为 -------- */
+        #att-toolbox-panel .att-quick-copy-row-v7160{
+            display:grid;
+            grid-template-columns:minmax(0,1fr) auto;
+            gap:6px;
+            align-items:center;
+        }
+        #att-toolbox-panel .att-quick-copy-row-v7160 .att-select{margin:0!important;}
+        #att-toolbox-panel .att-quick-hint-v7160{
+            display:flex;
+            flex-wrap:wrap;
+            gap:5px 9px;
+            margin-top:7px;
+            color:var(--att-ui-muted,#667085);
+            font-size:8.8px;
+        }
+        #att-toolbox-panel .att-quick-hint-v7160 kbd{
+            padding:1px 4px;
+            border:1px solid var(--att-ui-border,#e4e7ec);
+            border-radius:5px;
+            background:var(--att-ui-surface-2,#f2f4f7);
+            color:var(--att-ui-text-2,#344054);
+            font:700 8.5px/1.4 inherit;
+        }
+
+        /* -------- 底部工具入口 -------- */
+        #att-toolbox-panel .att-quick-tools-v7160{
+            display:grid;
+            grid-template-columns:repeat(4,minmax(0,1fr));
+            gap:5px;
+            margin-top:8px;
+        }
+        #att-toolbox-panel .att-quick-tools-v7160 button{
+            min-width:0;
+            min-height:40px;
+            display:flex;
+            flex-direction:column;
+            align-items:flex-start;
+            justify-content:center;
+            padding:6px 7px;
+            border:1px solid var(--att-ui-border,#e4e7ec);
+            border-radius:8px;
+            background:var(--att-ui-surface,#fff);
+            color:var(--att-ui-text-2,#344054);
+            text-align:left;
+            cursor:pointer;
+        }
+        #att-toolbox-panel .att-quick-tools-v7160 button:hover{
+            border-color:rgba(37,99,235,.24);
+            background:var(--att-ui-blue-soft,#eff6ff);
+        }
+        #att-toolbox-panel .att-quick-tools-v7160 b{
+            width:100%;
+            font-size:9px;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-tools-v7160 span{
+            width:100%;
+            margin-top:2px;
+            color:var(--att-ui-subtle,#98a2b3);
+            font-size:7.8px;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+
+        /* -------- 表格工具二级导航 -------- */
+        #att-toolbox-panel .att-table-tools-nav-v7160{
+            position:sticky;
+            top:-9px;
+            z-index:5;
+            margin:-9px -10px 9px;
+            padding:9px 10px 8px;
+            border-bottom:1px solid var(--att-ui-border,#e4e7ec);
+            background:var(--att-ui-panel,#f7f8fa);
+        }
+        #att-toolbox-panel .att-table-tools-context-v7160{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:8px;
+            margin-bottom:7px;
+        }
+        #att-toolbox-panel .att-table-tools-context-v7160 > div:first-child{
+            min-width:0;
+            display:flex;
+            align-items:baseline;
+            gap:6px;
+        }
+        #att-toolbox-panel .att-table-tools-context-v7160 b{
+            color:var(--att-ui-text,#101828);
+            font-size:11px;
+        }
+        #att-toolbox-panel .att-table-tools-context-v7160 span{
+            min-width:0;
+            max-width:220px;
+            color:var(--att-ui-muted,#667085);
+            font-size:9px;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-table-tools-stats-v7160{
+            flex:0 0 auto;
+            display:flex;
+            gap:4px;
+        }
+        #att-toolbox-panel .att-table-tools-stats-v7160 span{
+            max-width:none;
+            padding:2px 5px;
+            border:1px solid var(--att-ui-border-soft,#edf0f3);
+            border-radius:999px;
+            background:var(--att-ui-surface,#fff);
+            color:var(--att-ui-subtle,#98a2b3);
+            font-size:8px;
+        }
+        #att-toolbox-panel .att-table-tools-segment-v7160{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:4px;
+            padding:3px;
+            border:1px solid var(--att-ui-border,#e4e7ec);
+            border-radius:9px;
+            background:var(--att-ui-surface-2,#f2f4f7);
+        }
+        #att-toolbox-panel .att-table-tools-segment-v7160 button{
+            height:27px;
+            border:0;
+            border-radius:6px;
+            background:transparent;
+            color:var(--att-ui-muted,#667085);
+            font-size:9.5px;
+            font-weight:750;
+            cursor:pointer;
+        }
+        #att-toolbox-panel .att-table-tools-segment-v7160 button.is-active{
+            background:var(--att-ui-surface,#fff);
+            color:var(--att-ui-blue,#2563eb);
+            box-shadow:0 1px 3px rgba(15,23,42,.08);
+        }
+
+        /* 深色继承 UI 变量，不另起一套颜色。 */
+        /* V7.16.3：条件高亮状态不再只靠一个小圆点，深色/浅色都明确显示“已开启 / 已关闭”。 */
+        #att-toolbox-panel .att-quick-condition-v7162{
+            position:relative;
+        }
+        #att-toolbox-panel .att-quick-condition-v7162.is-on{
+            border-color:rgba(34,197,94,.42)!important;
+            background:linear-gradient(135deg,rgba(34,197,94,.10),var(--att-ui-surface-2,#f2f4f7))!important;
+            box-shadow:inset 3px 0 0 rgba(34,197,94,.72);
+        }
+        #att-toolbox-panel .att-quick-status-v7162{
+            flex:0 0 auto;
+            min-width:48px;
+            height:22px;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:5px;
+            padding:0 7px;
+            border:1px solid var(--att-ui-border,#e4e7ec);
+            border-radius:999px;
+            background:var(--att-ui-surface,#fff);
+            color:var(--att-ui-muted,#667085);
+            font-size:9px;
+            font-weight:800;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-status-v7162 i{
+            width:6px;height:6px;border-radius:50%;background:#98a2b3;
+            box-shadow:0 0 0 2px rgba(152,162,179,.12);
+        }
+        #att-toolbox-panel .att-quick-status-v7162.is-enabled{
+            color:#14803b;
+            border-color:rgba(34,197,94,.30);
+            background:rgba(34,197,94,.10);
+        }
+        #att-toolbox-panel .att-quick-status-v7162.is-enabled i{
+            background:#22c55e;
+            box-shadow:0 0 0 2px rgba(34,197,94,.16);
+        }
+        #att-toolbox-panel .att-quick-highlight-detail-v7162{
+            display:grid!important;
+            grid-template-columns:auto minmax(0,1fr) auto auto!important;
+        }
+        #att-toolbox-panel .att-quick-detail-status-v7162{
+            flex:0 0 auto;
+            padding:2px 6px;
+            border-radius:999px;
+            color:#8a919a;
+            background:var(--att-ui-surface-2,#f2f4f7);
+            border:1px solid var(--att-ui-border-soft,#edf0f3);
+            font-size:8.5px;
+            font-weight:800;
+            white-space:nowrap;
+        }
+        #att-toolbox-panel .att-quick-highlight-detail-v7162.is-enabled .att-quick-detail-status-v7162{
+            color:#14803b;
+            border-color:rgba(34,197,94,.28);
+            background:rgba(34,197,94,.10);
+        }
+        body.att-native-dark #att-toolbox-panel .att-quick-condition-v7162.is-on{
+            border-color:rgba(60,210,116,.38)!important;
+            background:linear-gradient(135deg,rgba(35,126,69,.18),var(--att-ui-surface-2,#2e3033))!important;
+        }
+        body.att-native-dark #att-toolbox-panel .att-quick-status-v7162.is-enabled,
+        body.att-native-dark #att-toolbox-panel .att-quick-highlight-detail-v7162.is-enabled .att-quick-detail-status-v7162{
+            color:#8ee7aa;
+            border-color:rgba(60,210,116,.30);
+            background:rgba(35,126,69,.22);
+        }
+
+        body.att-native-dark #att-toolbox-panel .att-quick-context-main-v7160,
+        body.att-native-dark #att-toolbox-panel .att-quick-section-v7160,
+        body.att-native-dark #att-toolbox-panel .att-quick-detail-v7160 label,
+        body.att-native-dark #att-toolbox-panel .att-quick-detail-v7160 button,
+        body.att-native-dark #att-toolbox-panel .att-quick-tools-v7160 button,
+        body.att-native-dark #att-toolbox-panel .att-table-tools-stats-v7160 span{
+            background:var(--att-ui-surface,#27282a)!important;
+            border-color:var(--att-ui-border,#3a3c40)!important;
+        }
+        body.att-native-dark #att-toolbox-panel .att-quick-action-v7160,
+        body.att-native-dark #att-toolbox-panel .att-quick-mode-v7160,
+        body.att-native-dark #att-toolbox-panel .att-quick-hint-v7160 kbd,
+        body.att-native-dark #att-toolbox-panel .att-table-tools-segment-v7160{
+            background:var(--att-ui-surface-2,#2e3033)!important;
+            border-color:var(--att-ui-border-soft,#323438)!important;
+        }
+        body.att-native-dark #att-toolbox-panel .att-table-tools-nav-v7160{
+            background:var(--att-ui-panel,#202124)!important;
+            border-color:var(--att-ui-border,#3a3c40)!important;
+        }
+        body.att-native-dark #att-toolbox-panel .att-table-tools-segment-v7160 button.is-active{
+            background:var(--att-ui-surface,#27282a)!important;
+        }
+
+        @media(max-width:520px){
+            #att-toolbox-panel{width:calc(100vw - 14px)!important;}
+            #att-toolbox-panel .att-quick-context-v7160{grid-template-columns:1fr;}
+            #att-toolbox-panel .att-quick-combo-button-v7160{min-height:48px;}
+            #att-toolbox-panel .att-quick-detail-groups-v7160{grid-template-columns:1fr;}
+            #att-toolbox-panel .att-quick-tools-v7160{grid-template-columns:repeat(2,1fr);}
+        }
+    `;
+    document.documentElement.appendChild(style);
 })();
 
 
@@ -24229,6 +28059,7 @@
 
         return Array.from(document.querySelectorAll(selectors)).some(el => {
             if (!(el instanceof HTMLElement) || !visible(el)) return false;
+            if (el.matches('[data-att-motion-skip="true"]')) return false;
             // 工具集自身的小型浮窗不作为“阻止页面动画”的业务覆盖层。
             if (el.closest('#att-toolbox-root,#att-editor-phrase-manager,.apc-shell,#att-bulk-progress-panel')) return false;
             return true;
@@ -24236,6 +28067,8 @@
     }
 
     function animatePopup(el, force = false) {
+        // 某些工具层（例如搜索历史）要求鼠标按下/松开期间绝对稳定，不能被全局 popup 入场动画二次接管。
+        if (el instanceof Element && el.matches('[data-att-motion-skip="true"]')) return;
         if (!enabled() || reduced() || !(el instanceof HTMLElement) || !visible(el)) return;
         if (!force && animatedPopups.has(el)) return;
         animatedPopups.add(el);
@@ -24269,6 +28102,10 @@
     function scanVisiblePopups() {
         if (!enabled() || reduced()) return;
         document.querySelectorAll(MOTION.popupSelector).forEach(el => {
+            if (el.matches?.('[data-att-motion-skip="true"]')) {
+                popupVisibleState.set(el, false);
+                return;
+            }
             const nowVisible = visible(el);
             const wasVisible = popupVisibleState.get(el) === true;
             popupVisibleState.set(el, nowVisible);
@@ -25751,3 +29588,7238 @@
     document.documentElement.appendChild(style);
     console.log('[AutoTable 工具集 V7.5.5] 已加载：置顶表头高亮不透明底层 / 防止滚动表头穿透叠影');
 })();
+
+
+/* ============================================================================
+ * AutoTable 字段条件高亮规则中心 V7.15.3
+ * --------------------------------------------------------------------------
+ * 设计目标：
+ * 1) 指定字段内容符合规则时，支持只高亮该单元格或高亮整行；
+ * 2) 支持当前表 / 全部表、文本 / 正则 / 空值 / 数值比较等条件；
+ * 3) 每条规则独立配置底色/透明度、边缘颜色/强度/宽度和文字加粗；整行模式默认同时绘制顶部与底部强调边缘；
+ * 4) 虚拟表格只处理当前可见行，新增 / 复用 / 编辑后的行增量重算；
+ * 5) 规则优先级按列表从上到下，同一目标先命中的规则优先；
+ * 6) 整行强调边缘逐单元格连续绘制，左置顶 / 主体 / 右置顶区域保持同一颜色与宽度；高亮不把置顶列改成透明背景；
+ * 7) 聚焦模式优先级高于条件高亮，二者不会互相抢当前格 / 行列聚焦状态；
+ * 8) 高级模式使用受限表达式解析器（非 eval / new Function），可组合同行字段、日期、正则与逻辑运算；
+ * 9) 支持规则组：同一时间只激活一个规则组，可在设置、快捷页或快捷键中瞬时切换；
+ * 10) 旧版未分组规则自动迁移到“默认规则组”，组配置继续使用 att_v3_ 前缀进入统一备份 / 导入 / 重置。
+ * ========================================================================== */
+(function () {
+    'use strict';
+
+    const PERF = globalThis.__attPerfStats || null;
+
+    const MOD = {
+        version: 'V7.15.3',
+        keyEnabled: 'att_v3_conditionalHighlightEnabled',
+        keyRules: 'att_v3_conditionalHighlightRules',
+        keyGroups: 'att_v3_conditionalHighlightGroups',
+        keyActiveGroup: 'att_v3_conditionalHighlightActiveGroup',
+        cardId: 'att-cond-highlight-card-v770',
+        modalId: 'att-cond-highlight-manager-v770',
+        styleId: 'att-cond-highlight-style-v770'
+    };
+    const DEFAULT_GROUP_ID = 'group_default';
+
+    const OP_META = {
+        contains: '包含',
+        notContains: '不包含',
+        equals: '等于',
+        notEquals: '不等于',
+        startsWith: '开头是',
+        endsWith: '结尾是',
+        regex: '正则表达式',
+        empty: '为空',
+        notEmpty: '非空',
+        gt: '数值 >',
+        gte: '数值 ≥',
+        lt: '数值 <',
+        lte: '数值 ≤',
+        dateToday: '日期 = 今天',
+        dateYesterday: '日期 = 昨天',
+        dateTomorrow: '日期 = 明天',
+        dateBeforeToday: '日期 < 今天（已逾期）',
+        dateAfterToday: '日期 > 今天',
+        dateWithinNextDays: '未来 N 天内',
+        dateWithinPastDays: '过去 N 天内',
+        dateEquals: '日期 = 指定日期'
+    };
+
+    const DATE_OPERATORS = new Set(['dateToday','dateYesterday','dateTomorrow','dateBeforeToday','dateAfterToday','dateWithinNextDays','dateWithinPastDays','dateEquals']);
+    const TEXT_OPERATORS = new Set(['contains','notContains','equals','notEquals','startsWith','endsWith','regex']);
+    const VALID_MODES = new Set(['cell', 'row']);
+    const VALID_SCOPES = new Set(['table', 'global']);
+    const VALID_RULE_TYPES = new Set(['standard','advanced']);
+    const exprTokenCache = new Map();
+    let enabled = Boolean(GM_getValue(MOD.keyEnabled, false));
+    let groups = normalizeGroups(GM_getValue(MOD.keyGroups, []));
+    let activeGroupId = String(GM_getValue(MOD.keyActiveGroup, '') || '');
+    let rules = normalizeRules(GM_getValue(MOD.keyRules, []));
+    let activeRulesCache = [];
+    // V7.16.5：按 grid-root + 当前 headerMap 缓存“规则 -> 实际字段”执行计划。
+    // 规则顺序完全保持不变，只避免每一行重复解析 table context / fieldId。
+    let activeRulePlanCache = new WeakMap();
+    let activeRulesGeneration = 0;
+    let managerDraft = [];
+    let managerGroupsDraft = [];
+    let managerSelectedId = '';
+    let managerFilter = '';
+    let managerGroupId = '';
+    let managerActiveGroupId = '';
+    let managerCheckedIds = new Set();
+    let managerLocalDialog = null;
+
+    const bodyObservers = new Map();
+    const dirtyRows = new Set();
+    const headerCache = new WeakMap();
+    let flushRaf = 0;
+    let scanRaf = 0;
+    let toolboxObserver = null;
+    let settingsCardEnsureRaf = 0;
+    let pageObserver = null;
+
+    function clamp(value, min, max, fallback) {
+        const n = Number(value);
+        return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : fallback;
+    }
+
+    function escHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function escAttr(value) {
+        return escHtml(value).replace(/`/g, '&#96;');
+    }
+
+    function cssEsc(value) {
+        if (window.CSS?.escape) return CSS.escape(String(value));
+        return String(value).replace(/["\\]/g, '\\$&');
+    }
+
+    function cleanText(value) {
+        return String(value ?? '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    function makeId() {
+        return `chr_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+    }
+
+    function normalizeColor(value, fallback = '#f59e0b') {
+        const s = String(value || '').trim();
+        return /^#[0-9a-f]{6}$/i.test(s) ? s.toLowerCase() : fallback;
+    }
+
+    function normalizeRule(raw, index = 0) {
+        const r = raw && typeof raw === 'object' ? raw : {};
+        const operator = OP_META[r.operator] ? r.operator : 'contains';
+        return {
+            id: String(r.id || makeId()),
+            enabled: r.enabled !== false,
+            groupId: String(r.groupId || DEFAULT_GROUP_ID),
+            name: cleanText(r.name) || `高亮规则 ${index + 1}`,
+            scope: VALID_SCOPES.has(r.scope) ? r.scope : 'table',
+            tableKey: String(r.tableKey || ''),
+            tableName: cleanText(r.tableName || ''),
+            fieldId: String(r.fieldId || ''),
+            fieldName: cleanText(r.fieldName || ''),
+            ruleType: VALID_RULE_TYPES.has(r.ruleType) ? r.ruleType : 'standard',
+            operator,
+            value: String(r.value ?? ''),
+            advancedExpr: String(r.advancedExpr ?? ''),
+            caseSensitive: Boolean(r.caseSensitive),
+            mode: VALID_MODES.has(r.mode) ? r.mode : 'cell',
+            color: normalizeColor(r.color),
+            opacity: Math.round(clamp(r.opacity, 4, 80, 24)),
+            // V7.8.1：边缘从填充视觉中独立出来。旧规则缺少这些字段时自动迁移。
+            edgeColor: normalizeColor(r.edgeColor, normalizeColor(r.color)),
+            edgeOpacity: Math.round(clamp(r.edgeOpacity, 0, 100, Math.min(100, Math.round(clamp(r.opacity, 4, 80, 24)) + 34))),
+            edgeWidth: Math.round(clamp(r.edgeWidth, 0, 5, 1)),
+            edgeTop: r.edgeTop !== false,
+            edgeBottom: r.edgeBottom !== false,
+            bold: Boolean(r.bold)
+        };
+    }
+
+    function normalizeRules(value) {
+        if (!Array.isArray(value)) return [];
+        const seen = new Set();
+        return value.map((r, i) => normalizeRule(r, i)).filter(r => {
+            if (!r.id || seen.has(r.id)) r.id = makeId();
+            seen.add(r.id);
+            return true;
+        });
+    }
+
+    function makeGroupId() {
+        return `chrg_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
+    }
+
+    function normalizeGroup(raw, index = 0) {
+        const g = raw && typeof raw === 'object' ? raw : {};
+        return {
+            id: String(g.id || (index === 0 ? DEFAULT_GROUP_ID : makeGroupId())),
+            name: cleanText(g.name) || (index === 0 ? '默认规则组' : `规则组 ${index + 1}`)
+        };
+    }
+
+    function normalizeGroups(value) {
+        const source = Array.isArray(value) && value.length ? value : [{ id: DEFAULT_GROUP_ID, name: '默认规则组' }];
+        const seen = new Set();
+        const result = [];
+        source.forEach((raw, index) => {
+            const group = normalizeGroup(raw, index);
+            if (!group.id || seen.has(group.id)) group.id = makeGroupId();
+            seen.add(group.id);
+            result.push(group);
+        });
+        return result.length ? result : [{ id: DEFAULT_GROUP_ID, name: '默认规则组' }];
+    }
+
+    function repairGroupIntegrity(persist = false) {
+        groups = normalizeGroups(groups);
+        const ids = new Set(groups.map(g => g.id));
+        if (!ids.has(activeGroupId)) activeGroupId = groups[0].id;
+        let changed = false;
+        rules.forEach(rule => {
+            if (!ids.has(rule.groupId)) { rule.groupId = groups[0].id; changed = true; }
+        });
+        if (persist) {
+            GM_setValue(MOD.keyGroups, groups);
+            GM_setValue(MOD.keyActiveGroup, activeGroupId);
+            if (changed) GM_setValue(MOD.keyRules, rules);
+        }
+    }
+
+    function getGroupById(id, source = groups) {
+        return source.find(g => g.id === id) || source[0] || null;
+    }
+
+    function getActiveGroup() {
+        return getGroupById(activeGroupId, groups);
+    }
+
+    function rebuildActiveRulesCache() {
+        const validGroupId = getActiveGroup()?.id || '';
+        activeRulesCache = validGroupId ? rules.filter(r => r.enabled && r.groupId === validGroupId) : [];
+        activeRulesGeneration++;
+        activeRulePlanCache = new WeakMap();
+    }
+
+    function getActiveRules() {
+        return activeRulesCache;
+    }
+
+    function emitStateSnapshot(source = 'ui') {
+        const group = getActiveGroup();
+        window.dispatchEvent(new CustomEvent('att:conditional-highlight:state', {
+            detail: {
+                enabled,
+                activeGroupId: group?.id || DEFAULT_GROUP_ID,
+                activeGroupName: group?.name || '默认规则组',
+                activeRuleCount: activeRulesCache.length,
+                totalRuleCount: rules.filter(r => r.groupId === group?.id).length,
+                groupCount: groups.length,
+                source
+            }
+        }));
+    }
+
+    function emitGroupChanged(source = 'ui') {
+        const group = getActiveGroup();
+        window.dispatchEvent(new CustomEvent('att:conditional-highlight:group-changed', {
+            detail: {
+                id: group?.id || '',
+                name: group?.name || '默认规则组',
+                activeCount: activeRulesCache.length,
+                totalCount: rules.filter(r => r.groupId === group?.id).length,
+                source
+            }
+        }));
+        emitStateSnapshot(source);
+    }
+
+    function setActiveGroup(groupId, source = 'ui') {
+        const group = getGroupById(String(groupId || ''), groups);
+        if (!group) return false;
+        const changed = activeGroupId !== group.id;
+        activeGroupId = group.id;
+        GM_setValue(MOD.keyActiveGroup, activeGroupId);
+        rebuildActiveRulesCache();
+        updateSettingsCard();
+        if (enabled) rescanAllVisibleRows();
+        else clearAllHighlights();
+        emitGroupChanged(source);
+        return changed;
+    }
+
+    function cycleActiveGroup(direction = 1, source = 'shortcut') {
+        if (groups.length < 2) { emitGroupChanged(source); return false; }
+        const current = Math.max(0, groups.findIndex(g => g.id === activeGroupId));
+        const step = Number(direction) < 0 ? -1 : 1;
+        const next = (current + step + groups.length) % groups.length;
+        return setActiveGroup(groups[next].id, source);
+    }
+
+    repairGroupIntegrity(true);
+    rebuildActiveRulesCache();
+
+    function saveRules(nextRules = rules) {
+        rules = normalizeRules(nextRules);
+        repairGroupIntegrity(false);
+        GM_setValue(MOD.keyRules, rules);
+        rebuildActiveRulesCache();
+        updateSettingsCard();
+        rescanAllVisibleRows();
+        emitStateSnapshot('rules-save');
+    }
+
+    function setEnabled(value) {
+        enabled = Boolean(value);
+        GM_setValue(MOD.keyEnabled, enabled);
+        if (enabled) rebuildActiveRulesCache();
+        updateSettingsCard();
+        syncEngineState();
+        emitStateSnapshot('enabled-change');
+    }
+
+    function hexToRgb(hex) {
+        const s = normalizeColor(hex).slice(1);
+        return {
+            r: parseInt(s.slice(0, 2), 16),
+            g: parseInt(s.slice(2, 4), 16),
+            b: parseInt(s.slice(4, 6), 16)
+        };
+    }
+
+    function rgba(hex, opacityPercent) {
+        const { r, g, b } = hexToRgb(hex);
+        const a = clamp(opacityPercent, 0, 100, 20) / 100;
+        return `rgba(${r}, ${g}, ${b}, ${a.toFixed(3)})`;
+    }
+
+    function getVisibleGridRoots() {
+        return Array.from(document.querySelectorAll('.grid-root')).filter(root => {
+            if (!(root instanceof HTMLElement) || !root.isConnected) return false;
+            const rect = root.getBoundingClientRect();
+            return rect.width > 40 && rect.height > 40;
+        });
+    }
+
+    function getPrimaryGridRoot() {
+        return getVisibleGridRoots()[0] || null;
+    }
+
+    function getTableContext(root = getPrimaryGridRoot()) {
+        if (!root) return null;
+        const path = location.pathname || '';
+        const tableMatch = path.match(/\/t\/(tbl_[^/]+)/i);
+        const baseMatch = path.match(/\/b\/([^/]+)/i);
+        const tableId = tableMatch?.[1] || '';
+        const baseId = baseMatch?.[1] || 'base';
+        const title = cleanText(
+            document.querySelector('.grid-page-title')?.textContent ||
+            document.querySelector('.grid-page-header h1')?.textContent ||
+            document.querySelector('main h1')?.textContent ||
+            tableId || '当前表格'
+        );
+        const key = tableId
+            ? `${baseId}::${tableId}`
+            : `path::${path.replace(/\/v\/[^/]+.*$/i, '').replace(/\/+$/, '') || '/'}`;
+        return { root, key, tableId, baseId, tableName: title };
+    }
+
+    function extractHeaderName(header) {
+        if (!(header instanceof Element)) return '';
+        const node = header.querySelector('.grid-header-text,.grid-header-title');
+        return cleanText(
+            node?.getAttribute?.('title') || node?.textContent ||
+            header.getAttribute('title') || header.getAttribute('aria-label') || ''
+        );
+    }
+
+    function buildHeaderMap(root, force = false) {
+        if (!root) return { defs: [], byId: new Map(), byName: new Map() };
+        if (!force) {
+            const cached = headerCache.get(root);
+            if (cached) return cached;
+        }
+        const defs = [];
+        const byId = new Map();
+        const byName = new Map();
+        root.querySelectorAll('.grid-header-cell[data-grid-field-id]').forEach((header, index) => {
+            const fieldId = header.getAttribute('data-grid-field-id') || '';
+            const name = extractHeaderName(header);
+            if (!fieldId || !name || byId.has(fieldId)) return;
+            const def = { fieldId, name, header, index };
+            defs.push(def);
+            byId.set(fieldId, def);
+            if (!byName.has(name)) byName.set(name, def);
+        });
+        const result = { defs, byId, byName };
+        headerCache.set(root, result);
+        return result;
+    }
+
+    function getCurrentFields() {
+        const root = getPrimaryGridRoot();
+        return root ? buildHeaderMap(root, true).defs : [];
+    }
+
+    function getCellValue(cell) {
+        if (!(cell instanceof Element)) return '';
+        const editor = cell.querySelector('input:not([type="checkbox"]),textarea,select');
+        if (editor && 'value' in editor) return cleanText(editor.value);
+        if (cell.querySelector('.cell-empty')) return '';
+        const title = cleanText(cell.getAttribute('title') || '');
+        if (title) return title;
+        const preferred = cell.querySelector(
+            '.cell-relation-label,.member-token__label,.cell-badge-text,.cell-date-badge__primary,.cell-text,.cell-textarea'
+        );
+        if (preferred) return cleanText(preferred.textContent || '');
+        return cleanText(cell.textContent || '');
+    }
+
+    function resolveFieldId(rule, root, map, context = null) {
+        const resolvedContext = context || getTableContext(root);
+        if (rule.scope === 'table' && rule.tableKey && resolvedContext?.key !== rule.tableKey) return '';
+        if (rule.scope === 'table' && rule.fieldId && map.byId.has(rule.fieldId)) return rule.fieldId;
+        if (rule.fieldName && map.byName.has(rule.fieldName)) return map.byName.get(rule.fieldName).fieldId;
+        return '';
+    }
+
+    function getActiveRulePlan(root, map) {
+        if (!(root instanceof Element) || !map) return [];
+
+        // tableKey 参与缓存签名：SPA 即使复用同一个 grid-root / 同一套表头，
+        // 换表后也必须重新解析 table-scope 规则，不能沿用旧计划。
+        const context = getTableContext(root);
+        const contextKey = context?.key || '';
+        const cached = activeRulePlanCache.get(root);
+        if (cached &&
+            cached.generation === activeRulesGeneration &&
+            cached.map === map &&
+            cached.contextKey === contextKey) {
+            if (PERF) PERF.counters.rulePlanCacheHits++;
+            return cached.entries;
+        }
+        if (PERF) PERF.counters.rulePlanCacheMisses++;
+
+        const entries = [];
+        for (const rule of activeRulesCache) {
+            const fieldId = resolveFieldId(rule, root, map, context);
+            if (!fieldId) continue;
+            entries.push({
+                rule,
+                fieldId,
+                selector: `.grid-cell[data-grid-field-id="${cssEsc(fieldId)}"]`
+            });
+        }
+
+        activeRulePlanCache.set(root, {
+            generation: activeRulesGeneration,
+            map,
+            contextKey,
+            entries
+        });
+        return entries;
+    }
+
+    function localMidnight(date = new Date()) {
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0);
+        return d.getTime();
+    }
+
+    function parseLocalDateValue(value) {
+        if (value instanceof Date && Number.isFinite(value.getTime())) return localMidnight(value);
+        const text = cleanText(value);
+        if (!text) return NaN;
+        let m = text.match(/(\d{4})\s*[-\/.年]\s*(\d{1,2})\s*[-\/.月]\s*(\d{1,2})\s*日?/);
+        let y, mo, d;
+        if (m) {
+            y = Number(m[1]); mo = Number(m[2]); d = Number(m[3]);
+        } else {
+            m = text.match(/(?:^|\D)(\d{1,2})\s*[-\/.月]\s*(\d{1,2})(?:\s*日)?(?:\D|$)/);
+            if (!m) return NaN;
+            y = new Date().getFullYear(); mo = Number(m[1]); d = Number(m[2]);
+        }
+        const parsed = new Date(y, mo - 1, d);
+        if (parsed.getFullYear() !== y || parsed.getMonth() !== mo - 1 || parsed.getDate() !== d) return NaN;
+        return localMidnight(parsed);
+    }
+
+    function dateOffsetMidnight(days = 0) {
+        const d = new Date();
+        d.setHours(0,0,0,0);
+        d.setDate(d.getDate() + Number(days || 0));
+        return d.getTime();
+    }
+
+    function tokenizeHighlightExpr(input) {
+        const src = String(input ?? '');
+        if (exprTokenCache.has(src)) return exprTokenCache.get(src);
+        const out = []; let i = 0;
+        const isIdStart = ch => /[A-Za-z_]/.test(ch);
+        const isId = ch => /[A-Za-z0-9_]/.test(ch);
+        while (i < src.length) {
+            const ch = src[i];
+            if (/\s/.test(ch)) { i++; continue; }
+            if (ch === '"' || ch === "'") {
+                const quote = ch; let value = ''; i++; let closed = false;
+                while (i < src.length) {
+                    const c = src[i++];
+                    if (c === quote) { closed = true; break; }
+                    if (c === '\\') {
+                        if (i >= src.length) break;
+                        const e = src[i++];
+                        const map = { n:'\n', r:'\r', t:'\t', '\\':'\\', '"':'"', "'":"'" };
+                        value += Object.prototype.hasOwnProperty.call(map, e) ? map[e] : ('\\' + e);
+                    } else value += c;
+                }
+                if (!closed) throw new Error('字符串没有结束引号');
+                out.push({type:'string',value}); continue;
+            }
+            if (/\d/.test(ch) || (ch === '.' && /\d/.test(src[i+1] || ''))) {
+                const m = src.slice(i).match(/^(?:\d+(?:\.\d*)?|\.\d+)/);
+                out.push({type:'number',value:Number(m[0])}); i += m[0].length; continue;
+            }
+            if (isIdStart(ch)) {
+                let j=i+1; while(j<src.length && isId(src[j])) j++;
+                out.push({type:'id',value:src.slice(i,j)}); i=j; continue;
+            }
+            const op3=src.slice(i,i+3), op2=src.slice(i,i+2);
+            if (['===','!=='].includes(op3)) { out.push({type:'op',value:op3}); i+=3; continue; }
+            if (['&&','||','==','!=','>=','<='].includes(op2)) { out.push({type:'op',value:op2}); i+=2; continue; }
+            if ('+-*/%!><()?,:'.includes(ch)) { out.push({type:'op',value:ch}); i++; continue; }
+            throw new Error(`不支持的字符：${ch}`);
+        }
+        out.push({type:'eof',value:''});
+        if (exprTokenCache.size > 80) exprTokenCache.clear();
+        exprTokenCache.set(src,out);
+        return out;
+    }
+
+    function getRowFieldValue(row, root, map, name) {
+        if (!(row instanceof Element) || !map?.byName) return '';
+        const fieldName = cleanText(name);
+        if (!fieldName) return '';
+        const def = map.byName.get(fieldName);
+        if (!def) return '';
+        const cell = row.querySelector(`.grid-cell[data-grid-field-id="${cssEsc(def.fieldId)}"]`);
+        return cell ? getCellValue(cell) : '';
+    }
+
+    function evalHighlightExpr(expression, context) {
+        const tokens = tokenizeHighlightExpr(expression); let p = 0;
+        const todayTs = dateOffsetMidnight(0);
+        const getField = name => getRowFieldValue(context.row, context.root, context.map, name);
+        const funcs = {
+            field: getField, row: getField,
+            contains: (a,b) => String(a??'').includes(String(b??'')),
+            startsWith: (a,b) => String(a??'').startsWith(String(b??'')),
+            endsWith: (a,b) => String(a??'').endsWith(String(b??'')),
+            lower: a => String(a??'').toLowerCase(), upper: a => String(a??'').toUpperCase(), trim: a => String(a??'').trim(),
+            len: a => String(a??'').length, num: a => Number(String(a??'').replace(/,/g,'').trim()), str: a => String(a??''),
+            empty: a => cleanText(a) === '', notEmpty: a => cleanText(a) !== '',
+            regex: (a,pattern,flags='i') => { try { return new RegExp(String(pattern??''),String(flags??'i')).test(String(a??'')); } catch { return false; } },
+            date: a => parseLocalDateValue(a),
+            daysFromToday: a => { const ts=parseLocalDateValue(a); return Number.isFinite(ts) ? Math.round((ts-todayTs)/86400000) : NaN; },
+            isToday: a => parseLocalDateValue(a) === todayTs,
+            isYesterday: a => parseLocalDateValue(a) === dateOffsetMidnight(-1),
+            isTomorrow: a => parseLocalDateValue(a) === dateOffsetMidnight(1),
+            isPast: a => { const ts=parseLocalDateValue(a); return Number.isFinite(ts) && ts < todayTs; },
+            isFuture: a => { const ts=parseLocalDateValue(a); return Number.isFinite(ts) && ts > todayTs; },
+            withinNextDays: (a,n) => { const x=funcs.daysFromToday(a),days=Number(n); return Number.isFinite(x)&&Number.isFinite(days)&&x>=0&&x<=days; },
+            withinPastDays: (a,n) => { const x=funcs.daysFromToday(a),days=Number(n); return Number.isFinite(x)&&Number.isFinite(days)&&x<=0&&x>=-days; },
+            between: (x,a,b) => x>=a && x<=b,
+            choose: (cond,a,b) => cond ? a : b,
+            coalesce: (...args) => args.find(v => v !== null && v !== undefined && String(v) !== '') ?? ''
+        };
+        const vars = {
+            value: context.value, fieldName: context.rule?.fieldName || '', table: getTableContext(context.root)?.tableName || '',
+            today: todayTs, yesterday: dateOffsetMidnight(-1), tomorrow: dateOffsetMidnight(1), now: Date.now(),
+            true:true, false:false, null:null
+        };
+        const peek=()=>tokens[p]||{type:'eof',value:''};
+        const take=(value=null)=>{const t=peek(); if(value!==null&&t.value!==value)throw new Error(`期望 ${value}，实际 ${t.value||'结束'}`); p++; return t;};
+        const prec={'||':1,'&&':2,'==':3,'!=':3,'===':3,'!==':3,'>':4,'>=':4,'<':4,'<=':4,'+':5,'-':5,'*':6,'/':6,'%':6};
+        const apply=(op,a,b)=>{switch(op){
+            case'||':return a||b; case'&&':return a&&b; case'==':return a==b; case'!=':return a!=b; case'===':return a===b; case'!==':return a!==b;
+            case'>':return a>b; case'>=':return a>=b; case'<':return a<b; case'<=':return a<=b;
+            case'+':return (typeof a==='string'||typeof b==='string')?String(a??'')+String(b??''):Number(a)+Number(b);
+            case'-':return Number(a)-Number(b); case'*':return Number(a)*Number(b); case'/':return Number(a)/Number(b); case'%':return Number(a)%Number(b);
+            default:throw new Error(`不支持运算符 ${op}`);
+        }};
+        const primary=()=>{
+            const t=peek();
+            if(t.type==='number'||t.type==='string'){p++;return t.value;}
+            if(t.type==='op'&&t.value==='('){take('(');const v=ternary();take(')');return v;}
+            if(t.type==='id'){
+                p++; const name=t.value;
+                if(peek().type==='op'&&peek().value==='('){
+                    take('('); const args=[];
+                    if(!(peek().type==='op'&&peek().value===')')){while(true){args.push(ternary());if(peek().type==='op'&&peek().value===','){take(',');continue;}break;}}
+                    take(')'); const fn=funcs[name]; if(typeof fn!=='function')throw new Error(`不允许的函数：${name}`); return fn(...args);
+                }
+                if(Object.prototype.hasOwnProperty.call(vars,name))return vars[name];
+                throw new Error(`未知变量：${name}`);
+            }
+            throw new Error(`无法解析：${t.value||'表达式结束'}`);
+        };
+        const unary=()=>{const tok=peek(),op=tok.value;if(tok.type==='op'&&['!','+','-'].includes(op)){take(op);const v=unary();return op==='!'?!v:op==='+'?Number(v):-Number(v);}return primary();};
+        const binary=(min=1)=>{let left=unary();while(true){const tok=peek(),op=tok.value,pr=tok.type==='op'?prec[op]:0;if(!pr||pr<min)break;take(op);const right=binary(pr+1);left=apply(op,left,right);}return left;};
+        const ternary=()=>{let v=binary(1);if(peek().type==='op'&&peek().value==='?'){take('?');const yes=ternary();take(':');const no=ternary();v=v?yes:no;}return v;};
+        const result=ternary(); if(peek().type!=='eof')throw new Error(`多余内容：${peek().value}`); return result;
+    }
+
+    function validateAdvancedExpression(rule, root = getPrimaryGridRoot()) {
+        if (rule.ruleType !== 'advanced') return {ok:true,error:''};
+        if (!cleanText(rule.advancedExpr)) return {ok:false,error:'高级表达式为空'};
+        try {
+            const row=root?.querySelector('.grid-row'); const map=root?buildHeaderMap(root):{byName:new Map()};
+            evalHighlightExpr(rule.advancedExpr,{rule,row,root,map,value:''});
+            return {ok:true,error:''};
+        } catch (err) { return {ok:false,error:err?.message||String(err)}; }
+    }
+
+    function matchRule(rule, rawValue, row = null, root = null, map = null) {
+        const actualRaw = String(rawValue ?? '');
+        const expectedRaw = String(rule.value ?? '');
+        const actual = rule.caseSensitive ? actualRaw : actualRaw.toLocaleLowerCase();
+        const expected = rule.caseSensitive ? expectedRaw : expectedRaw.toLocaleLowerCase();
+
+        if (rule.ruleType === 'advanced') {
+            if (!row || !root || !map || !cleanText(rule.advancedExpr)) return false;
+            try { return Boolean(evalHighlightExpr(rule.advancedExpr, { rule, row, root, map, value: actualRaw })); }
+            catch { return false; }
+        }
+
+        if (DATE_OPERATORS.has(rule.operator)) {
+            const ts = parseLocalDateValue(actualRaw);
+            if (!Number.isFinite(ts)) return false;
+            const today = dateOffsetMidnight(0);
+            if (rule.operator === 'dateToday') return ts === today;
+            if (rule.operator === 'dateYesterday') return ts === dateOffsetMidnight(-1);
+            if (rule.operator === 'dateTomorrow') return ts === dateOffsetMidnight(1);
+            if (rule.operator === 'dateBeforeToday') return ts < today;
+            if (rule.operator === 'dateAfterToday') return ts > today;
+            if (rule.operator === 'dateEquals') { const expectedTs=parseLocalDateValue(expectedRaw); return Number.isFinite(expectedTs)&&ts===expectedTs; }
+            const n = Math.max(0, Number(expectedRaw === '' ? '3' : expectedRaw)); if (!Number.isFinite(n)) return false;
+            const diff = Math.round((ts - today) / 86400000);
+            if (rule.operator === 'dateWithinNextDays') return diff >= 0 && diff <= n;
+            if (rule.operator === 'dateWithinPastDays') return diff <= 0 && diff >= -n;
+        }
+
+        if (rule.operator === 'empty') return cleanText(actualRaw) === '';
+        if (rule.operator === 'notEmpty') return cleanText(actualRaw) !== '';
+        if (!expectedRaw && ['contains','notContains','startsWith','endsWith','regex','gt','gte','lt','lte'].includes(rule.operator)) return false;
+
+        switch (rule.operator) {
+            case 'contains': return actual.includes(expected);
+            case 'notContains': return !actual.includes(expected);
+            case 'equals': return actual === expected;
+            case 'notEquals': return actual !== expected;
+            case 'startsWith': return actual.startsWith(expected);
+            case 'endsWith': return actual.endsWith(expected);
+            case 'regex':
+                try { return new RegExp(expectedRaw, rule.caseSensitive ? '' : 'i').test(actualRaw); }
+                catch { return false; }
+            case 'gt':
+            case 'gte':
+            case 'lt':
+            case 'lte': {
+                const a = Number(String(actualRaw).replace(/,/g, '').trim());
+                const b = Number(String(expectedRaw).replace(/,/g, '').trim());
+                if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
+                if (rule.operator === 'gt') return a > b;
+                if (rule.operator === 'gte') return a >= b;
+                if (rule.operator === 'lt') return a < b;
+                return a <= b;
+            }
+            default: return false;
+        }
+    }
+
+    function clearCellConditional(cell) {
+        if (!(cell instanceof HTMLElement)) return;
+        cell.classList.remove('att-cond-cell-v770');
+        cell.style.removeProperty('--att-cond-cell-fill');
+        cell.style.removeProperty('--att-cond-cell-edge');
+        cell.style.removeProperty('--att-cond-cell-edge-width');
+        cell.style.removeProperty('--att-cond-cell-font-weight');
+        cell.removeAttribute('data-att-cond-rule');
+    }
+
+    function clearRowConditional(row) {
+        if (!(row instanceof HTMLElement)) return;
+        row.classList.remove('att-cond-row-v770');
+        row.style.removeProperty('--att-cond-row-fill');
+        row.style.removeProperty('--att-cond-row-edge');
+        row.style.removeProperty('--att-cond-row-edge-top');
+        row.style.removeProperty('--att-cond-row-edge-bottom');
+        row.style.removeProperty('--att-cond-row-edge-width');
+        row.style.removeProperty('--att-cond-row-font-weight');
+        row.removeAttribute('data-att-cond-rule');
+        row.querySelectorAll('.grid-cell.att-cond-cell-v770').forEach(clearCellConditional);
+    }
+
+    function setRuleVars(el, prefix, rule) {
+        if (!(el instanceof HTMLElement)) return;
+        const edgeColor = rgba(rule.edgeColor || rule.color, rule.edgeOpacity);
+        el.style.setProperty(`--att-cond-${prefix}-fill`, rgba(rule.color, rule.opacity));
+        el.style.setProperty(`--att-cond-${prefix}-edge`, edgeColor);
+        el.style.setProperty(`--att-cond-${prefix}-edge-width`, `${rule.edgeWidth}px`);
+        el.style.setProperty(`--att-cond-${prefix}-font-weight`, rule.bold ? '650' : 'inherit');
+        if (prefix === 'row') {
+            el.style.setProperty('--att-cond-row-edge-top', rule.edgeTop ? edgeColor : 'transparent');
+            el.style.setProperty('--att-cond-row-edge-bottom', rule.edgeBottom ? edgeColor : 'transparent');
+        }
+    }
+
+    function evaluateRow(row) {
+        if (!(row instanceof HTMLElement) || !row.isConnected || !row.matches('.grid-row')) return;
+        clearRowConditional(row);
+        if (!enabled || !rules.length) return;
+        const root = row.closest('.grid-root');
+        if (!root) return;
+        const map = buildHeaderMap(root);
+        const plan = getActiveRulePlan(root, map);
+        if (!plan.length) return;
+        if (PERF) PERF.counters.conditionalRuleEvaluations += plan.length;
+
+        let rowWinner = null;
+        const cellWinners = new Set();
+        const rowCellCache = new Map();
+        for (const entry of plan) {
+            const { rule, fieldId, selector } = entry;
+            let cachedCell = rowCellCache.get(fieldId);
+            if (cachedCell === undefined) {
+                const cell = row.querySelector(selector) || null;
+                cachedCell = cell ? { cell, value: getCellValue(cell) } : null;
+                rowCellCache.set(fieldId, cachedCell);
+            }
+            if (!cachedCell) continue;
+            const { cell, value } = cachedCell;
+            if (!matchRule(rule, value, row, root, map)) continue;
+
+            if (rule.mode === 'row') {
+                if (!rowWinner) rowWinner = rule;
+            } else if (!cellWinners.has(fieldId)) {
+                cellWinners.add(fieldId);
+                cell.classList.add('att-cond-cell-v770');
+                cell.setAttribute('data-att-cond-rule', rule.id);
+                setRuleVars(cell, 'cell', rule);
+            }
+        }
+
+        if (rowWinner) {
+            row.classList.add('att-cond-row-v770');
+            row.setAttribute('data-att-cond-rule', rowWinner.id);
+            setRuleVars(row, 'row', rowWinner);
+        }
+    }
+
+    function markRowDirty(row) {
+        if (!(row instanceof HTMLElement) || !row.matches('.grid-row')) return;
+        dirtyRows.add(row);
+        if (!flushRaf) flushRaf = requestAnimationFrame(flushDirtyRows);
+    }
+
+    function flushDirtyRows() {
+        flushRaf = 0;
+        if (!enabled) {
+            dirtyRows.clear();
+            return;
+        }
+        const batch = Array.from(dirtyRows);
+        dirtyRows.clear();
+        if (!batch.length) return;
+        const perfStarted = PERF ? performance.now() : 0;
+        if (PERF) {
+            PERF.counters.conditionalFlushes++;
+            PERF.counters.conditionalRowsProcessed += batch.length;
+        }
+        try {
+            batch.forEach(evaluateRow);
+        } finally {
+            if (PERF) PERF.recordTiming('conditionalFlushMs', performance.now() - perfStarted);
+        }
+    }
+
+    function collectRowsFromNode(node, set) {
+        if (!(node instanceof Element)) return;
+        if (node.matches('.grid-row')) set.add(node);
+        const own = node.closest?.('.grid-row');
+        if (own) set.add(own);
+        node.querySelectorAll?.('.grid-row').forEach(row => set.add(row));
+    }
+
+    function installBodyObserver(body) {
+        if (!(body instanceof Element) || bodyObservers.has(body)) return;
+        const observer = new MutationObserver(records => {
+            if (PERF) PERF.counters.conditionalBodyObserverCallbacks++;
+            if (!enabled) return;
+            const rows = new Set();
+            for (const record of records) {
+                const targetEl = record.target instanceof Element ? record.target : record.target.parentElement;
+                const targetRow = targetEl?.closest?.('.grid-row');
+                if (targetRow) rows.add(targetRow);
+                if (record.type === 'childList') {
+                    record.addedNodes.forEach(node => collectRowsFromNode(node, rows));
+                }
+            }
+            rows.forEach(markRowDirty);
+        });
+        observer.observe(body, {
+            subtree: true,
+            childList: true,
+            characterData: true,
+            attributes: true,
+            attributeFilter: ['title']
+        });
+        bodyObservers.set(body, observer);
+        body.querySelectorAll('.grid-row').forEach(markRowDirty);
+    }
+
+    function cleanupBodyObservers() {
+        for (const [body, observer] of bodyObservers) {
+            if (body.isConnected && enabled) continue;
+            try { observer.disconnect(); } catch {}
+            bodyObservers.delete(body);
+        }
+    }
+
+    function scanGridBodies() {
+        scanRaf = 0;
+        if (!enabled) return cleanupBodyObservers();
+        getVisibleGridRoots().forEach(root => {
+            const body = root.querySelector('.grid-virtual-body') || root;
+            installBodyObserver(body);
+        });
+        cleanupBodyObservers();
+    }
+
+    function scheduleGridScan() {
+        if (scanRaf) return;
+        scanRaf = requestAnimationFrame(scanGridBodies);
+    }
+
+    function clearAllHighlights() {
+        document.querySelectorAll('.grid-row.att-cond-row-v770').forEach(clearRowConditional);
+        document.querySelectorAll('.grid-cell.att-cond-cell-v770').forEach(clearCellConditional);
+    }
+
+    function rescanAllVisibleRows() {
+        clearAllHighlights();
+        if (!enabled) return;
+        headerCacheCleanup();
+        getVisibleGridRoots().forEach(root => {
+            buildHeaderMap(root, true);
+            root.querySelectorAll('.grid-row').forEach(markRowDirty);
+        });
+        scheduleGridScan();
+    }
+
+    function headerCacheCleanup() {
+        // WeakMap 无需手动删除；此函数保留语义，强制重建通过 buildHeaderMap(..., true)。
+    }
+
+    function syncEngineState() {
+        if (!enabled) {
+            cleanupBodyObservers();
+            clearAllHighlights();
+            return;
+        }
+        // rescanAllVisibleRows() 自身会安排 grid scan；避免同一状态切换重复调度。
+        rescanAllVisibleRows();
+    }
+
+    function countVisibleMatches(rule) {
+        let count = 0;
+        getVisibleGridRoots().forEach(root => {
+            const map = buildHeaderMap(root, true);
+            const fieldId = resolveFieldId(rule, root, map);
+            if (!fieldId) return;
+            root.querySelectorAll('.grid-row').forEach(row => {
+                const cell = row.querySelector(`.grid-cell[data-grid-field-id="${cssEsc(fieldId)}"]`);
+                if (cell && matchRule(rule, getCellValue(cell), row, root, map)) count++;
+            });
+        });
+        return count;
+    }
+
+    function ensureStyles() {
+        if (document.getElementById(MOD.styleId)) return;
+        const style = document.createElement('style');
+        style.id = MOD.styleId;
+        style.textContent = `
+            /*
+             * V7.8.1 整行条件高亮：顶部 + 底部双边缘。
+             * 每一个可见 cell（包括左右置顶 cell、复选框列、行号列）绘制完全相同的水平边缘，
+             * 因而横向滚动时不会在 pinned / normal 区域交界处断线。
+             */
+            #root .grid-root .grid-row.att-cond-row-v770 > .grid-cell:not(.att-focus-cell):not(.att-focus-row-cell):not(.att-focus-column),
+            #root .grid-root .grid-row.att-cond-row-v770 > .grid-selectcol,
+            #root .grid-root .grid-row.att-cond-row-v770 > .grid-rownum {
+                background-image:
+                    linear-gradient(to bottom,
+                        var(--att-cond-row-edge-top) 0,
+                        var(--att-cond-row-edge-top) var(--att-cond-row-edge-width),
+                        transparent var(--att-cond-row-edge-width),
+                        transparent 100%),
+                    linear-gradient(to top,
+                        var(--att-cond-row-edge-bottom) 0,
+                        var(--att-cond-row-edge-bottom) var(--att-cond-row-edge-width),
+                        transparent var(--att-cond-row-edge-width),
+                        transparent 100%),
+                    linear-gradient(var(--att-cond-row-fill), var(--att-cond-row-fill)) !important;
+                font-weight: var(--att-cond-row-font-weight) !important;
+            }
+
+            #root .grid-root .grid-row .grid-cell.att-cond-cell-v770:not(.att-focus-cell):not(.att-focus-row-cell):not(.att-focus-column) {
+                background-image:
+                    linear-gradient(to right,
+                        var(--att-cond-cell-edge) 0,
+                        var(--att-cond-cell-edge) var(--att-cond-cell-edge-width),
+                        transparent var(--att-cond-cell-edge-width),
+                        transparent 100%),
+                    linear-gradient(var(--att-cond-cell-fill), var(--att-cond-cell-fill)) !important;
+                font-weight: var(--att-cond-cell-font-weight) !important;
+            }
+
+            /* 单元格规则比同一行的整行规则优先。 */
+            #root .grid-root .grid-row.att-cond-row-v770 > .grid-cell.att-cond-cell-v770:not(.att-focus-cell):not(.att-focus-row-cell):not(.att-focus-column) {
+                background-image:
+                    linear-gradient(to right,
+                        var(--att-cond-cell-edge) 0,
+                        var(--att-cond-cell-edge) var(--att-cond-cell-edge-width),
+                        transparent var(--att-cond-cell-edge-width),
+                        transparent 100%),
+                    linear-gradient(var(--att-cond-cell-fill), var(--att-cond-cell-fill)) !important;
+                font-weight: var(--att-cond-cell-font-weight) !important;
+            }
+
+            /* 管理器 */
+            #${MOD.modalId} {
+                position: fixed; inset: 0; z-index: 2147483000;
+                display: none; align-items: center; justify-content: center;
+                padding: 22px; background: rgba(0,0,0,.56); backdrop-filter: blur(3px);
+                color: #e8eaed; font-family: inherit;
+            }
+            #${MOD.modalId}.att-show { display:flex; }
+            #${MOD.modalId} .chr-shell {
+                width: min(1080px, calc(100vw - 36px)); height: min(760px, calc(100vh - 36px));
+                min-height: 520px; display:grid; grid-template-rows:auto minmax(0,1fr) auto;
+                background:#202124; border:1px solid #3b3d40; border-radius:14px;
+                box-shadow:0 22px 70px rgba(0,0,0,.46); overflow:hidden;
+            }
+            #${MOD.modalId} .chr-head,
+            #${MOD.modalId} .chr-foot { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; }
+            #${MOD.modalId} .chr-head { border-bottom:1px solid #34363a; }
+            #${MOD.modalId} .chr-foot { border-top:1px solid #34363a; }
+            #${MOD.modalId} .chr-title { font-size:16px; font-weight:700; }
+            #${MOD.modalId} .chr-sub { margin-top:3px; color:#9aa0a6; font-size:12px; }
+            #${MOD.modalId} .chr-main { min-height:0; display:grid; grid-template-columns:300px minmax(0,1fr); }
+            #${MOD.modalId} .chr-side { min-height:0; display:grid; grid-template-rows:auto auto auto minmax(0,1fr); border-right:1px solid #34363a; }
+            #${MOD.modalId} .chr-group-panel { padding:11px 12px 9px; border-bottom:1px solid #34363a; background:#222326; }
+            #${MOD.modalId} .chr-group-top { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:7px; align-items:center; }
+            #${MOD.modalId} .chr-group-top select { height:34px; }
+            #${MOD.modalId} .chr-group-active { height:25px; padding:0 8px; border-radius:999px; color:#9ecbff; background:#203047; border:1px solid #315b91; font-size:10px; font-weight:700; white-space:nowrap; }
+            #${MOD.modalId} .chr-group-active.is-current { color:#b7f7c7; background:#193324; border-color:#2f6a45; }
+            #${MOD.modalId} .chr-group-actions { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:5px; margin-top:7px; }
+            #${MOD.modalId} .chr-group-actions button { height:27px; min-width:0; padding:0 5px; font-size:10px; }
+            #${MOD.modalId} .chr-side-tools { padding:10px 12px; display:flex; gap:8px; }
+            #${MOD.modalId} input[type="text"], #${MOD.modalId} input[type="search"], #${MOD.modalId} select {
+                width:100%; min-width:0; box-sizing:border-box; height:34px; padding:0 9px;
+                color:#e8eaed; background:#292a2d; border:1px solid #424448; border-radius:7px; outline:none;
+            }
+            #${MOD.modalId} input:focus, #${MOD.modalId} select:focus { border-color:#4c8bf5; box-shadow:0 0 0 2px rgba(76,139,245,.16); }
+            #${MOD.modalId} .chr-filter { padding:0 12px 10px; }
+            #${MOD.modalId} .chr-list { min-height:0; overflow:auto; padding:0 8px 12px; scrollbar-gutter:stable; }
+            #${MOD.modalId} .chr-item { display:grid; grid-template-columns:auto minmax(0,1fr); gap:8px; padding:9px 8px; margin:3px 0; border:1px solid transparent; border-radius:8px; cursor:pointer; }
+            #${MOD.modalId} .chr-item:hover { background:#292b2f; }
+            #${MOD.modalId} .chr-item.active { background:#26354a; border-color:#315b91; }
+            #${MOD.modalId} .chr-dot { width:8px; height:8px; border-radius:50%; margin-top:5px; background:var(--chr-color,#6b7280); box-shadow:0 0 0 3px color-mix(in srgb, var(--chr-color,#6b7280) 16%, transparent); }
+            #${MOD.modalId} .chr-item-name { font-weight:650; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+            #${MOD.modalId} .chr-item-meta { margin-top:3px; color:#9aa0a6; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+            #${MOD.modalId} .chr-detail { min-width:0; min-height:0; overflow:auto; padding:16px 18px 24px; scrollbar-gutter:stable; }
+            #${MOD.modalId} .chr-empty { height:100%; min-height:260px; display:grid; place-items:center; color:#9aa0a6; text-align:center; }
+            #${MOD.modalId} .chr-section { padding:13px; margin-bottom:12px; background:#252629; border:1px solid #383a3e; border-radius:10px; }
+            #${MOD.modalId} .chr-section-title { margin-bottom:10px; font-weight:700; font-size:13px; }
+            #${MOD.modalId} .chr-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+            #${MOD.modalId} .chr-field { min-width:0; }
+            #${MOD.modalId} .chr-field > span { display:block; margin-bottom:5px; color:#b7bbc0; font-size:11px; }
+            #${MOD.modalId} .chr-check { display:flex; align-items:center; gap:7px; min-height:34px; font-size:12px; }
+            #${MOD.modalId} .chr-range { display:grid; grid-template-columns:minmax(0,1fr) 52px; align-items:center; gap:8px; }
+            #${MOD.modalId} input[type="range"] { width:100%; }
+            #${MOD.modalId} .chr-range b { font-size:11px; color:#c9ccd1; text-align:right; }
+            #${MOD.modalId} .chr-actions { display:flex; flex-wrap:wrap; gap:7px; }
+            #${MOD.modalId} button { height:32px; padding:0 11px; color:#e8eaed; background:#303134; border:1px solid #46484d; border-radius:7px; cursor:pointer; }
+            #${MOD.modalId} button:hover { background:#3a3c40; }
+            #${MOD.modalId} button.primary { background:#1a73e8; border-color:#1a73e8; color:white; }
+            #${MOD.modalId} button.danger { color:#ff8a80; border-color:#69413f; }
+            #${MOD.modalId} button:disabled { opacity:.45; cursor:not-allowed; }
+            #${MOD.modalId} .chr-preview { padding:9px 10px; border-radius:8px; background:#1f2023; color:#b9c0c8; font-size:12px; line-height:1.5; }
+            #${MOD.modalId} .chr-mode { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+            #${MOD.modalId} .chr-mode label { display:flex; align-items:center; justify-content:center; gap:6px; height:34px; border:1px solid #424448; border-radius:7px; cursor:pointer; }
+            #${MOD.modalId} .chr-mode label:has(input:checked) { background:#263b58; border-color:#3f78bd; color:#dbeafe; }
+            #${MOD.modalId} .chr-mode input { display:none; }
+            #${MOD.modalId} .chr-rule-type { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:8px; }
+            #${MOD.modalId} .chr-rule-type label { display:flex;align-items:center;justify-content:center;gap:6px;height:34px;border:1px solid #424448;border-radius:7px;cursor:pointer; }
+            #${MOD.modalId} .chr-rule-type label:has(input:checked) { background:#263b58;border-color:#3f78bd;color:#dbeafe; }
+            #${MOD.modalId} .chr-rule-type input { display:none; }
+            #${MOD.modalId} .chr-code { width:100%; min-height:150px; resize:vertical; padding:10px 11px; color:#e7eef7; background:#17191d; border:1px solid #41454b; border-radius:8px; font:12px/1.65 Consolas,'Cascadia Code',monospace; tab-size:4; }
+            #${MOD.modalId} .chr-code:focus { border-color:#3f78bd; box-shadow:0 0 0 2px rgba(63,120,189,.16); outline:none; }
+            #${MOD.modalId} .chr-code-tools { display:flex;flex-wrap:wrap;gap:6px;margin:8px 0; }
+            #${MOD.modalId} .chr-code-tools button { height:27px;padding:0 8px;color:#b9d7ff;background:#202c3d;border-color:#355171;font-size:11px; }
+            #${MOD.modalId} .chr-guide { margin-top:8px;padding:9px 10px;background:#1f2023;border:1px solid #36383c;border-radius:8px;color:#aeb5bd;font-size:11px;line-height:1.65; }
+            #${MOD.modalId} .chr-guide code { color:#9ecbff;background:#182333;padding:1px 4px;border-radius:4px; }
+            @media(max-width:820px){ #${MOD.modalId} .chr-main{grid-template-columns:240px minmax(0,1fr)} #${MOD.modalId} .chr-grid2{grid-template-columns:1fr} }
+        `;
+        (document.head || document.documentElement).appendChild(style);
+    }
+
+    function ruleScopeLabel(rule) {
+        return rule.scope === 'global' ? '全部表' : (rule.tableName || '当前表');
+    }
+
+    function updateSettingsCard() {
+        const card = document.getElementById(MOD.cardId);
+        if (!card) return;
+        const toggle = card.querySelector('[data-cond-setting="enabled"]');
+        if (toggle) toggle.checked = enabled;
+        const group = getActiveGroup();
+        const active = getActiveRules().length;
+        const groupTotal = rules.filter(r => r.groupId === group?.id).length;
+        const summary = card.querySelector('[data-cond-summary]');
+        if (summary) summary.textContent = `当前组：${group?.name || '默认规则组'} · ${active}/${groupTotal} 条启用 · 共 ${groups.length} 组`;
+        const select = card.querySelector('[data-cond-setting="group"]');
+        if (select) {
+            const signature = groups.map(g => `${g.id}:${g.name}`).join('|');
+            if (select.dataset.signature !== signature) {
+                select.innerHTML = groups.map(g => `<option value="${escAttr(g.id)}">${escHtml(g.name)}</option>`).join('');
+                select.dataset.signature = signature;
+            }
+            select.value = group?.id || '';
+        }
+        card.querySelectorAll('[data-cond-act="next-group"]').forEach(btn => btn.disabled = groups.length < 2);
+    }
+
+    function ensureSettingsCard() {
+        const section = document.querySelector('[data-section="settings"]');
+        if (!section || document.getElementById(MOD.cardId)) return;
+        const card = document.createElement('div');
+        card.id = MOD.cardId;
+        card.className = 'att-card';
+        card.innerHTML = `
+            <div class="att-card-title">字段条件高亮</div>
+            <div class="att-card-desc">支持把高亮规则整理成多个规则组；同一时间只激活一个组，可快速切换不同工作场景。组内继续支持文本、数值、日期语义、高级表达式、单元格 / 整行高亮与独立视觉样式。</div>
+            <div class="att-divider"></div>
+            <div class="att-row">
+                <div style="min-width:0;">
+                    <div class="att-label">启用字段条件高亮</div>
+                    <div class="att-sub-label" data-cond-summary></div>
+                    <div class="att-sub-label">总开关 <span class="att-kbd">Alt+H</span> · 下一规则组 <span class="att-kbd">Alt+Shift+H</span>，均可在快捷键设置中修改</div>
+                </div>
+                <label class="att-switch"><input type="checkbox" data-cond-setting="enabled" ${enabled ? 'checked' : ''}><span class="att-slider"></span></label>
+            </div>
+            <div class="att-divider"></div>
+            <div class="att-field" style="margin-top:8px;">
+                <div class="att-label">当前高亮规则组</div>
+                <select class="att-select" data-cond-setting="group">${groups.map(g => `<option value="${escAttr(g.id)}" ${g.id===activeGroupId?'selected':''}>${escHtml(g.name)}</option>`).join('')}</select>
+            </div>
+            <div class="att-actions" style="margin-top:8px;">
+                <button type="button" class="att-btn att-primary" data-cond-act="manage">管理规则组 / 规则</button>
+                <button type="button" class="att-btn" data-cond-act="next-group" ${groups.length < 2 ? 'disabled' : ''}>切换下一组</button>
+                <button type="button" class="att-btn" data-cond-act="refresh">重新扫描</button>
+            </div>
+        `;
+        // 条件高亮与表格视觉样式关系紧密，放在视觉样式卡片后面；找不到则放到设置顶部。
+        const cards = Array.from(section.querySelectorAll(':scope > .att-card'));
+        const visual = cards.find(el => cleanText(el.querySelector('.att-card-title')?.textContent) === '表格视觉样式');
+        if (visual?.nextSibling) section.insertBefore(card, visual.nextSibling);
+        else if (visual) section.appendChild(card);
+        else section.prepend(card);
+        updateSettingsCard();
+    }
+
+    function openManager() {
+        managerDraft = normalizeRules(JSON.parse(JSON.stringify(rules)));
+        managerGroupsDraft = normalizeGroups(JSON.parse(JSON.stringify(groups)));
+        managerActiveGroupId = managerGroupsDraft.some(g => g.id === activeGroupId) ? activeGroupId : managerGroupsDraft[0]?.id || '';
+        managerGroupId = managerActiveGroupId || managerGroupsDraft[0]?.id || '';
+        managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
+        managerFilter = '';
+        managerCheckedIds = new Set();
+        managerLocalDialog = null;
+        const modal = ensureManager();
+        modal.classList.add('att-show');
+        renderManager();
+    }
+
+    function closeManager() {
+        closeManagerLocalDialog();
+        document.getElementById(MOD.modalId)?.classList.remove('att-show');
+    }
+
+    function ensureManager() {
+        let modal = document.getElementById(MOD.modalId);
+        if (modal) return modal;
+        modal = document.createElement('div');
+        modal.id = MOD.modalId;
+        modal.innerHTML = `
+            <div class="chr-shell chr-shell-v7152" role="dialog" aria-modal="true" aria-label="字段条件高亮规则组">
+                <div class="chr-head">
+                    <div>
+                        <div class="chr-title">字段条件高亮规则组</div>
+                        <div class="chr-sub">V7.15.3 · 规则组与规则分层管理 · 快捷切换 · 单元格 / 整行 · 日期语义 · 安全高级表达式</div>
+                    </div>
+                    <button type="button" data-chr-act="close" title="关闭">×</button>
+                </div>
+
+                <div class="chr-groupbar">
+                    <div class="chr-groupbar-main">
+                        <span class="chr-groupbar-label">规则组</span>
+                        <button type="button" class="chr-group-nav" data-chr-act="prev-group" title="上一个规则组">‹</button>
+                        <select data-chr-group-select aria-label="规则组"></select>
+                        <button type="button" class="chr-group-nav" data-chr-act="next-group" title="下一个规则组">›</button>
+                        <button type="button" class="chr-group-active" data-chr-act="set-active-group"></button>
+                    </div>
+                    <div class="chr-groupbar-actions">
+                        <button type="button" class="primary" data-chr-act="new-group">+ 新建组</button>
+                        <button type="button" data-chr-act="rename-group">重命名</button>
+                        <button type="button" data-chr-act="duplicate-group">复制组</button>
+                        <button type="button" class="danger-soft" data-chr-act="delete-group">删除组</button>
+                    </div>
+                </div>
+
+                <div class="chr-main">
+                    <aside class="chr-side">
+                        <div class="chr-side-head">
+                            <div>
+                                <div class="chr-side-title">当前组规则</div>
+                                <div class="chr-side-count" data-chr-group-count>0 条规则</div>
+                            </div>
+                            <button type="button" class="primary" data-chr-act="new">+ 新建规则</button>
+                        </div>
+
+                        <div class="chr-batchbar">
+                            <div class="chr-batchbar-top">
+                                <label class="chr-select-all"><input type="checkbox" data-chr-select-all> 全选</label>
+                                <span data-chr-selected-count>已选 0 条</span>
+                            </div>
+                            <div class="chr-batch-actions">
+                                <button type="button" data-chr-act="batch-enable">启用</button>
+                                <button type="button" data-chr-act="batch-disable">停用</button>
+                                <button type="button" data-chr-act="batch-duplicate">复制</button>
+                                <button type="button" class="danger-soft" data-chr-act="batch-delete">删除</button>
+                            </div>
+                        </div>
+
+                        <div class="chr-filter">
+                            <input type="search" data-chr-filter placeholder="搜索规则名称 / 字段 / 表名…">
+                        </div>
+                        <div class="chr-list" data-chr-list></div>
+                    </aside>
+
+                    <main class="chr-detail" data-chr-detail></main>
+                </div>
+
+                <div class="chr-foot">
+                    <div class="chr-sub">仅当前生效规则组参与高亮；组内规则从上到下决定优先级。所有修改在“保存全部”后正式应用。</div>
+                    <div class="chr-actions">
+                        <button type="button" data-chr-act="cancel">取消</button>
+                        <button type="button" class="primary" data-chr-act="save">保存全部</button>
+                    </div>
+                </div>
+
+                <div class="chr-local-dialog-layer" data-chr-local-dialog hidden></div>
+            </div>`;
+        document.body.appendChild(modal);
+        modal.addEventListener('click', onManagerClick);
+        modal.addEventListener('input', onManagerInput);
+        modal.addEventListener('change', onManagerChange);
+        modal.addEventListener('keydown', onManagerKeydown);
+        return modal;
+    }
+
+
+    function closeManagerLocalDialog() {
+        const layer = document.querySelector(`#${MOD.modalId} [data-chr-local-dialog]`);
+        if (layer) {
+            layer.hidden = true;
+            layer.innerHTML = '';
+        }
+        managerLocalDialog = null;
+    }
+
+    function openManagerLocalDialog(options = {}) {
+        const modal = ensureManager();
+        const layer = modal.querySelector('[data-chr-local-dialog]');
+        if (!layer) return;
+
+        const kind = options.kind === 'input' ? 'input' : 'confirm';
+        const danger = Boolean(options.danger);
+        const value = String(options.value ?? '');
+        const confirmText = String(options.confirmText || (danger ? '确认删除' : '确定'));
+        const cancelText = String(options.cancelText || '取消');
+
+        managerLocalDialog = {
+            kind,
+            onConfirm: typeof options.onConfirm === 'function' ? options.onConfirm : null
+        };
+
+        layer.hidden = false;
+        layer.innerHTML = `
+            <div class="chr-local-dialog-backdrop" aria-hidden="true"></div>
+            <div class="chr-local-dialog-card ${danger ? 'is-danger' : ''}" role="dialog" aria-modal="true" aria-label="${escAttr(options.title || '操作确认')}">
+                <div class="chr-local-dialog-head">
+                    <div>
+                        <div class="chr-local-dialog-title">${escHtml(options.title || '操作确认')}</div>
+                        ${options.subtitle ? `<div class="chr-local-dialog-sub">${escHtml(options.subtitle)}</div>` : ''}
+                    </div>
+                    <button type="button" class="chr-local-dialog-close" data-chr-dialog-act="cancel" title="关闭">×</button>
+                </div>
+                <div class="chr-local-dialog-body">
+                    ${options.message ? `<div class="chr-local-dialog-message">${escHtml(options.message)}</div>` : ''}
+                    ${options.detail ? `<div class="chr-local-dialog-detail">${escHtml(options.detail)}</div>` : ''}
+                    ${kind === 'input' ? `
+                        <label class="chr-local-dialog-field">
+                            <span>${escHtml(options.label || '名称')}</span>
+                            <input type="text" data-chr-dialog-input value="${escAttr(value)}" placeholder="${escAttr(options.placeholder || '')}" autocomplete="off">
+                            <small data-chr-dialog-error></small>
+                        </label>
+                    ` : ''}
+                </div>
+                <div class="chr-local-dialog-foot">
+                    <button type="button" data-chr-dialog-act="cancel">${escHtml(cancelText)}</button>
+                    <button type="button" class="${danger ? 'danger' : 'primary'}" data-chr-dialog-act="confirm">${escHtml(confirmText)}</button>
+                </div>
+            </div>`;
+
+        requestAnimationFrame(() => {
+            const input = layer.querySelector('[data-chr-dialog-input]');
+            if (input) {
+                input.focus();
+                input.select();
+            } else {
+                layer.querySelector('[data-chr-dialog-act="confirm"]')?.focus();
+            }
+        });
+    }
+
+    function submitManagerLocalDialog() {
+        if (!managerLocalDialog) return;
+        const layer = document.querySelector(`#${MOD.modalId} [data-chr-local-dialog]`);
+        if (!layer) return;
+
+        let value = '';
+        if (managerLocalDialog.kind === 'input') {
+            const input = layer.querySelector('[data-chr-dialog-input]');
+            value = cleanText(input?.value);
+            const error = layer.querySelector('[data-chr-dialog-error]');
+            if (!value) {
+                if (error) error.textContent = '名称不能为空';
+                input?.focus();
+                return;
+            }
+        }
+
+        const callback = managerLocalDialog.onConfirm;
+        closeManagerLocalDialog();
+        callback?.(value);
+    }
+
+    function onManagerKeydown(event) {
+        if (!managerLocalDialog) return;
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            event.stopPropagation();
+            closeManagerLocalDialog();
+            return;
+        }
+        if (event.key === 'Enter' && managerLocalDialog.kind === 'input' && !event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey) {
+            event.preventDefault();
+            event.stopPropagation();
+            submitManagerLocalDialog();
+        }
+    }
+
+    function getSelectedDraftRule() {
+        return managerDraft.find(r => r.id === managerSelectedId) || null;
+    }
+
+    function getManagerGroup() {
+        return getGroupById(managerGroupId, managerGroupsDraft);
+    }
+
+    function makeUniqueGroupName(baseName, excludeId = '') {
+        const base = cleanText(baseName) || '新规则组';
+        const used = new Set(managerGroupsDraft.filter(g => g.id !== excludeId).map(g => g.name));
+        if (!used.has(base)) return base;
+        let i = 2;
+        while (used.has(`${base} ${i}`)) i++;
+        return `${base} ${i}`;
+    }
+
+    function selectManagerGroup(groupId) {
+        const group = getGroupById(groupId, managerGroupsDraft);
+        if (!group) return;
+        managerGroupId = group.id;
+        managerFilter = '';
+        managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
+        managerCheckedIds.clear();
+        renderManager();
+    }
+
+    function renderManagerGroups() {
+        const modal = ensureManager();
+        const select = modal.querySelector('[data-chr-group-select]');
+        if (select) {
+            select.innerHTML = managerGroupsDraft.map(g => {
+                const count = managerDraft.filter(r => r.groupId === g.id).length;
+                const activeMark = g.id === managerActiveGroupId ? ' ★' : '';
+                return `<option value="${escAttr(g.id)}" ${g.id===managerGroupId?'selected':''}>${escHtml(g.name)} · ${count} 条${activeMark}</option>`;
+            }).join('');
+            select.value = managerGroupId;
+        }
+
+        const currentGroup = getManagerGroup();
+        const currentRules = managerDraft.filter(r => r.groupId === managerGroupId);
+        const enabledCount = currentRules.filter(r => r.enabled).length;
+
+        const countEl = modal.querySelector('[data-chr-group-count]');
+        if (countEl) countEl.textContent = `${currentRules.length} 条规则 · ${enabledCount} 条启用`;
+
+        const activeBtn = modal.querySelector('[data-chr-act="set-active-group"]');
+        if (activeBtn) {
+            const isCurrent = managerGroupId === managerActiveGroupId;
+            activeBtn.textContent = isCurrent ? '当前生效' : '设为生效组';
+            activeBtn.classList.toggle('is-current', isCurrent);
+            activeBtn.disabled = false;
+            activeBtn.setAttribute('aria-pressed', isCurrent ? 'true' : 'false');
+            activeBtn.title = isCurrent ? `“${currentGroup?.name || ''}”当前参与高亮` : `保存后将“${currentGroup?.name || ''}”设为生效组`;
+        }
+
+        const deleteBtn = modal.querySelector('[data-chr-act="delete-group"]');
+        if (deleteBtn) deleteBtn.disabled = managerGroupsDraft.length <= 1;
+
+        const prev = modal.querySelector('[data-chr-act="prev-group"]');
+        const next = modal.querySelector('[data-chr-act="next-group"]');
+        if (prev) prev.disabled = managerGroupsDraft.length <= 1;
+        if (next) next.disabled = managerGroupsDraft.length <= 1;
+    }
+
+    function renderManager() {
+        const modal = ensureManager();
+        if (!managerGroupsDraft.length) managerGroupsDraft = [{ id:DEFAULT_GROUP_ID, name:'默认规则组' }];
+        if (!managerGroupsDraft.some(g => g.id === managerGroupId)) managerGroupId = managerGroupsDraft[0].id;
+        const selected = getSelectedDraftRule();
+        if (selected && selected.groupId !== managerGroupId) managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
+        const filter = modal.querySelector('[data-chr-filter]');
+        if (filter && document.activeElement !== filter) filter.value = managerFilter;
+        renderManagerGroups();
+        renderManagerList();
+        renderManagerDetail();
+    }
+
+    function updateManagerBatchBar(visibleRules = null) {
+        const modal = ensureManager();
+        const inGroup = managerDraft.filter(r => r.groupId === managerGroupId);
+        const validIds = new Set(inGroup.map(r => r.id));
+        managerCheckedIds = new Set([...managerCheckedIds].filter(id => validIds.has(id)));
+
+        const selectedCount = managerCheckedIds.size;
+        const count = modal.querySelector('[data-chr-selected-count]');
+        if (count) count.textContent = `已选 ${selectedCount} 条`;
+
+        const allBox = modal.querySelector('[data-chr-select-all]');
+        const q = cleanText(managerFilter).toLowerCase();
+        const targetRules = Array.isArray(visibleRules)
+            ? visibleRules
+            : inGroup.filter(r => !q || `${r.name} ${r.fieldName} ${r.tableName}`.toLowerCase().includes(q));
+        if (allBox) {
+            const visibleIds = targetRules.map(r => r.id);
+            const selectedVisible = visibleIds.filter(id => managerCheckedIds.has(id)).length;
+            allBox.checked = visibleIds.length > 0 && selectedVisible === visibleIds.length;
+            allBox.indeterminate = selectedVisible > 0 && selectedVisible < visibleIds.length;
+        }
+
+        modal.querySelectorAll('[data-chr-act^="batch-"]').forEach(btn => {
+            btn.disabled = selectedCount === 0;
+        });
+    }
+
+    function renderManagerList() {
+        const list = document.querySelector(`#${MOD.modalId} [data-chr-list]`);
+        if (!list) return;
+        const q = cleanText(managerFilter).toLowerCase();
+        const inGroup = managerDraft.filter(r => r.groupId === managerGroupId);
+        const visible = inGroup.filter(r => !q || `${r.name} ${r.fieldName} ${r.tableName}`.toLowerCase().includes(q));
+
+        if (!visible.length) {
+            list.innerHTML = `<div class="chr-empty" style="height:auto;min-height:140px;">${inGroup.length ? '没有匹配的规则' : '当前规则组还没有规则'}<br><span>${inGroup.length ? '可清空搜索词查看全部规则。' : '点击“+ 新建规则”开始配置。'}</span></div>`;
+            updateManagerBatchBar(visible);
+            return;
+        }
+
+        list.innerHTML = visible.map(r => {
+            const checked = managerCheckedIds.has(r.id);
+            return `
+            <div class="chr-item ${r.id === managerSelectedId ? 'active' : ''} ${r.enabled ? '' : 'is-disabled'}"
+                 data-chr-rule-id="${escAttr(r.id)}" style="--chr-color:${escAttr(r.color)}">
+                <label class="chr-item-check" title="加入批量选择">
+                    <input type="checkbox" data-chr-check-id="${escAttr(r.id)}" ${checked ? 'checked' : ''}>
+                </label>
+                <span class="chr-dot"></span>
+                <div class="chr-item-body">
+                    <div class="chr-item-top">
+                        <div class="chr-item-name">${escHtml(r.name)}</div>
+                        <div class="chr-item-badges">
+                            <span class="chr-mini-badge ${r.ruleType==='advanced'?'is-advanced':''}">${r.ruleType==='advanced'?'高级':'标准'}</span>
+                            <span class="chr-mini-badge ${r.enabled?'is-enabled':'is-off'}">${r.enabled?'启用':'停用'}</span>
+                        </div>
+                    </div>
+                    <div class="chr-item-meta">${escHtml(r.fieldName || '未选字段')} · ${r.ruleType==='advanced'?'表达式':OP_META[r.operator]} · ${r.mode === 'row' ? '整行' : '单元格'}</div>
+                    <div class="chr-item-scope">${escHtml(ruleScopeLabel(r))}</div>
+                </div>
+            </div>`;
+        }).join('');
+
+        updateManagerBatchBar(visible);
+    }
+
+    function buildFieldOptions(rule) {
+        const fields = getCurrentFields();
+        const options = [];
+        if (rule.fieldName && !fields.some(f => f.fieldId === rule.fieldId || f.name === rule.fieldName)) {
+            options.push(`<option value="${escAttr(rule.fieldId || `name:${rule.fieldName}`)}" selected>${escHtml(rule.fieldName)}（当前表未找到）</option>`);
+        }
+        options.push(...fields.map(f => `<option value="${escAttr(f.fieldId)}" ${f.fieldId === rule.fieldId || (!rule.fieldId && f.name === rule.fieldName) ? 'selected' : ''}>${escHtml(f.name)}</option>`));
+        return options.join('');
+    }
+
+    function buildOperatorOptions(rule) {
+        const sections = [
+            ['文本与空值', ['contains','notContains','equals','notEquals','startsWith','endsWith','regex','empty','notEmpty']],
+            ['数值', ['gt','gte','lt','lte']],
+            ['日期语义', ['dateToday','dateYesterday','dateTomorrow','dateBeforeToday','dateAfterToday','dateWithinNextDays','dateWithinPastDays','dateEquals']]
+        ];
+        return sections.map(([label, ops]) =>
+            `<optgroup label="${escAttr(label)}">${ops.map(v => `<option value="${v}" ${v===rule.operator?'selected':''}>${escHtml(OP_META[v])}</option>`).join('')}</optgroup>`
+        ).join('');
+    }
+
+    function getRuleMatchSummary(rule) {
+        if (rule.ruleType === 'advanced') return cleanText(rule.advancedExpr) ? '高级表达式' : '高级表达式未填写';
+        const label = OP_META[rule.operator] || rule.operator;
+        const noValue = ['empty','notEmpty','dateToday','dateYesterday','dateTomorrow','dateBeforeToday','dateAfterToday'].includes(rule.operator);
+        if (noValue) return label;
+        const value = cleanText(rule.value);
+        return value ? `${label} · ${value}` : label;
+    }
+
+    function getRuleSummaryParts(rule) {
+        return [
+            rule.scope === 'global' ? '全部表' : (rule.tableName || '当前表'),
+            rule.fieldName || '未选字段',
+            getRuleMatchSummary(rule),
+            rule.mode === 'row' ? '整行高亮' : '单元格高亮'
+        ];
+    }
+
+    function renderManagerDetail() {
+        const detail = document.querySelector(`#${MOD.modalId} [data-chr-detail]`);
+        if (!detail) return;
+        const rule = getSelectedDraftRule();
+        if (!rule) {
+            const group = getManagerGroup();
+            detail.innerHTML = `
+                <div class="chr-empty">
+                    <div class="chr-empty-card">
+                        <b>${escHtml(group?.name || '当前规则组')} 暂无规则</b>
+                        <span>左侧点击“+ 新建规则”开始配置，或使用顶部规则组切换器查看其它组。</span>
+                    </div>
+                </div>`;
+            return;
+        }
+
+        const context = getTableContext();
+        const valueDisabled = ['empty','notEmpty','dateToday','dateYesterday','dateTomorrow','dateBeforeToday','dateAfterToday'].includes(rule.operator);
+        const matchCount = countVisibleMatches(rule);
+        const summaryParts = getRuleSummaryParts(rule);
+        const isActiveGroup = rule.groupId === managerActiveGroupId;
+        const exprValidation = rule.ruleType === 'advanced' ? validateAdvancedExpression(rule) : {ok:true,error:''};
+
+        detail.innerHTML = `
+            <div class="chr-rule-summary">
+                <div class="chr-rule-summary-main">
+                    <div class="chr-rule-summary-title">${escHtml(rule.name)}</div>
+                    <div class="chr-rule-summary-chips">
+                        <span class="chr-summary-chip ${rule.enabled?'is-ok':'is-muted'}">${rule.enabled?'已启用':'已停用'}</span>
+                        <span class="chr-summary-chip ${isActiveGroup?'is-active':''}">${isActiveGroup?'当前生效组':'非生效组'}</span>
+                        <span class="chr-summary-chip">${rule.ruleType==='advanced'?'高级表达式':'标准规则'}</span>
+                    </div>
+                </div>
+                <div class="chr-rule-summary-line">${summaryParts.map(v => `<span>${escHtml(v)}</span>`).join('<i>›</i>')}</div>
+            </div>
+
+            <section class="chr-section chr-section-v7152">
+                <div class="chr-section-head">
+                    <div>
+                        <div class="chr-section-title">基本信息</div>
+                        <div class="chr-section-desc">定义规则身份、所属规则组和编辑模式。</div>
+                    </div>
+                </div>
+                <div class="chr-grid2">
+                    <label class="chr-field">
+                        <span>规则名称</span>
+                        <input type="text" data-chr-edit="name" value="${escAttr(rule.name)}">
+                    </label>
+                    <label class="chr-field">
+                        <span>所属规则组</span>
+                        <select data-chr-edit="groupId">${managerGroupsDraft.map(g => `<option value="${escAttr(g.id)}" ${g.id===rule.groupId?'selected':''}>${escHtml(g.name)}</option>`).join('')}</select>
+                    </label>
+                </div>
+                <div class="chr-basic-status-row">
+                    <label class="chr-check chr-switch-line"><input type="checkbox" data-chr-edit="enabled" ${rule.enabled ? 'checked' : ''}> 启用这条规则</label>
+                    <span class="chr-inline-status ${isActiveGroup?'is-active':''}">${isActiveGroup ? '所在规则组当前参与高亮' : '所在规则组当前未激活'}</span>
+                </div>
+
+                <div class="chr-subsection-label">规则模式</div>
+                <div class="chr-rule-type">
+                    <label><input type="radio" name="chr-rule-type" data-chr-edit="ruleType" value="standard" ${rule.ruleType==='standard'?'checked':''}>标准规则</label>
+                    <label><input type="radio" name="chr-rule-type" data-chr-edit="ruleType" value="advanced" ${rule.ruleType==='advanced'?'checked':''}>高级表达式</label>
+                </div>
+                <details class="chr-help">
+                    <summary>规则模式说明</summary>
+                    <div>标准规则适合常用文本、空值、数值和日期语义判断；高级表达式使用受限安全解析器，不执行 JavaScript，也不能访问 window / document / 网络 / 存储。</div>
+                </details>
+            </section>
+
+            <section class="chr-section chr-section-v7152">
+                <div class="chr-section-head">
+                    <div>
+                        <div class="chr-section-title">匹配条件</div>
+                        <div class="chr-section-desc">决定在哪张表、哪个字段、什么条件下触发高亮。</div>
+                    </div>
+                </div>
+
+                <div class="chr-grid2">
+                    <label class="chr-field">
+                        <span>作用范围</span>
+                        <select data-chr-edit="scope">
+                            <option value="table" ${rule.scope === 'table' ? 'selected' : ''}>仅当前表${context ? `：${escHtml(context.tableName)}` : ''}</option>
+                            <option value="global" ${rule.scope === 'global' ? 'selected' : ''}>全部表（按字段名称匹配）</option>
+                        </select>
+                    </label>
+                    <label class="chr-field">
+                        <span>${rule.ruleType==='advanced'?'高亮目标字段 / value':'目标字段'}</span>
+                        <select data-chr-edit="field">${buildFieldOptions(rule)}</select>
+                    </label>
+                </div>
+
+                ${rule.ruleType === 'standard' ? `
+                    <div class="chr-grid2" style="margin-top:10px;">
+                        <label class="chr-field">
+                            <span>判断方式</span>
+                            <select data-chr-edit="operator">${buildOperatorOptions(rule)}</select>
+                        </label>
+                        <label class="chr-field">
+                            <span>${rule.operator === 'dateWithinNextDays' || rule.operator === 'dateWithinPastDays' ? '天数 N' : rule.operator === 'dateEquals' ? '指定日期' : '匹配内容'}</span>
+                            ${valueDisabled
+                                ? `<input type="text" disabled placeholder="此判断无需填写内容">`
+                                : rule.operator === 'dateEquals'
+                                    ? `<input type="date" data-chr-edit="value" value="${escAttr(rule.value)}">`
+                                    : (rule.operator === 'dateWithinNextDays' || rule.operator === 'dateWithinPastDays')
+                                        ? `<input type="number" min="0" step="1" data-chr-edit="value" value="${escAttr(rule.value || '3')}" placeholder="例如：3">`
+                                        : `<input type="text" data-chr-edit="value" value="${escAttr(rule.value)}" placeholder="${rule.operator === 'regex' ? '例如：^BRL\\d+$' : '输入要匹配的内容'}">`}
+                        </label>
+                    </div>
+                    ${TEXT_OPERATORS.has(rule.operator) ? `
+                        <label class="chr-check chr-inline-check"><input type="checkbox" data-chr-edit="caseSensitive" ${rule.caseSensitive ? 'checked' : ''}> 区分大小写 <span>（正则同样适用）</span></label>
+                    ` : ''}
+                    ${DATE_OPERATORS.has(rule.operator) ? `
+                        <details class="chr-help">
+                            <summary>日期格式与边界说明</summary>
+                            <div>支持 YYYY-MM-DD、YYYY/MM/DD、YYYY年M月D日。“未来 N 天内”包含今天和第 N 天；“已逾期”严格早于今天。</div>
+                        </details>
+                    ` : ''}
+                ` : `
+                    <div class="chr-advanced-placeholder">
+                        此规则使用高级表达式。下方“高级能力”区域负责编辑和验证表达式。
+                    </div>
+                `}
+            </section>
+
+            ${rule.ruleType === 'advanced' ? `
+            <section class="chr-section chr-section-v7152">
+                <div class="chr-section-head">
+                    <div>
+                        <div class="chr-section-title">高级能力</div>
+                        <div class="chr-section-desc">像写条件代码一样组合同行字段、日期、文本、正则与逻辑运算。</div>
+                    </div>
+                    <span class="chr-inline-status ${exprValidation.ok?'is-active':'is-error'}">${exprValidation.ok?'表达式有效':'表达式有误'}</span>
+                </div>
+
+                <label class="chr-field">
+                    <span>高级条件表达式（结果为 true 时命中）</span>
+                    <textarea class="chr-code" data-chr-edit="advancedExpr" spellcheck="false" placeholder='例如：date(value) < today && field("二级阶段") == "商业流程中"'>${escHtml(rule.advancedExpr)}</textarea>
+                </label>
+
+                <div class="chr-code-tools">
+                    <button type="button" data-chr-expr='date(value) == today'>今天</button>
+                    <button type="button" data-chr-expr='date(value) < today'>已逾期</button>
+                    <button type="button" data-chr-expr='withinNextDays(value, 3)'>未来3天</button>
+                    <button type="button" data-chr-expr='field("二级阶段") == "商业流程中"'>同行字段</button>
+                    <button type="button" data-chr-expr='contains(field("商业名称"), "国药")'>包含字段</button>
+                    <button type="button" data-chr-expr='regex(value, "^BRL\\d+$")'>正则</button>
+                    <button type="button" data-chr-expr=' && '>AND</button>
+                    <button type="button" data-chr-expr=' || '>OR</button>
+                    <button type="button" class="primary-lite" data-chr-act="validate-expr">验证表达式</button>
+                </div>
+
+                ${!exprValidation.ok ? `<div class="chr-error-line">${escHtml(exprValidation.error)}</div>` : ''}
+
+                <details class="chr-help">
+                    <summary>可用变量、函数与运算符</summary>
+                    <div>
+                        <b>变量：</b> value、today、yesterday、tomorrow、now、table。<br>
+                        <b>同行字段：</b> field("字段名")。<br>
+                        <b>日期：</b> date(x)、daysFromToday(x)、isToday(x)、isPast(x)、withinNextDays(x,n)。<br>
+                        <b>文本：</b> contains、startsWith、endsWith、regex、empty、notEmpty、len。<br>
+                        <b>运算：</b> == != &gt; &gt;= &lt; &lt;= && || ! + - * / % ?:
+                    </div>
+                </details>
+            </section>` : ''}
+
+            <section class="chr-section chr-section-v7152">
+                <div class="chr-section-head">
+                    <div>
+                        <div class="chr-section-title">高亮方式</div>
+                        <div class="chr-section-desc">控制高亮范围、底色、边缘强调和文字样式。</div>
+                    </div>
+                </div>
+
+                <div class="chr-mode">
+                    <label><input type="radio" name="chr-mode" data-chr-edit="mode" value="cell" ${rule.mode==='cell'?'checked':''}>只高亮匹配单元格</label>
+                    <label><input type="radio" name="chr-mode" data-chr-edit="mode" value="row" ${rule.mode==='row'?'checked':''}>高亮整行</label>
+                </div>
+
+                <div class="chr-grid2 chr-visual-grid">
+                    <label class="chr-field">
+                        <span>高亮底色</span>
+                        <input type="color" data-chr-edit="color" value="${escAttr(rule.color)}" class="chr-color-input">
+                    </label>
+                    <label class="chr-field">
+                        <span>边缘颜色</span>
+                        <input type="color" data-chr-edit="edgeColor" value="${escAttr(rule.edgeColor)}" class="chr-color-input">
+                    </label>
+                    <label class="chr-field">
+                        <span>底色高亮程度</span>
+                        <div class="chr-range"><input type="range" min="4" max="80" step="1" data-chr-edit="opacity" value="${rule.opacity}"><b data-chr-value="opacity">${rule.opacity}%</b></div>
+                    </label>
+                    <label class="chr-field">
+                        <span>边缘强度</span>
+                        <div class="chr-range"><input type="range" min="0" max="100" step="1" data-chr-edit="edgeOpacity" value="${rule.edgeOpacity}"><b data-chr-value="edgeOpacity">${rule.edgeOpacity}%</b></div>
+                    </label>
+                    <label class="chr-field">
+                        <span>强调边缘宽度</span>
+                        <div class="chr-range"><input type="range" min="0" max="5" step="1" data-chr-edit="edgeWidth" value="${rule.edgeWidth}"><b data-chr-value="edgeWidth">${rule.edgeWidth}px</b></div>
+                    </label>
+                    <label class="chr-check chr-switch-line"><input type="checkbox" data-chr-edit="bold" ${rule.bold?'checked':''}> 高亮内容文字加粗</label>
+                </div>
+
+                ${rule.mode === 'row' ? `
+                    <div class="chr-edge-options">
+                        <div>
+                            <b>整行强调边缘</b>
+                            <span>默认上下同时开启；左置顶、主体和右置顶使用同一套参数。</span>
+                        </div>
+                        <label class="chr-check"><input type="checkbox" data-chr-edit="edgeTop" ${rule.edgeTop?'checked':''}> 顶部边缘</label>
+                        <label class="chr-check"><input type="checkbox" data-chr-edit="edgeBottom" ${rule.edgeBottom?'checked':''}> 底部边缘</label>
+                    </div>
+                ` : `
+                    <div class="chr-inline-note">单元格模式使用左侧强调边缘；颜色、强度和宽度沿用上方设置。</div>
+                `}
+            </section>
+
+            <section class="chr-section chr-section-v7152 chr-check-section">
+                <div class="chr-section-head">
+                    <div>
+                        <div class="chr-section-title">规则检查</div>
+                        <div class="chr-section-desc">当前页面可见区域实时检查，不会保存任何修改。</div>
+                    </div>
+                    <div class="chr-match-count">命中 <b>${matchCount}</b> 行</div>
+                </div>
+
+                <div class="chr-preview">
+                    ${rule.scope === 'table' && context && rule.tableKey && rule.tableKey !== context.key
+                        ? '<span style="color:#f6c26b;">此规则属于另一张表，当前表不会生效。</span>'
+                        : isActiveGroup
+                            ? '<span style="color:#81c995;">当前规则组已设为生效组。</span>'
+                            : '<span>当前规则组尚未设为生效组，保存并切换后才会参与实际高亮。</span>'}
+                </div>
+
+                <div class="chr-actions chr-rule-actions">
+                    <button type="button" data-chr-act="test">重新测试</button>
+                    <button type="button" data-chr-act="up">提高优先级</button>
+                    <button type="button" data-chr-act="down">降低优先级</button>
+                    <button type="button" data-chr-act="duplicate">复制规则</button>
+                    <button type="button" class="danger" data-chr-act="delete">删除规则</button>
+                </div>
+            </section>`;
+    }
+
+    function createDefaultRule() {
+        const context = getTableContext();
+        const field = getCurrentFields()[0] || null;
+        return normalizeRule({
+            id: makeId(), enabled: true, groupId: managerGroupId || managerGroupsDraft[0]?.id || DEFAULT_GROUP_ID, name: '新高亮规则',
+            scope: context ? 'table' : 'global', tableKey: context?.key || '', tableName: context?.tableName || '',
+            fieldId: field?.fieldId || '', fieldName: field?.name || '',
+            ruleType:'standard', operator: 'contains', value: '', advancedExpr:'', mode: 'cell',
+            color: '#f59e0b', opacity: 24, edgeColor: '#f59e0b', edgeOpacity: 58, edgeWidth: 1,
+            edgeTop: true, edgeBottom: true, bold: false
+        }, managerDraft.length);
+    }
+
+    function moveDraftRuleWithinGroup(ruleId, direction) {
+        const groupRules = managerDraft.filter(r => r.groupId === managerGroupId);
+        const pos = groupRules.findIndex(r => r.id === ruleId);
+        const other = pos + (direction < 0 ? -1 : 1);
+        if (pos < 0 || other < 0 || other >= groupRules.length) return false;
+        const aIndex = managerDraft.findIndex(r => r.id === groupRules[pos].id);
+        const bIndex = managerDraft.findIndex(r => r.id === groupRules[other].id);
+        if (aIndex < 0 || bIndex < 0) return false;
+        [managerDraft[aIndex], managerDraft[bIndex]] = [managerDraft[bIndex], managerDraft[aIndex]];
+        return true;
+    }
+
+    function onManagerClick(event) {
+        const localAction = event.target.closest?.('[data-chr-dialog-act]')?.dataset.chrDialogAct;
+        if (localAction) {
+            if (localAction === 'cancel') closeManagerLocalDialog();
+            else if (localAction === 'confirm') submitManagerLocalDialog();
+            return;
+        }
+        if (managerLocalDialog) return;
+        if (event.target.closest?.('[data-chr-check-id],[data-chr-select-all]')) return;
+        const item = event.target.closest('[data-chr-rule-id]');
+        if (item) {
+            managerSelectedId = item.dataset.chrRuleId || '';
+            renderManager();
+            return;
+        }
+        const exprBtn = event.target.closest('[data-chr-expr]');
+        if (exprBtn) {
+            const rule = getSelectedDraftRule();
+            const ta = document.querySelector(`#${MOD.modalId} textarea[data-chr-edit="advancedExpr"]`);
+            if (rule && ta) {
+                const insert = exprBtn.getAttribute('data-chr-expr') || '';
+                const start = Number.isInteger(ta.selectionStart) ? ta.selectionStart : ta.value.length;
+                const end = Number.isInteger(ta.selectionEnd) ? ta.selectionEnd : start;
+                ta.value = ta.value.slice(0,start) + insert + ta.value.slice(end);
+                rule.advancedExpr = ta.value;
+                const pos = start + insert.length; ta.focus(); ta.setSelectionRange(pos,pos);
+            }
+            return;
+        }
+        const action = event.target.closest('[data-chr-act]')?.dataset.chrAct;
+        if (!action) return;
+        const selected = getSelectedDraftRule();
+        const currentGroup = getManagerGroup();
+        if (action === 'close' || action === 'cancel') return closeManager();
+
+        if (action === 'prev-group' || action === 'next-group') {
+            if (managerGroupsDraft.length <= 1) return;
+            const index = Math.max(0, managerGroupsDraft.findIndex(g => g.id === managerGroupId));
+            const step = action === 'prev-group' ? -1 : 1;
+            const nextIndex = (index + step + managerGroupsDraft.length) % managerGroupsDraft.length;
+            selectManagerGroup(managerGroupsDraft[nextIndex].id);
+            return;
+        }
+
+        if (action.startsWith('batch-')) {
+            const ids = [...managerCheckedIds];
+            if (!ids.length) return;
+
+            if (action === 'batch-enable' || action === 'batch-disable') {
+                const nextEnabled = action === 'batch-enable';
+                managerDraft.forEach(r => {
+                    if (ids.includes(r.id) && r.groupId === managerGroupId) r.enabled = nextEnabled;
+                });
+                return renderManager();
+            }
+
+            if (action === 'batch-duplicate') {
+                const sourceRules = managerDraft.filter(r => ids.includes(r.id) && r.groupId === managerGroupId);
+                const copies = sourceRules.map((r, i) => normalizeRule({
+                    ...JSON.parse(JSON.stringify(r)),
+                    id: makeId(),
+                    groupId: managerGroupId,
+                    name: `${r.name} - 副本`
+                }, managerDraft.length + i));
+                managerDraft.push(...copies);
+                managerCheckedIds = new Set(copies.map(r => r.id));
+                managerSelectedId = copies[0]?.id || managerSelectedId;
+                return renderManager();
+            }
+
+            if (action === 'batch-delete') {
+                openManagerLocalDialog({
+                    kind: 'confirm',
+                    danger: true,
+                    title: `删除 ${ids.length} 条规则`,
+                    message: '这些规则将从当前规则组中移除。',
+                    detail: '此修改只有点击“保存全部”后才会正式写入配置；在保存前仍可通过“取消”放弃本次修改。',
+                    confirmText: '删除所选规则',
+                    onConfirm: () => {
+                        managerDraft = managerDraft.filter(r => !ids.includes(r.id));
+                        managerCheckedIds.clear();
+                        if (!managerDraft.some(r => r.id === managerSelectedId)) {
+                            managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
+                        }
+                        renderManager();
+                    }
+                });
+                return;
+            }
+        }
+
+        if (action === 'new-group') {
+            openManagerLocalDialog({
+                kind: 'input',
+                title: '新建高亮规则组',
+                subtitle: '规则组用于快速切换一整套高亮场景',
+                label: '规则组名称',
+                value: makeUniqueGroupName('新规则组'),
+                placeholder: '例如：到期预警 / 商业反馈 / 数据异常',
+                confirmText: '创建规则组',
+                onConfirm: name => {
+                    const group = { id: makeGroupId(), name: makeUniqueGroupName(name) };
+                    managerGroupsDraft.push(group);
+                    managerGroupId = group.id;
+                    managerSelectedId = '';
+                    managerFilter = '';
+                    managerCheckedIds.clear();
+                    renderManager();
+                }
+            });
+            return;
+        }
+        if (action === 'rename-group') {
+            if (!currentGroup) return;
+            openManagerLocalDialog({
+                kind: 'input',
+                title: '重命名规则组',
+                subtitle: `正在编辑：${currentGroup.name}`,
+                label: '规则组名称',
+                value: currentGroup.name,
+                confirmText: '保存名称',
+                onConfirm: name => {
+                    currentGroup.name = makeUniqueGroupName(name, currentGroup.id);
+                    renderManager();
+                }
+            });
+            return;
+        }
+        if (action === 'duplicate-group') {
+            if (!currentGroup) return;
+            const newGroup = { id: makeGroupId(), name: makeUniqueGroupName(`${currentGroup.name} - 副本`) };
+            managerGroupsDraft.push(newGroup);
+            const copies = managerDraft
+                .filter(r => r.groupId === currentGroup.id)
+                .map((r, i) => normalizeRule({ ...JSON.parse(JSON.stringify(r)), id:makeId(), groupId:newGroup.id, name:r.name }, managerDraft.length + i));
+            managerDraft.push(...copies);
+            managerGroupId = newGroup.id;
+            managerSelectedId = copies[0]?.id || '';
+            managerFilter = '';
+            managerCheckedIds.clear();
+            return renderManager();
+        }
+        if (action === 'delete-group') {
+            if (!currentGroup || managerGroupsDraft.length <= 1) return;
+            const count = managerDraft.filter(r => r.groupId === currentGroup.id).length;
+            openManagerLocalDialog({
+                kind: 'confirm',
+                danger: true,
+                title: `删除规则组“${currentGroup.name}”`,
+                message: `该组中的 ${count} 条规则会一起移除。`,
+                detail: managerActiveGroupId === currentGroup.id
+                    ? '当前组正在生效。删除后会自动切换到相邻规则组；只有点击“保存全部”后才正式应用。'
+                    : '此修改只有点击“保存全部”后才正式写入配置。',
+                confirmText: '删除规则组',
+                onConfirm: () => {
+                    const groupIndex = managerGroupsDraft.findIndex(g => g.id === currentGroup.id);
+                    managerGroupsDraft = managerGroupsDraft.filter(g => g.id !== currentGroup.id);
+                    managerDraft = managerDraft.filter(r => r.groupId !== currentGroup.id);
+                    const nextGroup = managerGroupsDraft[Math.min(groupIndex, managerGroupsDraft.length - 1)] || managerGroupsDraft[0];
+                    managerGroupId = nextGroup?.id || '';
+                    if (managerActiveGroupId === currentGroup.id) managerActiveGroupId = managerGroupId;
+                    managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
+                    managerFilter = '';
+                    managerCheckedIds.clear();
+                    renderManager();
+                }
+            });
+            return;
+        }
+        if (action === 'set-active-group') {
+            if (!currentGroup) return;
+            managerActiveGroupId = currentGroup.id;
+            return renderManager();
+        }
+
+        if (action === 'new') {
+            const rule = createDefaultRule();
+            managerDraft.push(rule);
+            managerSelectedId = rule.id;
+            managerCheckedIds.clear();
+            return renderManager();
+        }
+        if (action === 'enable-all' || action === 'disable-all') {
+            managerDraft.forEach(r => {
+                if (r.groupId === managerGroupId) r.enabled = action === 'enable-all';
+            });
+            return renderManager();
+        }
+        if (action === 'save') {
+            const bad = managerDraft.find(r => r.enabled && r.ruleType === 'advanced' && !validateAdvancedExpression(r).ok);
+            if (bad) {
+                const v = validateAdvancedExpression(bad);
+                managerGroupId = bad.groupId;
+                managerSelectedId = bad.id;
+                renderManager();
+                openManagerLocalDialog({
+                    kind: 'confirm',
+                    title: '暂时无法保存',
+                    message: `规则“${bad.name}”的高级表达式有误。`,
+                    detail: v.error,
+                    confirmText: '返回修正',
+                    cancelText: '关闭',
+                    onConfirm: () => {
+                        document.querySelector(`#${MOD.modalId} textarea[data-chr-edit="advancedExpr"]`)?.focus();
+                    }
+                });
+                return;
+            }
+            groups = normalizeGroups(managerGroupsDraft);
+            activeGroupId = groups.some(g => g.id === managerActiveGroupId) ? managerActiveGroupId : groups[0].id;
+            rules = normalizeRules(managerDraft);
+            repairGroupIntegrity(false);
+            GM_setValue(MOD.keyGroups, groups);
+            GM_setValue(MOD.keyActiveGroup, activeGroupId);
+            GM_setValue(MOD.keyRules, rules);
+            rebuildActiveRulesCache();
+            closeManager();
+            updateSettingsCard();
+            rescanAllVisibleRows();
+            emitGroupChanged('manager-save');
+            return;
+        }
+        if (!selected) return;
+        const index = managerDraft.findIndex(r => r.id === selected.id);
+        if (action === 'delete') {
+            openManagerLocalDialog({
+                kind: 'confirm',
+                danger: true,
+                title: `删除规则“${selected.name}”`,
+                message: '这条规则将从当前规则组中移除。',
+                detail: '只有点击“保存全部”后才会正式写入配置。',
+                confirmText: '删除规则',
+                onConfirm: () => {
+                    managerDraft.splice(index,1);
+                    managerCheckedIds.delete(selected.id);
+                    managerSelectedId = managerDraft.find(r => r.groupId === managerGroupId)?.id || '';
+                    renderManager();
+                }
+            });
+            return;
+        }
+        if (action === 'duplicate') {
+            const copy = normalizeRule({ ...JSON.parse(JSON.stringify(selected)), id:makeId(), groupId:selected.groupId, name:`${selected.name} - 副本` }, managerDraft.length);
+            managerDraft.splice(index+1,0,copy);
+            managerSelectedId = copy.id;
+            return renderManager();
+        }
+        if (action === 'up') {
+            if (moveDraftRuleWithinGroup(selected.id, -1)) renderManager();
+            return;
+        }
+        if (action === 'down') {
+            if (moveDraftRuleWithinGroup(selected.id, 1)) renderManager();
+            return;
+        }
+        if (action === 'validate-expr') {
+            const v = validateAdvancedExpression(selected);
+            renderManagerDetail();
+            openManagerLocalDialog({
+                kind: 'confirm',
+                danger: !v.ok,
+                title: v.ok ? '表达式验证通过' : '表达式需要修正',
+                message: v.ok ? '当前高级表达式语法有效，可以参与规则计算。' : '当前高级表达式无法通过安全解析器。',
+                detail: v.ok ? '你可以继续调整其它规则参数，最后统一点击“保存全部”。' : v.error,
+                confirmText: v.ok ? '知道了' : '返回修正',
+                cancelText: '关闭',
+                onConfirm: () => {
+                    if (!v.ok) document.querySelector(`#${MOD.modalId} textarea[data-chr-edit="advancedExpr"]`)?.focus();
+                }
+            });
+            return;
+        }
+        if (action === 'test') return renderManagerDetail();
+    }
+
+    function onManagerInput(event) {
+        if (event.target.matches('[data-chr-filter]')) {
+            managerFilter = event.target.value || ''; renderManagerList(); return;
+        }
+        const key = event.target.dataset.chrEdit;
+        const rule = getSelectedDraftRule();
+        if (!key || !rule) return;
+        if (['name','value','advancedExpr'].includes(key)) rule[key] = event.target.value;
+        if (key === 'opacity') { rule.opacity = Math.round(clamp(event.target.value,4,80,24)); const b=document.querySelector(`#${MOD.modalId} [data-chr-value="opacity"]`); if(b)b.textContent=`${rule.opacity}%`; }
+        if (key === 'edgeOpacity') { rule.edgeOpacity = Math.round(clamp(event.target.value,0,100,58)); const b=document.querySelector(`#${MOD.modalId} [data-chr-value="edgeOpacity"]`); if(b)b.textContent=`${rule.edgeOpacity}%`; }
+        if (key === 'edgeWidth') { rule.edgeWidth = Math.round(clamp(event.target.value,0,5,1)); const b=document.querySelector(`#${MOD.modalId} [data-chr-value="edgeWidth"]`); if(b)b.textContent=`${rule.edgeWidth}px`; }
+        if (key === 'color') rule.color = normalizeColor(event.target.value);
+        if (key === 'edgeColor') rule.edgeColor = normalizeColor(event.target.value, rule.color);
+        if (key === 'name') renderManagerList();
+    }
+
+    function onManagerChange(event) {
+        const checkId = event.target?.dataset?.chrCheckId;
+        if (checkId) {
+            if (event.target.checked) managerCheckedIds.add(checkId);
+            else managerCheckedIds.delete(checkId);
+            updateManagerBatchBar();
+            return;
+        }
+
+        if (event.target.matches('[data-chr-select-all]')) {
+            const q = cleanText(managerFilter).toLowerCase();
+            const visible = managerDraft
+                .filter(r => r.groupId === managerGroupId)
+                .filter(r => !q || `${r.name} ${r.fieldName} ${r.tableName}`.toLowerCase().includes(q));
+            visible.forEach(r => {
+                if (event.target.checked) managerCheckedIds.add(r.id);
+                else managerCheckedIds.delete(r.id);
+            });
+            renderManagerList();
+            return;
+        }
+
+        if (event.target.matches('[data-chr-group-select]')) {
+            selectManagerGroup(event.target.value);
+            return;
+        }
+        const key = event.target.dataset.chrEdit;
+        const rule = getSelectedDraftRule();
+        if (!key || !rule) return;
+        if (key === 'enabled' || key === 'caseSensitive' || key === 'bold' || key === 'edgeTop' || key === 'edgeBottom') rule[key] = Boolean(event.target.checked);
+        if (key === 'groupId') {
+            const nextGroup = getGroupById(event.target.value, managerGroupsDraft);
+            if (nextGroup) {
+                rule.groupId = nextGroup.id;
+                managerGroupId = nextGroup.id;
+                managerSelectedId = rule.id;
+                managerFilter = '';
+                managerCheckedIds.clear();
+            }
+            return renderManager();
+        }
+        if (key === 'scope') {
+            rule.scope = VALID_SCOPES.has(event.target.value) ? event.target.value : 'table';
+            if (rule.scope === 'table') {
+                const c = getTableContext(); rule.tableKey = c?.key || rule.tableKey; rule.tableName = c?.tableName || rule.tableName;
+            }
+            return renderManager();
+        }
+        if (key === 'field') {
+            const fields = getCurrentFields();
+            const def = fields.find(f => f.fieldId === event.target.value);
+            if (def) { rule.fieldId = rule.scope === 'table' ? def.fieldId : ''; rule.fieldName = def.name; }
+            return renderManager();
+        }
+        if (key === 'ruleType') { rule.ruleType = VALID_RULE_TYPES.has(event.target.value) ? event.target.value : 'standard'; return renderManager(); }
+        if (key === 'operator') { rule.operator = OP_META[event.target.value] ? event.target.value : 'contains'; if (['dateWithinNextDays','dateWithinPastDays'].includes(rule.operator) && !cleanText(rule.value)) rule.value='3'; return renderManagerDetail(); }
+        if (key === 'mode') { rule.mode = VALID_MODES.has(event.target.value) ? event.target.value : 'cell'; renderManagerList(); return renderManagerDetail(); }
+        if (key === 'color') { rule.color = normalizeColor(event.target.value); renderManagerList(); }
+    }
+
+    function bindSettingsCardEvents() {
+        document.addEventListener('change', event => {
+            const enabledInput = event.target.closest?.(`#${MOD.cardId} [data-cond-setting="enabled"]`);
+            if (enabledInput) { setEnabled(enabledInput.checked); return; }
+            const groupSelect = event.target.closest?.(`#${MOD.cardId} [data-cond-setting="group"]`);
+            if (groupSelect) { setActiveGroup(groupSelect.value, 'settings'); return; }
+        }, true);
+        document.addEventListener('click', event => {
+            const action = event.target.closest?.(`#${MOD.cardId} [data-cond-act]`)?.dataset.condAct;
+            if (action === 'manage') openManager();
+            if (action === 'next-group') cycleActiveGroup(1, 'settings');
+            if (action === 'refresh') rescanAllVisibleRows();
+        }, true);
+    }
+
+    function scheduleEnsureSettingsCard() {
+        if (settingsCardEnsureRaf) return;
+        settingsCardEnsureRaf = requestAnimationFrame(() => {
+            settingsCardEnsureRaf = 0;
+            ensureSettingsCard();
+        });
+    }
+
+    function attachToolboxObserver() {
+        const attach = () => {
+            const root = document.getElementById('att-toolbox-root');
+            if (!root) return false;
+            if (!toolboxObserver) {
+                toolboxObserver = new MutationObserver(records => {
+                    // settings 卡仍存在时，其它菜单区域的 DOM 更新无需重复 ensure。
+                    if (document.getElementById(MOD.cardId)?.isConnected) return;
+                    if (records.some(r => r.type === 'childList')) scheduleEnsureSettingsCard();
+                });
+                toolboxObserver.observe(root, { childList:true, subtree:true });
+            }
+            ensureSettingsCard();
+            return true;
+        };
+        if (attach()) return;
+        const wait = new MutationObserver(() => { if (attach()) wait.disconnect(); });
+        wait.observe(document.documentElement, { childList:true, subtree:true });
+    }
+
+    function attachPageObserver() {
+        if (pageObserver) return;
+        pageObserver = new MutationObserver(records => {
+            let needScan = false;
+            for (const record of records) {
+                const target = record.target instanceof Element ? record.target : record.target.parentElement;
+                if (target?.closest?.('.grid-virtual-body')) continue; // 已由专用 observer 增量处理。
+                for (const node of record.addedNodes || []) {
+                    if (!(node instanceof Element)) continue;
+                    if (node.matches?.('.grid-root,.grid-virtual-body,.grid-header-cell') || node.querySelector?.('.grid-root,.grid-virtual-body,.grid-header-cell')) {
+                        needScan = true; break;
+                    }
+                }
+                if (needScan) break;
+            }
+            if (needScan && enabled) {
+                // rescanAllVisibleRows() 已包含强制表头重建、可见行标脏与 body scan。
+                // 不再先重复 buildHeaderMap + scheduleGridScan。
+                rescanAllVisibleRows();
+            }
+        });
+        pageObserver.observe(document.documentElement, { childList:true, subtree:true });
+    }
+
+    function bindHotkeyBridge() {
+        window.addEventListener('att:conditional-highlight:set', event => {
+            const next = Boolean(event?.detail?.enabled);
+            // 直接走模块自己的状态入口，保证关闭时清理、开启时重扫都即时生效。
+            if (enabled !== next) setEnabled(next);
+            else {
+                updateSettingsCard();
+                syncEngineState();
+            }
+        });
+
+        // V7.15.3：规则组快捷切换桥接必须绑定在条件高亮模块内部，
+        // 这样才能访问 activeGroupId / groups / setActiveGroup 等模块私有状态。
+        window.addEventListener('att:conditional-highlight:cycle-group', event => {
+            const direction = Number(event?.detail?.direction) < 0 ? -1 : 1;
+            cycleActiveGroup(direction, event?.detail?.source || 'shortcut');
+        });
+
+        window.addEventListener('att:conditional-highlight:set-group', event => {
+            setActiveGroup(String(event?.detail?.groupId || ''), event?.detail?.source || 'external');
+        });
+    }
+
+    function init() {
+        ensureStyles();
+        bindHotkeyBridge();
+        bindSettingsCardEvents();
+        attachToolboxObserver();
+        attachPageObserver();
+        syncEngineState();
+        emitStateSnapshot('init');
+        console.log('[AutoTable 条件高亮] V7.16.6 已加载：沿用 V7.16.5 原规则结果与执行计划缓存 / 同字段单元格查询复用 / 虚拟滚动增量高亮');
+    }
+
+    if (document.body) init();
+    else window.addEventListener('DOMContentLoaded', init, { once:true });
+})();
+
+/* ============================================================================
+ * AutoTable 条件高亮规则组管理器 V7.15.3 · 分层商业化布局
+ * ========================================================================== */
+(function () {
+    'use strict';
+    const ID = 'att-cond-highlight-manager-layout-v7152';
+    if (document.getElementById(ID)) return;
+    const style = document.createElement('style');
+    style.id = ID;
+    style.textContent = `
+        #att-cond-highlight-manager-v770 .chr-shell-v7152{
+            width:min(1160px,calc(100vw - 36px))!important;
+            height:min(790px,calc(100vh - 36px))!important;
+            grid-template-rows:auto auto minmax(0,1fr) auto!important;
+        }
+
+        #att-cond-highlight-manager-v770 .chr-groupbar{
+            display:flex;align-items:center;justify-content:space-between;gap:14px;
+            padding:10px 14px;border-bottom:1px solid #34363a;background:#222326;flex-wrap:wrap;
+        }
+        #att-cond-highlight-manager-v770 .chr-groupbar-main{
+            min-width:0;display:grid;grid-template-columns:auto 30px minmax(220px,360px) 30px auto;
+            align-items:center;gap:6px;
+        }
+        #att-cond-highlight-manager-v770 .chr-groupbar-label{
+            color:#9aa0a6;font-size:11px;font-weight:700;letter-spacing:.04em;white-space:nowrap;
+        }
+        #att-cond-highlight-manager-v770 .chr-groupbar-main select{height:32px!important;}
+        #att-cond-highlight-manager-v770 .chr-group-nav{
+            width:30px;min-width:30px;height:32px!important;padding:0!important;font-size:18px;
+        }
+        #att-cond-highlight-manager-v770 .chr-groupbar-actions{
+            display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+        }
+        #att-cond-highlight-manager-v770 .chr-groupbar-actions button{height:30px;padding:0 9px;font-size:11px;}
+        #att-cond-highlight-manager-v770 button.danger-soft{
+            color:#ffaaa3;border-color:#5a3b3a;background:#2a2425;
+        }
+        #att-cond-highlight-manager-v770 button.danger-soft:hover{background:#382829;}
+
+        #att-cond-highlight-manager-v770 .chr-main{grid-template-columns:310px minmax(0,1fr)!important;}
+        #att-cond-highlight-manager-v770 .chr-side{
+            grid-template-rows:auto auto auto minmax(0,1fr)!important;background:#1f2022;
+        }
+        #att-cond-highlight-manager-v770 .chr-side-head{
+            padding:11px 12px 9px;display:flex;align-items:center;justify-content:space-between;gap:8px;
+            border-bottom:1px solid #303236;
+        }
+        #att-cond-highlight-manager-v770 .chr-side-head button{height:30px;font-size:11px;}
+        #att-cond-highlight-manager-v770 .chr-side-title{font-size:12px;font-weight:750;color:#e5e7eb;}
+        #att-cond-highlight-manager-v770 .chr-side-count{margin-top:2px;font-size:10px;color:#8f949b;}
+
+        #att-cond-highlight-manager-v770 .chr-batchbar{
+            padding:8px 12px;border-bottom:1px solid #303236;background:#222326;
+        }
+        #att-cond-highlight-manager-v770 .chr-batchbar-top{
+            display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:24px;
+            color:#9aa0a6;font-size:10px;
+        }
+        #att-cond-highlight-manager-v770 .chr-select-all{display:flex;align-items:center;gap:6px;cursor:pointer;}
+        #att-cond-highlight-manager-v770 .chr-batch-actions{
+            display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:6px;
+        }
+        #att-cond-highlight-manager-v770 .chr-batch-actions button{height:26px;padding:0 4px;font-size:10px;}
+        #att-cond-highlight-manager-v770 .chr-filter{padding:9px 12px!important;}
+        #att-cond-highlight-manager-v770 .chr-filter input{height:32px!important;}
+        #att-cond-highlight-manager-v770 input[type="number"],
+        #att-cond-highlight-manager-v770 input[type="date"]{
+            width:100%;min-width:0;box-sizing:border-box;height:34px;padding:0 9px;
+            color:#e8eaed;background:#292a2d;border:1px solid #424448;border-radius:7px;outline:none;
+        }
+        #att-cond-highlight-manager-v770 input[type="number"]:focus,
+        #att-cond-highlight-manager-v770 input[type="date"]:focus{
+            border-color:#4c8bf5;box-shadow:0 0 0 2px rgba(76,139,245,.16);
+        }
+
+        #att-cond-highlight-manager-v770 .chr-item{
+            grid-template-columns:auto auto minmax(0,1fr)!important;gap:7px!important;padding:9px 8px!important;align-items:start;
+        }
+        #att-cond-highlight-manager-v770 .chr-item.is-disabled{opacity:.72;}
+        #att-cond-highlight-manager-v770 .chr-item-check{
+            display:flex;align-items:center;justify-content:center;width:17px;min-height:18px;cursor:pointer;
+        }
+        #att-cond-highlight-manager-v770 .chr-item-check input{margin:2px 0 0;}
+        #att-cond-highlight-manager-v770 .chr-item-body{min-width:0;}
+        #att-cond-highlight-manager-v770 .chr-item-top{
+            display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:0;
+        }
+        #att-cond-highlight-manager-v770 .chr-item-name{min-width:0;flex:1;}
+        #att-cond-highlight-manager-v770 .chr-item-badges{
+            display:flex;align-items:center;gap:4px;flex-shrink:0;
+        }
+        #att-cond-highlight-manager-v770 .chr-mini-badge{
+            height:18px;display:inline-flex;align-items:center;padding:0 5px;border-radius:999px;
+            border:1px solid #45484d;color:#aeb4bb;background:#292b2f;font-size:9px;font-weight:700;white-space:nowrap;
+        }
+        #att-cond-highlight-manager-v770 .chr-mini-badge.is-advanced{color:#c4b5fd;background:#2b2540;border-color:#55458d;}
+        #att-cond-highlight-manager-v770 .chr-mini-badge.is-enabled{color:#9de4b0;background:#203329;border-color:#345d42;}
+        #att-cond-highlight-manager-v770 .chr-mini-badge.is-off{color:#a1a7ae;background:#292a2d;border-color:#424448;}
+        #att-cond-highlight-manager-v770 .chr-item-meta{margin-top:4px!important;}
+        #att-cond-highlight-manager-v770 .chr-item-scope{
+            margin-top:3px;color:#747a82;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+        }
+
+        #att-cond-highlight-manager-v770 .chr-detail{padding:0 16px 24px!important;background:#202124;}
+        #att-cond-highlight-manager-v770 .chr-rule-summary{
+            position:sticky;top:0;z-index:4;margin:0 -16px 14px;padding:12px 16px 10px;
+            background:linear-gradient(to bottom,#202124 78%,rgba(32,33,36,.94));
+            border-bottom:1px solid #34363a;backdrop-filter:blur(8px);
+        }
+        #att-cond-highlight-manager-v770 .chr-rule-summary-main{
+            display:flex;align-items:center;justify-content:space-between;gap:10px;
+        }
+        #att-cond-highlight-manager-v770 .chr-rule-summary-title{
+            min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+            font-size:15px;font-weight:750;color:#f1f3f4;
+        }
+        #att-cond-highlight-manager-v770 .chr-rule-summary-chips{
+            display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:flex-end;
+        }
+        #att-cond-highlight-manager-v770 .chr-summary-chip{
+            height:20px;display:inline-flex;align-items:center;padding:0 7px;border-radius:999px;
+            color:#b7bbc0;background:#292b2f;border:1px solid #424448;font-size:9px;font-weight:700;
+        }
+        #att-cond-highlight-manager-v770 .chr-summary-chip.is-ok{color:#9de4b0;background:#203329;border-color:#345d42;}
+        #att-cond-highlight-manager-v770 .chr-summary-chip.is-active{color:#9ecbff;background:#203047;border-color:#315b91;}
+        #att-cond-highlight-manager-v770 .chr-summary-chip.is-muted{color:#8f949b;}
+        #att-cond-highlight-manager-v770 .chr-rule-summary-line{
+            margin-top:7px;display:flex;align-items:center;gap:6px;min-width:0;color:#9aa0a6;
+            font-size:10px;white-space:nowrap;overflow:hidden;
+        }
+        #att-cond-highlight-manager-v770 .chr-rule-summary-line span{
+            min-width:0;max-width:220px;overflow:hidden;text-overflow:ellipsis;
+        }
+        #att-cond-highlight-manager-v770 .chr-rule-summary-line i{color:#5f6368;font-style:normal;flex-shrink:0;}
+
+        #att-cond-highlight-manager-v770 .chr-section-v7152{padding:14px!important;margin-bottom:11px!important;}
+        #att-cond-highlight-manager-v770 .chr-section-head{
+            display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:11px;
+        }
+        #att-cond-highlight-manager-v770 .chr-section-head .chr-section-title{margin-bottom:0!important;font-size:13px;}
+        #att-cond-highlight-manager-v770 .chr-section-desc{
+            margin-top:3px;color:#858b92;font-size:10px;line-height:1.45;
+        }
+        #att-cond-highlight-manager-v770 .chr-subsection-label{
+            margin:12px 0 6px;color:#aeb4bb;font-size:10px;font-weight:700;
+        }
+        #att-cond-highlight-manager-v770 .chr-basic-status-row{
+            margin-top:9px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+        }
+        #att-cond-highlight-manager-v770 .chr-switch-line{min-height:28px!important;padding:0 2px;}
+        #att-cond-highlight-manager-v770 .chr-inline-status{
+            display:inline-flex;align-items:center;min-height:22px;padding:0 7px;border-radius:999px;
+            color:#9aa0a6;background:#202124;border:1px solid #3b3d40;font-size:9px;font-weight:700;white-space:nowrap;
+        }
+        #att-cond-highlight-manager-v770 .chr-inline-status.is-active{
+            color:#9de4b0;background:#203329;border-color:#345d42;
+        }
+        #att-cond-highlight-manager-v770 .chr-inline-status.is-error{
+            color:#ffaaa3;background:#382829;border-color:#68413f;
+        }
+        #att-cond-highlight-manager-v770 .chr-inline-check{margin-top:7px;min-height:26px!important;}
+        #att-cond-highlight-manager-v770 .chr-inline-check span{color:#7f858c;font-size:10px;}
+
+        #att-cond-highlight-manager-v770 .chr-help{
+            margin-top:9px;border:1px solid #36383c;border-radius:8px;background:#212225;
+            color:#959ba2;font-size:10px;line-height:1.55;
+        }
+        #att-cond-highlight-manager-v770 .chr-help summary{
+            padding:7px 9px;cursor:pointer;color:#aeb4bb;font-weight:650;user-select:none;
+        }
+        #att-cond-highlight-manager-v770 .chr-help > div{padding:0 9px 9px;}
+        #att-cond-highlight-manager-v770 .chr-advanced-placeholder,
+        #att-cond-highlight-manager-v770 .chr-inline-note{
+            margin-top:10px;padding:8px 9px;border:1px dashed #3a3d42;border-radius:8px;
+            color:#8f949b;background:#202124;font-size:10px;
+        }
+        #att-cond-highlight-manager-v770 .chr-error-line{
+            margin-top:8px;padding:7px 9px;border-radius:7px;color:#ffaaa3;
+            background:#382829;border:1px solid #68413f;font-size:10px;
+        }
+
+        #att-cond-highlight-manager-v770 .chr-visual-grid{margin-top:11px;}
+        #att-cond-highlight-manager-v770 .chr-color-input{
+            width:100%!important;height:34px!important;padding:2px!important;background:#292a2d!important;
+            border:1px solid #424448!important;border-radius:7px!important;
+        }
+        #att-cond-highlight-manager-v770 .chr-edge-options{
+            margin-top:10px;display:grid;grid-template-columns:minmax(0,1fr) auto auto;
+            align-items:center;gap:12px;padding:9px 10px;border:1px solid #36383c;border-radius:8px;background:#202124;
+        }
+        #att-cond-highlight-manager-v770 .chr-edge-options > div{min-width:0;}
+        #att-cond-highlight-manager-v770 .chr-edge-options b{display:block;font-size:10px;color:#b9bec4;}
+        #att-cond-highlight-manager-v770 .chr-edge-options span{display:block;margin-top:2px;color:#7f858c;font-size:9px;}
+        #att-cond-highlight-manager-v770 .chr-edge-options .chr-check{min-height:24px!important;white-space:nowrap;}
+        #att-cond-highlight-manager-v770 .chr-check-section{margin-bottom:0!important;}
+        #att-cond-highlight-manager-v770 .chr-match-count{
+            min-width:78px;text-align:center;padding:6px 8px;border-radius:8px;color:#9ecbff;
+            background:#203047;border:1px solid #315b91;font-size:10px;
+        }
+        #att-cond-highlight-manager-v770 .chr-rule-actions{margin-top:9px;}
+        #att-cond-highlight-manager-v770 button.primary-lite{color:#b9d7ff;background:#22344c;border-color:#3b679d;}
+
+        #att-cond-highlight-manager-v770 .chr-empty-card{
+            display:flex;flex-direction:column;gap:6px;max-width:380px;padding:22px;
+            border:1px dashed #3b3d40;border-radius:12px;background:#222326;
+        }
+        #att-cond-highlight-manager-v770 .chr-empty-card b{font-size:14px;color:#dfe3e7;}
+        #att-cond-highlight-manager-v770 .chr-empty-card span{font-size:11px;line-height:1.6;color:#8f949b;}
+
+        #att-cond-highlight-manager-v770 .chr-shell-v7152{position:relative!important;}
+        #att-cond-highlight-manager-v770 .chr-local-dialog-layer[hidden]{display:none!important;}
+        #att-cond-highlight-manager-v770 .chr-local-dialog-layer{
+            position:absolute;
+            inset:0;
+            z-index:80;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:24px;
+            border-radius:inherit;
+            overflow:hidden;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-backdrop{
+            position:absolute;
+            inset:0;
+            background:rgba(9,10,12,.58);
+            backdrop-filter:blur(2px);
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-card{
+            position:relative;
+            z-index:1;
+            width:min(430px,calc(100% - 32px));
+            border:1px solid #45484d;
+            border-radius:12px;
+            background:#25272a;
+            box-shadow:0 22px 60px rgba(0,0,0,.42);
+            overflow:hidden;
+            animation:attChrLocalDialogIn .16s cubic-bezier(.2,.8,.2,1);
+        }
+        @keyframes attChrLocalDialogIn{
+            from{opacity:0;transform:translateY(6px);}
+            to{opacity:1;transform:translateY(0);}
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-card.is-danger{
+            border-color:#65413e;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-head{
+            min-height:58px;
+            display:flex;
+            align-items:flex-start;
+            justify-content:space-between;
+            gap:12px;
+            padding:13px 14px 10px;
+            border-bottom:1px solid #383b3f;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-title{
+            color:#f1f3f4;
+            font-size:14px;
+            font-weight:760;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-sub{
+            margin-top:3px;
+            color:#8f949b;
+            font-size:10px;
+            line-height:1.45;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-close{
+            width:28px;
+            min-width:28px;
+            height:28px!important;
+            padding:0!important;
+            border:0!important;
+            background:transparent!important;
+            color:#9aa0a6;
+            font-size:16px;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-close:hover{
+            color:#fff;
+            background:#34363a!important;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-body{
+            padding:14px;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-message{
+            color:#dfe3e7;
+            font-size:12px;
+            line-height:1.6;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-detail{
+            margin-top:8px;
+            padding:8px 9px;
+            border-radius:7px;
+            border:1px solid #373a3e;
+            background:#202124;
+            color:#9399a0;
+            font-size:10px;
+            line-height:1.55;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-card.is-danger .chr-local-dialog-detail{
+            border-color:#4d3534;
+            background:#2b2425;
+            color:#d4aaa7;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-field{
+            display:block;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-field > span{
+            display:block;
+            margin-bottom:6px;
+            color:#b9bec4;
+            font-size:10px;
+            font-weight:700;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-field input{
+            width:100%;
+            height:36px;
+            border:1px solid #4a4d52;
+            border-radius:7px;
+            background:#202124;
+            color:#f1f3f4;
+            padding:0 10px;
+            outline:none;
+            box-sizing:border-box;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-field input:focus{
+            border-color:#4b8dda;
+            box-shadow:0 0 0 2px rgba(75,141,218,.18);
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-field small{
+            display:block;
+            min-height:14px;
+            margin-top:4px;
+            color:#ff9b94;
+            font-size:9px;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-foot{
+            min-height:52px;
+            display:flex;
+            align-items:center;
+            justify-content:flex-end;
+            gap:7px;
+            padding:9px 14px;
+            border-top:1px solid #383b3f;
+            background:#222326;
+        }
+        #att-cond-highlight-manager-v770 .chr-local-dialog-foot button{
+            min-width:70px;
+            height:31px;
+        }
+
+        @media (max-width:900px){
+            #att-cond-highlight-manager-v770 .chr-main{grid-template-columns:270px minmax(0,1fr)!important;}
+            #att-cond-highlight-manager-v770 .chr-groupbar-main{
+                grid-template-columns:auto 28px minmax(180px,1fr) 28px auto;
+            }
+            #att-cond-highlight-manager-v770 .chr-groupbar-actions{width:100%;justify-content:flex-end;}
+            #att-cond-highlight-manager-v770 .chr-grid2{grid-template-columns:1fr!important;}
+            #att-cond-highlight-manager-v770 .chr-edge-options{grid-template-columns:1fr 1fr;}
+            #att-cond-highlight-manager-v770 .chr-edge-options > div{grid-column:1/-1;}
+        }
+    `;
+    document.documentElement.appendChild(style);
+})();
+
+
+
+/* ============================================================================
+ * AutoTable 悬浮菜单信息架构与体验优化 V7.9.2
+ * --------------------------------------------------------------------------
+ * - 快捷页：当前上下文 -> 四个高频操作 -> 常用状态 -> 智能复制；
+ * - 设置页：六个分区 + sticky 快速导航；
+ * - 文档 Tab 在文档视图中自动位于“设置”之前；
+ * - 仅调整工具面板 UI / 信息架构，不改变 AutoTable 业务数据与原功能实现。
+ * ========================================================================== */
+(function () {
+    'use strict';
+    const STYLE_ID = 'att-floating-menu-ux-v790';
+    if (document.getElementById(STYLE_ID)) return;
+    const style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = `
+        #att-toolbox-panel .att-quick-context-v790 {
+            padding:11px 12px; margin-bottom:8px; border:1px solid var(--att-ui-border,#e4e7ec); border-radius:11px;
+            background:linear-gradient(135deg,var(--att-ui-surface,#fff),var(--att-ui-surface-2,#f2f4f7));
+        }
+        #att-toolbox-panel .att-quick-context-head-v790 { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+        #att-toolbox-panel .att-quick-context-label-v790 { color:var(--att-ui-muted,#667085); font-size:10px; font-weight:700; }
+        #att-toolbox-panel .att-quick-context-table-v790 { margin-top:2px; color:var(--att-ui-text,#101828); font-size:12px; font-weight:800; max-width:270px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        #att-toolbox-panel .att-quick-combo-badge-v790 { flex:0 0 auto; max-width:150px; padding:3px 7px; border:1px solid rgba(37,99,235,.15); border-radius:999px; background:var(--att-ui-blue-soft,#eff6ff); color:var(--att-ui-blue,#2563eb); font-size:9.5px; font-weight:750; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        #att-toolbox-panel .att-quick-cell-v790 { display:grid; grid-template-columns:minmax(82px,120px) minmax(0,1fr); gap:8px; align-items:center; margin-top:9px; padding-top:8px; border-top:1px solid var(--att-ui-border-soft,#edf0f3); }
+        #att-toolbox-panel .att-quick-cell-field-v790 { color:var(--att-ui-text-2,#344054); font-size:10.5px; font-weight:750; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        #att-toolbox-panel .att-quick-cell-value-v790 { color:var(--att-ui-muted,#667085); font-size:10.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+        #att-toolbox-panel .att-quick-action-grid-v790 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-bottom:8px; }
+        #att-toolbox-panel .att-quick-action-v790 { min-width:0; min-height:54px; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:3px; padding:8px 10px; border:1px solid var(--att-ui-border,#e4e7ec); border-radius:10px; background:var(--att-ui-surface,#fff); color:var(--att-ui-text-2,#344054); text-align:left; cursor:pointer; transition:background-color .14s ease,border-color .14s ease,transform .14s ease; }
+        #att-toolbox-panel .att-quick-action-v790:hover:not(:disabled) { border-color:rgba(37,99,235,.28); background:var(--att-ui-blue-soft,#eff6ff); transform:translateY(-1px); }
+        #att-toolbox-panel .att-quick-action-v790:disabled { opacity:.42; cursor:not-allowed; }
+        #att-toolbox-panel .att-quick-action-v790 b { width:100%; font-size:11.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        #att-toolbox-panel .att-quick-action-v790 span { width:100%; color:var(--att-ui-muted,#667085); font-size:9.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+        #att-toolbox-panel .att-quick-toggle-grid-v790 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-top:9px; }
+        #att-toolbox-panel .att-quick-toggle-v790 { min-width:0; min-height:50px; box-sizing:border-box; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:7px 9px; border:1px solid var(--att-ui-border,#e4e7ec); border-radius:9px; background:var(--att-ui-surface-2,#f2f4f7); color:var(--att-ui-text-2,#344054); text-align:left; cursor:pointer; }
+        #att-toolbox-panel button.att-quick-toggle-v790 { width:100%; font:inherit; }
+        #att-toolbox-panel .att-quick-toggle-v790.is-on { border-color:rgba(37,99,235,.22); background:var(--att-ui-blue-soft,#eff6ff); }
+        #att-toolbox-panel .att-quick-toggle-v790 > span:first-child { min-width:0; display:flex; flex-direction:column; gap:2px; }
+        #att-toolbox-panel .att-quick-toggle-v790 b { font-size:10.5px; line-height:1.2; }
+        #att-toolbox-panel .att-quick-toggle-v790 small { max-width:120px; color:var(--att-ui-muted,#667085); font-size:9px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        #att-toolbox-panel .att-quick-toggle-v790 .att-switch { transform:scale(.83); transform-origin:right center; margin-right:-4px; }
+        #att-toolbox-panel .att-quick-state-dot-v790 { width:8px; height:8px; flex:0 0 auto; border-radius:50%; background:#9ca3af; box-shadow:0 0 0 3px rgba(156,163,175,.10); }
+        #att-toolbox-panel .att-quick-toggle-v790.is-on .att-quick-state-dot-v790 { background:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,.14); }
+        #att-toolbox-panel .att-quick-focus-sub-v790 { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:8px; padding-top:8px; border-top:1px solid var(--att-ui-border-soft,#edf0f3); }
+        #att-toolbox-panel .att-quick-focus-sub-v790.is-disabled { opacity:.55; }
+        #att-toolbox-panel .att-quick-focus-sub-v790 label,
+        #att-toolbox-panel .att-quick-focus-sub-v790 button { min-height:27px; box-sizing:border-box; display:inline-flex; align-items:center; gap:5px; padding:0 8px; border:1px solid var(--att-ui-border,#e4e7ec); border-radius:7px; background:var(--att-ui-surface,#fff); color:var(--att-ui-text-2,#344054); font-size:9.5px; cursor:pointer; }
+        #att-toolbox-panel .att-quick-focus-sub-v790 button:disabled { opacity:.45; cursor:not-allowed; }
+
+        #att-toolbox-panel .att-quick-copy-row-v790 { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:7px; margin-top:9px; align-items:center; }
+        #att-toolbox-panel .att-quick-copy-row-v790 .att-select { margin:0 !important; }
+        #att-toolbox-panel .att-quick-hotkeys-v790 { display:flex; flex-wrap:wrap; gap:5px 8px; margin-top:8px; color:var(--att-ui-muted,#667085); font-size:9px; }
+        #att-toolbox-panel .att-quick-hotkeys-v790 b { color:var(--att-ui-text-2,#344054); }
+        #att-toolbox-panel .att-quick-footer-v790 { display:flex; justify-content:flex-end; gap:6px; margin-top:8px; }
+        #att-toolbox-panel .att-quick-footer-v790 button { height:27px; padding:0 9px; border:0; border-radius:7px; background:transparent; color:var(--att-ui-blue,#2563eb); font-size:9.5px; cursor:pointer; }
+        #att-toolbox-panel .att-quick-footer-v790 button:hover { background:var(--att-ui-blue-soft,#eff6ff); }
+
+        #att-toolbox-panel .att-settings-nav-v790 { position:sticky; top:-9px; z-index:12; display:flex; gap:4px; margin:-1px -2px 10px; padding:5px 2px 7px; overflow-x:auto; scrollbar-width:none; background:linear-gradient(to bottom,var(--att-ui-panel,#f7f8fa) 72%,transparent); }
+        #att-toolbox-panel .att-settings-nav-v790::-webkit-scrollbar { display:none; }
+        #att-toolbox-panel .att-settings-nav-v790 button { flex:0 0 auto; height:26px; padding:0 8px; border:1px solid var(--att-ui-border,#e4e7ec); border-radius:999px; background:var(--att-ui-surface,#fff); color:var(--att-ui-muted,#667085); font-size:9.5px; font-weight:700; cursor:pointer; }
+        #att-toolbox-panel .att-settings-nav-v790 button:hover { color:var(--att-ui-blue,#2563eb); border-color:rgba(37,99,235,.22); background:var(--att-ui-blue-soft,#eff6ff); }
+        #att-toolbox-panel .att-settings-category-v790 { display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin:13px 1px 6px; padding-top:3px; scroll-margin-top:38px; }
+        #att-toolbox-panel .att-settings-nav-v790 + .att-settings-category-v790 { margin-top:2px; }
+        #att-toolbox-panel .att-settings-category-v790 b { color:var(--att-ui-text,#101828); font-size:11px; }
+        #att-toolbox-panel .att-settings-category-v790 span { color:var(--att-ui-subtle,#98a2b3); font-size:9px; text-align:right; }
+        #att-toolbox-panel .att-settings-category-v790::after { content:''; flex:1 1 auto; order:1; height:1px; min-width:14px; margin-left:2px; background:var(--att-ui-border-soft,#edf0f3); }
+        #att-toolbox-panel .att-settings-category-v790 b { order:0; flex:0 0 auto; }
+        #att-toolbox-panel .att-settings-category-v790 span { order:2; flex:0 1 auto; }
+
+        /* V7.9 导航短标签统一，更适合 4~5 个 Tab 的窄面板。 */
+        #att-toolbox-panel .att-tab { min-width:58px !important; }
+
+        body.att-native-dark #att-toolbox-panel .att-quick-action-v790,
+        body.att-native-dark #att-toolbox-panel .att-quick-focus-sub-v790 label,
+        body.att-native-dark #att-toolbox-panel .att-quick-focus-sub-v790 button,
+        body.att-native-dark #att-toolbox-panel .att-settings-nav-v790 button { background:var(--att-ui-surface,#27282a); }
+
+        @media (max-width:560px) {
+            #att-toolbox-panel .att-quick-toggle-grid-v790 { grid-template-columns:1fr; }
+            #att-toolbox-panel .att-quick-action-grid-v790 { gap:5px; }
+            #att-toolbox-panel .att-quick-context-table-v790 { max-width:190px; }
+        }
+    `;
+    document.documentElement.appendChild(style);
+    console.log('[AutoTable 工具集 V7.13.1] 悬浮菜单布局优化已加载：快捷操作聚合 / 设置分区导航 / 文档 Tab 顺序优化');
+})();
+
+
+/* ============================================================================
+ * AutoTable 全视图模糊搜索记录与搜索栏清空优化 V7.15.5
+ * --------------------------------------------------------------------------
+ * 1) 搜索框下方默认使用更紧凑的历史层，支持列表 / 胶囊自动填充两种展示；
+ * 2) 可调历史文字大小；每个视图最大保存条数继续独立控制；
+ * 3) 支持“同一个表中搜索记录互通”：当前视图可直接使用同表其它视图的历史；
+ * 4) “查看全部视图搜索记录”不再直接打开大弹窗，而是在原历史层下方丝滑展开；
+ * 5) 展开区可滚动查看全部视图记录，并提供“搜索记录管理”入口；
+ * 6) 原“全部视图搜索记录”大弹窗改为更紧凑的“搜索记录管理”面板，只负责维护；
+ * 7) V7.11.1 二阶段性能优化：历史索引缓存、下拉固定 DOM 骨架、展开/管理分块渲染；
+ * 8) 搜索记录 GM 写入改为短延迟批处理，pagehide / 切后台时强制落盘，减少关键路径同步写入；
+ * 9) Observer 去自循环、输入/定位 RAF 合并继续保留；所有新增设置自动进入“全部设置导出 / 导入 / 重置”；
+ * 10) V7.11.2 首次打开采用隐藏测量定位；
+ * 11) V7.11.3 紧凑历史层改为零尺寸动画 + 双 RAF 等待原生焦点布局稳定 + 重复 focus 不再二次定位；
+ * 12) V7.12.1 搜索栏清空优化继续保留：隐藏原生搜索状态块，在搜索输入框内部提供 X，并优先复用 AutoTable 原生清除搜索动作。
+ * 13) V7.12.1 基于最新组件抓取改为精准 toolbar / 搜索状态驱动：缓存搜索输入与状态 chip、减少全页扫描、按原生搜索状态落历史，并避免表格内部滚动触发无意义定位。
+ * 14) V7.13.0 正式历史记录条件可配置：原生搜索生效 / Enter / 失焦 / 停止输入可独立组合；停止输入延迟可调。
+ * 15) V7.13.0 胶囊模式改为“按行智能补位”：保持时间顺序，不重排历史；每行多个胶囊自动分配剩余宽度，删除 / 字号 / 窗口尺寸变化后自动重算。
+ * 16) V7.13.1 新增胶囊删除按钮显示开关：关闭后不生成胶囊内 × 节点，并按真实胶囊宽度重新补位；列表 / 展开 / 管理器删除能力不受影响。
+ * 17) V7.13.2 新增“紧凑搜索记录显示全部”开关：列表与胶囊均可取消前 8 / 14 条限制，剩余记录在原历史区域内部滚动查看。
+ * 18) V7.13.3 修复鼠标松开闪烁：搜索历史层不再使用 dialog 角色，并显式跳过全局丝滑弹窗入场动画，避免 click 阶段二次 opacity / translate / scale。
+ * 19) V7.13.4 “查看全部视图搜索记录”改为真正的展开/收起双态入口；展开区改用单一 height + opacity + translate 动画链，并移除重复定位，避免先撑开再跳动。
+ * 20) V7.15.5 新增搜索记录模块尺寸上限：最大宽度 / 最大高度可独立调节；紧凑层与原位“查看全部”共同遵循，超限后内部滚动。
+ * ========================================================================== */
+(function () {
+    'use strict';
+
+    const SH = {
+        version: 'V7.16.6',
+        enabledKey: 'att_v3_viewSearchHistoryEnabled',
+        maxKey: 'att_v3_viewSearchHistoryMaxPerView',
+        perViewKey: 'att_v3_viewSearchHistoryPerViewMode',
+        dataKey: 'att_v3_viewSearchHistoryData',
+        fontSizeKey: 'att_v3_viewSearchHistoryFontSize',
+        layoutKey: 'att_v3_viewSearchHistoryLayoutMode',
+        capsuleDeleteKey: 'att_v3_viewSearchHistoryCapsuleDeleteVisible',
+        compactShowAllKey: 'att_v3_viewSearchHistoryCompactShowAll',
+        sameTableShareKey: 'att_v3_viewSearchHistorySameTableShare',
+        clearOptimizeKey: 'att_v3_viewSearchClearOptimizeEnabled',
+        commitPolicyKey: 'att_v3_viewSearchHistoryCommitPolicy',
+        idleCommitDelayKey: 'att_v3_viewSearchHistoryIdleCommitDelay',
+        dropdownMaxWidthKey: 'att_v3_viewSearchHistoryDropdownMaxWidth',
+        dropdownMaxHeightKey: 'att_v3_viewSearchHistoryDropdownMaxHeight',
+        clearButtonClass: 'att-view-search-clear-inline-v7120',
+        clearHostClass: 'att-view-search-clear-host-v7120',
+        clearInputClass: 'att-view-search-clear-input-v7120',
+        clearBodyClass: 'att-view-search-clear-optimized-v7120',
+        dropdownId: 'att-view-search-history-dropdown-v7110',
+        managerId: 'att-view-search-history-manager-v7110',
+        settingsCardId: 'att-view-search-history-settings-v7110',
+        styleId: 'att-view-search-history-style-v7110'
+    };
+
+    let enabled = GM_getValue(SH.enabledKey, true) !== false;
+    let maxPerView = normalizeMax(GM_getValue(SH.maxKey, 20));
+    let perViewMode = GM_getValue(SH.perViewKey, true) !== false;
+    let sameTableShare = Boolean(GM_getValue(SH.sameTableShareKey, false));
+    // 默认关闭，避免升级后直接改变原站搜索工具栏布局；由用户在设置中主动开启。
+    let clearOptimizeEnabled = Boolean(GM_getValue(SH.clearOptimizeKey, false));
+    let historyFontSize = normalizeFontSize(GM_getValue(SH.fontSizeKey, 12));
+    let layoutMode = normalizeLayout(GM_getValue(SH.layoutKey, 'list'));
+    let capsuleDeleteVisible = GM_getValue(SH.capsuleDeleteKey, true) !== false;
+    let compactShowAll = GM_getValue(SH.compactShowAllKey, false) === true;
+    let commitPolicy = normalizeCommitPolicy(GM_getValue(SH.commitPolicyKey, null));
+    let idleCommitDelay = normalizeIdleCommitDelay(GM_getValue(SH.idleCommitDelayKey, 900));
+    let dropdownMaxWidth = normalizeDropdownMaxWidth(GM_getValue(SH.dropdownMaxWidthKey, 580));
+    let dropdownMaxHeight = normalizeDropdownMaxHeight(GM_getValue(SH.dropdownMaxHeightKey, 600));
+    let historyData = normalizeHistoryData(GM_getValue(SH.dataKey, {}));
+
+    let activeSearchInput = null;
+    let dropdownPointerDown = false;
+    let dropdownExpanded = false;
+    let expandedFilter = '';
+    let managerSelectedView = 'all';
+    let managerFilter = '';
+    let toolboxObserver = null;
+    let settingsAttachObserver = null;
+    let dropdownRenderRaf = 0;
+    let dropdownPositionRaf = 0;
+    let pendingDropdownInput = null;
+    // V7.11.2：避免首次显示未定位的一帧，以及 React 重挂载 input 时重复重绘。
+    let dropdownRenderSignature = '';
+    // V7.11.3：首次打开与重复 focus 的稳定状态。
+    let dropdownOpenedAt = 0;
+    let dropdownLastViewKey = '';
+    let dropdownLastInputValue = '';
+    let dropdownLastGeometry = { width:NaN, left:NaN, top:NaN };
+    let dropdownResizeMotionTimer = 0;
+    let settingsEnsureRaf = 0;
+    let lastRecordSignature = '';
+    let lastRecordAt = 0;
+    let viewContextCache = { href:'', at:0, value:null };
+
+    // V7.11.1：搜索记录性能二阶段。
+    let historyRevision = 1;
+    let historyIndexCache = { revision:0, allRows:[], profiles:[] };
+    let scopeRowsCache = { revision:0, key:'', rows:[] };
+    let persistTimer = 0;
+    let persistDirty = false;
+    let expandedFilterTimer = 0;
+    let managerFilterTimer = 0;
+    let expandedRenderLimit = 80;
+    let managerRenderLimit = 120;
+    let searchClearSyncRaf = 0;
+    let searchClearInitTimer = 0;
+    // V7.12.1：基于真实 toolbar 结构缓存搜索锚点 / 搜索状态，避免高频全页 querySelectorAll。
+    let cachedSearchInput = null;
+    let cachedSearchStateChip = null;
+    let observedSearchToolbar = null;
+    let searchToolbarObserver = null;
+    let toolbarStateSyncRaf = 0;
+    let lastNativeCommittedSignature = '';
+    let idleCommitTimer = 0;
+    let idleCommitToken = 0;
+    let capsuleLayoutRaf = 0;
+    let capsuleResizeObserver = null;
+    let dropdownMeasuredHeight = 0;
+    // V7.15.5：缓存搜索历史层的内容自适应宽度；仅内容/设置变化时重新测量。
+    let dropdownMeasuredWidth = 0;
+    let anchorScrollCleanups = [];
+    const EXPANDED_CHUNK = 80;
+    const MANAGER_CHUNK = 120;
+
+    function normalizeMax(value) {
+        const n=Number(value); return Number.isFinite(n) ? Math.min(100,Math.max(3,Math.round(n))) : 20;
+    }
+    function normalizeFontSize(value) {
+        const n=Number(value); return Number.isFinite(n) ? Math.min(16,Math.max(10,Math.round(n))) : 12;
+    }
+    function normalizeLayout(value) { return value === 'capsule' ? 'capsule' : 'list'; }
+    function normalizeIdleCommitDelay(value) {
+        const n=Number(value); return Number.isFinite(n) ? Math.min(3000,Math.max(300,Math.round(n/100)*100)) : 900;
+    }
+    function normalizeDropdownMaxWidth(value) {
+        const n=Number(value); return Number.isFinite(n) ? Math.min(900,Math.max(280,Math.round(n/10)*10)) : 580;
+    }
+    function normalizeDropdownMaxHeight(value) {
+        const n=Number(value); return Number.isFinite(n) ? Math.min(900,Math.max(220,Math.round(n/10)*10)) : 600;
+    }
+    function normalizeCommitPolicy(raw) {
+        const defaults={native:true,enter:true,blur:false,idle:false};
+        if(!raw||typeof raw!=='object'||Array.isArray(raw))return {...defaults};
+        return {
+            native: raw.native !== false,
+            enter: raw.enter !== false,
+            blur: Boolean(raw.blur),
+            idle: Boolean(raw.idle)
+        };
+    }
+    function cleanText(value) { return String(value??'').replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim(); }
+    function escHtml(value) { return String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+    function escAttr(value) { return escHtml(value).replace(/`/g,'&#96;'); }
+    function cssEscape(value) { if(window.CSS?.escape)return CSS.escape(String(value)); return String(value).replace(/["\\]/g,'\\$&'); }
+    function formatTime(ts, compact=false) {
+        const n=Number(ts||0); if(!n)return ''; const d=new Date(n); if(Number.isNaN(d.getTime()))return '';
+        const now=new Date(), same=d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();
+        const pad=v=>String(v).padStart(2,'0');
+        if(same)return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        if(compact)return `${d.getMonth()+1}/${d.getDate()}`;
+        return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function normalizeHistoryData(raw) {
+        const out={}; if(!raw||typeof raw!=='object'||Array.isArray(raw))return out;
+        for(const [key,value] of Object.entries(raw)){
+            if(!value||typeof value!=='object')continue;
+            const cleanItems=[],seen=new Set();
+            for(const item of (Array.isArray(value.items)?value.items:[])){
+                const query=cleanText(typeof item==='string'?item:item?.query); if(!query||seen.has(query))continue;
+                seen.add(query); cleanItems.push({query,ts:Number(item?.ts||item?.timestamp||Date.now())});
+                if(cleanItems.length>=maxPerView)break;
+            }
+            out[key]={key,baseId:String(value.baseId||''),tableId:String(value.tableId||''),viewId:String(value.viewId||''),tableName:cleanText(value.tableName||''),viewName:cleanText(value.viewName||''),path:String(value.path||''),updatedAt:Number(value.updatedAt||cleanItems[0]?.ts||0),items:cleanItems};
+        }
+        return out;
+    }
+    function trimAllProfiles(){ for(const p of Object.values(historyData)) if(p&&Array.isArray(p.items)) p.items=p.items.slice(0,maxPerView); }
+    function invalidateHistoryIndex(){
+        historyRevision += 1;
+        historyIndexCache={revision:0,allRows:[],profiles:[]};
+        scopeRowsCache={revision:0,key:'',rows:[]};
+    }
+    function flushHistoryPersist(){
+        if(persistTimer){clearTimeout(persistTimer);persistTimer=0;}
+        if(!persistDirty)return;
+        persistDirty=false;
+        try{GM_setValue(SH.dataKey,historyData);}catch(err){console.warn('[AutoTable 搜索记录] 保存历史失败：',err);}
+    }
+    function saveHistoryData({immediate=false}={}){
+        trimAllProfiles();
+        invalidateHistoryIndex();
+        persistDirty=true;
+        if(immediate)return flushHistoryPersist();
+        if(persistTimer)clearTimeout(persistTimer);
+        // 合并连续的 Enter / focusout / 删除等操作，退出关键交互路径后再写 GM。
+        persistTimer=setTimeout(flushHistoryPersist,260);
+    }
+    function buildHistoryIndex(){
+        if(historyIndexCache.revision===historyRevision)return historyIndexCache;
+        const allRows=[],profiles=[];
+        for(const p of Object.values(historyData)){
+            if(!p||!Array.isArray(p.items))continue;
+            const profileSearch=cleanText(`${p.tableName||''} ${p.viewName||''}`).toLocaleLowerCase();
+            let count=0;
+            for(const item of p.items){
+                const query=cleanText(item?.query);if(!query)continue;
+                const row={query,ts:Number(item?.ts||0),viewKey:p.key,viewName:p.viewName||p.viewId||'视图',tableName:p.tableName||'',path:p.path||'',baseId:p.baseId||'',tableId:p.tableId||'',searchText:`${query} ${p.viewName||''} ${p.tableName||''}`.toLocaleLowerCase()};
+                allRows.push(row);count++;
+            }
+            if(count)profiles.push({profile:p,count,searchText:profileSearch,updatedAt:Number(p.updatedAt||0)});
+        }
+        allRows.sort((a,b)=>b.ts-a.ts);
+        profiles.sort((a,b)=>b.updatedAt-a.updatedAt);
+        historyIndexCache={revision:historyRevision,allRows,profiles};
+        return historyIndexCache;
+    }
+
+    function isViewSearchInput(el){
+        if(!(el instanceof HTMLInputElement))return false;
+        const ph=cleanText(el.getAttribute('placeholder')||'').replace(/\s+/g,''), ar=cleanText(el.getAttribute('aria-label')||'').replace(/\s+/g,'');
+        return (ph.includes('全视图')&&ph.includes('搜索'))||(ar.includes('全视图')&&ar.includes('搜索'));
+    }
+
+    function isElementVisible(el) {
+        if (!(el instanceof HTMLElement) || !el.isConnected) return false;
+        const rect = el.getBoundingClientRect();
+        return rect.width > 40 && rect.height > 18 && el.getClientRects().length > 0;
+    }
+
+    function findVisibleViewSearchInput() {
+        // 优先复用刚刚已经确认过的真实搜索框，React 没有重挂载时 O(1)。
+        if (cachedSearchInput instanceof HTMLInputElement && isViewSearchInput(cachedSearchInput) && isElementVisible(cachedSearchInput)) return cachedSearchInput;
+        if (activeSearchInput instanceof HTMLInputElement && isViewSearchInput(activeSearchInput) && isElementVisible(activeSearchInput)) {
+            cachedSearchInput = activeSearchInput;
+            return activeSearchInput;
+        }
+
+        // 最新抓取表明搜索控件位于 view-filter-toolbar-slot；先只扫描这个小区域。
+        const toolbar = document.querySelector('.view-filter-toolbar-slot');
+        if (toolbar) {
+            const candidates = toolbar.querySelectorAll('input[placeholder*="搜索"],input[aria-label*="搜索"],input[type="search"]');
+            for (const input of candidates) {
+                if (isViewSearchInput(input) && isElementVisible(input)) {
+                    cachedSearchInput = input;
+                    return input;
+                }
+            }
+        }
+
+        // 兼容旧页面结构的低频兜底。只有缓存失效且 toolbar 中没找到时才扫描全页。
+        for (const input of document.querySelectorAll('input[placeholder*="全视图"],input[aria-label*="全视图"]')) {
+            if (isViewSearchInput(input) && isElementVisible(input)) {
+                cachedSearchInput = input;
+                return input;
+            }
+        }
+        cachedSearchInput = null;
+        return null;
+    }
+
+    function isNativeSearchStateChip(chip) {
+        if (!(chip instanceof Element) || !chip.isConnected || !chip.classList.contains('toolbar-state-chip')) return false;
+        const title = cleanText(chip.getAttribute('title') || '');
+        return title.startsWith('搜索：') || Boolean(chip.querySelector('.anticon-search,[data-icon="search"]'));
+    }
+
+    function findNativeSearchStateChip() {
+        if (isNativeSearchStateChip(cachedSearchStateChip)) return cachedSearchStateChip;
+        // 最新抓取到的精确结构优先。
+        const exact = document.querySelector('.view-filter-toolbar-slot > .toolbar-inline-buttons > .toolbar-state-chips > .toolbar-state-chip[title^="搜索："]')
+            || document.querySelector('.view-filter-toolbar-slot > .toolbar-inline-buttons > .toolbar-state-chips > .toolbar-state-chip .anticon-search')?.closest('.toolbar-state-chip');
+        if (isNativeSearchStateChip(exact)) {
+            cachedSearchStateChip = exact;
+            return exact;
+        }
+        // 旧结构兜底。
+        const chips = document.querySelectorAll('.view-filter-toolbar-slot .toolbar-state-chips .toolbar-state-chip');
+        for (const chip of chips) {
+            if (isNativeSearchStateChip(chip)) {
+                cachedSearchStateChip = chip;
+                return chip;
+            }
+        }
+        cachedSearchStateChip = null;
+        return null;
+    }
+
+    function extractNativeSearchQuery(chip = findNativeSearchStateChip()) {
+        if (!(chip instanceof Element)) return '';
+        const title = cleanText(chip.getAttribute('title') || '');
+        if (title.startsWith('搜索：')) return cleanText(title.slice(3));
+        const main = cleanText(chip.querySelector('.toolbar-state-chip__main')?.textContent || chip.textContent || '');
+        return main.startsWith('搜索：') ? cleanText(main.slice(3)) : '';
+    }
+
+    function canCommitFrom(source) {
+        return Boolean(enabled && commitPolicy && commitPolicy[source]);
+    }
+
+    function commitSearchFrom(source, query, context=getCurrentViewContext()) {
+        if(!canCommitFrom(source))return false;
+        recordSearch(query, context);
+        return true;
+    }
+
+    function clearIdleCommitTimer() {
+        idleCommitToken += 1;
+        if(idleCommitTimer){clearTimeout(idleCommitTimer);idleCommitTimer=0;}
+    }
+
+    function scheduleIdleSearchCommit(input) {
+        clearIdleCommitTimer();
+        if(!canCommitFrom('idle')||!(input instanceof HTMLInputElement)||!input.isConnected)return;
+        const query=cleanText(input.value||'');
+        if(!query)return;
+        const token=idleCommitToken;
+        const context=getCurrentViewContext();
+        idleCommitTimer=setTimeout(()=>{
+            idleCommitTimer=0;
+            if(token!==idleCommitToken||!input.isConnected||cleanText(input.value||'')!==query)return;
+            commitSearchFrom('idle',query,context);
+        },idleCommitDelay);
+    }
+
+    function scheduleNativeToolbarStateSync(input = null) {
+        if (input instanceof HTMLInputElement && isViewSearchInput(input)) cachedSearchInput = input;
+        if (toolbarStateSyncRaf) return;
+        toolbarStateSyncRaf = requestAnimationFrame(() => {
+            toolbarStateSyncRaf = 0;
+            const chip = findNativeSearchStateChip();
+            const query = extractNativeSearchQuery(chip);
+            if (enabled && query) {
+                const ctx = getCurrentViewContext();
+                const sig = `${ctx.key}\n${query}`;
+                if (sig !== lastNativeCommittedSignature) {
+                    lastNativeCommittedSignature = sig;
+                    commitSearchFrom('native',query,ctx);
+                }
+            } else if (!query) {
+                lastNativeCommittedSignature = '';
+            }
+            if (clearOptimizeEnabled) scheduleSearchClearSync(cachedSearchInput || activeSearchInput);
+        });
+    }
+
+    function cleanupInlineSearchClear() {
+        document.documentElement.classList.remove(SH.clearBodyClass);
+        document.body?.classList.remove(SH.clearBodyClass);
+        document.querySelectorAll(`.${SH.clearButtonClass}`).forEach(btn => btn.remove());
+        document.querySelectorAll(`.${SH.clearHostClass}`).forEach(host => host.classList.remove(SH.clearHostClass));
+        document.querySelectorAll(`.${SH.clearInputClass}`).forEach(input => input.classList.remove(SH.clearInputClass));
+    }
+
+    function getSearchInputClearHost(input) {
+        if (!(input instanceof HTMLInputElement)) return null;
+        // 优先使用 Ant Design / 常见搜索输入包装器；找不到时才退回直接父节点。
+        const host = input.closest('.ant-input-affix-wrapper,.ant-input-group-wrapper,.view-filter-toolbar-slot .ant-input-affix-wrapper,.view-search-input-wrap,.view-filter-search,.toolbar-search') || input.parentElement;
+        return host instanceof HTMLElement ? host : null;
+    }
+
+    function syncInlineSearchClear(input = null) {
+        searchClearSyncRaf = 0;
+        if (!clearOptimizeEnabled) {
+            cleanupInlineSearchClear();
+            return;
+        }
+
+        document.documentElement.classList.add(SH.clearBodyClass);
+        document.body?.classList.add(SH.clearBodyClass);
+
+        const target = (input instanceof HTMLInputElement && isViewSearchInput(input) && input.isConnected)
+            ? input
+            : findVisibleViewSearchInput();
+        if (!target) return;
+        cachedSearchInput = target;
+
+        // React 重挂载搜索框后，移除已失效/非当前输入上的增强节点。
+        document.querySelectorAll(`.${SH.clearButtonClass}`).forEach(btn => {
+            const owner = btn.__attSearchInput;
+            if (!(owner instanceof HTMLInputElement) || !owner.isConnected || owner !== target) btn.remove();
+        });
+        document.querySelectorAll(`.${SH.clearInputClass}`).forEach(el => {
+            if (el !== target) el.classList.remove(SH.clearInputClass);
+        });
+        document.querySelectorAll(`.${SH.clearHostClass}`).forEach(el => {
+            if (!el.contains(target)) el.classList.remove(SH.clearHostClass);
+        });
+
+        const host = getSearchInputClearHost(target);
+        if (!host) return;
+        host.classList.add(SH.clearHostClass);
+        target.classList.add(SH.clearInputClass);
+
+        let button = Array.from(host.children).find(el => el.classList?.contains(SH.clearButtonClass));
+        if (!(button instanceof HTMLButtonElement)) {
+            button = document.createElement('button');
+            button.type = 'button';
+            button.className = SH.clearButtonClass;
+            button.setAttribute('aria-label', '清空搜索');
+            button.title = '清空搜索';
+            button.innerHTML = '<span aria-hidden="true">×</span>';
+            button.__attSearchInput = target;
+            // pointerdown 阶段阻止输入框失焦，避免先触发搜索记录 focusout 再清空。
+            button.addEventListener('pointerdown', event => {
+                event.preventDefault();
+                event.stopPropagation();
+            });
+            button.addEventListener('click', event => {
+                event.preventDefault();
+                event.stopPropagation();
+                const inputEl = button.__attSearchInput instanceof HTMLInputElement && button.__attSearchInput.isConnected
+                    ? button.__attSearchInput
+                    : findVisibleViewSearchInput();
+                if (!inputEl) return;
+
+                // 首选原站的“清除搜索”按钮：这样 React 查询状态、URL/视图状态和输入值一起清理。
+                const chip = findNativeSearchStateChip();
+                const nativeClear = chip?.querySelector('button.toolbar-state-chip__remove[aria-label="清除搜索"],button[aria-label="清除搜索"]');
+                if (nativeClear instanceof HTMLButtonElement) nativeClear.click();
+                else setNativeInputValue(inputEl, '');
+
+                // 某些 React 生命周期会晚一帧更新 input；兜底只在仍有值时再触发一次原生 value setter。
+                requestAnimationFrame(() => {
+                    if (!inputEl.isConnected) return;
+                    if (inputEl.value) setNativeInputValue(inputEl, '');
+                    inputEl.focus({ preventScroll: true });
+                    scheduleSearchClearSync(inputEl);
+                    if (enabled) scheduleDropdownRender(inputEl);
+                });
+            });
+            host.appendChild(button);
+        } else {
+            button.__attSearchInput = target;
+        }
+
+        const hasSearch = cleanText(target.value || '') !== '' || Boolean(findNativeSearchStateChip());
+        button.classList.toggle('is-visible', hasSearch);
+        button.setAttribute('aria-hidden', hasSearch ? 'false' : 'true');
+        button.tabIndex = hasSearch ? 0 : -1;
+    }
+
+    function scheduleSearchClearSync(input = null) {
+        if (!clearOptimizeEnabled && !document.documentElement.classList.contains(SH.clearBodyClass)) return;
+        if (searchClearSyncRaf) return;
+        searchClearSyncRaf = requestAnimationFrame(() => syncInlineSearchClear(input));
+    }
+
+    function applySearchClearOptimizeState() {
+        if (!clearOptimizeEnabled) {
+            if (searchClearSyncRaf) { cancelAnimationFrame(searchClearSyncRaf); searchClearSyncRaf = 0; }
+            cleanupInlineSearchClear();
+            return;
+        }
+        const firstInput = findVisibleViewSearchInput();
+        scheduleSearchClearSync(firstInput);
+        ensureSearchToolbarObserver(firstInput);
+        // 页面初次进入时 React 可能尚未挂载原生搜索框；短暂有限重试，不常驻轮询。
+        clearTimeout(searchClearInitTimer);
+        let tries = 0;
+        const retry = () => {
+            if (!clearOptimizeEnabled) return;
+            const input = findVisibleViewSearchInput();
+            if (input) { scheduleSearchClearSync(input); return; }
+            if (++tries < 10) searchClearInitTimer = setTimeout(retry, 180);
+        };
+        retry();
+    }
+
+    function getCurrentViewContext(){
+        const hrefKey=`${location.pathname||''}${location.search||''}`,now=performance.now();
+        if(viewContextCache.value&&viewContextCache.href===hrefKey&&(now-viewContextCache.at)<1200)return viewContextCache.value;
+        const path=location.pathname||'',baseId=path.match(/\/b\/([^/]+)/i)?.[1]||'base',tableId=path.match(/\/t\/(tbl_[^/]+)/i)?.[1]||'',viewId=path.match(/\/v\/(viw_[^/]+)/i)?.[1]||'';
+        const tableName=cleanText(document.querySelector('.grid-page-title')?.textContent||document.querySelector('.grid-page-header h1')?.textContent||document.querySelector('main h1')?.textContent||tableId||'当前表格');
+        let viewName='';
+        if(viewId){
+            const candidates=[...document.querySelectorAll(`[data-view-id="${cssEscape(viewId)}"], [data-view-key="${cssEscape(viewId)}"]`),...document.querySelectorAll(`a[href*="/v/${cssEscape(viewId)}"]`)];
+            const names=candidates.map(el=>cleanText(el.getAttribute('title')||el.textContent||'')).filter(v=>v&&v.length<=80&&v!==tableName);
+            viewName=names.sort((a,b)=>a.length-b.length)[0]||'';
+        }
+        if(!viewName){const tab=document.querySelector('.ant-tabs-tab-active,.view-tab.active,[aria-selected="true"]');const t=cleanText(tab?.getAttribute('title')||tab?.textContent||'');if(t&&t.length<=80&&t!==tableName)viewName=t;}
+        if(!viewName)viewName=viewId||'当前视图';
+        const fallback=path.replace(/\/+$/,'')||'/',key=`${baseId}::${tableId||'table'}::${viewId||fallback}`;
+        const value={key,baseId,tableId,viewId,tableName,viewName,path:location.pathname+location.search}; viewContextCache={href:hrefKey,at:now,value}; return value;
+    }
+
+    function ensureProfile(context=getCurrentViewContext()){
+        let p=historyData[context.key];
+        if(!p)p=historyData[context.key]={key:context.key,baseId:context.baseId,tableId:context.tableId,viewId:context.viewId,tableName:context.tableName,viewName:context.viewName,path:context.path,updatedAt:0,items:[]};
+        else {p.baseId=context.baseId||p.baseId;p.tableId=context.tableId||p.tableId;p.viewId=context.viewId||p.viewId;p.tableName=context.tableName||p.tableName;p.viewName=context.viewName||p.viewName;p.path=context.path||p.path;}
+        return p;
+    }
+
+    function recordSearch(query,context=getCurrentViewContext()){
+        if(!enabled)return; const q=cleanText(query); if(!q)return; const p=ensureProfile(context),now=Date.now(),sig=`${context.key}\n${q}`;
+        if(sig===lastRecordSignature&&(now-lastRecordAt)<1200)return;
+        if(p.items?.[0]?.query===q&&(now-Number(p.items[0].ts||0))<1200){lastRecordSignature=sig;lastRecordAt=now;return;}
+        lastRecordSignature=sig;lastRecordAt=now;p.items=[{query:q,ts:now},...p.items.filter(i=>cleanText(i.query)!==q)].slice(0,maxPerView);p.updatedAt=now;saveHistoryData();
+        if(activeSearchInput?.isConnected&&document.getElementById(SH.dropdownId)?.classList.contains('is-open'))scheduleDropdownRender(activeSearchInput);
+    }
+
+    function removeHistoryItem(viewKey,query){const p=historyData[viewKey];if(!p)return;p.items=p.items.filter(i=>i.query!==query);p.updatedAt=p.items[0]?.ts||p.updatedAt;saveHistoryData();if(activeSearchInput?.isConnected)scheduleDropdownRender(activeSearchInput);if(document.getElementById(SH.managerId)?.classList.contains('is-open'))renderManager(true);}
+    function clearViewHistory(viewKey){const p=historyData[viewKey];if(!p)return;p.items=[];p.updatedAt=Date.now();saveHistoryData();if(activeSearchInput?.isConnected)scheduleDropdownRender(activeSearchInput);if(document.getElementById(SH.managerId)?.classList.contains('is-open'))renderManager(true);}
+    function clearAllHistory(){for(const p of Object.values(historyData))p.items=[];saveHistoryData({immediate:true});if(activeSearchInput?.isConnected)scheduleDropdownRender(activeSearchInput);if(document.getElementById(SH.managerId)?.classList.contains('is-open'))renderManager(true);}
+
+    function getScopeProfiles(){
+        const current=getCurrentViewContext(),all=Object.values(historyData);
+        if(!perViewMode)return all;
+        if(sameTableShare)return all.filter(p=>p.baseId===current.baseId&&((current.tableId&&p.tableId===current.tableId)||(!current.tableId&&p.tableName===current.tableName)));
+        return [historyData[current.key]].filter(Boolean);
+    }
+    function scopeLabel(){ if(!perViewMode)return '全部视图'; if(sameTableShare)return '当前表互通'; return '当前视图'; }
+    function getScopeRows(){
+        const current=getCurrentViewContext();
+        const modeKey=!perViewMode?'all':sameTableShare?`table:${current.baseId}:${current.tableId||current.tableName}`:`view:${current.key}`;
+        if(scopeRowsCache.revision===historyRevision&&scopeRowsCache.key===modeKey)return scopeRowsCache.rows;
+        const all=buildHistoryIndex().allRows;
+        let rows;
+        if(!perViewMode)rows=all;
+        else if(sameTableShare)rows=all.filter(r=>r.baseId===current.baseId&&((current.tableId&&r.tableId===current.tableId)||(!current.tableId&&r.tableName===current.tableName)));
+        else rows=all.filter(r=>r.viewKey===current.key);
+        scopeRowsCache={revision:historyRevision,key:modeKey,rows};
+        return rows;
+    }
+    function queryIndexedRows(rows,{filter='',dedupe=false,limit=Infinity}={}){
+        const q=cleanText(filter).toLocaleLowerCase();
+        const out=[],seen=dedupe?new Set():null;
+        for(const row of rows){
+            if(q&&!row.searchText.includes(q))continue;
+            if(seen){if(seen.has(row.query))continue;seen.add(row.query);}
+            out.push(row);if(out.length>=limit)break;
+        }
+        return out;
+    }
+    function compactDisplayLimit(){ return compactShowAll ? Infinity : (layoutMode==='capsule' ? 14 : 8); }
+    function compactDisplayStatus(){ return compactShowAll ? '全部' : `显示前${layoutMode==='capsule'?14:8}`; }
+    function getDisplayItems(inputValue=''){return queryIndexedRows(getScopeRows(),{filter:inputValue,dedupe:true,limit:compactDisplayLimit()});}
+    function getAllItems(filter=''){return queryIndexedRows(buildHistoryIndex().allRows,{filter,dedupe:false});}
+
+    function setNativeInputValue(input,value){const d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value');if(d?.set)d.set.call(input,value);else input.value=value;input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}));}
+    function findCurrentSearchInput(){return findVisibleViewSearchInput();}
+    function useHistoryQuery(query){const input=activeSearchInput?.isConnected?activeSearchInput:findCurrentSearchInput();if(!input)return;setNativeInputValue(input,query);input.focus({preventScroll:true});dropdownExpanded=false;expandedFilter='';hideDropdown();setTimeout(()=>scheduleNativeToolbarStateSync(input),0);}
+
+    function ensureDropdown(){
+        let d=document.getElementById(SH.dropdownId);if(d)return d;
+        d=document.createElement('div');d.id=SH.dropdownId;
+        // 这是依附搜索框的非模态历史区域，不是 dialog。使用 region 也避免全局丝滑动效把它当作新弹窗，
+        // 在 mouseup/click 阶段再次播放 opacity/translate/scale 入场动画造成闪烁。
+        d.setAttribute('role','region');
+        d.setAttribute('aria-label','搜索记录');
+        d.setAttribute('data-att-motion-skip','true');
+        d.style.setProperty('--att-sh-max-width',`${dropdownMaxWidth}px`);
+        d.style.setProperty('--att-sh-max-height',`${dropdownMaxHeight}px`);
+        d.innerHTML=`<div class="shd-head" data-shd-head></div>
+        <div class="shd-list" data-shd-list></div>
+        <button type="button" class="shd-all" data-sh-act="expand-all" aria-expanded="false"><span data-shd-expand-label>查看全部视图搜索记录</span><b data-shd-expand-icon>›</b></button>
+        <div class="shd-expanded" data-sh-expanded-box>
+            <div class="shd-expanded-head"><div><b>全部视图搜索记录</b><span data-sh-expanded-count>0 条</span></div><div class="shd-expanded-actions"><button type="button" data-sh-act="open-manager">管理记录</button><button type="button" data-sh-act="collapse">收起</button></div></div>
+            <div class="shd-expanded-search"><input type="search" data-sh-expanded-filter placeholder="筛选全部搜索记录…"></div>
+            <div class="shd-expanded-list" data-sh-expanded-list></div>
+        </div>`;
+        const compactList=d.querySelector('[data-shd-list]');
+        if(window.ResizeObserver&&compactList){
+            capsuleResizeObserver=new ResizeObserver(()=>{if(layoutMode==='capsule'&&d.classList.contains('is-open'))scheduleCapsuleAutoFill(compactList);});
+            capsuleResizeObserver.observe(compactList);
+        }
+        d.addEventListener('pointerdown',e=>{dropdownPointerDown=true;if(e.target.closest('button,[data-sh-query]'))e.preventDefault();});
+        d.addEventListener('pointerup',()=>{setTimeout(()=>dropdownPointerDown=false,0);});
+        d.addEventListener('click',onDropdownClick);
+        d.addEventListener('input',e=>{
+            if(!e.target.matches('[data-sh-expanded-filter]'))return;
+            expandedFilter=e.target.value||'';
+            clearTimeout(expandedFilterTimer);
+            expandedFilterTimer=setTimeout(()=>{expandedRenderLimit=EXPANDED_CHUNK;renderExpandedList(true);},80);
+        });
+        d.addEventListener('scroll',e=>{
+            const list=e.target;if(!(list instanceof Element)||!list.matches('[data-sh-expanded-list]'))return;
+            if(list.scrollTop+list.clientHeight<list.scrollHeight-80)return;
+            const items=getAllItems(expandedFilter);if(expandedRenderLimit>=items.length)return;
+            const old=expandedRenderLimit;expandedRenderLimit=Math.min(items.length,expandedRenderLimit+EXPANDED_CHUNK);appendExpandedRows(items.slice(old,expandedRenderLimit),list);updateExpandedCount(items.length);
+        },true);
+        document.body.appendChild(d);return d;
+    }
+    function scheduleDropdownRender(input=activeSearchInput){
+        if(!enabled||!input?.isConnected)return;
+        pendingDropdownInput=input;
+        if(dropdownRenderRaf)return;
+        const run=()=>{
+            dropdownRenderRaf=0;
+            const target=pendingDropdownInput;pendingDropdownInput=null;
+            if(target?.isConnected&&enabled)renderDropdown(target);
+        };
+        // 搜索框刚获得焦点时，AutoTable/React 可能还在同一帧修改 focus 样式或重挂载 input。
+        // 首次打开多等一帧，只影响约 16ms，却避免历史层锚在“中间态”坐标后再跳一次。
+        dropdownRenderRaf=requestAnimationFrame(()=>{
+            dropdownRenderRaf=0;
+            const d=document.getElementById(SH.dropdownId);
+            if(!d?.classList.contains('is-open')){
+                dropdownRenderRaf=requestAnimationFrame(run);
+            }else run();
+        });
+    }
+    function scheduleDropdownPosition(){
+        const d=document.getElementById(SH.dropdownId);
+        if(!d?.classList.contains('is-open')||!activeSearchInput?.isConnected)return;
+        // focus 后浏览器/React 可能产生一次内部 scroll。紧凑层刚出现的 180ms 内忽略这类二次定位，
+        // 避免已经稳定显示后又因 1~2px 的原生焦点布局变化产生肉眼可见的“抖一下”。
+        if(!dropdownExpanded&&performance.now()-dropdownOpenedAt<180)return;
+        if(dropdownPositionRaf)return;
+        dropdownPositionRaf=requestAnimationFrame(()=>{
+            dropdownPositionRaf=0;
+            const cur=document.getElementById(SH.dropdownId);
+            if(cur?.classList.contains('is-open')&&activeSearchInput?.isConnected)positionDropdown(activeSearchInput,cur);
+        });
+    }
+    function measureDropdownPreferredWidth(input,d=ensureDropdown()){
+        if(!input?.isConnected)return 300;
+        const margin=10;
+        const r=input.getBoundingClientRect();
+        const viewportCap=Math.max(220,Math.min(dropdownMaxWidth,window.innerWidth-margin*2));
+        const minWidth=Math.min(viewportCap,Math.max(280,Math.ceil(r.width)));
+
+        // 展开“查看全部”时允许充分使用用户配置的宽度上限。
+        if(dropdownExpanded){
+            return Math.round(Math.max(minWidth,Math.min(viewportCap,Math.max(520,r.width*1.8))));
+        }
+
+        // 紧凑层按真实内容测量，不再额外锁死在 300/420px。
+        // max-content 只在隐藏测量阶段读取一次，随后使用缓存，避免滚动时反复强制布局。
+        const prevWidth=d.style.width;
+        const prevMaxWidth=d.style.maxWidth;
+        try{
+            d.style.width='max-content';
+            d.style.maxWidth=`${viewportCap}px`;
+            const rectWidth=Math.ceil(d.getBoundingClientRect().width||0);
+            const scrollWidth=Math.ceil(d.scrollWidth||0);
+            const intrinsic=Math.max(rectWidth,scrollWidth,minWidth);
+            return Math.round(Math.min(viewportCap,Math.max(minWidth,intrinsic)));
+        }finally{
+            d.style.width=prevWidth;
+            d.style.maxWidth=prevMaxWidth;
+        }
+    }
+
+    function positionDropdown(input,d=ensureDropdown(),allowMeasure=false,force=false){
+        if(!input?.isConnected)return false;
+        if(!allowMeasure&&!d.classList.contains('is-open'))return false;
+        const r=input.getBoundingClientRect(),margin=10,gap=5;
+        // V7.15.5：最大宽度现在是真正的“内容自动扩展上限”。
+        // 之前即使设置 900px，紧凑层仍被内部 300/420px 逻辑卡住；现在已移除该隐性限制。
+        if(allowMeasure || force || !dropdownMeasuredWidth){
+            dropdownMeasuredWidth=measureDropdownPreferredWidth(input,d);
+        }
+        const width=Math.min(dropdownMeasuredWidth||Math.max(280,r.width),dropdownMaxWidth,window.innerWidth-margin*2);
+        let left=r.right-width;left=Math.max(margin,Math.min(left,window.innerWidth-width-margin));
+        // measuring 状态的 scrollHeight 是唯一一次用于决定上下方向的高度；总高度同样服从用户上限。
+        const viewportHeightCap=Math.max(120,window.innerHeight-margin*2);
+        const cap=dropdownExpanded
+            ? Math.min(dropdownMaxHeight,viewportHeightCap)
+            : Math.min(280,dropdownMaxHeight,viewportHeightCap);
+        // scroll / resize 重定位时不再反复读取 scrollHeight；仅首次测量或强制尺寸变化时读取。
+        if (allowMeasure || force || !dropdownMeasuredHeight) dropdownMeasuredHeight = Math.min(d.scrollHeight || cap, cap);
+        const measured=Math.min(dropdownMeasuredHeight||cap,cap),below=window.innerHeight-r.bottom-margin,above=r.top-margin;
+        let top;if(below>=Math.min(dropdownExpanded?390:170,measured)||below>=above)top=r.bottom+gap;else top=Math.max(margin,r.top-measured-gap);
+        const next={width:Math.round(width),left:Math.round(left),top:Math.round(top)};
+        const changed=force || !Number.isFinite(dropdownLastGeometry.width)
+            || Math.abs(next.width-dropdownLastGeometry.width)>=1
+            || Math.abs(next.left-dropdownLastGeometry.left)>=1
+            || Math.abs(next.top-dropdownLastGeometry.top)>=1;
+        if(changed){
+            d.style.width=`${next.width}px`;
+            d.style.left=`${next.left}px`;
+            d.style.top=`${next.top}px`;
+            dropdownLastGeometry=next;
+        }
+        return true;
+    }
+
+    function openDropdownStable(input,d=ensureDropdown()){
+        if(d.classList.contains('is-open'))return;
+        // 紧凑历史层首次出现绝不做尺寸过渡：隐藏测量 → 最终坐标 → 直接显示。
+        d.classList.add('is-measuring','is-opening-stable');
+        positionDropdown(input,d,true,true);
+        d.classList.add('is-open');
+        d.classList.remove('is-measuring');
+        dropdownOpenedAt=performance.now();
+        // 跨过两个 paint 后再解除稳定类；此时 width/left/top 已经完全固定。
+        requestAnimationFrame(()=>requestAnimationFrame(()=>d.classList.remove('is-opening-stable')));
+    }
+
+    function enableDropdownResizeMotion(d=ensureDropdown()){
+        clearTimeout(dropdownResizeMotionTimer);
+        d.classList.add('allow-resize-motion');
+        dropdownResizeMotionTimer=setTimeout(()=>d.classList.remove('allow-resize-motion'),320);
+    }
+
+
+    function applyCapsuleAutoFill(list=document.querySelector(`#${SH.dropdownId} [data-shd-list]`)) {
+        capsuleLayoutRaf=0;
+        if(layoutMode!=='capsule'||!(list instanceof HTMLElement)||!list.isConnected)return;
+        const box=list.querySelector('.shd-capsules');
+        if(!(box instanceof HTMLElement))return;
+        const chips=Array.from(box.querySelectorAll('.shd-chip')).filter(el=>el instanceof HTMLElement);
+        if(!chips.length)return;
+
+        // 每次都先回到自然宽度再测量，避免上一次窗口宽度留下的固定宽度污染新布局。
+        for(const chip of chips){chip.style.removeProperty('width');chip.style.removeProperty('flex-basis');}
+        const available=Math.floor(box.clientWidth);
+        if(available<=40)return;
+        const cs=getComputedStyle(box),gap=parseFloat(cs.columnGap||cs.gap)||5;
+        const measured=chips.map(chip=>Math.min(available,Math.max(44,Math.ceil(chip.getBoundingClientRect().width))));
+        const rows=[];let row=[],used=0;
+        measured.forEach((width,index)=>{
+            const need=(row.length?gap:0)+width;
+            if(row.length&&used+need>available){rows.push(row);row=[];used=0;}
+            row.push({chip:chips[index],width});used+=(row.length>1?gap:0)+width;
+        });
+        if(row.length)rows.push(row);
+
+        // “自动补位”保持时间顺序，只把一行中原本空着的尾部空间分配给该行胶囊。
+        // 单独一枚的最后行不强行拉满，避免一个很短的词变成整行大按钮。
+        rows.forEach((items,rowIndex)=>{
+            // 中间某一行若因长文本只能放 1 个胶囊，则补满该行，避免右侧形成明显空洞；
+            // 只有最后一行的单个胶囊保留自然宽度。
+            if(items.length===1){
+                if(rowIndex<rows.length-1){
+                    items[0].chip.style.width=`${available}px`;
+                    items[0].chip.style.flexBasis=`${available}px`;
+                }
+                return;
+            }
+            const natural=items.reduce((sum,x)=>sum+x.width,0)+gap*(items.length-1);
+            let extra=Math.max(0,available-natural);
+            if(extra<2)return;
+            const base=Math.floor(extra/items.length);let remain=Math.round(extra-base*items.length);
+            items.forEach((item,index)=>{
+                const add=base+(remain>0?1:0);if(remain>0)remain--;
+                const target=Math.max(44,Math.floor(item.width+add));
+                item.chip.style.width=`${target}px`;
+                item.chip.style.flexBasis=`${target}px`;
+            });
+        });
+    }
+
+    function scheduleCapsuleAutoFill(list=document.querySelector(`#${SH.dropdownId} [data-shd-list]`)) {
+        if(capsuleLayoutRaf)cancelAnimationFrame(capsuleLayoutRaf);
+        capsuleLayoutRaf=requestAnimationFrame(()=>applyCapsuleAutoFill(list));
+    }
+
+    function renderCompactItems(items,input){
+        if(!items.length)return `<div class="shd-empty">${cleanText(input.value)?'历史记录中没有匹配项':'暂无搜索记录'}<span>${scopeLabel()}的搜索会显示在这里</span></div>`;
+        if(layoutMode==='capsule')return `<div class="shd-capsules">${items.map(i=>`<span class="shd-chip"><button type="button" class="shd-chip-main" data-sh-query="${escAttr(i.query)}" title="${escAttr(i.query)}">${escHtml(i.query)}</button>${capsuleDeleteVisible?`<button type="button" class="shd-chip-del" data-sh-act="delete" data-sh-query-delete="${escAttr(i.query)}" data-sh-view-key="${escAttr(i.viewKey)}" title="删除">×</button>`:''}</span>`).join('')}</div>`;
+        return items.map(i=>`<div class="shd-item" data-sh-query="${escAttr(i.query)}"><span class="shd-clock">↺</span><div class="shd-main"><div class="shd-query">${escHtml(i.query)}</div>${(sameTableShare||!perViewMode)?`<div class="shd-source">${escHtml(i.tableName)} · ${escHtml(i.viewName)}</div>`:''}</div><span class="shd-time">${escHtml(formatTime(i.ts,true))}</span><button type="button" class="shd-del" data-sh-act="delete" data-sh-query-delete="${escAttr(i.query)}" data-sh-view-key="${escAttr(i.viewKey)}" title="删除">×</button></div>`).join('');
+    }
+    function expandedRowHtml(i){return `<div class="shd-expanded-item"><button type="button" class="shd-expanded-use" data-sh-query="${escAttr(i.query)}"><b>${escHtml(i.query)}</b><span>${escHtml(i.tableName)} · ${escHtml(i.viewName)} · ${escHtml(formatTime(i.ts))}</span></button><button type="button" class="shd-del" data-sh-act="delete" data-sh-query-delete="${escAttr(i.query)}" data-sh-view-key="${escAttr(i.viewKey)}">×</button></div>`;}
+    function updateExpandedCount(total){const el=document.querySelector(`#${SH.dropdownId} [data-sh-expanded-count]`);if(el)el.textContent=`${Math.min(expandedRenderLimit,total)} / ${total} 条`;}
+    function appendExpandedRows(rows,list=document.querySelector(`#${SH.dropdownId} [data-sh-expanded-list]`)){if(!list||!rows.length)return;list.insertAdjacentHTML('beforeend',rows.map(expandedRowHtml).join(''));}
+    function updateExpandedMotionTarget(d=ensureDropdown(), totalOverride=null){
+        const total=Number.isFinite(totalOverride)?totalOverride:getAllItems(expandedFilter).length;
+        // 头部 + 筛选栏约 72px；列表最多按 7 行参与外层高度，更多记录在内部滚动。
+        // 这样少量记录不会突然撑出大片空白，大量记录也不会无限增高。
+        const rows=Math.max(1,Math.min(total,12));
+        // 默认 600px 时仍保持旧版约 365px 展开高度；调低会主动收敛，调高则最多给展开区约 520px。
+        // 预留约 235px 给紧凑头部 / 紧凑记录 / 展开入口，确保整块模块不会突破总高度上限。
+        const expandedCap=Math.max(118,Math.min(520,dropdownMaxHeight-235));
+        const target=Math.max(118,Math.min(expandedCap,76+rows*36));
+        d.style.setProperty('--att-sh-expanded-height',`${target}px`);
+        return target;
+    }
+
+    function applyDropdownSizeLimits({reposition=true}={}){
+        const d=document.getElementById(SH.dropdownId);
+        if(!d)return;
+        d.style.setProperty('--att-sh-max-width',`${dropdownMaxWidth}px`);
+        d.style.setProperty('--att-sh-max-height',`${dropdownMaxHeight}px`);
+        dropdownMeasuredHeight=0;
+        dropdownMeasuredWidth=0;
+        if(dropdownExpanded)updateExpandedMotionTarget(d);
+        if(reposition&&d.classList.contains('is-open')&&activeSearchInput?.isConnected){
+            dropdownLastGeometry={width:NaN,left:NaN,top:NaN};
+            positionDropdown(activeSearchInput,d,false,true);
+            if(layoutMode==='capsule')scheduleCapsuleAutoFill();
+        }
+    }
+
+    function syncExpandedToggleUi(d=ensureDropdown()){
+        const btn=d.querySelector('[data-sh-act="expand-all"]');
+        if(btn){
+            btn.setAttribute('aria-expanded',dropdownExpanded?'true':'false');
+            btn.title=dropdownExpanded?'收起全部视图搜索记录':'查看全部视图搜索记录';
+        }
+        const label=d.querySelector('[data-shd-expand-label]');
+        if(label)label.textContent=dropdownExpanded?'收起全部视图搜索记录':'查看全部视图搜索记录';
+    }
+
+    function renderExpandedList(reset=true){
+        const d=ensureDropdown(),list=d.querySelector('[data-sh-expanded-list]');if(!list)return;
+        const items=getAllItems(expandedFilter);if(reset){expandedRenderLimit=Math.min(EXPANDED_CHUNK,items.length);list.innerHTML=items.length?items.slice(0,expandedRenderLimit).map(expandedRowHtml).join(''):'<div class="shd-empty">没有符合条件的记录</div>';list.scrollTop=0;}
+        updateExpandedCount(items.length);
+        updateExpandedMotionTarget(d,items.length);
+        // V7.13.4：列表自身不再安排第二次 positionDropdown。
+        // 展开/收起由 toggleExpandedPanel() 统一完成一次尺寸 + 定位动画，筛选只更新内部列表。
+    }
+
+    function renderDropdown(input=activeSearchInput){
+        const d=ensureDropdown();if(!enabled||!input?.isConnected||!isViewSearchInput(input)){hideDropdown();return;}activeSearchInput=input;
+        const ctx=getCurrentViewContext(),scopeRows=getScopeRows(),total=scopeRows.length;
+        const signature=[ctx.key,cleanText(input.value||''),historyRevision,perViewMode?1:0,sameTableShare?1:0,layoutMode,capsuleDeleteVisible?1:0,compactShowAll?1:0,historyFontSize,dropdownMaxWidth,dropdownMaxHeight,dropdownExpanded?1:0,expandedFilter].join('\u001f');
+        const sameRender=signature===dropdownRenderSignature;
+        if(!sameRender){
+            dropdownMeasuredHeight=0;
+            dropdownMeasuredWidth=0;
+            const items=getDisplayItems(input.value||'');
+            d.style.setProperty('--att-sh-font-size',`${historyFontSize}px`);d.style.setProperty('--att-sh-max-width',`${dropdownMaxWidth}px`);d.style.setProperty('--att-sh-max-height',`${dropdownMaxHeight}px`);d.classList.toggle('is-capsule',layoutMode==='capsule');
+            const head=d.querySelector('[data-shd-head]');if(head)head.innerHTML=`<div><b>${escHtml(scopeLabel()==='当前视图'?ctx.viewName:scopeLabel())}</b><span>${total} 条 · ${layoutMode==='capsule'?'胶囊':'列表'} · ${compactDisplayStatus()}</span></div>${perViewMode&&!sameTableShare&&historyData[ctx.key]?.items?.length?'<button type="button" data-sh-act="clear-current">清空</button>':''}`;
+            const list=d.querySelector('[data-shd-list]');if(list){list.innerHTML=renderCompactItems(items,input);if(layoutMode==='capsule')scheduleCapsuleAutoFill(list);}
+            const filter=d.querySelector('[data-sh-expanded-filter]');if(filter&&filter.value!==expandedFilter)filter.value=expandedFilter;
+            if(dropdownExpanded)renderExpandedList(true);else updateExpandedMotionTarget(d,0);
+            syncExpandedToggleUi(d);
+            // 所有内容和目标高度准备好后只切一次 class，避免中途状态被浏览器绘制出来。
+            d.classList.toggle('is-expanded',dropdownExpanded);
+            dropdownRenderSignature=signature;
+        }
+        dropdownLastViewKey=ctx.key;
+        dropdownLastInputValue=cleanText(input.value||'');
+        openDropdownStable(input,d);
+    }
+    function hideDropdown(){
+        const d=document.getElementById(SH.dropdownId);
+        if(dropdownRenderRaf){cancelAnimationFrame(dropdownRenderRaf);dropdownRenderRaf=0;}
+        pendingDropdownInput=null;
+        clearTimeout(dropdownResizeMotionTimer);dropdownResizeMotionTimer=0;
+        d?.classList.remove('is-open','is-expanded','is-measuring','is-opening-stable','allow-resize-motion');
+        dropdownExpanded=false;expandedFilter='';expandedRenderLimit=EXPANDED_CHUNK;clearTimeout(expandedFilterTimer);
+        dropdownLastGeometry={width:NaN,left:NaN,top:NaN};dropdownMeasuredHeight=0;dropdownMeasuredWidth=0;
+    }
+    function toggleExpandedPanel(nextExpanded=!dropdownExpanded){
+        const d=ensureDropdown();
+        const next=Boolean(nextExpanded);
+        if(next===dropdownExpanded)return;
+        enableDropdownResizeMotion(d);
+        dropdownExpanded=next;
+        expandedFilter='';
+        expandedRenderLimit=EXPANDED_CHUNK;
+        // 强制本次切换进入新的渲染签名；内容准备和 class 切换都在 renderDropdown 内一次完成。
+        renderDropdown(activeSearchInput);
+        positionDropdown(activeSearchInput,d,false,true);
+        if(next){
+            const f=d.querySelector('[data-sh-expanded-filter]');
+            if(f)f.value='';
+        }
+    }
+
+    function onDropdownClick(event){
+        const action=event.target.closest('[data-sh-act]')?.dataset.shAct;
+        if(action==='expand-all'){
+            // 同一个“查看全部”入口就是双态开关：展开后再次点击同一行即可收起。
+            toggleExpandedPanel(!dropdownExpanded);return;
+        }
+        if(action==='collapse'){
+            toggleExpandedPanel(false);return;
+        }
+        if(action==='open-manager'){openManager();return;}
+        if(action==='clear-current'){const c=getCurrentViewContext();if(historyData[c.key]&&confirm(`清空“${c.viewName}”的搜索记录吗？`))clearViewHistory(c.key);return;}
+        if(action==='delete'){const b=event.target.closest('[data-sh-act="delete"]');removeHistoryItem(b?.dataset.shViewKey||'',b?.dataset.shQueryDelete||'');return;}
+        const row=event.target.closest('[data-sh-query]');if(row)useHistoryQuery(row.dataset.shQuery||'');
+    }
+
+    function getManagerProfiles(){return buildHistoryIndex().profiles;}
+    function ensureManager(){
+        let m=document.getElementById(SH.managerId);if(m)return m;m=document.createElement('div');m.id=SH.managerId;
+        m.innerHTML=`<div class="shm-shell" role="dialog" aria-modal="true"><header class="shm-head"><div><b>搜索记录管理</b><span>跨视图维护搜索历史：查看、使用、删除与清空</span></div><button type="button" data-shm-act="close">×</button></header><div class="shm-body"><aside class="shm-side"><div class="shm-side-search"><input type="search" data-shm-filter placeholder="搜索视图 / 表 / 内容…"></div><div class="shm-views" data-shm-views></div></aside><main class="shm-main" data-shm-main></main></div><footer class="shm-foot"><span></span><div><button type="button" data-shm-act="clear-all" class="danger">清空全部记录</button><button type="button" data-shm-act="close" class="primary">完成</button></div></footer></div>`;
+        m.addEventListener('click',onManagerClick);
+        m.addEventListener('input',e=>{if(!e.target.matches('[data-shm-filter]'))return;managerFilter=e.target.value||'';clearTimeout(managerFilterTimer);managerFilterTimer=setTimeout(()=>renderManager(true),100);});
+        m.addEventListener('scroll',e=>{const list=e.target;if(!(list instanceof Element)||!list.matches('.shm-records'))return;if(list.scrollTop+list.clientHeight<list.scrollHeight-100)return;const items=getManagerItems();if(managerRenderLimit>=items.length)return;const old=managerRenderLimit;managerRenderLimit=Math.min(items.length,managerRenderLimit+MANAGER_CHUNK);appendManagerRows(items.slice(old,managerRenderLimit),list);updateManagerRecordCount(items.length);},true);
+        m.style.setProperty('--att-sh-font-size',`${historyFontSize}px`);document.body.appendChild(m);return m;
+    }
+    function openManager(selectedKey=''){const ps=getManagerProfiles(),current=getCurrentViewContext().key;managerSelectedView=selectedKey||(historyData[current]?.items?.length?current:(ps[0]?.profile?.key||'all'));managerFilter='';managerRenderLimit=MANAGER_CHUNK;const m=ensureManager(),f=m.querySelector('[data-shm-filter]');m.style.setProperty('--att-sh-font-size',`${historyFontSize}px`);if(f)f.value='';m.classList.add('is-open');renderManager(true);hideDropdown();}
+    function closeManager(){clearTimeout(managerFilterTimer);document.getElementById(SH.managerId)?.classList.remove('is-open');}
+    function managerQuery(){return cleanText(managerFilter).toLocaleLowerCase();}
+    function getManagerItems(){
+        const q=managerQuery(),all=buildHistoryIndex().allRows;
+        let rows=managerSelectedView==='all'?all:all.filter(r=>r.viewKey===managerSelectedView);
+        if(q)rows=rows.filter(r=>r.searchText.includes(q));
+        return rows;
+    }
+    function managerRowHtml(i){return `<div class="shm-record"><div class="shm-record-text"><b>${escHtml(i.query)}</b><span>${managerSelectedView==='all'?`${escHtml(i.tableName)} · ${escHtml(i.viewName)} · `:''}${escHtml(formatTime(i.ts))}</span></div><div class="shm-record-actions"><button type="button" data-shm-act="use" data-shm-query="${escAttr(i.query)}">使用</button>${i.path&&i.path!==location.pathname+location.search?`<button type="button" data-shm-act="open-view" data-shm-path="${escAttr(i.path)}">打开视图</button>`:''}<button type="button" class="danger" data-shm-act="delete" data-shm-view-key="${escAttr(i.viewKey)}" data-shm-query="${escAttr(i.query)}">删除</button></div></div>`;}
+    function appendManagerRows(rows,list){if(rows.length)list.insertAdjacentHTML('beforeend',rows.map(managerRowHtml).join(''));}
+    function updateManagerRecordCount(total){const el=document.querySelector(`#${SH.managerId} [data-shm-record-count]`);if(el)el.textContent=`${Math.min(managerRenderLimit,total)} / ${total} 条`;}
+    function renderManager(reset=true){
+        const m=ensureManager(),profileEntries=getManagerProfiles(),profiles=profileEntries.map(x=>x.profile);if(managerSelectedView!=='all'&&!profiles.some(p=>p.key===managerSelectedView))managerSelectedView='all';const q=managerQuery();
+        const filtered=profileEntries.filter(x=>!q||x.searchText.includes(q)||x.profile.items?.some(i=>cleanText(i.query).toLocaleLowerCase().includes(q)));
+        const views=m.querySelector('[data-shm-views]');if(views)views.innerHTML=`<button type="button" class="shm-view ${managerSelectedView==='all'?'active':''}" data-shm-view="all"><span><b>全部记录</b><small>${buildHistoryIndex().allRows.length} 条</small></span></button>${filtered.map(x=>{const p=x.profile;return `<button type="button" class="shm-view ${managerSelectedView===p.key?'active':''}" data-shm-view="${escAttr(p.key)}"><span><b>${escHtml(p.viewName||p.viewId||'视图')}</b><small>${escHtml(p.tableName||'')} · ${x.count} 条</small></span><em>${escHtml(formatTime(p.updatedAt,true))}</em></button>`;}).join('')||'<div class="shm-none">暂无记录</div>'}`;
+        const selected=managerSelectedView==='all'?null:historyData[managerSelectedView],items=getManagerItems();if(reset)managerRenderLimit=Math.min(MANAGER_CHUNK,items.length);
+        const title=selected?`${selected.tableName} · ${selected.viewName}`:'全部记录';const main=m.querySelector('[data-shm-main]');if(main)main.innerHTML=`<div class="shm-main-head"><div><b>${escHtml(title)}</b><span data-shm-record-count>${Math.min(managerRenderLimit,items.length)} / ${items.length} 条</span></div>${selected?`<button type="button" data-shm-act="clear-view" data-shm-view-key="${escAttr(selected.key)}">清空此视图</button>`:''}</div><div class="shm-records">${items.length?items.slice(0,managerRenderLimit).map(managerRowHtml).join(''):'<div class="shm-empty">没有符合条件的记录</div>'}</div>`;
+        const foot=m.querySelector('.shm-foot > span');if(foot)foot.textContent=`每视图最多 ${maxPerView} 条 · ${profiles.length} 个视图有记录 · 分批渲染`;
+    }
+    function onManagerClick(event){const vb=event.target.closest('[data-shm-view]');if(vb){managerSelectedView=vb.dataset.shmView||'all';managerRenderLimit=MANAGER_CHUNK;renderManager(true);return;}const b=event.target.closest('[data-shm-act]');if(!b)return;const a=b.dataset.shmAct;if(a==='close')return closeManager();if(a==='use'){closeManager();useHistoryQuery(b.dataset.shmQuery||'');return;}if(a==='open-view'){const p=b.dataset.shmPath;if(p)location.href=p;return;}if(a==='delete'){removeHistoryItem(b.dataset.shmViewKey||'',b.dataset.shmQuery||'');return;}if(a==='clear-view'){const k=b.dataset.shmViewKey||'',p=historyData[k];if(p&&confirm(`清空“${p.viewName||'此视图'}”的全部搜索记录吗？`))clearViewHistory(k);return;}if(a==='clear-all'&&confirm('清空所有搜索记录吗？此操作不会影响 AutoTable 业务数据。'))clearAllHistory();}
+
+    function ensureSettingsCard(){
+        const section=document.querySelector('[data-section="settings"]');if(!section)return;let card=document.getElementById(SH.settingsCardId);if(card?.isConnected){updateSettingsCard();return;}card=document.createElement('div');card.id=SH.settingsCardId;card.className='att-card';const anchor=section.querySelector('[data-settings-anchor="visual"]');if(anchor)section.insertBefore(card,anchor);else section.appendChild(card);
+        card.innerHTML=`<div class="att-card-title">全视图搜索增强</div><div class="att-card-desc">集中管理搜索记录与搜索栏交互：可自定义哪些行为才算正式历史，支持列表/胶囊智能补位，以及搜索框内部一键清空。</div><div class="att-divider"></div>
+        <div class="att-row"><div><div class="att-label">搜索栏清空优化</div><div class="att-sub-label">开启后隐藏右侧“搜索：…”状态块，并在全视图搜索框内部显示 X；筛选/排序等其它状态标签不受影响。</div></div><label class="att-switch"><input type="checkbox" data-sh-setting="clearOptimize" ${clearOptimizeEnabled?'checked':''}><span class="att-slider"></span></label></div>
+        <div class="att-row"><div><div class="att-label">启用搜索记录</div><div class="att-sub-label">关闭后停止记录并隐藏搜索历史层。</div></div><label class="att-switch"><input type="checkbox" data-sh-setting="enabled" ${enabled?'checked':''}><span class="att-slider"></span></label></div>
+        <div class="att-row"><div><div class="att-label">按视图显示搜索记录</div><div class="att-sub-label">开启后以当前视图为基础；关闭后直接混合全部视图记录。</div></div><label class="att-switch"><input type="checkbox" data-sh-setting="perViewMode" ${perViewMode?'checked':''}><span class="att-slider"></span></label></div>
+        <div class="att-row"><div><div class="att-label">同一个表中搜索记录互通</div><div class="att-sub-label">开启后，当前视图会同时显示同一张表其它视图的历史；仅在“按视图显示”开启时生效。</div></div><label class="att-switch"><input type="checkbox" data-sh-setting="sameTableShare" ${sameTableShare?'checked':''}><span class="att-slider"></span></label></div>
+        <div class="att-divider"></div>
+        <div class="att-label">哪些情况算正式搜索记录</div><div class="att-sub-label">下面条件为“或”关系，可自由组合；同一搜索词在短时间重复触发会自动去重。</div>
+        <div class="att-sh-commit-grid-v7130">
+            <label><input type="checkbox" data-sh-commit-source="native" ${commitPolicy.native?'checked':''}><span><b>搜索实际生效</b><small>检测原生“搜索：…”条件，推荐</small></span></label>
+            <label><input type="checkbox" data-sh-commit-source="enter" ${commitPolicy.enter?'checked':''}><span><b>按下 Enter</b><small>回车时立即记入历史</small></span></label>
+            <label><input type="checkbox" data-sh-commit-source="blur" ${commitPolicy.blur?'checked':''}><span><b>离开搜索框</b><small>即使只是输入草稿也会记录</small></span></label>
+            <label><input type="checkbox" data-sh-commit-source="idle" ${commitPolicy.idle?'checked':''}><span><b>停止输入</b><small>停顿达到设定时间后记录</small></span></label>
+        </div>
+        <div class="att-label" style="margin-top:9px;">停止输入判定时间</div><div class="att-sh-range-row-v7110"><input type="range" min="300" max="3000" step="100" value="${idleCommitDelay}" data-sh-setting="idleCommitDelay" ${commitPolicy.idle?'':'disabled'}><b data-sh-idle-delay-value>${idleCommitDelay}ms</b></div>
+        <div class="att-divider"></div>
+        <div class="att-label" style="margin-top:9px;">搜索记录展示</div><div class="att-sh-layout-row-v7110"><button type="button" data-sh-layout="list">列表</button><button type="button" data-sh-layout="capsule">胶囊自动填充</button></div>
+        <div class="att-row" style="margin-top:8px;"><div><div class="att-label">胶囊显示删除按钮</div><div class="att-sub-label">仅控制胶囊右侧 ×；关闭后胶囊更紧凑，列表、展开全部和管理面板仍可删除记录。</div></div><label class="att-switch"><input type="checkbox" data-sh-setting="capsuleDeleteVisible" ${capsuleDeleteVisible?'checked':''}><span class="att-slider"></span></label></div>
+        <div class="att-row" style="margin-top:8px;"><div><div class="att-label">紧凑搜索记录显示全部</div><div class="att-sub-label">同时作用于列表和胶囊。关闭时列表显示前 8 条、胶囊显示前 14 条；开启后全部记录在当前历史区域内滚动查看。</div></div><label class="att-switch"><input type="checkbox" data-sh-setting="compactShowAll" ${compactShowAll?'checked':''}><span class="att-slider"></span></label></div>
+        <div class="att-label" style="margin-top:10px;">搜索记录字体大小</div><div class="att-sh-range-row-v7110"><input type="range" min="10" max="16" step="1" value="${historyFontSize}" data-sh-setting="fontSize"><b data-sh-font-value>${historyFontSize}px</b></div>
+        <div class="att-label" style="margin-top:10px;">搜索记录模块尺寸上限</div><div class="att-sub-label">控制搜索框下方历史层及“查看全部”原位展开区的最大占位；不会突破浏览器可用空间，超出高度后内部滚动。</div>
+        <div class="att-sh-size-grid-v7154">
+            <div><span>最大宽度（内容自动扩展上限）</span><div class="att-sh-range-row-v7110"><input type="range" min="280" max="900" step="10" value="${dropdownMaxWidth}" data-sh-setting="dropdownMaxWidth"><b data-sh-width-value>${dropdownMaxWidth}px</b></div></div>
+            <div><span>最大高度</span><div class="att-sh-range-row-v7110"><input type="range" min="220" max="900" step="10" value="${dropdownMaxHeight}" data-sh-setting="dropdownMaxHeight"><b data-sh-height-value>${dropdownMaxHeight}px</b></div></div>
+        </div>
+        <div class="att-label" style="margin-top:10px;">每个视图最多保存</div><div class="att-sh-range-row-v7110"><input type="range" min="3" max="100" step="1" value="${maxPerView}" data-sh-setting="maxPerView"><b data-sh-max-value>${maxPerView} 条</b></div>
+        <div class="att-sub-label">条数只限制每个视图自己的存储；同表互通不会额外复制记录。</div>
+        <div class="att-actions" style="margin-top:9px;"><button type="button" class="att-btn att-primary" data-sh-settings-act="open-manager">搜索记录管理</button><button type="button" class="att-btn" data-sh-settings-act="clear-current">清空当前视图</button></div>`;updateSettingsCard();
+    }
+    function updateSettingsCard(){
+        const c=document.getElementById(SH.settingsCardId);if(!c)return;
+        const set=(q,v)=>{const e=c.querySelector(q);if(e)e.checked=v;};
+        set('[data-sh-setting="clearOptimize"]',clearOptimizeEnabled);set('[data-sh-setting="enabled"]',enabled);set('[data-sh-setting="perViewMode"]',perViewMode);set('[data-sh-setting="sameTableShare"]',sameTableShare);set('[data-sh-setting="capsuleDeleteVisible"]',capsuleDeleteVisible);set('[data-sh-setting="compactShowAll"]',compactShowAll);
+        c.querySelectorAll('[data-sh-commit-source]').forEach(i=>{i.checked=Boolean(commitPolicy[i.dataset.shCommitSource]);});
+        const idle=c.querySelector('[data-sh-setting="idleCommitDelay"]');if(idle){idle.value=idleCommitDelay;idle.disabled=!commitPolicy.idle;}
+        const idv=c.querySelector('[data-sh-idle-delay-value]');if(idv)idv.textContent=`${idleCommitDelay}ms`;
+        const max=c.querySelector('[data-sh-setting="maxPerView"]');if(max)max.value=maxPerView;const mv=c.querySelector('[data-sh-max-value]');if(mv)mv.textContent=`${maxPerView} 条`;
+        const fs=c.querySelector('[data-sh-setting="fontSize"]');if(fs)fs.value=historyFontSize;const fv=c.querySelector('[data-sh-font-value]');if(fv)fv.textContent=`${historyFontSize}px`;
+        const dw=c.querySelector('[data-sh-setting="dropdownMaxWidth"]');if(dw)dw.value=dropdownMaxWidth;const dwv=c.querySelector('[data-sh-width-value]');if(dwv)dwv.textContent=`${dropdownMaxWidth}px`;
+        const dh=c.querySelector('[data-sh-setting="dropdownMaxHeight"]');if(dh)dh.value=dropdownMaxHeight;const dhv=c.querySelector('[data-sh-height-value]');if(dhv)dhv.textContent=`${dropdownMaxHeight}px`;
+        c.querySelectorAll('[data-sh-layout]').forEach(b=>b.classList.toggle('active',b.dataset.shLayout===layoutMode));
+    }
+    function bindSettingsEvents(){
+        document.addEventListener('change',e=>{
+            const source=e.target.closest?.(`#${SH.settingsCardId} [data-sh-commit-source]`);
+            if(source){const key=source.dataset.shCommitSource;if(Object.prototype.hasOwnProperty.call(commitPolicy,key)){commitPolicy={...commitPolicy,[key]:Boolean(source.checked)};GM_setValue(SH.commitPolicyKey,commitPolicy);if(key==='idle'&&!commitPolicy.idle)clearIdleCommitTimer();updateSettingsCard();}return;}
+            const i=e.target.closest?.(`#${SH.settingsCardId} [data-sh-setting]`);if(!i)return;const k=i.dataset.shSetting;
+            if(k==='clearOptimize'){clearOptimizeEnabled=i.checked;GM_setValue(SH.clearOptimizeKey,clearOptimizeEnabled);applySearchClearOptimizeState();}
+            if(k==='enabled'){enabled=i.checked;GM_setValue(SH.enabledKey,enabled);if(!enabled){clearIdleCommitTimer();hideDropdown();}}
+            if(k==='perViewMode'){perViewMode=i.checked;GM_setValue(SH.perViewKey,perViewMode);scopeRowsCache={revision:0,key:'',rows:[]};}
+            if(k==='sameTableShare'){sameTableShare=i.checked;GM_setValue(SH.sameTableShareKey,sameTableShare);scopeRowsCache={revision:0,key:'',rows:[]};}
+            if(k==='capsuleDeleteVisible'){capsuleDeleteVisible=i.checked;GM_setValue(SH.capsuleDeleteKey,capsuleDeleteVisible);dropdownRenderSignature='';}
+            if(k==='compactShowAll'){compactShowAll=i.checked;GM_setValue(SH.compactShowAllKey,compactShowAll);dropdownRenderSignature='';}
+            if(k==='idleCommitDelay'){idleCommitDelay=normalizeIdleCommitDelay(i.value);GM_setValue(SH.idleCommitDelayKey,idleCommitDelay);if(activeSearchInput?.isConnected&&commitPolicy.idle)scheduleIdleSearchCommit(activeSearchInput);}
+            if(k==='maxPerView'){maxPerView=normalizeMax(i.value);GM_setValue(SH.maxKey,maxPerView);trimAllProfiles();saveHistoryData();}
+            if(k==='fontSize'){historyFontSize=normalizeFontSize(i.value);GM_setValue(SH.fontSizeKey,historyFontSize);}
+            if(k==='dropdownMaxWidth'){dropdownMaxWidth=normalizeDropdownMaxWidth(i.value);GM_setValue(SH.dropdownMaxWidthKey,dropdownMaxWidth);dropdownRenderSignature='';applyDropdownSizeLimits();}
+            if(k==='dropdownMaxHeight'){dropdownMaxHeight=normalizeDropdownMaxHeight(i.value);GM_setValue(SH.dropdownMaxHeightKey,dropdownMaxHeight);dropdownRenderSignature='';applyDropdownSizeLimits();}
+            updateSettingsCard();if(activeSearchInput?.isConnected&&enabled)scheduleDropdownRender(activeSearchInput);
+        },true);
+        document.addEventListener('input',e=>{const i=e.target.closest?.(`#${SH.settingsCardId} input[data-sh-setting]`);if(!i)return;if(i.dataset.shSetting==='maxPerView'){const v=document.querySelector(`#${SH.settingsCardId} [data-sh-max-value]`);if(v)v.textContent=`${normalizeMax(i.value)} 条`;}if(i.dataset.shSetting==='idleCommitDelay'){const v=document.querySelector(`#${SH.settingsCardId} [data-sh-idle-delay-value]`);if(v)v.textContent=`${normalizeIdleCommitDelay(i.value)}ms`;}if(i.dataset.shSetting==='fontSize'){const size=normalizeFontSize(i.value),v=document.querySelector(`#${SH.settingsCardId} [data-sh-font-value]`);if(v)v.textContent=`${size}px`;const d=document.getElementById(SH.dropdownId);if(d)d.style.setProperty('--att-sh-font-size',`${size}px`);const m=document.getElementById(SH.managerId);if(m)m.style.setProperty('--att-sh-font-size',`${size}px`);if(layoutMode==='capsule')scheduleCapsuleAutoFill();}if(i.dataset.shSetting==='dropdownMaxWidth'){dropdownMaxWidth=normalizeDropdownMaxWidth(i.value);const v=document.querySelector(`#${SH.settingsCardId} [data-sh-width-value]`);if(v)v.textContent=`${dropdownMaxWidth}px`;applyDropdownSizeLimits();}if(i.dataset.shSetting==='dropdownMaxHeight'){dropdownMaxHeight=normalizeDropdownMaxHeight(i.value);const v=document.querySelector(`#${SH.settingsCardId} [data-sh-height-value]`);if(v)v.textContent=`${dropdownMaxHeight}px`;applyDropdownSizeLimits();}},true);
+        document.addEventListener('click',e=>{const lb=e.target.closest?.(`#${SH.settingsCardId} [data-sh-layout]`);if(lb){layoutMode=normalizeLayout(lb.dataset.shLayout);GM_setValue(SH.layoutKey,layoutMode);dropdownRenderSignature='';updateSettingsCard();if(activeSearchInput?.isConnected)scheduleDropdownRender(activeSearchInput);return;}const a=e.target.closest?.(`#${SH.settingsCardId} [data-sh-settings-act]`)?.dataset.shSettingsAct;if(a==='open-manager')openManager();if(a==='clear-current'){const c=getCurrentViewContext(),p=historyData[c.key];if(p?.items?.length&&confirm(`清空“${c.viewName}”的搜索记录吗？`))clearViewHistory(c.key);}},true);
+    }
+    function attachSettingsObserver(){
+        const schedule=()=>{if(document.getElementById(SH.settingsCardId)?.isConnected)return;if(!document.querySelector('[data-section="settings"]'))return;if(settingsEnsureRaf)return;settingsEnsureRaf=requestAnimationFrame(()=>{settingsEnsureRaf=0;if(!document.getElementById(SH.settingsCardId)?.isConnected)ensureSettingsCard();});};
+        const attach=()=>{const root=document.getElementById('att-toolbox-root');if(!root)return false;if(!toolboxObserver){toolboxObserver=new MutationObserver(rs=>{const relevant=rs.some(r=>{const t=r.target instanceof Element?r.target:r.target.parentElement;if(t?.closest?.(`#${SH.settingsCardId}`))return false;return r.type==='childList';});if(relevant)schedule();});toolboxObserver.observe(root,{childList:true,subtree:true});}schedule();return true;};
+        if(attach())return;settingsAttachObserver=new MutationObserver(()=>{if(attach()){settingsAttachObserver.disconnect();settingsAttachObserver=null;}});settingsAttachObserver.observe(document.documentElement,{childList:true,subtree:true});
+    }
+
+    function clearAnchorScrollListeners() {
+        for (const fn of anchorScrollCleanups) { try { fn(); } catch {} }
+        anchorScrollCleanups = [];
+    }
+
+    function bindAnchorScrollListeners(input) {
+        clearAnchorScrollListeners();
+        if (!(input instanceof HTMLElement)) return;
+        // 只监听搜索框真正的可滚动祖先；不再 capture 全页面所有内部滚动。
+        let node = input.parentElement;
+        const seen = new Set();
+        while (node && node !== document.body && node !== document.documentElement) {
+            const cs = getComputedStyle(node);
+            const oy = `${cs.overflowY} ${cs.overflowX}`;
+            if (/(auto|scroll|overlay)/.test(oy) && !seen.has(node)) {
+                node.addEventListener('scroll', scheduleDropdownPosition, { passive:true });
+                anchorScrollCleanups.push(() => node.removeEventListener('scroll', scheduleDropdownPosition));
+                seen.add(node);
+            }
+            node = node.parentElement;
+        }
+    }
+
+    function bindSearchEvents(){
+        document.addEventListener('focusin',e=>{
+            if(!isViewSearchInput(e.target))return;
+            activeSearchInput=e.target;
+            cachedSearchInput=e.target;
+            ensureSearchToolbarObserver(activeSearchInput);
+            bindAnchorScrollListeners(activeSearchInput);
+            if(clearOptimizeEnabled)scheduleSearchClearSync(activeSearchInput);
+            if(!enabled)return;
+            const d=document.getElementById(SH.dropdownId),ctx=getCurrentViewContext(),value=cleanText(e.target.value||'');
+            if(d?.classList.contains('is-open')&&performance.now()-dropdownOpenedAt<200&&ctx.key===dropdownLastViewKey&&value===dropdownLastInputValue)return;
+            scheduleDropdownRender(activeSearchInput);
+        },true);
+        document.addEventListener('input',e=>{
+            if(!isViewSearchInput(e.target))return;
+            activeSearchInput=e.target;cachedSearchInput=e.target;
+            if(clearOptimizeEnabled)scheduleSearchClearSync(activeSearchInput);
+            if(enabled){dropdownExpanded=false;expandedFilter='';scheduleDropdownRender(activeSearchInput);scheduleIdleSearchCommit(activeSearchInput);}
+        },true);
+        document.addEventListener('keydown',e=>{
+            if(!isViewSearchInput(e.target))return;
+            if(e.key==='Enter'){
+                clearIdleCommitTimer();
+                // 是否把 Enter 作为正式历史由用户设置决定；原生搜索状态仍可作为另一条独立判定来源。
+                commitSearchFrom('enter',e.target.value);
+                setTimeout(()=>scheduleNativeToolbarStateSync(e.target),0);
+                hideDropdown();
+            }
+            if(e.key==='Escape')hideDropdown();
+        },true);
+        document.addEventListener('focusout',e=>{
+            if(!isViewSearchInput(e.target))return;
+            const input=e.target;
+            setTimeout(()=>{
+                const d=document.getElementById(SH.dropdownId);
+                if(dropdownPointerDown||d?.contains(document.activeElement))return;
+                if(document.activeElement!==input){
+                    clearIdleCommitTimer();
+                    commitSearchFrom('blur',input.value);
+                    hideDropdown();
+                }
+            },120);
+        },true);
+        document.addEventListener('pointerdown',e=>{
+            const d=document.getElementById(SH.dropdownId);
+            if(!d?.classList.contains('is-open'))return;
+            if(e.target===activeSearchInput||d.contains(e.target))return;
+            // 点击外部只负责关闭，不再猜测并保存搜索词；真实搜索以原生 toolbar 状态为准。
+            hideDropdown();
+        },true);
+        // 关键性能修复：不再 capture 所有表格内部 scroll。搜索栏位于 toolbar 外层，表格横纵滚动不会移动它。
+        window.addEventListener('scroll',scheduleDropdownPosition,{passive:true});
+        window.addEventListener('resize',scheduleDropdownPosition,{passive:true});
+    }
+
+    function ensureSearchToolbarObserver(input = cachedSearchInput || activeSearchInput || findVisibleViewSearchInput()) {
+        const host = input?.closest?.('.view-filter-toolbar-slot') || document.querySelector('.view-filter-toolbar-slot');
+        if (!(host instanceof Element)) return false;
+        if (host === observedSearchToolbar && searchToolbarObserver) return true;
+        try { searchToolbarObserver?.disconnect(); } catch {}
+        observedSearchToolbar = host;
+        cachedSearchStateChip = null;
+        searchToolbarObserver = new MutationObserver(records => {
+            let relevant = false;
+            for (const r of records) {
+                const target = r.target instanceof Element ? r.target : r.target.parentElement;
+                // 忽略我们自己给搜索输入追加 X 所产生的 DOM 变化。
+                if (target?.closest?.(`.${SH.clearButtonClass}`)) continue;
+                if (r.type === 'attributes' && target?.matches?.('.toolbar-state-chip')) { relevant = true; break; }
+                if (r.type === 'characterData' && target?.closest?.('.toolbar-state-chip')) { relevant = true; break; }
+                if (r.type === 'childList') {
+                    const nodes=[...r.addedNodes,...r.removedNodes];
+                    if(nodes.some(n=>{
+                        if(!(n instanceof Element))return false;
+                        if(n.matches?.(`.${SH.clearButtonClass}`))return false;
+                        return n.matches?.('.toolbar-state-chip,.toolbar-state-chips,input') || n.querySelector?.('.toolbar-state-chip,.toolbar-state-chips,input');
+                    })) { relevant=true; break; }
+                }
+            }
+            if (!relevant) return;
+            cachedSearchStateChip = null;
+            scheduleNativeToolbarStateSync(cachedSearchInput || activeSearchInput);
+        });
+        // title 是搜索词最稳定的原生来源；characterData 兼容站点只更新文本的情况。
+        searchToolbarObserver.observe(host,{childList:true,subtree:true,attributes:true,attributeFilter:['title'],characterData:true});
+        scheduleNativeToolbarStateSync(input);
+        return true;
+    }
+
+    function attachSearchClearToolbarObserver() {
+        // 保留旧函数名以避免其它补丁引用，但内部已升级为搜索历史 + 清空按钮共用的精准 toolbar observer。
+        ensureSearchToolbarObserver();
+        window.addEventListener('popstate',()=>{
+            cachedSearchInput=null;cachedSearchStateChip=null;viewContextCache={href:'',at:0,value:null};
+            setTimeout(()=>ensureSearchToolbarObserver(findVisibleViewSearchInput()),80);
+        },{passive:true});
+        document.addEventListener('focusin',event=>{
+            if(!isViewSearchInput(event.target))return;
+            cachedSearchInput=event.target;
+            ensureSearchToolbarObserver(event.target);
+        },true);
+        window.__attSearchClearToolbarAttachV7121=ensureSearchToolbarObserver;
+    }
+
+    function ensureStyle(){
+        if(document.getElementById(SH.styleId))return;const st=document.createElement('style');st.id=SH.styleId;st.textContent=`
+        /* V7.12.1 搜索增强：基于真实 toolbar 搜索状态精准联动，只隐藏搜索 chip，不影响筛选/排序。 */
+        html.${SH.clearBodyClass} .view-filter-toolbar-slot .toolbar-state-chip:has(.anticon-search),
+        body.${SH.clearBodyClass} .view-filter-toolbar-slot .toolbar-state-chip:has(.anticon-search){display:none!important;}
+        .${SH.clearHostClass}{position:relative!important;}
+        .${SH.clearInputClass}{padding-right:29px!important;}
+        .${SH.clearInputClass}::-webkit-search-cancel-button{-webkit-appearance:none!important;appearance:none!important;display:none!important;}
+        .${SH.clearButtonClass}{position:absolute!important;right:5px!important;top:50%!important;transform:translateY(-50%)!important;width:20px!important;height:20px!important;min-width:20px!important;padding:0!important;margin:0!important;display:flex!important;align-items:center!important;justify-content:center!important;border:0!important;border-radius:5px!important;background:transparent!important;color:#8b9198!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important;cursor:pointer!important;font:600 17px/1 system-ui,-apple-system,'Segoe UI',sans-serif!important;z-index:6!important;transition:background-color .12s ease,color .12s ease,opacity .12s ease!important;}
+        .${SH.clearButtonClass}.is-visible{opacity:1!important;visibility:visible!important;pointer-events:auto!important;}
+        .${SH.clearButtonClass}:hover{background:rgba(127,127,127,.16)!important;color:#d7dce2!important;}
+        .${SH.clearButtonClass}:active{background:rgba(127,127,127,.24)!important;}
+        body:not(.att-native-dark) .${SH.clearButtonClass}{color:#7c838b!important;}
+        body:not(.att-native-dark) .${SH.clearButtonClass}:hover{background:rgba(15,23,42,.08)!important;color:#374151!important;}
+        #${SH.dropdownId}{--att-sh-font-size:12px;--att-sh-expanded-height:118px;--att-sh-max-width:580px;--att-sh-max-height:600px;position:fixed;z-index:2147482600;display:none;max-width:min(var(--att-sh-max-width),calc(100vw - 20px));max-height:min(var(--att-sh-max-height),calc(100vh - 22px));overflow:hidden;background:#202124;color:#e8eaed;border:1px solid #414348;border-radius:9px;box-shadow:0 12px 34px rgba(0,0,0,.38);font-family:inherit;font-size:var(--att-sh-font-size);line-height:1.35;transition:none;transform-origin:top right;will-change:auto;contain:layout paint style;animation:none!important;translate:none!important;scale:none!important;} #${SH.dropdownId}.is-opening-stable{transition:none!important;animation:none!important;} #${SH.dropdownId}.allow-resize-motion{transition:width .30s cubic-bezier(.22,1,.36,1),left .30s cubic-bezier(.22,1,.36,1),top .30s cubic-bezier(.22,1,.36,1),box-shadow .24s ease;}
+        #${SH.dropdownId}.is-measuring{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;visibility:hidden!important;pointer-events:none!important;transition:none!important;} #${SH.dropdownId}.is-open{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;} #${SH.dropdownId}.is-expanded{box-shadow:0 18px 48px rgba(0,0,0,.46);}
+        #${SH.dropdownId} button,#${SH.dropdownId} input{font:inherit;} #${SH.dropdownId} .shd-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px 6px;border-bottom:1px solid #34363a;} #${SH.dropdownId} .shd-head>div{min-width:0;display:flex;align-items:center;gap:6px;} #${SH.dropdownId} .shd-head b{font-size:1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-head span{color:#868b92;font-size:.82em;white-space:nowrap;} #${SH.dropdownId} .shd-head button{border:0;background:transparent;color:#8ab4f8;padding:2px 4px;cursor:pointer;border-radius:4px;}
+        #${SH.dropdownId} .shd-list{min-height:0;max-height:min(166px,calc(var(--att-sh-max-height) - 90px));overflow:auto;padding:3px 4px;scrollbar-gutter:stable;overscroll-behavior:contain;} #${SH.dropdownId}.is-capsule .shd-list{max-height:min(148px,calc(var(--att-sh-max-height) - 90px));padding:6px;}
+        #${SH.dropdownId} .shd-item{display:grid;grid-template-columns:17px minmax(0,1fr) auto 20px;align-items:center;gap:4px;min-height:29px;padding:2px 3px;border-radius:5px;cursor:pointer;} #${SH.dropdownId} .shd-item:hover{background:#2b2d31;} #${SH.dropdownId} .shd-clock{font-size:1em;color:#7e848b;text-align:center;} #${SH.dropdownId} .shd-main{min-width:0;} #${SH.dropdownId} .shd-query{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-source{margin-top:1px;color:#7d838a;font-size:.78em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-time{font-size:.78em;color:#747a81;} #${SH.dropdownId} .shd-del{width:19px;height:19px;padding:0;border:0;border-radius:4px;background:transparent;color:#7f858c;cursor:pointer;} #${SH.dropdownId} .shd-del:hover{background:#3b2929;color:#ff8a80;}
+        #${SH.dropdownId} .shd-capsules{display:flex;flex-wrap:wrap;align-content:flex-start;align-items:flex-start;width:100%;gap:5px;} #${SH.dropdownId} .shd-chip{display:inline-flex;align-items:center;box-sizing:border-box;flex:0 0 auto;min-width:44px;max-width:100%;height:25px;background:#292d32;border:1px solid #3a4047;border-radius:999px;overflow:hidden;transition:border-color .13s ease,background-color .13s ease;} #${SH.dropdownId} .shd-chip:hover{border-color:#4a6f9d;background:#283446;} #${SH.dropdownId} .shd-chip-main{flex:1 1 auto;min-width:0;max-width:190px;height:100%;padding:0 8px;border:0;background:transparent;color:#dfe7f1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;} #${SH.dropdownId} .shd-chip-del{flex:0 0 22px;width:22px;height:100%;border:0;border-left:1px solid rgba(255,255,255,.05);background:transparent;color:#7d858e;cursor:pointer;} #${SH.dropdownId} .shd-chip-del:hover{color:#ff8a80;background:#3b2929;}
+        #${SH.dropdownId} .shd-empty{padding:15px 9px;text-align:center;color:#a7adb4;} #${SH.dropdownId} .shd-empty span{display:block;margin-top:3px;color:#747a81;font-size:.8em;} #${SH.dropdownId} .shd-all{height:30px;display:flex;align-items:center;justify-content:space-between;padding:0 9px;border:0;border-top:1px solid #34363a;background:#232427;color:#9ecbff;cursor:pointer;transition:background-color .14s ease,color .14s ease;} #${SH.dropdownId} .shd-all:hover{background:#292c31;} #${SH.dropdownId} .shd-all b{font-size:1.3em;font-weight:400;transform:rotate(0deg);transition:transform .28s cubic-bezier(.22,1,.36,1);} #${SH.dropdownId}.is-expanded .shd-all b{transform:rotate(90deg);}
+        #${SH.dropdownId} .shd-expanded{height:0;min-height:0;opacity:0;overflow:hidden;visibility:hidden;pointer-events:none;transform:translateY(-5px);background:#1e1f22;border-top:1px solid transparent;display:grid;grid-template-rows:auto auto minmax(0,1fr);transition:height .30s cubic-bezier(.22,1,.36,1),opacity .18s ease,transform .30s cubic-bezier(.22,1,.36,1),border-color .18s ease,visibility 0s linear .30s;} #${SH.dropdownId}.is-expanded .shd-expanded{height:var(--att-sh-expanded-height);opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0);border-top-color:#34363a;transition-delay:0s;} #${SH.dropdownId} .shd-expanded-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 9px 5px;} #${SH.dropdownId} .shd-expanded-head>div{display:flex;align-items:baseline;gap:7px;min-width:0;} #${SH.dropdownId} .shd-expanded-head b{font-size:1.03em;} #${SH.dropdownId} .shd-expanded-head span{font-size:.8em;color:#7f858c;} #${SH.dropdownId} .shd-expanded-actions{display:flex;gap:5px;} #${SH.dropdownId} .shd-expanded-actions button{height:25px;padding:0 7px;border:1px solid #41454a;border-radius:5px;background:#292b2f;color:#cfd4da;cursor:pointer;} #${SH.dropdownId} .shd-expanded-actions button:first-child{color:#9ecbff;}
+        #${SH.dropdownId} .shd-expanded-search{padding:3px 8px 6px;} #${SH.dropdownId} .shd-expanded-search input{width:100%;height:28px;box-sizing:border-box;padding:0 8px;border:1px solid #3c4045;border-radius:6px;background:#27282b;color:#e8eaed;outline:none;} #${SH.dropdownId} .shd-expanded-search input:focus{border-color:#4b77ad;} #${SH.dropdownId} .shd-expanded-list{min-height:0;overflow:auto;padding:0 5px 7px;scrollbar-gutter:stable;contain:layout paint;overscroll-behavior:contain;} #${SH.dropdownId} .shd-expanded-item{display:grid;grid-template-columns:minmax(0,1fr) 22px;align-items:center;gap:5px;min-height:34px;padding:3px 3px;border-bottom:1px solid #2d2f33;content-visibility:auto;contain-intrinsic-size:36px;} #${SH.dropdownId} .shd-expanded-item:hover{background:#25272a;} #${SH.dropdownId} .shd-expanded-use{min-width:0;text-align:left;border:0;background:transparent;color:#e8eaed;padding:2px 4px;cursor:pointer;} #${SH.dropdownId} .shd-expanded-use b,#${SH.dropdownId} .shd-expanded-use span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.dropdownId} .shd-expanded-use b{font-size:1em;} #${SH.dropdownId} .shd-expanded-use span{margin-top:2px;color:#80868d;font-size:.78em;}
+
+        #${SH.managerId}{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.56);backdrop-filter:blur(3px);color:#e8eaed;font-family:inherit;} #${SH.managerId}.is-open{display:flex;} #${SH.managerId}{--att-sh-font-size:12px;} #${SH.managerId} .shm-shell{width:min(820px,calc(100vw - 32px));height:min(560px,calc(100vh - 32px));min-height:430px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:#202124;border:1px solid #3c3f43;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.46);overflow:hidden;font-size:var(--att-sh-font-size);} #${SH.managerId} .shm-head,#${SH.managerId} .shm-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;} #${SH.managerId} .shm-head{border-bottom:1px solid #34363a;} #${SH.managerId} .shm-foot{border-top:1px solid #34363a;color:#858b92;font-size:.82em;} #${SH.managerId} .shm-head>div{display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-head b{font-size:1.15em;} #${SH.managerId} .shm-head span{color:#8f949b;font-size:.82em;} #${SH.managerId} button{height:28px;padding:0 8px;border:1px solid #45484d;border-radius:6px;background:#303134;color:#e8eaed;cursor:pointer;font:inherit;} #${SH.managerId} button:hover{background:#3a3c40;} #${SH.managerId} button.primary{background:#1a73e8;border-color:#1a73e8;color:#fff;} #${SH.managerId} button.danger{color:#ff8a80;border-color:#67413f;}
+        #${SH.managerId} .shm-body{min-height:0;display:grid;grid-template-columns:235px minmax(0,1fr);} #${SH.managerId} .shm-side{min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);border-right:1px solid #34363a;} #${SH.managerId} .shm-side-search{padding:8px;} #${SH.managerId} input[type="search"]{width:100%;height:30px;box-sizing:border-box;padding:0 8px;border:1px solid #424448;border-radius:6px;background:#292a2d;color:#e8eaed;outline:none;} #${SH.managerId} .shm-views{min-height:0;overflow:auto;padding:0 5px 8px;} #${SH.managerId} .shm-view{width:100%;height:auto;min-height:39px;margin:1px 0;padding:5px 6px;display:flex;align-items:center;justify-content:space-between;gap:6px;text-align:left;border-color:transparent;background:transparent;} #${SH.managerId} .shm-view.active{background:#26364d;border-color:#345d90;} #${SH.managerId} .shm-view span{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-view b,#${SH.managerId} .shm-view small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-view small,#${SH.managerId} .shm-view em{color:#7f858c;font-size:.78em;font-style:normal;} #${SH.managerId} .shm-none{padding:18px 8px;text-align:center;color:#858b92;}
+        #${SH.managerId} .shm-main{min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);} #${SH.managerId} .shm-main-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid #34363a;} #${SH.managerId} .shm-main-head>div{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-main-head b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-main-head span{color:#7f858c;font-size:.78em;} #${SH.managerId} .shm-records{min-height:0;overflow:auto;padding:4px 7px 9px;scrollbar-gutter:stable;contain:layout paint;overscroll-behavior:contain;} #${SH.managerId} .shm-record{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:34px;padding:4px 5px;border-bottom:1px solid #303236;content-visibility:auto;contain-intrinsic-size:36px;} #${SH.managerId} .shm-record:hover{background:#25272a;} #${SH.managerId} .shm-record-text{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.managerId} .shm-record-text b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} #${SH.managerId} .shm-record-text span{color:#7f858c;font-size:.78em;} #${SH.managerId} .shm-record-actions{display:flex;gap:4px;flex:0 0 auto;} #${SH.managerId} .shm-record-actions button{height:24px;padding:0 6px;font-size:.78em;} #${SH.managerId} .shm-empty{padding:35px 12px;text-align:center;color:#858b92;} #${SH.managerId} .shm-foot>div{display:flex;gap:5px;}
+        #${SH.settingsCardId} .att-sh-size-grid-v7154{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:7px;padding:8px;border:1px solid #3a3e43;border-radius:8px;background:#292b2e;} #${SH.settingsCardId} .att-sh-size-grid-v7154>div>span{display:block;color:#aeb4bb;font-size:10px;font-weight:650;} #${SH.settingsCardId} .att-sh-range-row-v7110{display:grid;grid-template-columns:minmax(0,1fr) 58px;align-items:center;gap:8px;margin-top:5px;} #${SH.settingsCardId} .att-sh-range-row-v7110 input{width:100%;} #${SH.settingsCardId} .att-sh-range-row-v7110 input:disabled{opacity:.42;cursor:not-allowed;} #${SH.settingsCardId} .att-sh-range-row-v7110 b{text-align:right;font-size:11px;color:inherit;opacity:.78;} #${SH.settingsCardId} .att-sh-commit-grid-v7130{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:7px;} #${SH.settingsCardId} .att-sh-commit-grid-v7130 label{min-width:0;display:flex;align-items:flex-start;gap:7px;padding:7px 8px;border:1px solid #3a3e43;border-radius:7px;background:#292b2e;cursor:pointer;} #${SH.settingsCardId} .att-sh-commit-grid-v7130 label:has(input:checked){border-color:#3c6b9d;background:#26384d;} #${SH.settingsCardId} .att-sh-commit-grid-v7130 input{margin:2px 0 0;accent-color:#4b8dd8;} #${SH.settingsCardId} .att-sh-commit-grid-v7130 span{min-width:0;display:flex;flex-direction:column;gap:2px;} #${SH.settingsCardId} .att-sh-commit-grid-v7130 b{font-size:11px;} #${SH.settingsCardId} .att-sh-commit-grid-v7130 small{color:#8c939b;font-size:10px;line-height:1.35;} #${SH.settingsCardId} .att-sh-layout-row-v7110{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:5px;} #${SH.settingsCardId} .att-sh-layout-row-v7110 button{height:30px;border:1px solid #40444a;border-radius:6px;background:#292b2f;color:inherit;cursor:pointer;} #${SH.settingsCardId} .att-sh-layout-row-v7110 button.active{background:#21466f;border-color:#3978b9;color:#dbeeff;box-shadow:inset 0 0 0 1px rgba(94,173,255,.12);}
+        @media(max-width:720px){#${SH.settingsCardId} .att-sh-commit-grid-v7130,#${SH.settingsCardId} .att-sh-size-grid-v7154{grid-template-columns:1fr;}#${SH.managerId} .shm-body{grid-template-columns:190px minmax(0,1fr);}#${SH.managerId} .shm-record-actions button[data-shm-act="open-view"]{display:none;}}
+        `;document.documentElement.appendChild(st);
+    }
+
+    function bindPersistLifecycle(){
+        window.addEventListener('pagehide',()=>{clearIdleCommitTimer();flushHistoryPersist();},{capture:true});
+        document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){clearIdleCommitTimer();flushHistoryPersist();}},{passive:true});
+    }
+    function init(){ensureStyle();bindSearchEvents();bindSettingsEvents();attachSettingsObserver();attachSearchClearToolbarObserver();bindPersistLifecycle();buildHistoryIndex();applySearchClearOptimizeState();window.addEventListener('att:search-history:open-manager',()=>openManager());console.log('[AutoTable 工具集 V7.16.0] 已加载：正式历史提交策略 / 搜索记录模块尺寸上限 / 紧凑记录全部显示 / 胶囊智能补位 / 精准 toolbar / 内置 X / 零闪烁历史层 / 查看全部双态收展 / 单链路丝滑展开 / 分块渲染 / GM 批处理');}
+    if(document.body)init();else window.addEventListener('DOMContentLoaded',init,{once:true});
+})();
+
+/* ============================================================================
+ * AutoTable Document Table Plus V7.19.0 · 文档表格完整交互增强
+ * --------------------------------------------------------------------------
+ * 目标：不重做 ProseMirror 表格引擎，只给原生表格能力增加一层稳定的交互外壳。
+ *
+ * 已实现：原生矩形选择、整行/整列/整表入口、四方向插入、区域复制和粘贴、
+ * 扩展确认、列宽设置、选区清空、右键菜单、行列柄排序、表头与冻结首行、
+ * 表格前后插入、防误移动与误嵌套、表格导航和健康检查。
+ * 合并/拆分支持原生命令与跨度校验后的模型适配；选区样式按 schema 属性显示。
+ * 内容修改仅通过原生 commands 或 schema 校验后的 transaction 完成。
+ * 行列柄、高亮、冻结表头和菜单均在编辑器外绘制，视觉设置不进入文档正文。
+ *
+ * 性能边界：无 setInterval；一个结构 MutationObserver；交互更新按 RAF 合并。
+ * ========================================================================== */
+(function () {
+    'use strict';
+
+    const DTP = {
+        version: 'V7.19.0',
+        styleId: 'att-doc-table-plus-style-v7170',
+        toolbarId: 'att-doc-table-mini-toolbar-v7170',
+        guardId: 'att-doc-table-nested-guard-v7170',
+        toastId: 'att-doc-table-toast-v7170',
+        settingsHostId: 'att-doc-table-settings-host-v7170',
+        settingsCardId: 'att-doc-table-settings-card-v7170',
+        navId: 'att-doc-table-nav-v7170',
+        editorSelector: [
+            '.document-view-page .document-editor__content.ProseMirror',
+            '.document-view-page .document-editor__content[contenteditable="true"]',
+            '.document-view-shell .tiptap.ProseMirror',
+            '.ProseMirror.document-editor__content'
+        ].join(', '),
+        keys: {
+            enabled: 'att_doc_table_plus_enabled_v7170',
+            miniToolbar: 'att_doc_table_plus_mini_toolbar_v7170',
+            assistHighlight: 'att_doc_table_plus_assist_highlight_v7170',
+            resizeHit: 'att_doc_table_plus_resize_hit_v7170',
+            nestedGuard: 'att_doc_table_plus_nested_guard_v7170',
+            navigator: 'att_doc_table_plus_navigator_v7170',
+            navigationHierarchy: 'att_doc_table_plus_navigation_hierarchy_v7184',
+            preventCellMove: 'att_doc_table_plus_prevent_cell_move_v7172',
+            dragCells: 'att_doc_table_plus_drag_cells_v7173',
+            clipboard:'att_doc_table_plus_clipboard_v7180',
+            edgeHandles:'att_doc_table_plus_edge_handles_v7180',
+            contextMenu:'att_doc_table_plus_context_menu_v7180'
+        }
+    };
+
+    const DEFAULTS = {
+        enabled: true,
+        miniToolbar: true,
+        assistHighlight: true,
+        resizeHit: true,
+        nestedGuard: true,
+        navigator: true,
+        navigationHierarchy: true,
+        preventCellMove: true,
+        dragCells: true,
+        clipboard:true, edgeHandles:true, contextMenu:true
+    };
+
+    const S = {
+        settings: loadSettings(),
+        editor: null,
+        editorAbort: null,
+        table: null,
+        cell: null,
+        selectedCells: [],
+        selectionMode: 'none',
+        rowIndex: -1,
+        colIndex: -1,
+        lastCell: null,
+        lastCellAt: 0,
+        contextStickyUntil: 0,
+        lastStableContext: null,
+        contextRaf: 0,
+        positionRaf: 0,
+        structureTimer: 0,
+        contentTimer: 0,
+        observer: null,
+        guardBypassUntil: 0,
+        guardButton: null,
+        deleteConfirmUntil: 0,
+        deleteConfirmTimer: 0,
+        healthIssueCursor: 0,
+        tableCache: [],
+        health: { topLevel: 0, nested: 0, empty: 0, narrow: 0, issues: [] },
+        assistElements: [],
+        assistOverlay: null,
+        editorView: null,
+        selectionBase: null,
+        cellSelectionType: null,
+        rangeAnchor: null,
+        rangeMode: false,
+        consumedCell: null,
+        consumedUntil: 0,
+        dragging: false,
+        dragPointerId: null,
+        dragTimer: 0,
+        gridCache: new WeakMap(),
+        metrics: { contextRefreshes: 0, dragRefreshSkips: 0, rangeSelections: 0, dragApplySkips: 0 },
+        selectionError: '',
+        pointerGesture: null,
+        blockedCellDrags: 0,
+        nativeRectAvailable: null,
+        selectionRaf: 0,
+        rectEnd: null,
+        pendingStructureSync: false,
+        pendingContentRefresh: false,
+        interactionEpoch: 0,
+        editorOwner:null, frozenTable:null, edgeGesture:null, edgeSignature:null, edgeTable:null, tableDialog:null
+    };
+
+    function safeGet(key, fallback) {
+        try { return GM_getValue(key, fallback); }
+        catch (_) { return fallback; }
+    }
+
+    function safeSet(key, value) {
+        try { GM_setValue(key, value); } catch (_) {}
+    }
+
+    function loadSettings() {
+        const out = {};
+        for (const [name, fallback] of Object.entries(DEFAULTS)) {
+            out[name] = Boolean(safeGet(DTP.keys[name], fallback));
+        }
+        return out;
+    }
+
+    function saveSetting(name, value) {
+        if (!(name in DEFAULTS)) return;
+        S.settings[name] = Boolean(value);
+        safeSet(DTP.keys[name], S.settings[name]);
+        if (['enabled', 'navigator', 'navigationHierarchy'].includes(name)) publishNavigationSettings();
+        applyFeatureClasses();
+        if (!S.settings.enabled || !S.settings.resizeHit) {cancelColumnResize();finishDrag();}
+        if (!S.settings.enabled) { S.frozenTable=null; hideProductivityUi(); closeTableDialog(); updateFrozenHeader(); }
+        if (!S.settings.enabled) {
+            S.rangeMode = false;
+            S.rangeAnchor = null;
+            finishDrag();
+            hideToolbar();
+            clearAssistClasses();
+            removeNavigator();
+            hideGuard();
+        } else {
+            scheduleContextRefresh();
+            scheduleContentRefresh(0);
+        }
+        updateSettingsCardState();
+    }
+
+    function isDocumentView() {
+        return /\/document(?:\/|$)/.test(location.pathname) || Boolean(document.querySelector('.document-view-page'));
+    }
+
+    function findEditor() {
+        const nodes = Array.from(document.querySelectorAll(DTP.editorSelector));
+        return nodes.find(el => el instanceof HTMLElement && el.isConnected && el.getAttribute('contenteditable') === 'true') ||
+            nodes.find(el => el instanceof HTMLElement && el.isConnected) || null;
+    }
+
+    function isVisible(el) {
+        if (!(el instanceof Element) || !el.isConnected) return false;
+        const style = getComputedStyle(el);
+        if (style.display === 'none' || style.visibility === 'hidden') return false;
+        const r = el.getBoundingClientRect();
+        return r.width > 0 && r.height > 0;
+    }
+
+    function getSelectionCell(editor = S.editor) {
+        if (!editor) return null;
+        try {
+            const selection = window.getSelection();
+            const node = selection?.anchorNode;
+            const el = node instanceof Element ? node : node?.parentElement;
+            const cell = el?.closest?.('td,th') || null;
+            return cell && editor.contains(cell) ? cell : null;
+        } catch (_) {
+            return null;
+        }
+    }
+
+    function editorOwnsFocus(editor = S.editor) {
+        if (!editor) return false;
+        const active = document.activeElement;
+        return active === editor || Boolean(active instanceof Element && editor.contains(active));
+    }
+
+    function cellFromEventTarget(target, editor = S.editor) {
+        const el = target instanceof Element ? target : target?.parentElement;
+        const cell = el?.closest?.('td,th') || null;
+        return cell && editor?.contains?.(cell) ? cell : null;
+    }
+
+    function rememberInteractionCell(cell, stickyMs = 12000) {
+        if (!(cell instanceof HTMLTableCellElement) || !S.editor?.contains?.(cell)) return false;
+        S.lastCell = cell;
+        S.lastCellAt = performance.now();
+        S.contextStickyUntil = S.lastCellAt + Math.max(1000, Number(stickyMs) || 12000);
+        return true;
+    }
+
+    function getSelectedCells(editor = S.editor) {
+        if (!editor) return [];
+        return Array.from(editor.querySelectorAll('td.selectedCell,th.selectedCell'))
+            .filter(cell => cell instanceof HTMLTableCellElement && cell.isConnected);
+    }
+
+    function getNativeTableContextActive() {
+        return Array.from(document.querySelectorAll('.document-toolbar__context-label'))
+            .some(el => String(el.textContent || '').trim() === '表格编辑' && isVisible(el));
+    }
+
+    function getTopTable(cell) {
+        const table = cell?.closest?.('table') || null;
+        return table instanceof HTMLTableElement ? table : null;
+    }
+
+    function isNestedTable(table) {
+        return Boolean(table?.parentElement?.closest?.('td,th'));
+    }
+
+    function deriveSelectionMode(editor, selectedCells, cell) {
+        if (selectedCells.length) return 'cell';
+        const nodeSelected = editor?.querySelector?.('.ProseMirror-selectednode');
+        if (nodeSelected && nodeSelected.closest?.('table')) return 'node';
+        try {
+            const selection = window.getSelection();
+            if (cell && selection) return selection.isCollapsed ? 'caret' : 'text';
+        } catch (_) {}
+        return cell ? 'caret' : 'none';
+    }
+
+    function makeContextSnapshot() {
+        return {
+            editor: S.editor,
+            table: S.table,
+            cell: S.cell,
+            selectedCells: [...S.selectedCells],
+            selectionMode: S.selectionMode,
+            rowIndex: S.rowIndex,
+            colIndex: S.colIndex,
+            at: performance.now()
+        };
+    }
+
+
+    // Scroll with the editor in the browser compositor, outside ProseMirror's document.
+    const SCROLL_LAYER_ID = 'att-dtp-scroll-layer-v7182';
+
+    function releaseScrollLayer() {
+        const root = S.scrollLayer;
+        if (root) {
+            for (const child of Array.from(root.children)) document.body.appendChild(child);
+            root.remove();
+        }
+        const parent = S.scrollLayerParent;
+        if (parent && S.scrollLayerPosition && parent.style.position === 'relative') {
+            const saved = S.scrollLayerPosition;
+            if (saved.value) parent.style.setProperty('position', saved.value, saved.priority);
+            else parent.style.removeProperty('position');
+        }
+        S.scrollLayer = S.scrollLayerParent = S.scrollLayerPosition = null;
+    }
+
+    function ensureScrollLayer() {
+        const parent = S.editor?.parentElement;
+        if (!parent || parent === document.body || parent === document.documentElement) return null;
+        if (S.scrollLayer?.isConnected && S.scrollLayerParent === parent) return S.scrollLayer;
+        releaseScrollLayer();
+        if (getComputedStyle(parent).position === 'static') {
+            S.scrollLayerPosition = {value:parent.style.getPropertyValue('position'), priority:parent.style.getPropertyPriority('position')};
+            parent.style.setProperty('position', 'relative');
+        }
+        const root = document.createElement('div');
+        root.id = SCROLL_LAYER_ID;
+        root.setAttribute('contenteditable', 'false');
+        root.setAttribute('data-lumatrace-ignore', '');
+        root.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;overflow:visible;pointer-events:none;z-index:2;';
+        parent.appendChild(root);
+        S.scrollLayer = root;
+        S.scrollLayerParent = parent;
+        return root;
+    }
+
+    function attachScrollingUi(el) {
+        const root = ensureScrollLayer();
+        const parent = root || document.body;
+        if (el.parentElement !== parent) parent.appendChild(el);
+        el.style.position = root ? 'absolute' : 'fixed';
+        return el;
+    }
+
+    function scrollingUiFrame() {
+        const root = ensureScrollLayer();
+        if (!root) return {left:0, top:0, scaleX:1, scaleY:1};
+        const r = root.getBoundingClientRect(), parent = S.scrollLayerParent,
+            p = parent.getBoundingClientRect();
+        return {left:r.left, top:r.top,
+            scaleX:parent.offsetWidth ? p.width / parent.offsetWidth || 1 : 1,
+            scaleY:parent.offsetHeight ? p.height / parent.offsetHeight || 1 : 1};
+    }
+
+    function setScrollingUiPosition(el, left, top, frame) {
+        el.style.left = `${(left-frame.left)/frame.scaleX}px`;
+        el.style.top = `${(top-frame.top)/frame.scaleY}px`;
+    }
+
+    function clearAssistClasses() {
+        // 高亮独立绘制在编辑器之外，不改 td/th 的 class，避免触发文档 Observer 和保存。
+        if (S.assistOverlay) S.assistOverlay.style.display = 'none';
+        S.assistElements = [];
+    }
+
+    function ensureAssistOverlay() {
+        if (S.assistOverlay?.isConnected) return S.assistOverlay;
+        const host = document.createElement('div');
+        host.id = 'att-doc-table-assist-overlay-v7172';
+        host.setAttribute('data-lumatrace-ignore', '');
+        host.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;z-index:0;display:none;';
+        const styles = [
+            'background:rgba(59,130,246,.035);',
+            'background:rgba(59,130,246,.025);',
+            'border:2px solid rgba(59,130,246,.58);border-radius:2px;'
+        ];
+        for (const css of styles) {
+            const box = document.createElement('div');
+            box.style.cssText = 'position:absolute;box-sizing:border-box;pointer-events:none;' + css;
+            host.appendChild(box);
+        }
+        attachScrollingUi(host);
+        S.assistOverlay = host;
+        return host;
+    }
+
+    function editorClipRect() {
+        const clip = { left:0, top:0, right:window.innerWidth, bottom:window.innerHeight };
+        for (let node = S.editor?.parentElement; node && node !== document.body; node = node.parentElement) {
+            const style = getComputedStyle(node);
+            const r = node.getBoundingClientRect();
+            const sx=node.offsetWidth?r.width/node.offsetWidth || 1:1,
+                sy=node.offsetHeight?r.height/node.offsetHeight || 1:1;
+            if (/(auto|scroll|overlay|hidden|clip)/.test(style.overflowX)) {
+                clip.left = Math.max(clip.left, r.left + node.clientLeft*sx);
+                clip.right = Math.min(clip.right, r.left + (node.clientLeft + node.clientWidth)*sx);
+            }
+            if (/(auto|scroll|overlay|hidden|clip)/.test(style.overflowY)) {
+                clip.top = Math.max(clip.top, r.top + node.clientTop*sy);
+                clip.bottom = Math.min(clip.bottom, r.top + (node.clientTop + node.clientHeight)*sy);
+            }
+        }
+        const toolbar = S.editor?.closest('.document-view-page,.document-view-shell')?.querySelector('.document-toolbar');
+        if (toolbar && isVisible(toolbar)) {
+            const style = getComputedStyle(toolbar), r = toolbar.getBoundingClientRect();
+            if (['sticky','fixed'].includes(style.position) && r.top <= clip.top + 2 && r.bottom > clip.top) {
+                clip.top = Math.min(clip.bottom, r.bottom);
+            }
+        }
+        return clip;
+    }
+
+    function applyAssistClasses() {
+        if (S.dragging || S.pointerGesture || !S.settings.enabled || !S.settings.assistHighlight || !S.table?.isConnected || !S.cell?.isConnected) {
+            clearAssistClasses();
+            return;
+        }
+        const table = S.table.getBoundingClientRect();
+        const cell = S.cell.getBoundingClientRect();
+        const row = S.cell.parentElement.getBoundingClientRect();
+        const clip = editorClipRect();
+        const rects = [row, { left:cell.left, right:cell.right, top:table.top, bottom:table.bottom }, cell];
+        const host = attachScrollingUi(ensureAssistOverlay());
+        const frame = scrollingUiFrame();
+        const boxes = host.children;
+        rects.forEach((r, index) => {
+            const left = Math.max(r.left, clip.left), top = Math.max(r.top, clip.top);
+            const right = Math.min(r.right, clip.right), bottom = Math.min(r.bottom, clip.bottom);
+            const box = boxes[index];
+            box.style.display = right > left && bottom > top ? 'block' : 'none';
+            // Keep the complete geometry; native overflow clips it during scrolling.
+            setScrollingUiPosition(box, r.left, r.top, frame);
+            box.style.width = `${Math.max(0,r.right-r.left)/frame.scaleX}px`;
+            box.style.height = `${Math.max(0,r.bottom-r.top)/frame.scaleY}px`;
+        });
+        host.style.display = 'block';
+    }
+
+    function getEditorView(editor = S.editor) {
+        if (!editor) return null;
+        const inspect = value => value?.state?.doc && typeof value.dispatch === 'function' &&
+            typeof value.posAtDOM === 'function' && value.dom === editor ? value : null;
+        if (inspect(S.editorView)) return S.editorView;
+        const accept = value => {
+            const view = inspect(value) || inspect(value?.view) || inspect(value?.editorView);
+            if (view) S.editorView = view;
+            return view;
+        };
+        try {
+            let desc = editor.pmViewDesc;
+            for (let depth=0; desc && depth<8; depth++, desc=desc.parent) {
+                const view = accept(desc.view) || accept(desc.editorView);
+                if (view) return view;
+            }
+            for (const key of Object.getOwnPropertyNames(editor)) {
+                let value;
+                try { value = editor[key]; } catch (_) { continue; }
+                const view = accept(value);
+                if (view) return view;
+                if (!/^__react(?:Fiber|InternalInstance|Props)\$/.test(key)) continue;
+                for (let depth=0, fiber=value; fiber && depth<18; depth++, fiber=fiber.return) {
+                    for (const props of [fiber, fiber.memoizedProps, fiber.pendingProps]) {
+                        const fromProps = accept(props?.editor) || accept(props?.editorView) || accept(props?.view);
+                        if (fromProps) return fromProps;
+                    }
+                }
+            }
+            // AutoTable 的 Vue/Tiptap 编辑器：只沿当前组件的有限父链寻找，不扫描全站对象。
+            for (let el=editor, depth=0; el && depth<6; el=el.parentElement, depth++) {
+                let component = el.__vueParentComponent;
+                for (let n=0; component && n<14; component=component.parent, n++) {
+                    for (const data of [component.setupState, component.props, component.ctx]) {
+                        const owner = data?.editor?.value || data?.editor;
+                        const view = accept(owner) || accept(data?.editorView);
+                        if (view) return view;
+                    }
+                }
+            }
+        } catch (_) {}
+        return null;
+    }
+
+    function getSelectionBase(view) {
+        if (S.selectionBase) return S.selectionBase;
+        // TextSelection.fromJSON 会强制生成文本选择。必须沿静态继承链找到 Selection 注册入口。
+        for (let ctor=view?.state?.selection?.constructor, depth=0;
+             typeof ctor === 'function' && depth<8; ctor=Object.getPrototypeOf(ctor), depth++) {
+            if (Object.prototype.hasOwnProperty.call(ctor, 'jsonID') && typeof ctor.fromJSON === 'function') {
+                return S.selectionBase = ctor;
+            }
+        }
+        return null;
+    }
+
+    function cellPmPosition(view, cell) {
+        if (!(cell instanceof HTMLTableCellElement) || !S.editor?.contains(cell)) return null;
+        try {
+            const raw = view.posAtDOM(cell, 0);
+            if (!Number.isInteger(raw)) return null;
+            const doc = view.state.doc;
+            const $pos = doc.resolve(raw);
+            // posAtDOM(td,0) 通常是单元格内容起点；先找最内层 cell，再处理位于 cell 前的情况。
+            for (let depth=$pos.depth; depth>0; depth--) {
+                const role = $pos.node(depth).type.spec.tableRole;
+                if (role === 'cell' || role === 'header_cell') return $pos.before(depth);
+            }
+            const role = doc.nodeAt(raw)?.type?.spec?.tableRole;
+            return role === 'cell' || role === 'header_cell' ? raw : null;
+        } catch (_) { return null; }
+    }
+
+    function selectCellRange(anchor, head, notify = true) {
+        if (!anchor?.isConnected || !head?.isConnected || getTopTable(anchor) !== getTopTable(head) ||
+            !S.editor?.contains(anchor) || !S.editor.contains(head)) return false;
+        const view = getEditorView();
+        try {
+            if (!view || view.editable === false) throw new Error('editor view unavailable');
+            const anchorPos = cellPmPosition(view, anchor), headPos = cellPmPosition(view, head);
+            if (anchorPos === null || headPos === null) throw new Error('cell position unavailable');
+            const current = view.state.selection;
+            let selection;
+            if (current.$anchorCell && current.$headCell) S.cellSelectionType = current.constructor;
+            if (S.cellSelectionType) {
+                selection = new S.cellSelectionType(view.state.doc.resolve(anchorPos), view.state.doc.resolve(headPos));
+            } else {
+                const base = getSelectionBase(view);
+                if (!base) throw new Error('selection registry unavailable');
+                selection = base.fromJSON(view.state.doc, {type:'cell', anchor:anchorPos, head:headPos});
+            }
+            if (!selection?.$anchorCell || !selection?.$headCell) throw new Error('native CellSelection unavailable');
+            S.cellSelectionType = selection.constructor;
+            // 只更新 selection，不修改 doc，不给 undo history 增加内容记录。
+            if (!selection.eq(current)) {
+                const transaction = view.state.tr.setSelection(selection).setMeta('addToHistory', false);
+                view.dispatch(transaction);
+            }
+            if (!view.hasFocus?.()) view.focus();
+            if (!view.state.selection.$anchorCell) throw new Error('selection rejected by editor');
+            S.rangeAnchor = anchor;
+            rememberInteractionCell(head);
+            S.selectionError = '';
+            S.metrics.rangeSelections++;
+            scheduleContextRefresh();
+            return true;
+        } catch (error) {
+            S.selectionError = String(error?.message || error);
+            if (notify) showToast('暂时无法建立单元格选区，请刷新后重试；未改动表格内容');
+            return false;
+        }
+    }
+
+    function getTableGrid(table) {
+        const doc = getEditorView()?.state?.doc || null;
+        const cached = S.gridCache.get(table);
+        if (cached && doc && cached.doc === doc) return cached;
+        const grid = [], cells = new Map();
+        let slots = 0, width = 0;
+        const rows = Array.from(table.rows);
+        rows.forEach((row, r) => {
+            grid[r] ||= [];
+            let c=0;
+            for (const cell of Array.from(row.cells)) {
+                while (grid[r][c]) c++;
+                const height = Math.min(cell.rowSpan || rows.length-r, rows.length-r);
+                const span = Math.max(1,cell.colSpan);
+                if (slots + height*span > 100000) throw new Error('table range too large');
+                cells.set(cell, {row:r, col:c, height, width:span});
+                for (let y=r; y<r+height; y++) {
+                    grid[y] ||= [];
+                    for (let x=c; x<c+span; x++) { grid[y][x]=cell; slots++; }
+                }
+                c += span;
+                width = Math.max(width,c);
+            }
+        });
+        const result = {doc, grid, cells, width, height:rows.length};
+        if (doc) S.gridCache.set(table,result);
+        return result;
+    }
+
+    function selectTablePart(part) {
+        if (!S.table?.isConnected || !S.cell?.isConnected) return false;
+        try {
+            const map = getTableGrid(S.table), active = map.cells.get(S.cell);
+            if (!active || !map.width || !map.height) return false;
+            let anchor, head;
+            if (part === 'row') {
+                anchor = map.grid[active.row][0];
+                head = map.grid[active.row+active.height-1][map.width-1];
+            } else if (part === 'column') {
+                anchor = map.grid[0][active.col];
+                head = map.grid[map.height-1][active.col+active.width-1];
+            } else {
+                anchor = map.grid[0][0];
+                head = map.grid[map.height-1][map.width-1];
+            }
+            S.rangeMode = false;
+            return selectCellRange(anchor,head);
+        } catch (_) { showToast('当前表格范围过大或结构异常，请缩小选择范围'); return false; }
+    }
+
+    function toggleRangeMode() {
+        S.rangeMode = !S.rangeMode;
+        S.rangeAnchor = S.cell?.isConnected ? S.cell : null;
+        if (S.rangeMode) showToast('起点已设为当前格，请点击同一表格的终点；Esc 取消');
+        scheduleContextRefresh();
+    }
+
+    function consumeSelectionEvent(event) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+    }
+
+    function cancelSelectionFrame() {
+        if (S.selectionRaf) cancelAnimationFrame(S.selectionRaf);
+        S.selectionRaf = 0;
+    }
+
+    function invalidatePendingSelection(event) {
+        if (event?.target?.closest?.(`#${PLUS.dialogId}`)) return;
+        S.interactionEpoch++;
+        S.rectEnd = null;
+    }
+
+    function isInteractiveCellTarget(target) {
+        const el = target instanceof Element ? target : target?.parentElement;
+        return Boolean(el?.closest('a,button,input,textarea,select,option,img,video,audio,iframe,[data-type="image"],[data-type="attachment"]') ||
+            el?.closest('[contenteditable]')?.getAttribute('contenteditable') === 'false');
+    }
+
+    function finishDrag(refresh = true) {
+        cancelSelectionFrame();
+        if (!S.dragging && !S.pointerGesture) return;
+        S.dragging = false;
+        S.editor?.classList.remove('att-dtp-selecting-v7173');
+        S.pointerGesture = null;
+        S.dragPointerId = null;
+        clearTimeout(S.dragTimer);
+        S.dragTimer = 0;
+        if (S.pendingStructureSync) { S.pendingStructureSync = false; scheduleStructureSync(0); }
+        if (S.pendingContentRefresh) { S.pendingContentRefresh = false; scheduleContentRefresh(0); }
+        if (refresh) scheduleContextRefresh();
+    }
+
+    function onSelectionPointerDown(event) {
+        S.consumedCell = null;
+        S.consumedUntil = 0;
+        if (!S.settings.enabled || event.button !== 0 || (event.pointerType && event.pointerType !== 'mouse')) return;
+        const cell = cellFromEventTarget(event.target);
+        if (!cell) return;
+        const target = event.target instanceof Element ? event.target : null;
+        if (isInteractiveCellTarget(target) || target?.closest('.column-resize-handle') ||
+            isNativeResizeTarget(target)) return;
+        const anchor = S.rangeMode ? S.rangeAnchor : (S.rangeAnchor || S.cell);
+        if ((S.rangeMode || event.shiftKey) && anchor?.isConnected && getTopTable(anchor) === getTopTable(cell) &&
+            !event.altKey && !event.ctrlKey && !event.metaKey) {
+            consumeSelectionEvent(event);
+            S.consumedCell = cell;
+            S.consumedUntil = performance.now()+1000;
+            if (selectCellRange(anchor,cell)) S.rangeMode = false;
+            return;
+        }
+        S.rangeMode = false;
+        S.rangeAnchor = cell;
+        rememberInteractionCell(cell);
+        // 正常文本拖选保留给原生；按住期间停掉辅助高亮和菜单重排。
+        S.dragging = true;
+        S.dragPointerId = event.pointerId;
+        clearAssistClasses();
+        hideToolbar();
+        clearTimeout(S.dragTimer);
+    }
+
+    function swallowSelectionCompatibilityEvent(event) {
+        if (performance.now() >= S.consumedUntil) return;
+        const cell = cellFromEventTarget(event.target);
+        if (cell && cell === S.consumedCell) {
+            consumeSelectionEvent(event);
+            if (event.type === 'click') S.consumedUntil = 0;
+        }
+    }
+
+    function syncContextNow() {
+        S.contextRaf = 0;
+        if (S.dragging || S.pointerGesture) { S.metrics.dragRefreshSkips++; return; }
+        S.metrics.contextRefreshes++;
+        // 按住鼠标选文字/选区域/调列宽时不重绘交互层，防止工具栏进入鼠标路径。
+        if (S.pointerGesture) return;
+        if (!S.settings.enabled || !isDocumentView()) {
+            S.table = null;
+            S.cell = null;
+            S.selectedCells = [];
+            S.selectionMode = 'none';
+            hideToolbar();
+            clearAssistClasses();
+            return;
+        }
+
+        syncEditor();
+        const editor = S.editor;
+        if (!editor) {
+            hideToolbar();
+            clearAssistClasses();
+            return;
+        }
+
+        const selectedCells = getSelectedCells(editor);
+        const selectionCell = getSelectionCell(editor);
+        let cell = selectedCells[0] || selectionCell || null;
+
+        if (!cell && S.lastCell?.isConnected && editor.contains(S.lastCell)) {
+            const now = performance.now();
+            const age = now - S.lastCellAt;
+            // 直接点进单元格本身就是最可靠的上下文证据。V7.17.0 过度依赖顶部“表格编辑”标签，
+            // 在其尚未出现/短暂重建时会把真实单元格误判为空，导致工具栏和高亮完全不显示。
+            if (
+                (age < 15000 && now < S.contextStickyUntil) ||
+                (age < 15000 && editorOwnsFocus(editor)) ||
+                (age < 5000 && getNativeTableContextActive())
+            ) cell = S.lastCell;
+        }
+
+        const table = getTopTable(cell);
+        S.selectedCells = selectedCells;
+        S.cell = cell;
+        S.table = table;
+        S.selectionMode = deriveSelectionMode(editor, selectedCells, cell);
+        S.rowIndex = cell?.parentElement instanceof HTMLTableRowElement
+            ? Array.from(table?.rows || []).indexOf(cell.parentElement)
+            : -1;
+        S.colIndex = cell instanceof HTMLTableCellElement ? cell.cellIndex : -1;
+        if (cell && table) {
+            try { S.colIndex = getTableGrid(table).cells.get(cell)?.col ?? S.colIndex; } catch (_) {}
+        }
+
+        if (cell && table) {
+            rememberInteractionCell(cell);
+            S.lastStableContext = makeContextSnapshot();
+        }
+
+        applyAssistClasses();
+        updateToolbar();
+        updateNavigatorActive();
+        positionEdgeHandles(); updateFrozenHeader();
+    }
+
+    function scheduleContextRefresh() {
+        if (S.dragging) { S.metrics.dragRefreshSkips++; return; }
+        if (S.contextRaf) return;
+        S.contextRaf = requestAnimationFrame(syncContextNow);
+    }
+
+    function schedulePosition() {
+        if (S.positionRaf) return;
+        S.positionRaf = requestAnimationFrame(() => {
+            S.positionRaf = 0;
+            positionToolbar();
+            applyAssistClasses();
+            positionEdgeHandles(); updateFrozenHeader(); positionContextMenu();
+        });
+    }
+
+    function syncEditor() {
+        const next = findEditor();
+        if (next === S.editor) return;
+
+        try { S.editorAbort?.abort(); } catch (_) {}
+        hideToolbar();
+        clearAssistClasses();
+        releaseScrollLayer();
+        invalidatePendingSelection();
+        S.editor?.classList.remove('att-dtp-selecting-v7173');
+        S.pointerGesture = null;
+        S.editorAbort = null;
+        S.editor = next;
+        S.lastCell = null;
+        S.lastStableContext = null;
+        S.table = null;
+        S.cell = null;
+        S.selectedCells = [];
+        S.editorView = null;
+        S.editorOwner = null;
+        S.frozenTable = null;
+        cancelColumnResize();
+        S.edgeGesture = null;
+        hideProductivityUi(); closeTableDialog(); updateFrozenHeader();
+        S.selectionBase = null;
+        S.cellSelectionType = null;
+        S.rangeAnchor = null;
+        S.rangeMode = false;
+        S.gridCache = new WeakMap();
+        finishDrag();
+        if (S.observer) {
+            S.observer.disconnect();
+            S.observer.observe(document.documentElement,{childList:true,subtree:true});
+            if (next) S.observer.observe(next,{attributes:true,subtree:true,attributeFilter:['class'],attributeOldValue:true});
+        }
+
+        if (!next) return;
+
+        const ac = new AbortController();
+        S.editorAbort = ac;
+        const opt = { signal: ac.signal };
+
+        next.addEventListener('pointerdown', event => {
+            if (!S.settings.enabled || event.button !== 0 || event.isPrimary === false) return;
+            S.rectEnd = null;
+            const cell = cellFromEventTarget(event.target, next);
+            const target = event.target instanceof Element ? event.target : event.target?.parentElement;
+            if (isInteractiveCellTarget(target)) return;
+            const table = cell?.closest('table') || target?.closest('table') ||
+                target?.closest('.tableWrapper')?.querySelector('table');
+            if (cell) rememberInteractionCell(cell);
+            else if (!table) {
+                // 明确点击正文时结束旧表格上下文，避免误操作上一张表。
+                S.lastCell = null;
+                S.lastStableContext = null;
+                S.contextStickyUntil = 0;
+            }
+            if (table && next.contains(table)) {
+                S.pointerGesture = {
+                    pointerId: event.pointerId,
+                    table,
+                    cell,
+                    allowCellMove: Boolean(event.altKey),
+                    textOnly: Boolean(event.shiftKey) || (event.pointerType && event.pointerType !== 'mouse'),
+                    resize: isNativeResizeTarget(target, next),
+                    endCell: cell,
+                    cellSelecting: false,
+                    disabled: false,
+                    cancelled: false,
+                    epoch: S.interactionEpoch,
+                    appliedCell: null,
+                    appliedDoc: null,
+                    appliedSelection: null,
+                    lastPointer: null
+                };
+                clearAssistClasses();
+                hideToolbar();
+            }
+            scheduleContextRefresh();
+        }, { ...opt, capture: true });
+
+        next.addEventListener('dragstart', guardCellDrag, { ...opt, capture: true });
+        next.addEventListener('click', event => {
+            if (S.rectEnd && performance.now() < S.rectEnd.until &&
+                S.rectEnd.table.contains(event.target)) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+            }
+        }, { ...opt, capture: true });
+
+        next.addEventListener('pointerup', event => {
+            const cell = cellFromEventTarget(event.target, next);
+            if (cell) rememberInteractionCell(cell);
+            scheduleContextRefresh();
+        }, opt);
+        next.addEventListener('click', event => {
+            const cell = cellFromEventTarget(event.target, next);
+            if (cell) rememberInteractionCell(cell);
+            scheduleContextRefresh();
+        }, opt);
+        next.addEventListener('keyup', () => {
+            const cell = getSelectionCell(next);
+            if (cell) rememberInteractionCell(cell);
+            else if (S.lastCell?.isConnected && editorOwnsFocus(next)) S.contextStickyUntil = performance.now() + 12000;
+            scheduleContextRefresh();
+        }, opt);
+        next.addEventListener('focusin', event => {
+            const cell = cellFromEventTarget(event.target, next) || getSelectionCell(next);
+            if (cell) rememberInteractionCell(cell);
+            scheduleContextRefresh();
+        }, opt);
+        next.addEventListener('input', () => {
+            scheduleContextRefresh();
+            scheduleContentRefresh(120);
+        }, opt);
+    }
+
+    function isNativeResizeTarget(target, editor = S.editor) {
+        const el = target instanceof Element ? target : target?.parentElement;
+        return Boolean(el?.closest('.column-resize-handle') ||
+            editor?.classList.contains('resize-cursor') ||
+            editor?.classList.contains('column-resize-cursor') ||
+            (el && /^(col|ew)-resize$/.test(getComputedStyle(el).cursor)));
+    }
+
+    function finishPointerGesture(event) {
+        const gesture = S.pointerGesture;
+        if (!gesture) return;
+        if (event?.pointerId != null && gesture.pointerId != null &&
+            event.pointerId !== gesture.pointerId) return;
+        const finalize = (gesture.cellSelecting || gesture.cancelled) && event?.type === 'pointerup' &&
+            gesture.epoch === S.interactionEpoch && S.settings.enabled && S.settings.dragCells;
+        let completed = null;
+        if (finalize) {
+            if (!gesture.cancelled) {
+                const end = cellAtPointer(event, gesture);
+                if (end) gesture.endCell = end;
+            }
+            completed = S.rectEnd = {table: gesture.table, until: performance.now() + 250, epoch: S.interactionEpoch};
+        }
+        S.editor?.classList.remove('att-dtp-selecting-v7173');
+        S.pointerGesture = null;
+        finishDrag(false);
+        // 只恢复这次松开对应的选区。新的点击/键盘操作会使旧任务失效。
+        if (completed) requestAnimationFrame(() => {
+            if (!S.pointerGesture && S.rectEnd === completed && S.interactionEpoch === completed.epoch &&
+                S.settings.enabled && S.settings.dragCells) setNativeCellSelection(gesture, gesture.endCell);
+        });
+        if (S.pendingStructureSync) { S.pendingStructureSync = false; scheduleStructureSync(0); }
+        if (S.pendingContentRefresh) { S.pendingContentRefresh = false; scheduleContentRefresh(0); }
+        scheduleContextRefresh();
+    }
+
+    function setNativeCellSelection(gesture, end) {
+        if (!S.settings.enabled || !gesture?.cell?.isConnected || !end?.isConnected ||
+            end.closest('table') !== gesture.table) return false;
+        const ok = selectCellRange(gesture.cell, end, false);
+        S.nativeRectAvailable = ok;
+        if (ok) {
+            const view = getEditorView();
+            gesture.appliedCell = end;
+            gesture.appliedDoc = view?.state.doc;
+            gesture.appliedSelection = view?.state.selection;
+        }
+        return ok;
+    }
+
+    function selectionIsApplied(gesture, end) {
+        const view = getEditorView();
+        if (!view || gesture.appliedCell !== end || gesture.appliedDoc !== view.state.doc) return false;
+        const applied = gesture.appliedSelection, current = view.state.selection;
+        return current === applied || Boolean(applied?.$anchorCell && current?.$anchorCell &&
+            applied.$anchorCell.pos === current.$anchorCell.pos && applied.$headCell.pos === current.$headCell?.pos);
+    }
+
+    function releaseFailedSelection(gesture) {
+        gesture.cellSelecting = false;
+        gesture.disabled = true;
+        S.editor?.classList.remove('att-dtp-selecting-v7173');
+    }
+
+    function cellAtPointer(event, gesture) {
+        let target = event.target;
+        if (Number.isFinite(event.clientX) && Number.isFinite(event.clientY)) {
+            target = document.elementFromPoint(event.clientX, event.clientY) || target;
+        }
+        const cell = cellFromEventTarget(target);
+        return cell?.closest('table') === gesture.table ? cell : null;
+    }
+
+    function handleCellPointerMove(event) {
+        const gesture = S.pointerGesture;
+        if (!gesture || !S.settings.enabled || !S.settings.dragCells || gesture.disabled ||
+            gesture.resize || gesture.allowCellMove || gesture.textOnly || !gesture.cell) return;
+        if (event.pointerId != null && gesture.pointerId != null && event.pointerId !== gesture.pointerId) return;
+        if (event.buttons != null && !(event.buttons & 1)) { finishPointerGesture(); return; }
+        if (Number.isFinite(event.clientX) && Number.isFinite(event.clientY)) {
+            gesture.lastPointer = {clientX: event.clientX, clientY: event.clientY, pointerId: gesture.pointerId};
+        }
+        const end = cellAtPointer(event, gesture);
+        if (!end || (!gesture.cellSelecting && end === gesture.cell)) return;
+        if (!gesture.cellSelecting) {
+            if (!setNativeCellSelection(gesture, end)) { releaseFailedSelection(gesture); return; }
+            gesture.cellSelecting = true;
+            S.editor.classList.add('att-dtp-selecting-v7173');
+        }
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        gesture.endCell = end;
+        if (selectionIsApplied(gesture, end)) { S.metrics.dragApplySkips++; return; }
+        if (S.selectionRaf) return;
+        const frameId = requestAnimationFrame(() => {
+            if (S.selectionRaf !== frameId) return;
+            S.selectionRaf = 0;
+            if (S.pointerGesture === gesture && !gesture.cancelled && gesture.epoch === S.interactionEpoch &&
+                !setNativeCellSelection(gesture, gesture.endCell)) releaseFailedSelection(gesture);
+        });
+        S.selectionRaf = frameId;
+    }
+
+    function refreshDragAfterScroll() {
+        const gesture = S.pointerGesture;
+        if (!gesture?.cellSelecting || !gesture.lastPointer) return;
+        handleCellPointerMove({
+            ...gesture.lastPointer, target: S.editor, buttons: 1,
+            preventDefault() {}, stopImmediatePropagation() {}
+        });
+    }
+
+    function guardCellDrag(event) {
+        if (!S.settings.enabled || !S.settings.preventCellMove) return;
+        const target = event.target instanceof Element ? event.target : event.target?.parentElement;
+        if (!target || !S.editor?.contains(target)) return;
+        const gesture = S.pointerGesture;
+        if (event.altKey || gesture?.allowCellMove || gesture?.resize ||
+            isNativeResizeTarget(target)) return;
+        // 单元格中的图片/附件保持其原生拖动；普通文本拖动同样不拦截。
+        if (target.closest('img,video,audio,[data-type="image"],[data-type="attachment"]')) return;
+        const cell = cellFromEventTarget(target);
+        const wrapper = target.closest('.tableWrapper');
+        const table = cell?.closest('table') || target.closest('table') || wrapper?.querySelector('table');
+        if (!table || !S.editor.contains(table)) return;
+        const cells = getSelectedCells(S.editor).filter(c => c.closest('table') === table);
+        let draggableBlock = null;
+        for (let el = target; el && el !== S.editor; el = el.parentElement) {
+            if (el.getAttribute('draggable') === 'true' &&
+                el.matches('td,th,tr,table,.tableWrapper')) {
+                draggableBlock = el;
+                break;
+            }
+        }
+        const tableNodeSelected = table.matches('.ProseMirror-selectednode') ||
+            Boolean(wrapper?.matches('.ProseMirror-selectednode'));
+        if (!cells.length && !draggableBlock && !tableNodeSelected && !gesture?.cellSelecting) return;
+        // 在 ProseMirror 收到 dragstart 前阻止块级搬移，不改 selection/doc/撤销记录。
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        event.stopPropagation();
+        S.blockedCellDrags++;
+        // 被取消的块拖动不会结束左键选区手势；等待真实松开或取消。
+        showToast('已阻止单元格误拖动；需要移动时可关闭防误移动');
+    }
+
+    // V7.19.0: keep menus inside the document viewport and preserve header paint.
+    const MENU_ICONS = {
+        'select-row':'M3 3h18v18H3z M3 9h18 M3 15h18 M3 12h18',
+        'select-column':'M3 3h18v18H3z M9 3v18 M15 3v18 M12 3v18',
+        'select-table':'M3 3h18v18H3z M3 9h18 M3 15h18 M9 3v18 M15 3v18',
+        'copy-cell':'M9 9h12v12H9z M15 5V3H3v12h2',
+        'copy-area':'M9 9h12v12H9z M15 5V3H3v12h2 M9 15h12 M15 9v12',
+        'clear-area':'M3 15l9-11 9 8-7 8H8z M8 10l10 9 M14 20h7',
+        'align-left':'M3 4h18 M3 9h11 M3 14h18 M3 19h11',
+        'align-center':'M3 4h18 M6 9h12 M3 14h18 M6 19h12',
+        'align-right':'M3 4h18 M10 9h11 M3 14h18 M10 19h11',
+        'background-yellow':'M4 9l7-7 9 9-8 8z M4 9h15 M20 15c-3 3-3 5 0 5s3-2 0-5',
+        'background-clear':'M3 3l18 18 M4 9l7-7 9 9-8 8z M3 21h18',
+        'width-page':'M3 4v16 M21 4v16 M6 12h12 M9 9l-3 3 3 3 M15 9l3 3-3 3',
+        'width-content':'M7 3v18 M17 3v18 M3 12h4 M17 12h4 M10 8h4 M10 12h4 M10 16h4',
+        'width-equal':'M3 4h18v16H3z M9 4v16 M15 4v16 M3 12h18',
+        'width-reset':'M4 4v6h6 M4 10a8 8 0 1 1 0 5',
+        'header-first':'M3 3h18v18H3z M3 9h18 M8 5v2 M16 5v2 M9 9v12 M15 9v12',
+        'freeze-first':'M8 3h8 M9 3v6l-3 4v2h12v-2l-3-4V3 M12 15v7',
+        'mergeCells':'M3 3h18v18H3z M3 9h5 M16 9h5 M9 3v5 M9 16v5 M6 12h12 M9 9l3 3-3 3 M15 9l-3 3 3 3',
+        'splitCell':'M3 3h18v18H3z M12 3v18 M5 12h4 M15 12h4 M7 10l-2 2 2 2 M17 10l2 2-2 2',
+        'move-row-up':'M4 16h16v5H4z M12 13V3 M8 7l4-4 4 4',
+        'move-row-down':'M4 3h16v5H4z M12 11v10 M8 17l4 4 4-4',
+        'move-column-left':'M16 4h5v16h-5z M13 12H3 M7 8l-4 4 4 4',
+        'move-column-right':'M3 4h5v16H3z M11 12h10 M17 8l4 4-4 4',
+        'insertRowAbove':'M3 11h18v10H3z M3 16h18 M12 2v6 M9 5h6',
+        'insertRowBelow':'M3 3h18v10H3z M3 8h18 M12 16v6 M9 19h6',
+        'insertColumnBefore':'M11 3h10v18H11z M16 3v18 M2 12h6 M5 9v6',
+        'insertColumnAfter':'M3 3h10v18H3z M8 3v18 M16 12h6 M19 9v6',
+        'locate-table':'M12 2v4 M12 18v4 M2 12h4 M18 12h4 M12 6a6 6 0 1 0 0 12 6 6 0 1 0 0-12 M12 10a2 2 0 1 0 0 4 2 2 0 1 0 0-4',
+        'delete-table':'M3 6h18 M9 6V3h6v3 M5 6l1 15h12l1-15 M10 10v7 M14 10v7'
+    };
+
+    function menuIconMarkup(key) {
+        const path=MENU_ICONS[key];
+        return path?`<svg class="att-dtp-item-icon-v7183" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="${path}"></path></svg>`:'';
+    }
+
+    const MORE_POPUP_ID='att-dtp-more-popup-v7183';
+
+    function toolbarMenuControls(bar,selector) {
+        const popup=document.getElementById(MORE_POPUP_ID);
+        return [...bar.querySelectorAll(selector),...Array.from(popup?.querySelectorAll(selector) || [])];
+    }
+
+    function setMenuButtonLabel(button,text) {
+        const label=button.querySelector?.('.att-dtp-item-label-v7183');
+        if(label) label.textContent=text;
+        else button.textContent=text;
+    }
+
+    function decorateTableMenu(menu) {
+        if(!menu)return;
+        menu.setAttribute('role','menu');
+        menu.querySelectorAll('button').forEach(button=>{
+            const key=button.dataset.dtpAction || button.dataset.dtpCmd;
+            if(!MENU_ICONS[key] || button.dataset.dtpIcon===key)return;
+            const label=button.textContent;
+            button.innerHTML=menuIconMarkup(key)+`<span class="att-dtp-item-label-v7183">${escapeHtml(label)}</span>`;
+            button.dataset.dtpIcon=key;
+            button.setAttribute('role','menuitem');
+            if(key==='delete-table')button.classList.add('danger');
+        });
+    }
+
+    function tableUiViewportRect() {
+        const clip=editorClipRect();
+        const native=S.editor?.closest('.document-view-page,.document-view-shell')?.querySelector('.document-toolbar');
+        if(native && isVisible(native)) {
+            const r=native.getBoundingClientRect();
+            // A parent can pin a toolbar whose own position remains static.
+            if(r.bottom>clip.top && r.top<clip.bottom && r.right>clip.left && r.left<clip.right)
+                clip.top=Math.min(clip.bottom,Math.max(clip.top,r.bottom+1));
+        }
+        return clip;
+    }
+
+    function fitTableMenu(anchor,desiredHeight,desiredWidth,clip,margin=7,gap=5) {
+        const leftEdge=clip.left+margin,rightEdge=clip.right-margin,
+            topEdge=clip.top+margin,bottomEdge=clip.bottom-margin;
+        const width=Math.max(0,Math.min(desiredWidth,rightEdge-leftEdge));
+        const below=Math.max(0,bottomEdge-anchor.bottom-gap),above=Math.max(0,anchor.top-gap-topEdge);
+        const up=desiredHeight>below && above>below;
+        let height=Math.min(desiredHeight,up?above:below),top=up?anchor.top-gap-height:anchor.bottom+gap;
+        if(height<40) {height=Math.max(0,Math.min(desiredHeight,bottomEdge-topEdge));top=topEdge;}
+        height=Math.max(0,Math.min(height,bottomEdge-topEdge));
+        top=Math.max(topEdge,Math.min(top,bottomEdge-height));
+        return {left:Math.max(leftEdge,Math.min(anchor.right-width,rightEdge-width)),top,width,height,up};
+    }
+
+    function positionMoreMenu(bar,frame,clip) {
+        const menu=document.getElementById(MORE_POPUP_ID);
+        if(!menu)return;
+        if(!bar.classList.contains('att-dtp-more-open-v7170') || bar.style.visibility==='hidden') {
+            menu.style.display='none';return;
+        }
+        decorateTableMenu(menu);
+        menu.style.display='grid';
+        menu.style.width=`${Math.max(0,Math.min(230,clip.right-clip.left-14))}px`;
+        const r=bar.getBoundingClientRect(),natural=(menu.scrollHeight || 450)+2,
+            bounds=fitTableMenu(r,Math.min(natural,460),230,clip);
+        menu.style.display=bounds.width>0 && bounds.height>0?'grid':'none';
+        menu.style.right='auto';menu.style.bottom='auto';
+        menu.style.left=`${bounds.left}px`;
+        menu.style.top=`${bounds.top}px`;
+        menu.style.width=`${bounds.width}px`;
+        menu.style.maxHeight=`${bounds.height}px`;
+        menu.dataset.placement=bounds.up?'above':'below';
+    }
+
+    function hideMorePopup() {
+        const menu=document.getElementById(MORE_POPUP_ID);
+        if(menu)menu.style.display='none';
+    }
+
+    function positionContextMenu() {
+        const menu=document.getElementById(PLUS.menuId),anchor=S.contextMenuAnchor;
+        if(!menu || menu.style.display==='none' || !anchor)return;
+        const clip=tableUiViewportRect(),margin=7,width=Math.max(0,Math.min(210,clip.right-clip.left-2*margin)),
+            maxHeight=Math.max(0,clip.bottom-clip.top-2*margin);
+        menu.style.width=`${width}px`;menu.style.maxHeight=`${maxHeight}px`;
+        const height=Math.min(menu.offsetHeight || 380,maxHeight);
+        menu.style.left=`${Math.max(clip.left+margin,Math.min(anchor.x,clip.right-width-margin))}px`;
+        menu.style.top=`${Math.max(clip.top+margin,Math.min(anchor.y,clip.bottom-height-margin))}px`;
+        menu.style.display=width>0 && height>0?'grid':'none';
+    }
+
+    function closeTableMenus() {
+        const bar=document.getElementById(DTP.toolbarId);
+        bar?.classList.remove('att-dtp-more-open-v7170');
+        const more=document.getElementById(MORE_POPUP_ID);
+        if(more)more.style.display='none';
+        const context=document.getElementById(PLUS.menuId);
+        if(context)context.style.display='none';
+        S.contextMenuAnchor=null;
+    }
+
+    function updateFreezeMenuState(bar) {
+        const button=document.getElementById(MORE_POPUP_ID)?.querySelector('[data-dtp-action="freeze-first"]') || bar?.querySelector('[data-dtp-action="freeze-first"]');
+        if(!button)return;
+        const frozen=S.frozenTable===S.table;
+        setMenuButtonLabel(button,frozen?'取消冻结首行':'冻结首行');
+        button.setAttribute('aria-pressed',String(frozen));
+    }
+
+    function scrollbarPointer(event) {
+        const el=event.target;
+        if(!(el instanceof HTMLElement) || !Number.isFinite(event.clientX) ||
+            el.scrollHeight<=el.clientHeight || el.offsetWidth-el.clientWidth<5)return false;
+        const r=el.getBoundingClientRect(),scale=el.offsetWidth?r.width/el.offsetWidth:1;
+        return event.clientX>=r.left+(el.clientLeft+el.clientWidth)*scale ||
+            event.clientX<r.left+el.clientLeft*scale;
+    }
+
+    function opaqueColor(value) {
+        if(!value || value==='transparent')return false;
+        const rgba=value.match(/^rgba\([^)]*,\s*([\d.]+)\s*\)$/i);
+        const slash=value.match(/\/\s*([\d.]+)(%)?\s*\)$/);
+        return rgba?Number(rgba[1])>=.999:slash?Number(slash[1])/(slash[2]?100:1)>=.999:true;
+    }
+
+    function frozenBackdrop(table) {
+        for(let node=table.rows[0]?.parentElement || table;node;node=node.parentElement) {
+            const bg=getComputedStyle(node).backgroundColor;
+            if(opaqueColor(bg))return bg;
+        }
+        const style=getComputedStyle(S.editor || document.body),color=style.color || '';
+        const rgb=color.match(/\d+(?:\.\d+)?/g);
+        const lightText=rgb && rgb.slice(0,3).reduce((a,b)=>a+Number(b),0)>384;
+        return style.colorScheme==='dark' || lightText?'#25282e':'#ffffff';
+    }
+
+    const HEADER_PAINT_PROPS = ['color','background-color','background-image','font-family','font-size','font-weight','font-style',
+        'line-height','letter-spacing','text-align','vertical-align','white-space','word-break','overflow-wrap','text-decoration','text-indent','text-transform','display',
+        'margin-top','margin-right','margin-bottom','margin-left',
+        'padding-top','padding-right','padding-bottom','padding-left','border-top-width','border-right-width','border-bottom-width',
+        'border-left-width','border-top-style','border-right-style','border-bottom-style','border-left-style',
+        'border-top-color','border-right-color','border-bottom-color','border-left-color','border-collapse','border-spacing','box-sizing'];
+
+    function copyHeaderPaint(source,clone) {
+        const style=getComputedStyle(source);
+        for(const property of HEADER_PAINT_PROPS) {
+            const value=style.getPropertyValue?style.getPropertyValue(property):style[property.replace(/-([a-z])/g,(_,c)=>c.toUpperCase())];
+            if(value)clone.style.setProperty(property,value,'important');
+        }
+        const sourceChildren=Array.from(source.children),children=Array.from(clone.children);
+        children.forEach((child,index)=>{if(sourceChildren[index])copyHeaderPaint(sourceChildren[index],child);});
+    }
+
+    function frozenColumnWidths(table,row) {
+        const widths=[];
+        for(const cell of Array.from(row.cells)) {
+            const r=cell.getBoundingClientRect(),span=Math.max(1,cell.colSpan),
+                known=String(cell.getAttribute('colwidth') || '').split(',').map(Number),
+                total=known.reduce((sum,w)=>sum+w,0),weighted=known.length===span && known.every(w=>w>0);
+            for(let i=0;i<span;i++)widths.push(r.width*(weighted?known[i]/total:1/span));
+        }
+        const map=getTableGrid(table);
+        for(let c=0;c<map.width;c++) {
+            const single=map.grid.map(r=>r[c]).find(cell=>cell && map.cells.get(cell)?.width===1);
+            if(single)widths[c]=single.getBoundingClientRect().width;
+        }
+        return widths;
+    }
+
+    function frozenHeaderPlacement(rect,row,clip) {
+        const left=Math.max(clip.left,rect.left),right=Math.min(clip.right,rect.right),
+            top=clip.top,height=Math.max(0,Math.min(row.height,clip.bottom-top,rect.bottom-top));
+        return {visible:row.top<top && right>left && height>0,left,top,width:Math.max(0,right-left),height,
+            contentLeft:rect.left-left,contentTop:Math.min(0,rect.bottom-row.height-top)};
+    }
+
+    function sanitizeFrozenRow(row) {
+        row.querySelectorAll('script,style,iframe,video,audio,input,button,.column-resize-handle,.ProseMirror-widget').forEach(n=>n.remove());
+        for(const node of [row,...row.querySelectorAll('*')]) {
+            node.classList.remove('selectedCell','ProseMirror-selectednode');
+            for(const attribute of Array.from(node.attributes)) {
+                if(/^on/i.test(attribute.name) || ['id','contenteditable','draggable','tabindex','autofocus'].includes(attribute.name))node.removeAttribute(attribute.name);
+            }
+        }
+        Array.from(row.cells).forEach(cell=>{cell.rowSpan=1;});
+    }
+
+    function updateFrozenHeader() {
+        let host=document.getElementById('att-dtp-frozen-v7180');
+        const table=S.frozenTable;
+        if(!S.settings.enabled || !table?.isConnected || !S.editor?.contains(table)) {host?.remove();S.frozenTable=null;return;}
+        const clip=tableUiViewportRect(),rect=table.getBoundingClientRect(),row=table.rows[0],r=row?.getBoundingClientRect();
+        if(!r) {if(host)host.style.display='none';return;}
+        const placement=frozenHeaderPlacement(rect,r,clip);
+        if(!placement.visible) {if(host)host.style.display='none';return;}
+        if(!host) {
+            host=document.createElement('div');host.id='att-dtp-frozen-v7180';
+            host.setAttribute('data-lumatrace-ignore','');host.setAttribute('aria-hidden','true');host.setAttribute('contenteditable','false');
+            host.style.cssText='position:fixed;pointer-events:none;z-index:2147482510;overflow:hidden;box-sizing:border-box;';
+            document.body.appendChild(host);
+        }
+        const backdrop=frozenBackdrop(table),firstPaint=getComputedStyle(row.cells[0] || row),
+            paintKey=[backdrop,firstPaint.color,firstPaint.backgroundColor,firstPaint.fontFamily,firstPaint.fontSize,firstPaint.borderColor,
+                document.documentElement.className,document.body.className].join('|'),
+            signature=row.innerHTML,sourceDoc=getEditorView()?.state.doc;
+        if(host.dataset.signature!==signature || host._sourceDoc!==sourceDoc || host._sourceTable!==table || host._paintKey!==paintKey) {
+            const clone=table.cloneNode(false),body=document.createElement('tbody'),cloneRow=row.cloneNode(true),
+                group=document.createElement('colgroup'),content=document.createElement('div');
+            clone.removeAttribute('id');clone.removeAttribute('contenteditable');clone.removeAttribute('draggable');
+            for(const attr of Array.from(clone.attributes))if(/^on/i.test(attr.name))clone.removeAttribute(attr.name);
+            copyHeaderPaint(table,clone);copyHeaderPaint(row.parentElement,body);copyHeaderPaint(row,cloneRow);sanitizeFrozenRow(cloneRow);
+            body.appendChild(cloneRow);clone.appendChild(group);clone.appendChild(body);content.appendChild(clone);host.replaceChildren(content);
+            content.style.cssText='position:absolute;transform-origin:top left;pointer-events:none;';
+            host.dataset.signature=signature;host._sourceDoc=sourceDoc;host._sourceTable=table;host._paintKey=paintKey;
+        }
+        const sx=table.offsetWidth?rect.width/table.offsetWidth || 1:1,sy=row.offsetHeight?r.height/row.offsetHeight || 1:1,
+            content=host.firstElementChild,clone=content.firstElementChild,group=clone.querySelector('colgroup');
+        let widths;
+        try {widths=frozenColumnWidths(table,row);} catch(_) {host.style.display='none';return;}
+        while(group.children.length<widths.length)group.appendChild(document.createElement('col'));
+        while(group.children.length>widths.length)group.lastElementChild.remove();
+        widths.forEach((width,index)=>group.children[index].style.setProperty('width',`${width/sx}px`,'important'));
+        clone.style.setProperty('width',`${rect.width/sx}px`,'important');clone.style.setProperty('table-layout','fixed','important');
+        clone.style.setProperty('height','auto','important');clone.style.setProperty('min-height','0','important');
+        clone.style.setProperty('position','static','important');clone.style.setProperty('transform','none','important');
+        clone.style.setProperty('margin','0','important');clone.rows[0].style.setProperty('height',`${r.height/sy}px`,'important');
+        Array.from(clone.rows[0].cells).forEach((cell,index)=>{
+            cell.style.setProperty('width',`${row.cells[index].getBoundingClientRect().width/sx}px`,'important');
+            cell.style.setProperty('height',`${r.height/sy}px`,'important');
+        });
+        content.style.left=`${placement.contentLeft}px`;content.style.top=`${placement.contentTop}px`;
+        content.style.transform=`scale(${sx},${sy})`;
+        host.style.backgroundColor=backdrop;host.style.display='block';host.style.left=`${placement.left}px`;host.style.top=`${placement.top}px`;
+        host.style.width=`${placement.width}px`;host.style.height=`${placement.height}px`;
+    }
+
+    function isolateToolbarEvents(bar) {
+        // 工具栏是独立控件；阻止页面把它的按下/拖动理解为表格操作。
+        for (const type of ['pointerdown', 'mousedown', 'pointerup', 'mouseup']) {
+            bar.addEventListener(type, event => {
+                if (event.button !== 0) return;
+                event.stopPropagation();
+                if (scrollbarPointer(event)) return;
+                event.preventDefault();
+                if (type === 'pointerdown' || type === 'mousedown') snapshotStableContext();
+            }, true);
+        }
+        bar.addEventListener('dragstart', event => {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        }, true);
+    }
+
+    function ensureToolbar() {
+        let bar = document.getElementById(DTP.toolbarId);
+        if (bar) return attachScrollingUi(bar);
+
+        bar = document.createElement('div');
+        bar.id = DTP.toolbarId;
+        bar.setAttribute('data-lumatrace-ignore', '');
+        bar.innerHTML = `
+            <div class="att-dtp-status-v7170" data-dtp-role="status">表格</div>
+            <div class="att-dtp-actions-v7170">
+                <button type="button" data-dtp-action="select-range" title="以当前格为起点，点击终点选择矩形区域；Esc 取消">选区域</button>
+                <button type="button" data-dtp-cmd="insertRowAbove" title="在当前行上方插入一行">＋行↑</button>
+                <button type="button" data-dtp-cmd="insertRowBelow" title="在当前行下方插入一行">＋行↓</button>
+                <button type="button" data-dtp-cmd="insertColumnBefore" title="在当前列左侧插入一列">＋列←</button>
+                <button type="button" data-dtp-cmd="insertColumnAfter" title="在当前列右侧插入一列">＋列→</button>
+                <button type="button" data-dtp-cmd="insertColumn" title="调用原生插入列">＋列</button>
+                <button type="button" data-dtp-cmd="deleteRow" title="删除当前行">－行</button>
+                <button type="button" data-dtp-cmd="deleteColumn" title="删除当前列">－列</button>
+                <button type="button" data-dtp-action="more" class="att-dtp-more-v7170" title="更多表格操作">⋯</button>
+            </div>
+            <div class="att-dtp-more-menu-v7170" data-dtp-role="more-menu">
+                <button type="button" data-dtp-action="select-row">选择整行</button>
+                <button type="button" data-dtp-action="select-column">选择整列</button>
+                <button type="button" data-dtp-action="select-table">选择整个表格</button>
+                <button type="button" data-dtp-action="copy-cell">复制当前单元格</button>
+                <button type="button" data-dtp-action="copy-area">复制区域（TSV / HTML）</button>
+                <button type="button" data-dtp-action="clear-area">清空选区内容</button>
+                <button type="button" data-dtp-action="align-left">选区左对齐</button>
+                <button type="button" data-dtp-action="align-center">选区居中</button>
+                <button type="button" data-dtp-action="align-right">选区右对齐</button>
+                <button type="button" data-dtp-action="background-yellow">选区浅黄背景</button>
+                <button type="button" data-dtp-action="background-clear">清除选区背景</button>
+                <button type="button" data-dtp-action="width-page">表格适应页面</button>
+                <button type="button" data-dtp-action="width-content">列宽适应内容</button>
+                <button type="button" data-dtp-action="width-equal">平均列宽</button>
+                <button type="button" data-dtp-action="width-reset">重置列宽</button>
+                <button type="button" data-dtp-action="header-first">首行转表头 / 取消表头</button>
+                <button type="button" data-dtp-action="freeze-first">冻结 / 取消冻结首行</button>
+                <button type="button" data-dtp-cmd="mergeCells">合并单元格</button>
+                <button type="button" data-dtp-cmd="splitCell">拆分单元格</button>
+                <button type="button" data-dtp-action="move-row-up">当前行上移</button>
+                <button type="button" data-dtp-action="move-row-down">当前行下移</button>
+                <button type="button" data-dtp-action="move-column-left">当前列左移</button>
+                <button type="button" data-dtp-action="move-column-right">当前列右移</button>
+                <button type="button" data-dtp-action="locate-table">定位当前表格</button>
+                <button type="button" data-dtp-action="delete-table" class="danger">删除整个表格</button>
+            </div>
+        `;
+
+        decorateTableMenu(bar.querySelector('[data-dtp-role="more-menu"]'));
+        bar.setAttribute('contenteditable', 'false');
+        bar.setAttribute('draggable', 'false');
+        isolateToolbarEvents(bar);
+
+        const toolbarClick = event => {
+            const button = event.target instanceof Element ? event.target.closest('button') : null;
+            if (!button) return;
+            event.preventDefault();
+            event.stopPropagation();
+
+            const cmd = button.dataset.dtpCmd;
+            if (cmd) {
+                snapshotStableContext();
+                runCommand(cmd);
+                closeTableMenus();
+                return;
+            }
+
+            const action = button.dataset.dtpAction;
+            if (action && executePlusAction(action)) return;
+            if (action === 'select-range') {
+                toggleRangeMode();
+            } else if (['select-row','select-column','select-table'].includes(action)) {
+                selectTablePart(action.slice(7));
+                bar.classList.remove('att-dtp-more-open-v7170');
+            } else if (action === 'more') {
+                bar.classList.toggle('att-dtp-more-open-v7170');
+                updateFreezeMenuState(bar);
+                positionToolbar();
+            } else if (action === 'copy-cell') {
+                copyCurrentCell();
+                bar.classList.remove('att-dtp-more-open-v7170');
+            } else if (action === 'locate-table') {
+                if (S.table) locateElement(S.table);
+                bar.classList.remove('att-dtp-more-open-v7170');
+            } else if (action === 'delete-table') {
+                handleDeleteTable(button);
+            }
+            if(action !== 'more' && action !== 'delete-table')closeTableMenus();
+        };
+        bar.addEventListener('click',toolbarClick);
+        const popup=bar.querySelector('[data-dtp-role="more-menu"]');
+        if(popup) {
+            popup.id=MORE_POPUP_ID;popup.setAttribute('contenteditable','false');
+            popup.setAttribute('data-lumatrace-ignore','');document.body.appendChild(popup);
+            isolateToolbarEvents(popup);popup.addEventListener('click',toolbarClick);
+        }
+
+        attachScrollingUi(bar);
+        return bar;
+    }
+
+    function snapshotStableContext() {
+        if (S.table && S.cell) S.lastStableContext = makeContextSnapshot();
+    }
+
+
+    function getToolbarAnchorRect() {
+        // 工具栏跟随表格，不逐格读取大选区的 DOMRect。
+        return S.table?.getBoundingClientRect?.() || S.cell?.getBoundingClientRect?.() || null;
+    }
+
+    function updateToolbar() {
+        const bar = ensureToolbar();
+        if (S.pointerGesture) { hideToolbar(); return; }
+        const show = Boolean(
+            S.settings.enabled && S.settings.miniToolbar && S.table && S.cell && S.table.isConnected && S.cell.isConnected
+        );
+        if (!show) {
+            hideToolbar();
+            return;
+        }
+
+        const selected = S.selectedCells.length;
+        const status = bar.querySelector('[data-dtp-role="status"]');
+        if (status) {
+            const rows = S.table.rows.length;
+            const cached = S.gridCache.get(S.table);
+            const cols = cached?.width || tableColumnCount(S.table);
+            const cellText = S.rowIndex >= 0 && S.colIndex >= 0 ? `R${S.rowIndex + 1}C${S.colIndex + 1}` : '当前格';
+            const text = S.rangeMode ? '请选择终点 · Esc 取消' : selected > 1
+                ? `表格 ${rows}×${cols} · 选中 ${selectionDimensions()} · ${selected} 格`
+                : `表格 ${rows}×${cols} · ${cellText}`;
+            if (status.textContent !== text) status.textContent = text;
+            const rangeButton = bar.querySelector('[data-dtp-action="select-range"]');
+            if (rangeButton) {
+                rangeButton.setAttribute('aria-pressed',String(S.rangeMode));
+                const label = S.rangeMode ? '取消选择' : '选区域';
+                if (rangeButton.textContent !== label) rangeButton.textContent = label;
+            }
+        }
+
+        const appearance=appearanceSupport();
+        toolbarMenuControls(bar,'[data-dtp-action]').forEach(button=>{
+            const action=button.dataset.dtpAction;
+            if(action?.startsWith('align-'))button.style.display=appearance.align?'':'none';
+            if(action?.startsWith('background-'))button.style.display=appearance.background?'':'none';
+        });
+        toolbarMenuControls(bar,'[data-dtp-cmd]').forEach(button => {
+            const available=nativeCommandAvailable(button.dataset.dtpCmd);
+            button.disabled=!available;
+            button.style.display=button.dataset.dtpCmd==='insertColumn' &&
+                (nativeCommandAvailable('insertColumnBefore') || nativeCommandAvailable('insertColumnAfter'))?'none':
+                ['mergeCells','splitCell'].includes(button.dataset.dtpCmd) && !available?'none':'';
+        });
+        updateFreezeMenuState(bar);
+        bar.classList.add('is-visible');
+        schedulePosition();
+    }
+
+    function hideToolbar() {
+        closeTableMenus();
+        hideProductivityUi();
+        const bar = document.getElementById(DTP.toolbarId);
+        if (!bar) return;
+        bar.classList.remove('is-visible', 'att-dtp-more-open-v7170');
+    }
+
+    function positionToolbar() {
+        if (S.pointerGesture) return;
+        const bar = document.getElementById(DTP.toolbarId);
+        if (!bar?.classList.contains('is-visible')) {hideMorePopup();return;}
+        attachScrollingUi(bar);
+        const frame = scrollingUiFrame(), anchor = getToolbarAnchorRect(), clip = tableUiViewportRect();
+        if (!anchor || anchor.bottom <= clip.top || anchor.top >= clip.bottom ||
+            anchor.right <= clip.left || anchor.left >= clip.right) {
+            bar.style.visibility = 'hidden';hideMorePopup();return;
+        }
+        const margin = 7;
+        bar.style.maxWidth = `${Math.max(0,clip.right-clip.left-2*margin)/frame.scaleX}px`;
+        const w = (bar.offsetWidth || 300)*frame.scaleX, h = (bar.offsetHeight || 38)*frame.scaleY;
+        let left = anchor.right-w, top = anchor.top-h-margin;
+        if (top < clip.top+margin) {
+            const cell = S.cell?.getBoundingClientRect();
+            // When both the table header and active cell leave view, hide instead of
+            // pinning an unrelated toolbar to the page chrome.
+            if (!cell || cell.top < clip.top || cell.bottom > clip.bottom ||
+                cell.right <= clip.left || cell.left >= clip.right) {
+                bar.style.visibility = 'hidden';hideMorePopup();return;
+            }
+            top = cell.bottom+margin;
+            left = Math.min(left,cell.right-w);
+            if (top+h > clip.bottom-margin) top = cell.top-h-margin;
+        }
+        if (top < clip.top+margin || top+h > clip.bottom-margin || w > clip.right-clip.left-2*margin) {
+            bar.style.visibility = 'hidden';hideMorePopup();return;
+        }
+        bar.style.visibility = '';
+        left = Math.max(clip.left+margin, Math.min(left,clip.right-w-margin));
+        setScrollingUiPosition(bar,left,top,frame);
+        positionMoreMenu(bar,frame,clip);
+    }
+
+    function findNativeButton(aliases, iconClass = '') {
+        const buttons = Array.from(document.querySelectorAll('.document-toolbar button.document-toolbar__button'));
+        const names = aliases.map(v => String(v).trim());
+        let candidates = buttons.filter(button => {
+            const title = String(button.getAttribute('title') || '').trim();
+            const aria = String(button.getAttribute('aria-label') || '').trim();
+            return names.includes(title) || names.includes(aria);
+        });
+        if (iconClass) {
+            const iconMatched = candidates.filter(button => button.querySelector(`.${iconClass}`));
+            if (iconMatched.length) candidates = iconMatched;
+        }
+        return candidates.find(isVisible) || candidates[0] || null;
+    }
+
+    const COMMANDS = {
+        insertRowAbove: () => findNativeButton(['插入行','上方插行','在上方插入行'], 'anticon-insert-row-above'),
+        insertRowBelow: () => findDirectedButton(['下方插行','在下方插入行'],'anticon-insert-row-below'),
+        insertColumn: () => findNativeButton(['插入列']),
+        insertColumnBefore: () => findDirectedButton(['左侧插列','在左侧插入列'],'anticon-insert-column-left'),
+        insertColumnAfter: () => findDirectedButton(['右侧插列','在右侧插入列'],'anticon-insert-column-right'),
+        deleteRow: () => findNativeButton(['删行','删除行'], 'anticon-delete-row'),
+        deleteColumn: () => findNativeButton(['删列','删除列'], 'anticon-delete-column'),
+        deleteTable: () => findNativeButton(['删除表格']),
+        mergeCells: () => findNativeButton(['合并单元格']),
+        splitCell: () => findNativeButton(['拆分单元格'])
+    };
+
+    function findDirectedButton(aliases,icon) {
+        const buttons=Array.from(document.querySelectorAll('.document-toolbar button.document-toolbar__button'));
+        return buttons.find(button=>button.querySelector(`.${icon}`) || aliases.includes(button.title) ||
+            aliases.includes(button.getAttribute('title')) || aliases.includes(button.getAttribute('aria-label'))) || null;
+    }
+
+    function selectionDimensions() {
+        try {const info=modelTableInfo(),b=info && selectedBounds(info);return b?`${b.height}×${b.width}`:'区域';}
+        catch (_) {return '区域';}
+    }
+
+    function runCommand(name) {
+        const resolver = COMMANDS[name];
+        if (!resolver) return false;
+        if (S.pointerGesture || !S.cell?.isConnected || !S.table?.isConnected ||
+            !S.editor?.contains(S.cell)) return false;
+        if (getEditorView()?.editable===false || S.editor?.getAttribute('contenteditable')==='false') return false;
+        const liveCell = getSelectionCell();
+        const liveCells = getSelectedCells();
+        if ((liveCell && liveCell.closest('table') !== S.table) ||
+            liveCells.some(cell => cell.closest('table') !== S.table)) {
+            showToast('请先点击需要操作的表格单元格');
+            return false;
+        }
+
+        try {
+            const owner=getEditorOwner(),native=OWNER_COMMANDS[name];
+            let done=false;
+            if(native && typeof owner?.commands?.[native]==='function') {
+                const can=owner.can?.();
+                if(typeof can?.[native]==='function' && !can[native]()) {
+                    showToast('当前选择不支持此操作');return false;
+                }
+                done=owner.commands[native]()!==false;
+            } else {
+                const button=resolver();
+                if(button && !button.disabled && button.getAttribute('aria-disabled')!=='true') {button.click();done=true;}
+                else if(!button) done=simpleModelCommand(name);
+            }
+            if(!done) {showToast('当前表格或选择不支持此操作');return false;}
+            hideMoreMenuSoon();
+            window.setTimeout(() => {
+                syncEditor();
+                scheduleContextRefresh();
+                scheduleContentRefresh(0);
+            }, 32);
+            return true;
+        } catch (err) {
+            console.warn('[Document Table Plus] 原生命令执行失败：', name, err);
+            showToast('表格命令执行失败');
+            return false;
+        }
+    }
+
+    function hideMoreMenuSoon() {
+        requestAnimationFrame(closeTableMenus);
+    }
+
+    function handleDeleteTable(button) {
+        const now = performance.now();
+        if (now < S.deleteConfirmUntil && S.deleteConfirmTable===S.table && S.deleteConfirmButton===button) {
+            S.deleteConfirmUntil = 0;
+            clearTimeout(S.deleteConfirmTimer);
+            setMenuButtonLabel(button, '删除整个表格');
+            button.classList.remove('confirming');
+            runCommand('deleteTable');
+            closeTableMenus();
+            return;
+        }
+
+        S.deleteConfirmUntil = now + 2400;
+        S.deleteConfirmTable=S.table;S.deleteConfirmButton=button;
+        setMenuButtonLabel(button, '再次点击确认删除');
+        button.classList.add('confirming');
+        clearTimeout(S.deleteConfirmTimer);
+        S.deleteConfirmTimer = window.setTimeout(() => {
+            S.deleteConfirmUntil = 0;
+            setMenuButtonLabel(button, '删除整个表格');
+            button.classList.remove('confirming');
+        }, 2500);
+    }
+
+    async function copyCurrentCell() {
+        const cell = S.cell;
+        if (!cell) return;
+        const text = String(cell.innerText || cell.textContent || '').replace(/\u200b/g, '').trim();
+        try {
+            if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+            else if (typeof GM_setClipboard === 'function') GM_setClipboard(text);
+            else throw new Error('clipboard unavailable');
+            showToast('已复制当前单元格');
+        } catch (_) {
+            try {
+                if (typeof GM_setClipboard === 'function') {
+                    GM_setClipboard(text);
+                    showToast('已复制当前单元格');
+                }
+            } catch (_) { showToast('复制失败'); }
+        }
+    }
+
+    // V7.18.1：操作入口与剪贴板统一使用 EditorState，不改正文表格 DOM。
+    const PLUS = { edgeId:'att-dtp-edges-v7180', menuId:'att-dtp-context-v7180', dialogId:'att-dtp-dialog-v7180' };
+    const OWNER_COMMANDS = { insertRowAbove:'addRowBefore', insertRowBelow:'addRowAfter',
+        insertColumnBefore:'addColumnBefore', insertColumnAfter:'addColumnAfter',
+        deleteRow:'deleteRow', deleteColumn:'deleteColumn', deleteTable:'deleteTable',
+        mergeCells:'mergeCells', splitCell:'splitCell' };
+    const CELL_LIMIT = 10000;
+
+    function getEditorOwner() {
+        const view = getEditorView();
+        const accept = value => {
+            try {
+                const owner = value?.value || value;
+                return owner?.commands && owner.view === view ? owner : null;
+            } catch (_) { return null; }
+        };
+        const cached = accept(S.editorOwner) || accept(S.editor?.editor) || accept(view?.editor);
+        if (cached) return S.editorOwner=cached;
+        if (!view) return null;
+        if(S.ownerProbeView===view && performance.now()<(S.ownerProbeUntil||0))return null;
+        S.ownerProbeView=view;S.ownerProbeUntil=performance.now()+1200;
+        for (let el=S.editor, depth=0; el && depth<6; el=el.parentElement,depth++) {
+            for (const key of Object.getOwnPropertyNames(el)) {
+                let value; try { value=el[key]; } catch (_) { continue; }
+                const direct = accept(value) || accept(value?.editor);
+                if (direct) return S.editorOwner=direct;
+                if (/^__react(?:Fiber|InternalInstance|Props)\$/.test(key)) {
+                    for (let f=value,n=0; f && n<18; f=f.return,n++) {
+                        const found=accept(f.memoizedProps?.editor) || accept(f.pendingProps?.editor);
+                        if (found) return S.editorOwner=found;
+                    }
+                }
+            }
+            for (let c=el.__vueParentComponent,n=0; c && n<14; c=c.parent,n++) {
+                for (const data of [c.setupState,c.props,c.ctx]) {
+                    const found=accept(data?.editor);
+                    if (found) return S.editorOwner=found;
+                }
+            }
+        }
+        return null;
+    }
+
+    function modelTableInfo() {
+        const view=getEditorView(), cell=S.cell;
+        if (!S.settings.enabled || !view || view.editable===false || !cell?.isConnected || !S.table?.isConnected) return null;
+        const cached=S.modelInfoCache;
+        if(cached && cached.view===view && cached.doc===view.state.doc && cached.table===S.table && cached.cell===cell)
+            return {...cached.info,epoch:S.interactionEpoch};
+        const cellPos=cellPmPosition(view,cell);
+        if (cellPos===null) return null;
+        const $pos=view.state.doc.resolve(cellPos+1);
+        let node=null,pos=null;
+        for (let d=$pos.depth; d>0; d--) if ($pos.node(d).type.spec.tableRole==='table') {
+            node=$pos.node(d); pos=$pos.before(d); break;
+        }
+        if (!node || node.childCount!==S.table.rows.length) return null;
+        const map=getTableGrid(S.table), rows=[], entries=[];
+        let offset=pos+1, simple=true;
+        for (let r=0;r<node.childCount;r++) {
+            const row=node.child(r), cells=[];
+            let at=offset+1;
+            for (let c=0;c<row.childCount;c++) {
+                const item=row.child(c),dom=S.table.rows[r].cells[c];
+                const grid=map.cells.get(dom);
+                if (!grid || !['cell','header_cell'].includes(item.type.spec.tableRole)) return null;
+                cells.push(item); entries.push({node:item,pos:at,dom,...grid});
+                if ((item.attrs.rowspan||1)!==1 || (item.attrs.colspan||1)!==1 || grid.height!==1 || grid.width!==1) simple=false;
+                at+=item.nodeSize;
+            }
+            if (cells.length!==map.width) simple=false;
+            rows.push({node:row,cells}); offset+=row.nodeSize;
+        }
+        const info={view,doc:view.state.doc,node,pos,rows,entries,map,simple,table:S.table,cell,epoch:S.interactionEpoch};
+        S.modelInfoCache={view,doc:info.doc,table:info.table,cell,info};
+        return info;
+    }
+
+    function ensureModelContext(info) {
+        return Boolean(info && S.settings.enabled && !S.pointerGesture && info.view===getEditorView() &&
+            info.view.editable!==false && info.view.state.doc===info.doc && info.table===S.table &&
+            info.table.isConnected && S.editor?.contains(info.table));
+    }
+
+    function commitModelTable(info, rows, target={row:0,col:0}) {
+        if (!ensureModelContext(info)) return false;
+        const nodes=rows.map((cells,r)=>{
+            const original=rows.rowTemplates?.[r] || info.rows[Math.min(r,info.rows.length-1)].node;
+            const attrs={...original.attrs};
+            if(!rows.rowTemplates?.[r] && r>=info.rows.length && 'id' in attrs)attrs.id=original.type.spec.attrs?.id?.default ?? null;
+            return original.type.createChecked(attrs,cells,original.marks);
+        });
+        const next=info.node.type.createChecked(info.node.attrs,nodes,info.node.marks);
+        next.check?.();
+        if (next.eq(info.node)) return true;
+        const tr=info.view.state.tr.replaceWith(info.pos,info.pos+info.node.nodeSize,next);
+        const at=positionInSpanRows(nodes,info.pos,target);
+        const base=getSelectionBase(info.view);
+        if (base?.near) tr.setSelection(base.near(tr.doc.resolve(at+1)));
+        tr.setMeta('addToHistory',true).setMeta('attDocumentTablePlus',true);
+        invalidatePendingSelection();
+        info.view.dispatch(tr);
+        if (!info.view.hasFocus?.()) info.view.focus();
+        S.gridCache.delete(info.table);
+        hideProductivityUi();
+        scheduleContextRefresh(); scheduleContentRefresh(0);
+        return true;
+    }
+
+    function blankCell(template) {
+        const attrs={...template.attrs,colspan:1,rowspan:1};
+        if ('id' in attrs) attrs.id=template.type.spec.attrs?.id?.default ?? null;
+        const cell=template.type.createAndFill(attrs);
+        if (!cell) throw new Error('当前单元格类型无法创建空内容');
+        return cell;
+    }
+
+    function simpleModelCommand(name) {return spanModelCommand(name);}
+
+    function nativeCommandAvailable(name) {
+        if(getEditorView()?.editable===false || S.editor?.getAttribute('contenteditable')==='false')return false;
+        const native=OWNER_COMMANDS[name],owner=getEditorOwner();
+        try {
+            if (native && typeof owner?.commands?.[native]==='function') {
+                const can=owner.can?.();
+                return typeof can?.[native]==='function' ? Boolean(can[native]()) : true;
+            }
+        } catch (_) {}
+        const button=COMMANDS[name]?.();
+        if (button) return !button.disabled && button.getAttribute('aria-disabled')!=='true';
+        return spanModelAvailable(name);
+    }
+
+    function selectedBounds(info, useCurrent=true) {
+        const selected=getSelectedCells().filter(cell=>getTopTable(cell)===info.table);
+        const cells=selected.length?selected:(useCurrent?[S.cell]:[]);
+        const entries=info.entries.filter(entry=>cells.includes(entry.dom));
+        if (!entries.length) return null;
+        const minRow=Math.min(...entries.map(e=>e.row)),maxRow=Math.max(...entries.map(e=>e.row+e.height-1));
+        const minCol=Math.min(...entries.map(e=>e.col)),maxCol=Math.max(...entries.map(e=>e.col+e.width-1));
+        return {cells,entries,minRow,maxRow,minCol,maxCol,height:maxRow-minRow+1,width:maxCol-minCol+1};
+    }
+
+    function cellPlainText(cell) {
+        if(!cell.isConnected && cell.childNodes) {
+            const read=node=>{
+                if(node.nodeType===3)return node.nodeValue || '';
+                if(node.nodeType!==1)return '';
+                if(['SCRIPT','STYLE'].includes(node.tagName))return '';
+                if(node.tagName==='BR')return '\n';
+                let value=Array.from(node.childNodes).map(read).join('');
+                if(['P','DIV','LI'].includes(node.tagName) && !value.endsWith('\n'))value+='\n';
+                return value;
+            };
+            return Array.from(cell.childNodes).map(read).join('').replace(/\u200b/g,'').replace(/\r\n?/g,'\n').replace(/\n$/,'');
+        }
+        const text=String(cell.innerText ?? cell.textContent ?? '').replace(/\u200b/g,'');
+        return text.replace(/\r\n?/g,'\n').replace(/\n$/,'');
+    }
+    function encodeTSV(matrix) {
+        return matrix.map(row=>row.map(value=>/[\t\n\r"]/.test(String(value))?
+            '"'+String(value).replace(/"/g,'""')+'"':String(value)).join('\t')).join('\r\n');
+    }
+    function parseTSV(text) {
+        if (text.length>2000000) throw new Error('粘贴内容过大，请分批粘贴');
+        const rows=[],row=[]; let value='',quoted=false,start=true;
+        for(let i=0;i<text.length;i++) {
+            const ch=text[i];
+            if (quoted) {
+                if(ch==='"') { if(text[i+1]==='"'){value+='"';i++;} else quoted=false; }
+                else value+=ch;
+            } else if(ch==='"' && start) {quoted=true;start=false;}
+            else if(ch==='\t') {row.push(value);value='';start=true;}
+            else if(ch==='\n' || ch==='\r') {
+                if(ch==='\r' && text[i+1]==='\n')i++;
+                row.push(value);rows.push(row.splice(0));value='';start=true;
+            } else {value+=ch;start=false;}
+            if (rows.length + row.length>CELL_LIMIT) throw new Error('粘贴内容超过处理范围');
+        }
+        if(quoted) throw new Error('剪贴板引号未闭合，请检查内容');
+        if(value!=='' || row.length || !rows.length) {row.push(value);rows.push(row);}
+        const width=Math.max(...rows.map(r=>r.length));
+        if(rows.length*width>CELL_LIMIT) throw new Error('最多支持一次粘贴 10000 格');
+        return rows.map(r=>Array.from({length:width},(_,c)=>r[c]??''));
+    }
+    function clipboardPayload() {
+        const info=modelTableInfo(); if(!info)return null;
+        const bounds=selectedBounds(info); if(!bounds)return null;
+        const matrix=[]; let html='<table><tbody>';
+        for(let r=bounds.minRow;r<=bounds.maxRow;r++) {
+            const row=[]; html+='<tr>';
+            for(let c=bounds.minCol;c<=bounds.maxCol;c++) {
+                const dom=info.map.grid[r]?.[c],entry=info.map.cells.get(dom);
+                const topLeft=entry && entry.row===r && entry.col===c;
+                const text=topLeft?cellPlainText(dom):'';row.push(text);
+                if (topLeft) {
+                    const tag=dom.tagName==='TH'?'th':'td';
+                    html+=`<${tag} rowspan="${entry.height}" colspan="${entry.width}">${escapeHtml(text).replace(/\n/g,'<br>')}</${tag}>`;
+                }
+            }
+            html+='</tr>';matrix.push(row);
+        }
+        return {text:encodeTSV(matrix),html:html+'</tbody></table>',bounds};
+    }
+
+    async function copyArea() {
+        try {
+            const payload=clipboardPayload();if(!payload)return;
+            if(navigator.clipboard?.write && typeof ClipboardItem!=='undefined') {
+                await navigator.clipboard.write([new ClipboardItem({'text/plain':new Blob([payload.text],{type:'text/plain'}),
+                    'text/html':new Blob([payload.html],{type:'text/html'})})]);
+            } else {
+                S.copyPayload=payload;
+                try {if(!document.execCommand('copy'))throw new Error('copy unavailable');}
+                finally {S.copyPayload=null;}
+            }
+            showToast(`已复制 ${payload.bounds.height}×${payload.bounds.width} 区域`);
+        } catch (_) { showToast('复制失败，请在选区中使用 Ctrl+C'); }
+    }
+
+    function clipboardMatrix(data) {
+        const plain=data.getData('text/plain') || '';
+        if(plain.includes('\t')) return parseTSV(plain);
+        const html=data.getData('text/html') || '';
+        if(html && html.length<=2000000 && typeof DOMParser!=='undefined') {
+            const dom=new DOMParser().parseFromString(html,'text/html'),table=dom.querySelector('table');
+            if(table && !table.querySelector('table')) {
+                const grid=[];let slots=0,width=0;
+                Array.from(table.rows).forEach((row,r)=>{
+                    grid[r] ||= [];let c=0;
+                    for(const cell of Array.from(row.cells)) {
+                        while(grid[r][c]!==undefined)c++;
+                        const h=cell.rowSpan || table.rows.length-r,w=cell.colSpan || 1;
+                        if((slots+=h*w)>CELL_LIMIT)throw new Error('粘贴内容超过 10000 格');
+                        for(let y=r;y<r+h;y++) {grid[y] ||= [];for(let x=c;x<c+w;x++)grid[y][x]=y===r && x===c?cellPlainText(cell):'';}
+                        c+=w;width=Math.max(width,c);
+                    }
+                });
+                if(grid.length*width>CELL_LIMIT)throw new Error('粘贴内容超过 10000 格');
+                return grid.map(r=>Array.from({length:width},(_,c)=>r[c]??''));
+            }
+        }
+        return null;
+    }
+
+    function textCell(template,text,schema) {
+        const paragraph=schema.nodes.paragraph;
+        if(!paragraph)throw new Error('当前编辑器不支持普通段落');
+        const content=String(text).replace(/\r\n?/g,'\n').split('\n').map(line=>paragraph.createChecked(null,line?schema.text(line):null));
+        return template.type.createChecked(template.attrs,content,template.marks);
+    }
+    function fillMatrix(info,matrix,start,allowSplit=false) {
+        return fillSpanMatrix(info,matrix,start,allowSplit);
+    }
+
+    function clearArea() {
+        try {
+            const info=modelTableInfo(),bounds=info && selectedBounds(info);if(!bounds || !ensureModelContext(info))return false;
+            const tr=info.view.state.tr;
+            for(const entry of [...bounds.entries].sort((a,b)=>b.pos-a.pos)) {
+                const empty=entry.node.type.createAndFill(entry.node.attrs);
+                if(!empty)throw new Error('无法清空当前单元格');
+                tr.replaceWith(entry.pos+1,entry.pos+entry.node.nodeSize-1,empty.content);
+            }
+            if(!tr.docChanged)return true;
+            invalidatePendingSelection();tr.setMeta('addToHistory',true);info.view.dispatch(tr);
+            info.view.focus();scheduleContextRefresh();scheduleContentRefresh(0);showToast('已清空选区内容');return true;
+        } catch (_) {showToast('当前选区无法清空');return false;}
+    }
+
+    function setColumnWidths(mode) {
+        try {
+            const info=modelTableInfo();if(!info || !ensureModelContext(info))return false;
+            if(!info.entries.every(e=>'colwidth' in e.node.attrs)) {showToast('当前编辑器未开放列宽属性');return false;}
+            const count=info.map.width,tableRect=info.table.getBoundingClientRect();
+            const page=Math.max(40,S.editor.clientWidth-24),width=mode==='page'?page:tableRect.width;
+            const canvas=mode==='content'?document.createElement('canvas'):null,ctx=canvas?.getContext('2d');
+            const widths=Array.from({length:count},(_,c)=>{
+                if(mode!=='content')return Math.max(25,Math.floor(width/count));
+                let measured=40;
+                for(const entry of info.entries.filter(e=>e.col===c && e.width===1)) {
+                    if(ctx)ctx.font=getComputedStyle(entry.dom).font;
+                    const line=cellPlainText(entry.dom).split('\n');
+                    for(const text of line)measured=Math.max(measured,(ctx?ctx.measureText(text.slice(0,512)).width:Math.min(512,text.length)*12)+24);
+                }
+                return Math.round(Math.min(Math.max(60,page*.65),measured));
+            });
+            const tr=info.view.state.tr;
+            for(const e of info.entries)tr.setNodeMarkup(e.pos,null,{...e.node.attrs,colwidth:mode==='reset'?null:widths.slice(e.col,e.col+e.width)});
+            invalidatePendingSelection();tr.setMeta('addToHistory',true);info.view.dispatch(tr);
+            info.view.focus();scheduleContextRefresh();showToast(mode==='reset'?'已重置列宽':'已调整列宽');return true;
+        } catch (_) {showToast('当前表格无法调整列宽');return false;}
+    }
+
+    function toggleFirstHeader() {
+        try {
+            const info=modelTableInfo();if(!info)return false;
+            const nodes=Object.values(info.view.state.schema.nodes),header=nodes.find(t=>t.spec.tableRole==='header_cell'),
+                ordinary=nodes.find(t=>t.spec.tableRole==='cell');
+            if(!header || !ordinary) {showToast('当前编辑器未开放表头类型');return false;}
+            const rows=info.rows.map(r=>[...r.cells]),allHeader=rows[0].every(c=>c.type.spec.tableRole==='header_cell');
+            rows[0]=rows[0].map(c=>(allHeader?ordinary:header).createChecked(c.attrs,c.content,c.marks));
+            return commitModelTable(info,rows,{row:0,col:0});
+        } catch (_) {showToast('无法切换首行表头');return false;}
+    }
+
+    function appearanceSupport() {
+        try {
+            const info=modelTableInfo();if(!info)return {align:false,background:false};
+            return {align:Boolean(info.view.state.schema.nodes.paragraph?.spec.attrs?.textAlign),
+                background:info.entries.some(e=>['backgroundColor','background','bgcolor'].some(key=>key in e.node.attrs))};
+        } catch (_) {return {align:false,background:false};}
+    }
+    function setAreaAppearance(kind,value) {
+        try {
+            const info=modelTableInfo(),bounds=info && selectedBounds(info);
+            if(!bounds || !ensureModelContext(info))return false;
+            const tr=info.view.state.tr;let applied=0;
+            for(const entry of bounds.entries) {
+                if(kind==='background') {
+                    const key=['backgroundColor','background','bgcolor'].find(key=>key in entry.node.attrs);
+                    if(!key)continue;
+                    tr.setNodeMarkup(entry.pos,null,{...entry.node.attrs,[key]:value || entry.node.type.spec.attrs?.[key]?.default || null});applied++;
+                } else {
+                    entry.node.descendants((node,offset)=>{
+                        if(node.isTextblock && 'textAlign' in node.attrs) {
+                            tr.setNodeMarkup(entry.pos+1+offset,null,{...node.attrs,textAlign:value});applied++;
+                        }
+                    });
+                }
+            }
+            if(!applied) {showToast('当前编辑器未开放此样式属性');return false;}
+            invalidatePendingSelection();tr.setMeta('addToHistory',true);info.view.dispatch(tr);info.view.focus();
+            scheduleContextRefresh();showToast('已更新选区样式');return true;
+        } catch (_) {showToast('当前选区无法调整样式');return false;}
+    }
+
+    function moveAxis(part,from,to) {
+        try {return moveSpanAxis(part,from,to);}
+        catch(err) {showToast(err.message || '表格结构异常，无法排序');return false;}
+    }
+
+    function hideProductivityUi() {
+        S.contextMenuAnchor=null;
+        for(const id of [PLUS.edgeId,PLUS.menuId]) {const el=document.getElementById(id);if(el)el.style.display='none';}
+    }
+    function closeTableDialog() {
+        const dialog=document.getElementById(PLUS.dialogId),restore=dialog?.contains(document.activeElement);
+        dialog?.remove();S.tableDialog=null;
+        if(restore && S.editor?.isConnected)getEditorView()?.focus();
+    }
+    function showTableDialog(message,confirmLabel,confirm) {
+        closeTableDialog();
+        const dialog=document.createElement('div');dialog.id=PLUS.dialogId;dialog.setAttribute('data-lumatrace-ignore','');
+        dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-label','表格操作确认');
+        dialog.innerHTML=`<div><p>${escapeHtml(message)}</p><button type="button" data-choice="cancel">取消</button>
+            <button type="button" data-choice="confirm">${escapeHtml(confirmLabel)}</button></div>`;
+        S.tableDialog={epoch:S.interactionEpoch,confirm};
+        dialog.addEventListener('pointerdown',e=>e.stopPropagation());
+        dialog.addEventListener('click',e=>{
+            const button=e.target.closest('button');if(!button)return;
+            const action=S.tableDialog;closeTableDialog();
+            if(button.dataset.choice==='confirm') {try {action?.confirm();}catch(err){showToast(err.message || '操作失败');}}
+        });
+        document.body.appendChild(dialog);dialog.querySelector('[data-choice="cancel"]')?.focus();
+    }
+
+    function insertTableOutside(direction) {
+        try {
+            const info=modelTableInfo();if(!info || !ensureModelContext(info))return false;
+            const view=info.view,$cell=view.state.doc.resolve(cellPmPosition(view,S.cell)+1);
+            let outer=info.node,at=info.pos;
+            for(let d=1;d<=$cell.depth;d++)if($cell.node(d).type.spec.tableRole==='table') {
+                outer=$cell.node(d);at=$cell.before(d);break;
+            }
+            const type=Object.values(view.state.schema.nodes).find(t=>t.spec.tableRole==='cell');
+            const header=Object.values(view.state.schema.nodes).find(t=>t.spec.tableRole==='header_cell') || type;
+            if(!type)return false;
+            const rowType=info.rows[0].node.type,rows=[];
+            for(let r=0;r<3;r++) {
+                const cells=[];
+                for(let c=0;c<3;c++) {const cell=(r===0?header:type).createAndFill();if(!cell)return false;cells.push(cell);}
+                rows.push(rowType.createChecked(null,cells));
+            }
+            const next=info.node.type.createChecked(null,rows);next.check?.();
+            const position=direction==='before'?at:at+outer.nodeSize,$insert=view.state.doc.resolve(position),index=$insert.index();
+            if(!$insert.parent.canReplaceWith(index,index,next.type)) {showToast('此位置无法插入表格');return false;}
+            const tr=view.state.tr.insert(position,next),base=getSelectionBase(view);
+            if(base?.near)tr.setSelection(base.near(tr.doc.resolve(position+3)));
+            invalidatePendingSelection();tr.setMeta('addToHistory',true);view.dispatch(tr);view.focus();
+            scheduleContextRefresh();scheduleContentRefresh(0);return true;
+        } catch (_) {showToast('无法在表格外插入，请先点击正文位置');return false;}
+    }
+
+    function handleAreaPaste(event) {
+        if(!S.settings.enabled || !S.settings.clipboard || !S.editor?.contains(event.target) || !event.clipboardData ||
+            isInteractiveCellTarget(event.target))return;
+        const live=cellFromEventTarget(event.target) || getSelectionCell();
+        if(live) {S.cell=live;S.table=getTopTable(live);rememberInteractionCell(live);}
+        try {
+            const matrix=clipboardMatrix(event.clipboardData);
+            if(!matrix || (matrix.length===1 && matrix[0].length===1))return;
+            const info=modelTableInfo(),start=info?.map.cells.get(S.cell);if(!info || !start)return;
+            const plan=spanPastePlan(info,matrix,start);
+            event.preventDefault();event.stopImmediatePropagation();
+            invalidatePendingSelection();info.epoch=S.interactionEpoch;
+            if(plan.extraRows || plan.extraCols || plan.splits.length) {
+                const changes=[];
+                if(plan.extraRows || plan.extraCols)changes.push(`增加 ${plan.extraRows} 行、${plan.extraCols} 列`);
+                if(plan.splits.length)changes.push(`拆分覆盖区域的 ${plan.splits.length} 个合并格（各格原内容保留在左上格）`);
+                showTableDialog(`粘贴 ${matrix.length}×${matrix[0].length} 区域，需要${changes.join('，')}。拆分与填充可以一起撤销。`, '确认并粘贴',()=>{
+                    if(!fillMatrix(info,matrix,start,true))showToast('表格或选择已变化，请重新粘贴');
+                });
+            } else if(!fillMatrix(info,matrix,start))showToast('当前表格无法粘贴此区域');
+        } catch(err) {event.preventDefault();event.stopImmediatePropagation();showToast(err.message || '无法识别表格剪贴板');}
+    }
+
+    function handleAreaCopy(event) {
+        if(!S.settings.enabled || !S.settings.clipboard || !event.clipboardData)return;
+        const selected=getSelectedCells(),explicit=S.copyPayload;
+        if(!explicit && (!S.editor?.contains(event.target) || selected.length<2 ||
+            new Set(selected.map(getTopTable)).size!==1))return;
+        try {
+            const payload=explicit || clipboardPayload();if(!payload)return;
+            event.clipboardData.setData('text/plain',payload.text);event.clipboardData.setData('text/html',payload.html);
+            event.preventDefault();event.stopImmediatePropagation();
+        } catch (_) {}
+    }
+
+    function executePlusAction(action) {
+        if(action==='copy-area')copyArea();
+        else if(action==='clear-area')clearArea();
+        else if(action.startsWith('width-'))setColumnWidths(action.slice(6));
+        else if(action==='header-first')toggleFirstHeader();
+        else if(action.startsWith('align-'))setAreaAppearance('align',action.slice(6));
+        else if(action==='background-yellow')setAreaAppearance('background','#fff3c4');
+        else if(action==='background-clear')setAreaAppearance('background',null);
+        else if(action==='freeze-first') { S.frozenTable=S.frozenTable===S.table?null:S.table;updateFrozenHeader();updateFreezeMenuState(document.getElementById(DTP.toolbarId)); }
+        else if(action.startsWith('move-')) {
+            const info=modelTableInfo(),active=info?.map.cells.get(S.cell);if(!active)return;
+            const part=/row/.test(action)?'row':'column',from=part==='row'?active.row:active.col,
+                delta=/up|left/.test(action)?-1:1;
+            moveAxis(part,from,from+delta);
+        } else return false;
+        hideMoreMenuSoon();return true;
+    }
+
+    function buildContextMenu() {
+        let menu=document.getElementById(PLUS.menuId);if(menu)return menu;
+        menu=document.createElement('div');menu.id=PLUS.menuId;menu.setAttribute('data-lumatrace-ignore','');menu.setAttribute('role','menu');
+        isolateToolbarEvents(menu);
+        menu.addEventListener('click',event=>{
+            const button=event.target.closest('button');if(!button || button.disabled)return;
+            event.preventDefault();event.stopPropagation();
+            const action=button.dataset.dtpAction,cmd=button.dataset.dtpCmd;
+            if(cmd)runCommand(cmd);
+            else if(['select-row','select-column','select-table'].includes(action))selectTablePart(action.slice(7));
+            else if(action==='delete-table') {handleDeleteTable(button);return;}
+            else executePlusAction(action);
+            menu.style.display='none';
+        });document.body.appendChild(menu);return menu;
+    }
+    function openContextMenu(event) {
+        if(!S.settings.enabled || !S.settings.contextMenu || event.shiftKey || getEditorView()?.editable===false)return;
+        const cell=cellFromEventTarget(event.target);if(!cell || isInteractiveCellTarget(event.target))return;
+        finishDrag();invalidatePendingSelection();rememberInteractionCell(cell);S.cell=cell;S.table=getTopTable(cell);
+        const selected=getSelectedCells().filter(c=>getTopTable(c)===S.table);
+        if(!selected.includes(cell))selectCellRange(cell,cell,false);
+        S.cell=cell;S.table=getTopTable(cell);snapshotStableContext();event.preventDefault();
+        const menu=buildContextMenu();
+        menu.innerHTML=`<b>${selected.includes(cell) && selected.length>1?`已选择 ${selected.length} 格`:'单元格操作'}</b>
+            <button data-dtp-action="copy-area">复制区域</button><button data-dtp-action="clear-area">清空内容</button>
+            <button data-dtp-action="select-row">选择整行</button><button data-dtp-action="select-column">选择整列</button>
+            <button data-dtp-action="select-table">选择整个表格</button>
+            ${[['insertRowAbove','上方插行'],['insertRowBelow','下方插行'],['insertColumnBefore','左侧插列'],
+                ['insertColumnAfter','右侧插列'],['mergeCells','合并单元格'],['splitCell','拆分单元格']].filter(([cmd])=>nativeCommandAvailable(cmd))
+                .map(([cmd,label])=>`<button data-dtp-cmd="${cmd}">${label}</button>`).join('')}
+            <button data-dtp-action="delete-table">删除整个表格</button>`;
+        decorateTableMenu(menu);
+        menu.style.display='grid';
+        S.contextMenuAnchor={x:event.clientX,y:event.clientY};
+        positionContextMenu();
+    }
+
+    function ensureEdgeHandles() {
+        let host=document.getElementById(PLUS.edgeId);if(host)return attachScrollingUi(host);
+        host=document.createElement('div');host.id=PLUS.edgeId;host.setAttribute('data-lumatrace-ignore','');
+        host.setAttribute('contenteditable','false');isolateToolbarEvents(host);
+        host.addEventListener('click',event=>{
+            if(S.edgeGesture?.moved)return;
+            const button=event.target.closest('button');if(!button)return;
+            event.preventDefault();event.stopPropagation();
+            const part=button.dataset.part,index=Number(button.dataset.index),map=getTableGrid(S.table),
+                cell=part==='row'?map.grid[index]?.[0]:map.grid[0]?.[index];
+            if(cell) {S.cell=cell;rememberInteractionCell(cell);selectTablePart(part);}
+            if(button.dataset.command)runCommand(button.dataset.command);
+        });
+        host.addEventListener('pointerdown',event=>{
+            const button=event.target.closest('button');if(!button || button.dataset.command || event.button!==0)return;
+            const info=modelTableInfo();if(!info || !spanModelAvailable('deleteTable'))return;
+            S.edgeGesture={pointerId:event.pointerId,part:button.dataset.part,index:Number(button.dataset.index),
+                x:event.clientX,y:event.clientY,moved:false,info,target:null};
+        });attachScrollingUi(host);return host;
+    }
+    function positionEdgeHandles() {
+        const host=document.getElementById(PLUS.edgeId);
+        if(!S.settings.enabled || !S.settings.edgeHandles || S.pointerGesture || S.dragging || !S.cell?.isConnected || !S.table?.isConnected) {
+            if(host)host.style.display='none';return;
+        }
+        const el=ensureEdgeHandles(),map=getTableGrid(S.table),clip=editorClipRect(),rect=S.table.getBoundingClientRect(),frame=scrollingUiFrame();
+        if(map.height>300 || map.width>100) {el.style.display='none';return;}
+        const signature=`${map.height}:${map.width}`;
+        if(S.edgeSignature!==signature || S.edgeTable!==S.table) {
+            el.innerHTML=Array.from({length:map.height},(_,i)=>`<button data-part="row" data-index="${i}" title="选择第 ${i+1} 行；拖动可排序，合并格覆盖的行列一起移动">${i+1}</button>`).join('')+
+                Array.from({length:map.width},(_,i)=>`<button data-part="column" data-index="${i}" title="选择第 ${i+1} 列；拖动可排序，合并格覆盖的行列一起移动">${i+1}</button>`).join('')+
+                '<button data-part="row" data-index="0" data-command="insertRowBelow" title="在末尾增加一行">＋</button>'+
+                '<button data-part="column" data-index="0" data-command="insertColumnAfter" title="在末尾增加一列">＋</button>';
+            S.edgeSignature=signature;S.edgeTable=S.table;
+        }
+        el.style.display='block';
+        el.querySelectorAll('button').forEach(button=>{
+            const part=button.dataset.part,index=button.dataset.command?(part==='row'?map.height-1:map.width-1):Number(button.dataset.index);
+            button.dataset.index=String(index);
+            const cell=part==='row'?map.grid[index]?.[0]:map.grid[0]?.[index];if(!cell)return;
+            // Rowspans share cells, but each physical row needs its own handle.
+            let r=part==='row'?S.table.rows[index].getBoundingClientRect():cell.getBoundingClientRect();
+            let center=r.left+r.width/2;
+            if(part==='column') {
+                const single=map.grid.map(row=>row[index]).find(c=>c && map.cells.get(c)?.width===1);
+                if(single) {r=single.getBoundingClientRect();center=r.left+r.width/2;}
+                else {
+                    const span=map.cells.get(cell),offset=index-span.col;
+                    const known=String(cell.getAttribute('colwidth') || '').split(',').map(Number);
+                    const total=known.reduce((sum,w)=>sum+w,0);
+                    const weighted=known.length===span.width && known.every(w=>w>0);
+                    center=r.left+r.width*(weighted?(known.slice(0,offset).reduce((sum,w)=>sum+w,0)+known[offset]/2)/total:(offset+.5)/span.width);
+                }
+            }
+            const left=part==='row'?rect.left-19*frame.scaleX:center-9*frame.scaleX,
+                top=part==='row'?r.top+(r.height-18*frame.scaleY)/2:rect.top-19*frame.scaleY;
+            const x=button.dataset.command?(part==='row'?rect.left-19*frame.scaleX:rect.right+frame.scaleX):left,
+                y=button.dataset.command?(part==='row'?rect.bottom+frame.scaleY:rect.top-19*frame.scaleY):top;
+            setScrollingUiPosition(button,x,y,frame);
+            button.style.display=x>=clip.left && x+18*frame.scaleX<=clip.right && y>=clip.top && y+18*frame.scaleY<=clip.bottom &&
+                (part==='row'?r.bottom>clip.top && r.top<clip.bottom:rect.top>=clip.top)?'block':'none';
+            if(button.dataset.command)button.disabled=!nativeCommandAvailable(button.dataset.command);
+        });
+    }
+
+    function bindProductivityEvents() {
+        document.addEventListener('copy',handleAreaCopy,true);
+        document.addEventListener('paste',handleAreaPaste,true);
+        document.addEventListener('contextmenu',openContextMenu,true);
+        document.addEventListener('pointerdown',event=>{
+            S.edgeGesture=null;
+            const el=event.target instanceof Element?event.target:null;
+            const own=el?.closest(`#${PLUS.edgeId},#${PLUS.menuId},#${PLUS.dialogId},#${MORE_POPUP_ID},#${DTP.toolbarId},#${DTP.guardId},#att-dtp-column-hit-v7181`);
+            if(!own) {closeTableMenus();closeTableDialog();}
+        },true);
+        document.addEventListener('keydown',event=>{
+            if(event.key==='Escape') {closeTableMenus();hideProductivityUi();closeTableDialog();S.edgeGesture=null;}
+        },true);
+        document.addEventListener('pointermove',event=>{
+            const gesture=S.edgeGesture;if(!gesture || gesture.pointerId!==event.pointerId)return;
+            if(Math.hypot(event.clientX-gesture.x,event.clientY-gesture.y)<6 && !gesture.moved)return;
+            gesture.moved=true;event.preventDefault();event.stopImmediatePropagation();
+            let nearest=null,distance=Infinity;
+            const map=gesture.info.map,limit=gesture.part==='row'?map.height:map.width;
+            for(let i=0;i<limit;i++) {
+                const cell=gesture.part==='row'?map.grid[i]?.[0]:map.grid[0]?.[i];if(!cell)continue;
+                const r=cell.getBoundingClientRect(),d=Math.abs(gesture.part==='row'?event.clientY-(r.top+r.bottom)/2:event.clientX-(r.left+r.right)/2);
+                if(d<distance) {nearest=i;distance=d;}
+            }
+            gesture.target=nearest;
+            const host=document.getElementById(PLUS.edgeId);
+            host?.querySelectorAll('button').forEach(b=>b.classList.toggle('is-target',b.dataset.part===gesture.part && Number(b.dataset.index)===nearest));
+        },{capture:true,passive:false});
+        window.addEventListener('pointerup',event=>{
+            const gesture=S.edgeGesture;if(!gesture || gesture.pointerId!==event.pointerId)return;
+            S.edgeGesture=null;
+            if(gesture.moved) {
+                S.edgeClickUntil=performance.now()+600;
+                if(ensureModelContext(gesture.info) && S.interactionEpoch===gesture.info.epoch && gesture.target!==null)
+                    moveAxis(gesture.part,gesture.index,gesture.target);
+                event.preventDefault();event.stopImmediatePropagation();
+            }
+        },true);
+        document.addEventListener('click',event=>{
+            if(performance.now()<(S.edgeClickUntil||0) && event.target?.closest?.(`#${PLUS.edgeId}`)) {
+                event.preventDefault();event.stopImmediatePropagation();S.edgeClickUntil=0;
+            }
+        },true);
+        for(const type of ['blur','pointercancel'])window.addEventListener(type,()=>{S.edgeGesture=null;});
+    }
+
+    // V7.18.1：用矩形跨度校验保护每一次模型操作；原生命令仍优先。
+    function spanGrid(entries,height,width) {
+        if(!Number.isInteger(height) || !Number.isInteger(width) || height<1 || width<1 || height*width>CELL_LIMIT)
+            throw new Error('表格超过处理范围或尺寸异常');
+        const grid=Array.from({length:height},()=>Array(width));
+        for(const entry of entries) {
+            const {row,col,height:h,width:w}=entry;
+            if(![row,col,h,w].every(Number.isInteger) || row<0 || col<0 || h<1 || w<1 || row+h>height || col+w>width)
+                throw new Error('单元格跨度超出表格范围');
+            if((entry.node.attrs.rowspan || 1)!==h || (entry.node.attrs.colspan || 1)!==w)
+                throw new Error('单元格跨度与编辑器状态不一致');
+            const widths=entry.node.attrs.colwidth;
+            if(widths && (!Array.isArray(widths) || widths.length!==w || !widths.every(v=>Number.isFinite(v) && v>=0)))
+                throw new Error('单元格列宽属性异常');
+            for(let y=row;y<row+h;y++)for(let x=col;x<col+w;x++) {
+                if(grid[y][x])throw new Error('单元格跨度重叠');
+                grid[y][x]=entry;
+            }
+        }
+        if(grid.some(row=>row.some(value=>!value)))throw new Error('表格存在缺失单元格');
+        // Array.some 跳过空槽，显式遍历每个逻辑格。
+        for(let y=0;y<height;y++)for(let x=0;x<width;x++)if(!grid[y][x])throw new Error('表格存在缺失单元格');
+        return grid;
+    }
+
+    function spanTable(info) {
+        if(!info)return null;
+        const entries=info.entries.map(e=>({node:e.node,row:e.row,col:e.col,height:e.height,width:e.width}));
+        const table={height:info.map.height,width:info.map.width,entries,rowTemplates:info.rows.map(r=>r.node)};
+        table.grid=spanGrid(entries,table.height,table.width);
+        return table;
+    }
+    function spanAttrs(entry,h=entry.height,w=entry.width,widths=entry.node.attrs.colwidth) {
+        const attrs={...entry.node.attrs,rowspan:h,colspan:w};
+        if('colwidth' in attrs)attrs.colwidth=widths?Array.from({length:w},(_,i)=>widths[i] || 0):null;
+        return attrs;
+    }
+    function resizeSpan(entry,h,w,widths=entry.node.attrs.colwidth) {
+        const node=entry.node.type.createChecked(spanAttrs(entry,h,w,widths),entry.node.content,entry.node.marks);
+        return {...entry,height:h,width:w,node};
+    }
+    function blankSpan(template,row,col,columnOffset=0,ordinary=false) {
+        let node=blankCell(template);
+        const attrs={...node.attrs};
+        if('colwidth' in attrs)attrs.colwidth=template.attrs.colwidth?[template.attrs.colwidth[columnOffset] || 0]:null;
+        if(ordinary && template.type.spec.tableRole==='header_cell') {
+            const type=Object.values(getEditorView().state.schema.nodes).find(t=>t.spec.tableRole==='cell');
+            if(type)node=type.createAndFill(attrs);
+        } else node=node.type.createChecked(attrs,node.content,node.marks);
+        if(!node)throw new Error('无法创建普通单元格');
+        return {row,col,height:1,width:1,node};
+    }
+    function commitSpanTable(info,table,target={row:0,col:0}) {
+        if(!ensureModelContext(info))return false;
+        spanGrid(table.entries,table.height,table.width);
+        const rows=Array.from({length:table.height},(_,r)=>table.entries.filter(e=>e.row===r)
+            .sort((a,b)=>a.col-b.col).map(e=>e.node));
+        rows.rowTemplates=table.rowTemplates;
+        return commitModelTable(info,rows,target);
+    }
+
+    function positionInSpanRows(nodes,pos,target) {
+        const occupied=[],fallback=pos+2;let rowPos=pos+1;
+        for(let r=0;r<nodes.length;r++) {
+            occupied[r] ||= [];let col=0,at=rowPos+1;
+            for(let i=0;i<nodes[r].childCount;i++) {
+                const node=nodes[r].child(i),h=node.attrs.rowspan || 1,w=node.attrs.colspan || 1;
+                while(occupied[r][col])col++;
+                if(target.row>=r && target.row<r+h && target.col>=col && target.col<col+w)return at;
+                for(let y=r;y<r+h;y++){occupied[y] ||= [];for(let x=col;x<col+w;x++)occupied[y][x]=true;}
+                col+=w;at+=node.nodeSize;
+            }
+            rowPos+=nodes[r].nodeSize;
+        }
+        return fallback;
+    }
+
+    function mergeBounds(info) {
+        const bounds=selectedBounds(info,false);
+        if(!bounds || bounds.entries.length<2)return null;
+        const table=spanTable(info),selected=new Set(bounds.entries.map(e=>e.node));
+        for(let y=bounds.minRow;y<=bounds.maxRow;y++)for(let x=bounds.minCol;x<=bounds.maxCol;x++)
+            if(!selected.has(table.grid[y][x].node))return null;
+        const first=table.grid[bounds.minRow][bounds.minCol];
+        if(!('rowspan' in first.node.attrs) || !('colspan' in first.node.attrs))return null;
+        // 混合表头与普通格会丢失单元格语义，因此先要求统一类型。
+        if(bounds.entries.some(e=>e.node.type!==first.node.type))return null;
+        return {bounds,table,first};
+    }
+    function mergeSpanCells(info=modelTableInfo()) {
+        const merge=info && mergeBounds(info);if(!merge || !ensureModelContext(info))return false;
+        const {bounds,table,first}=merge;
+        const selected=new Set(bounds.entries.map(e=>e.node)),content=[];
+        for(const e of [...bounds.entries].sort((a,b)=>a.row-b.row || a.col-b.col))
+            for(let i=0;i<e.node.childCount;i++)content.push(e.node.child(i));
+        let widths=[];
+        for(let c=bounds.minCol;c<=bounds.maxCol;c++) {
+            const entry=table.grid[bounds.minRow][c];widths.push(entry.node.attrs.colwidth?.[c-entry.col] || 0);
+        }
+        if(!widths.some(Boolean))widths=null;
+        const node=first.node.type.createChecked(spanAttrs(first,bounds.height,bounds.width,widths),content,first.node.marks);
+        table.entries=table.entries.filter(e=>!selected.has(e.node));
+        table.entries.push({row:bounds.minRow,col:bounds.minCol,height:bounds.height,width:bounds.width,node});
+        return commitSpanTable(info,table,{row:bounds.minRow,col:bounds.minCol});
+    }
+    function splitEntries(table,entries) {
+        const selected=new Set(entries),next=[];
+        for(const entry of table.entries) {
+            if(!selected.has(entry) || (entry.height===1 && entry.width===1)){next.push(entry);continue;}
+            if(!('rowspan' in entry.node.attrs) || !('colspan' in entry.node.attrs))throw new Error('编辑器未开放跨度属性');
+            for(let y=0;y<entry.height;y++)for(let x=0;x<entry.width;x++) {
+                const blank=blankSpan(entry.node,entry.row+y,entry.col+x,x);
+                if(y===0 && x===0)blank.node=entry.node.type.createChecked(
+                    {...blank.node.attrs,id:entry.node.attrs.id},entry.node.content,entry.node.marks);
+                // 只保留已注册属性；无 id 的 schema 不写入 id。
+                if(y===0 && x===0 && !('id' in entry.node.attrs)) {
+                    const attrs={...blank.node.attrs};delete attrs.id;
+                    blank.node=entry.node.type.createChecked(attrs,entry.node.content,entry.node.marks);
+                }
+                next.push(blank);
+            }
+        }
+        table.entries=next;return table;
+    }
+    function splitSpanCells(info=modelTableInfo()) {
+        if(!info || !ensureModelContext(info))return false;
+        const table=spanTable(info),bounds=selectedBounds(info),selected=new Set(bounds?.entries.map(e=>e.node));
+        const entries=table.entries.filter(e=>selected.has(e.node) && (e.height>1 || e.width>1));
+        if(!entries.length)return false;
+        splitEntries(table,entries);return commitSpanTable(info,table,{row:bounds.minRow,col:bounds.minCol});
+    }
+
+    function insertSpanAxis(table,part,index,info) {
+        const row=part==='row',axis=row?'row':'col',size=row?'height':'width',limit=row?table.height:table.width;
+        if(index<0 || index>limit)throw new Error('插入位置异常');
+        const oldGrid=table.grid;
+        table.entries=table.entries.map(e=>{
+            if(e[axis]>=index)return {...e,[axis]:e[axis]+1};
+            if(e[axis]+e[size]>index) {
+                let widths=e.node.attrs.colwidth;
+                if(!row && widths){widths=[...widths];widths.splice(index-e.col,0,0);}
+                return resizeSpan(e,row?e.height+1:e.height,row?e.width:e.width+1,widths);
+            }
+            return e;
+        });
+        if(row) {
+            const template=table.rowTemplates[Math.min(index,limit-1)],attrs={...template.attrs};
+            if('id' in attrs)attrs.id=template.type.spec.attrs?.id?.default ?? null;
+            table.rowTemplates.splice(index,0,template.type.createChecked(attrs,[],template.marks));
+            table.height++;
+        } else table.width++;
+        const covered=Array.from({length:row?table.width:table.height},()=>false);
+        for(const e of table.entries)if(e[axis]<=index && e[axis]+e[size]>index) {
+            const start=row?e.col:e.row,span=row?e.width:e.height;for(let j=start;j<start+span;j++)covered[j]=true;
+        }
+        for(let j=0;j<covered.length;j++)if(!covered[j]) {
+            const source=row?oldGrid[Math.min(index,limit-1)][j]:oldGrid[j][Math.min(index,limit-1)];
+            table.entries.push(blankSpan(source.node,row?index:j,row?j:index,row?j-source.col:Math.min(index,limit-1)-source.col,
+                row && index>0));
+        }
+        table.grid=spanGrid(table.entries,table.height,table.width);return table;
+    }
+    function deleteSpanAxis(table,part,start,end) {
+        const row=part==='row',axis=row?'row':'col',size=row?'height':'width',count=end-start;
+        if(count<1 || start<0 || end>(row?table.height:table.width))throw new Error('删除范围异常');
+        if(count===(row?table.height:table.width))return null;
+        const next=[];
+        for(const e of table.entries) {
+            const overlap=Math.max(0,Math.min(e[axis]+e[size],end)-Math.max(e[axis],start)),span=e[size]-overlap;
+            if(!span)continue;
+            const origin=e[axis]>=end?e[axis]-count:e[axis]>=start?start:e[axis];
+            let widths=e.node.attrs.colwidth;
+            if(!row && widths)widths=widths.filter((_,i)=>e.col+i<start || e.col+i>=end);
+            const entry=overlap?resizeSpan(e,row?span:e.height,row?e.width:span,widths):{...e};
+            entry[axis]=origin;next.push(entry);
+        }
+        table.entries=next;
+        if(row){table.height-=count;table.rowTemplates.splice(start,count);}else table.width-=count;
+        table.grid=spanGrid(table.entries,table.height,table.width);return table;
+    }
+    function deleteModelTable(info) {
+        if(!ensureModelContext(info))return false;
+        const tr=info.view.state.tr.delete(info.pos,info.pos+info.node.nodeSize);
+        const base=getSelectionBase(info.view);
+        if(base?.near)tr.setSelection(base.near(tr.doc.resolve(Math.min(info.pos,tr.doc.content.size))));
+        invalidatePendingSelection();tr.setMeta('addToHistory',true);info.view.dispatch(tr);info.view.focus();
+        hideProductivityUi();scheduleContextRefresh();scheduleContentRefresh(0);return true;
+    }
+    function spanModelCommand(name) {
+        const info=modelTableInfo();if(!info || !ensureModelContext(info))return false;
+        if(name==='mergeCells')return mergeSpanCells(info);
+        if(name==='splitCell')return splitSpanCells(info);
+        if(name==='deleteTable')return deleteModelTable(info);
+        const bounds=selectedBounds(info),table=spanTable(info);if(!bounds)return false;
+        let part,index,next=table;
+        if(/^insertRow/.test(name)){part='row';index=name==='insertRowBelow'?bounds.maxRow+1:bounds.minRow;insertSpanAxis(table,part,index,info);}
+        else if(/^insertColumn/.test(name) && name!=='insertColumn') {part='column';index=name==='insertColumnAfter'?bounds.maxCol+1:bounds.minCol;insertSpanAxis(table,part,index,info);}
+        else if(name==='deleteRow'){part='row';index=bounds.minRow;next=deleteSpanAxis(table,part,index,bounds.maxRow+1);}
+        else if(name==='deleteColumn'){part='column';index=bounds.minCol;next=deleteSpanAxis(table,part,index,bounds.maxCol+1);}
+        else return false;
+        if(!next)return deleteModelTable(info);
+        return commitSpanTable(info,next,{row:part==='row'?Math.min(index,next.height-1):bounds.minRow,
+            col:part==='column'?Math.min(index,next.width-1):bounds.minCol});
+    }
+    function spanModelAvailable(name) {
+        try {
+            const info=modelTableInfo();if(!info)return false;
+            const table=spanTable(info);
+            if(name==='mergeCells')return Boolean(mergeBounds(info));
+            if(name==='splitCell') {
+                const bounds=selectedBounds(info);return Boolean(bounds?.entries.some(e=>e.height>1 || e.width>1));
+            }
+            return name==='deleteTable' || name==='deleteRow' || name==='deleteColumn' ||
+                (/^insert(?:Row|Column)/.test(name) && name!=='insertColumn' &&
+                    table.entries.every(e=>'rowspan' in e.node.attrs && 'colspan' in e.node.attrs));
+        } catch (_) {return false;}
+    }
+
+    function spanPastePlan(info,matrix,start) {
+        const table=spanTable(info),height=Math.max(table.height,start.row+matrix.length),width=Math.max(table.width,start.col+matrix[0].length);
+        if(height*width>CELL_LIMIT)throw new Error('扩展后的表格超过 10000 格');
+        const right=start.col+matrix[0].length,bottom=start.row+matrix.length;
+        const splits=table.entries.filter(e=>(e.height>1 || e.width>1) && e.row<bottom && e.row+e.height>start.row && e.col<right && e.col+e.width>start.col);
+        return {table,height,width,splits,extraRows:height-table.height,extraCols:width-table.width};
+    }
+    function fillSpanMatrix(info,matrix,start,allowSplit=false) {
+        if(!ensureModelContext(info) || info.epoch!==S.interactionEpoch)return false;
+        const plan=spanPastePlan(info,matrix,start),table=plan.table;
+        if(plan.splits.length && !allowSplit)return false;
+        splitEntries(table,plan.splits);
+        const oldGrid=spanGrid(table.entries,table.height,table.width),oldHeight=table.height,oldWidth=table.width;
+        for(let r=0;r<plan.height;r++)for(let c=0;c<plan.width;c++)if(r>=oldHeight || c>=oldWidth) {
+            const source=oldGrid[Math.min(r,oldHeight-1)][Math.min(c,oldWidth-1)];
+            table.entries.push(blankSpan(source.node,r,c,Math.min(c,oldWidth-1)-source.col,r>=oldHeight));
+        }
+        while(table.rowTemplates.length<plan.height) {
+            const source=info.rows.at(-1).node,attrs={...source.attrs};
+            if('id' in attrs)attrs.id=source.type.spec.attrs?.id?.default ?? null;
+            table.rowTemplates.push(source.type.createChecked(attrs,[],source.marks));
+        }
+        table.height=plan.height;table.width=plan.width;table.grid=spanGrid(table.entries,table.height,table.width);
+        for(let r=0;r<matrix.length;r++)for(let c=0;c<matrix[r].length;c++) {
+            const entry=table.grid[start.row+r][start.col+c];
+            entry.node=textCell(entry.node,matrix[r][c],info.view.state.schema);
+        }
+        return commitSpanTable(info,table,start);
+    }
+
+    function spanAxisGroups(table,part) {
+        const row=part==='row',axis=row?'row':'col',size=row?'height':'width',limit=row?table.height:table.width;
+        const breaks=Array.from({length:limit+1},()=>true);
+        for(const e of table.entries)for(let i=e[axis]+1;i<e[axis]+e[size];i++)breaks[i]=false;
+        const groups=[];let start=0;
+        for(let i=1;i<=limit;i++)if(breaks[i]){groups.push({start,end:i});start=i;}
+        return groups;
+    }
+    function moveSpanAxis(part,from,to) {
+        const info=modelTableInfo();if(!info || !ensureModelContext(info))return false;
+        const table=spanTable(info),row=part==='row',limit=row?table.height:table.width;
+        if(from<0 || to<0 || from>=limit || to>=limit || from===to)return false;
+        const groups=spanAxisGroups(table,part),a=groups.findIndex(g=>from>=g.start && from<g.end),b=groups.findIndex(g=>to>=g.start && to<g.end);
+        if(a===b){showToast('这几行或列属于同一组合并格，需要一起移动');return false;}
+        const reordered=[...groups];reordered.splice(b,0,reordered.splice(a,1)[0]);
+        const permutation=reordered.flatMap(g=>Array.from({length:g.end-g.start},(_,i)=>g.start+i));
+        const inverse=[];permutation.forEach((old,next)=>{inverse[old]=next;});
+        table.entries=table.entries.map(e=>({...e,[row?'row':'col']:inverse[row?e.row:e.col]}));
+        if(row)table.rowTemplates=permutation.map(old=>table.rowTemplates[old]);
+        const target={row:row?inverse[from]:0,col:row?0:inverse[from]},moved=groups[a].end-groups[a].start;
+        const ok=commitSpanTable(info,table,target);
+        if(ok && moved>1)showToast(`已一起移动合并格覆盖的 ${moved} ${row?'行':'列'}`);
+        return ok;
+    }
+
+    const RESIZE_ID='att-dtp-column-hit-v7181';
+    function cancelColumnResize() {
+        S.columnResizeGesture=null;S.resizeHover=null;
+        const handle=document.getElementById(RESIZE_ID);if(handle)handle.style.display='none';
+    }
+    function ensureColumnHit() {
+        let handle=document.getElementById(RESIZE_ID);if(handle)return handle;
+        handle=document.createElement('div');handle.id=RESIZE_ID;handle.setAttribute('data-lumatrace-ignore','');
+        handle.style.cssText='position:fixed;display:none;width:12px;cursor:col-resize;z-index:2147482580;touch-action:none;user-select:none;';
+        const line=document.createElement('div');line.style.cssText='position:absolute;left:5px;top:0;bottom:0;width:2px;background:#3b82f6;pointer-events:none;';handle.appendChild(line);
+        isolateToolbarEvents(handle);
+        handle.addEventListener('pointerdown',event=>{
+            if(event.button!==0 || !S.settings.enabled || !S.settings.resizeHit || !S.resizeHover)return;
+            const info=modelTableInfo();if(!info || !ensureModelContext(info) || !info.entries.every(e=>'colwidth' in e.node.attrs))return;
+            const widths=measuredColumnWidths(info),column=S.resizeHover.column;
+            S.columnResizeGesture={info,column,widths,startX:event.clientX,pointerId:event.pointerId,epoch:S.interactionEpoch,
+                delta:0,lineX:S.resizeHover.x,changed:false};
+            S.dragging=true;S.dragPointerId=event.pointerId;hideToolbar();clearAssistClasses();
+            event.preventDefault();event.stopImmediatePropagation();
+        });document.body.appendChild(handle);return handle;
+    }
+    function measuredColumnWidths(info) {
+        const widths=Array(info.map.width).fill(null);
+        for(const entry of info.entries) {
+            const rect=entry.dom.getBoundingClientRect();
+            for(let i=0;i<entry.width;i++) {
+                const known=entry.node.attrs.colwidth?.[i];
+                if(known>0)widths[entry.col+i]=known;
+                else if(widths[entry.col+i]===null || entry.width===1)widths[entry.col+i]=rect.width/entry.width;
+            }
+        }
+        return widths.map(w=>Math.max(25,Math.round(w || 40)));
+    }
+    function commitColumnResize(gesture) {
+        const {info,column,widths,delta}=gesture;
+        if(!S.settings.enabled || !S.settings.resizeHit || !ensureModelContext(info) || gesture.epoch!==S.interactionEpoch ||
+            !gesture.changed)return false;
+        const value=Math.max(25,Math.round(widths[column]+delta)),tr=info.view.state.tr;
+        for(const entry of info.entries)if(entry.col<=column && entry.col+entry.width>column) {
+            const next=Array.from({length:entry.width},(_,i)=>entry.node.attrs.colwidth?.[i] || widths[entry.col+i]);
+            next[column-entry.col]=value;tr.setNodeMarkup(entry.pos,null,{...entry.node.attrs,colwidth:next});
+        }
+        if(!tr.docChanged)return false;
+        invalidatePendingSelection();tr.setMeta('addToHistory',true);info.view.dispatch(tr);info.view.focus();
+        scheduleContextRefresh();return true;
+    }
+    function updateColumnHit(event) {
+        const gesture=S.columnResizeGesture;
+        if(gesture) {
+            if(event.pointerId!==gesture.pointerId)return;
+            if(!S.settings.enabled || !S.settings.resizeHit || gesture.epoch!==S.interactionEpoch ||
+                infoIsStale(gesture.info)) {cancelColumnResize();finishDrag();return;}
+            event.preventDefault();event.stopImmediatePropagation();
+            gesture.delta=Math.max(25-gesture.widths[gesture.column],event.clientX-gesture.startX);
+            gesture.changed=Math.abs(gesture.delta)>=1;
+            const handle=document.getElementById(RESIZE_ID);if(handle)handle.style.left=`${gesture.lineX+gesture.delta-6}px`;
+            return;
+        }
+        if(!S.settings.enabled || !S.settings.resizeHit || S.dragging || S.pointerGesture || event.buttons ||
+            (event.pointerType && event.pointerType!=='mouse')) {cancelColumnResize();return;}
+        const target=event.target instanceof Element?event.target:null;
+        if(target?.closest(`#${RESIZE_ID}`) && S.resizeHover)return;
+        const cell=cellFromEventTarget(target);
+        if(!cell || getTopTable(cell)!==S.table || isInteractiveCellTarget(target)) {cancelColumnResize();return;}
+        const info=modelTableInfo(),entry=info?.map.cells.get(cell);
+        if(!entry || !info.entries.every(e=>'colwidth' in e.node.attrs)) {cancelColumnResize();return;}
+        const r=cell.getBoundingClientRect(),clip=editorClipRect(),table=info.table.getBoundingClientRect(),
+            left=Math.abs(event.clientX-r.left),right=Math.abs(event.clientX-r.right);
+        let x,column;
+        if(right<=6) {x=r.right;column=entry.col+entry.width-1;}
+        else if(left<=6 && entry.col>0) {x=r.left;column=entry.col-1;}
+        else {cancelColumnResize();return;}
+        if(x<clip.left+6 || x>clip.right-6) {cancelColumnResize();return;}
+        const top=Math.max(table.top,clip.top),bottom=Math.min(table.bottom,clip.bottom);
+        if(bottom<=top)return;
+        S.resizeHover={x,column};const handle=ensureColumnHit();handle.style.display='block';
+        handle.style.left=`${x-6}px`;handle.style.top=`${top}px`;handle.style.height=`${bottom-top}px`;
+    }
+    function infoIsStale(info) {
+        return info.view!==getEditorView() || info.view.state.doc!==info.doc || !info.table.isConnected ||
+            info.table!==S.table || info.view.editable===false;
+    }
+    function finishColumnResize(event) {
+        const gesture=S.columnResizeGesture;if(!gesture)return;
+        if(event?.pointerId!=null && event.pointerId!==gesture.pointerId)return;
+        cancelColumnResize();finishDrag();
+        if(event?.type==='pointerup') {
+            event.preventDefault();event.stopImmediatePropagation();
+            try {if(!commitColumnResize(gesture) && gesture.changed)showToast('表格或选择已变化，未保存列宽');}
+            catch (_) {showToast('列宽调整失败，未改动单元格内容');}
+        }
+    }
+    function bindColumnResize() {
+        document.addEventListener('pointermove',updateColumnHit,{capture:true,passive:false});
+        window.addEventListener('pointerup',finishColumnResize,true);
+        window.addEventListener('pointercancel',finishColumnResize,true);
+        window.addEventListener('blur',()=>{cancelColumnResize();finishDrag();});
+        document.addEventListener('scroll',()=>{if(!S.columnResizeGesture)cancelColumnResize();},{capture:true,passive:true});
+        window.addEventListener('resize',()=>{cancelColumnResize();finishDrag();});
+        document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){cancelColumnResize();finishDrag();}});
+        document.addEventListener('keydown',event=>{
+            if(event.key==='Escape' && S.columnResizeGesture) {
+                cancelColumnResize();finishDrag();event.preventDefault();event.stopImmediatePropagation();
+            }
+        },true);
+    }
+
+    function ensureGuard() {
+        let guard = document.getElementById(DTP.guardId);
+        if (guard) return guard;
+        guard = document.createElement('div');
+        guard.id = DTP.guardId;
+        guard.setAttribute('data-lumatrace-ignore', '');
+        guard.innerHTML = `
+            <div class="att-dtp-guard-title-v7170">当前光标位于表格中</div>
+            <div class="att-dtp-guard-text-v7170">继续“插入表格”会创建嵌套表格。可直接选择在当前表格前后插入。</div>
+            <div class="att-dtp-guard-actions-v7170">
+                <button type="button" data-dtp-guard="before">在当前表格之前插入</button>
+                <button type="button" data-dtp-guard="after">在当前表格之后插入</button>
+                <button type="button" data-dtp-guard="cancel">取消</button>
+                <button type="button" data-dtp-guard="allow" class="danger">仍然嵌套</button>
+            </div>
+        `;
+        guard.addEventListener('pointerdown', event => {
+            if (event.target instanceof Element && event.target.closest('button')) event.preventDefault();
+        }, true);
+        guard.addEventListener('click', event => {
+            const button = event.target instanceof Element ? event.target.closest('button[data-dtp-guard]') : null;
+            if (!button) return;
+            event.preventDefault();
+            event.stopPropagation();
+            if (['before','after'].includes(button.dataset.dtpGuard)) {
+                insertTableOutside(button.dataset.dtpGuard);hideGuard();return;
+            }
+            if (button.dataset.dtpGuard === 'cancel') {
+                hideGuard();
+                return;
+            }
+            if (button.dataset.dtpGuard === 'allow') {
+                const original = S.guardButton;
+                S.guardBypassUntil = performance.now() + 1200;
+                hideGuard();
+                if (original?.isConnected) requestAnimationFrame(() => original.click());
+            }
+        });
+        document.body.appendChild(guard);
+        return guard;
+    }
+
+    function hideGuard() {
+        const guard = document.getElementById(DTP.guardId);
+        guard?.classList.remove('is-visible');
+        S.guardButton = null;
+    }
+
+    function contextIsFreshInsideTable() {
+        if (!S.settings.enabled || !S.settings.nestedGuard) return false;
+        if (getSelectionCell(S.editor)) return true;
+        if (getSelectedCells(S.editor).length) return true;
+        const now = performance.now();
+        return Boolean(
+            S.cell && S.table &&
+            (
+                (S.cell.isConnected && now < S.contextStickyUntil) ||
+                (editorOwnsFocus(S.editor) && now - S.lastCellAt < 15000) ||
+                (getNativeTableContextActive() && now - S.lastCellAt < 5000)
+            )
+        );
+    }
+
+    function maybeBlockInsertTable(event) {
+        if (performance.now() < S.guardBypassUntil) return false;
+        const target = event.target instanceof Element ? event.target : null;
+        const button = target?.closest?.('button[title="插入表格"],button[aria-label="插入表格"]');
+        if (!button || !contextIsFreshInsideTable()) return false;
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        event.stopPropagation();
+        S.guardButton = button;
+        const guard = ensureGuard();
+        guard.classList.add('is-visible');
+        const r = button.getBoundingClientRect();
+        const w = guard.offsetWidth || 330;
+        let left = r.left + r.width / 2 - w / 2;
+        let top = r.bottom + 8;
+        left = Math.max(10, Math.min(left, window.innerWidth - w - 10));
+        if (top + (guard.offsetHeight || 130) > window.innerHeight - 10) top = Math.max(10, r.top - (guard.offsetHeight || 130) - 8);
+        guard.style.left = `${Math.round(left)}px`;
+        guard.style.top = `${Math.round(top)}px`;
+        return true;
+    }
+
+    function ensureToast() {
+        let toast = document.getElementById(DTP.toastId);
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = DTP.toastId;
+            toast.setAttribute('data-lumatrace-ignore', '');
+            document.body.appendChild(toast);
+        }
+        return toast;
+    }
+
+    let toastTimer = 0;
+    function showToast(message) {
+        const toast = ensureToast();
+        toast.textContent = String(message || '');
+        toast.classList.add('is-visible');
+        clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => toast.classList.remove('is-visible'), 1700);
+    }
+
+    function getTopLevelTables(editor = S.editor) {
+        if (!editor) return [];
+        return Array.from(editor.querySelectorAll('.tableWrapper > table'))
+            .filter(table => table instanceof HTMLTableElement && !table.closest('td .tableWrapper, th .tableWrapper'));
+    }
+
+    function getNestedTables(editor = S.editor) {
+        if (!editor) return [];
+        return Array.from(editor.querySelectorAll('td .tableWrapper > table,th .tableWrapper > table'))
+            .filter(table => table instanceof HTMLTableElement);
+    }
+
+    function tableColumnCount(table) {
+        return Math.max(0, ...Array.from(table?.rows || []).map(row => row.cells.length));
+    }
+
+    function isEmptyTable(table) {
+        return Array.from(table.querySelectorAll('td,th')).every(cell => !String(cell.innerText || cell.textContent || '').replace(/\s+/g, '').trim());
+    }
+
+    function isNarrowTable(table) {
+        const cols = tableColumnCount(table);
+        if (cols < 3) return false;
+        const width = table.getBoundingClientRect().width || table.offsetWidth || 0;
+        return width > 0 && width < Math.max(220, cols * 62);
+    }
+
+    function getPreviousHeading(wrapper) {
+        let node = wrapper?.previousElementSibling || null;
+        while (node) {
+            if (/^H[1-6]$/.test(node.tagName)) {
+                const text = String(node.textContent || '').replace(/\s+/g, ' ').trim();
+                if (text) return text;
+            }
+            node = node.previousElementSibling;
+        }
+        return '';
+    }
+
+    function tableLabel(table, index) {
+        const first = table.rows[0];
+        if (first) {
+            const labels = Array.from(first.cells)
+                .map(cell => String(cell.innerText || cell.textContent || '').replace(/\s+/g, ' ').trim())
+                .filter(Boolean)
+                .slice(0, 2);
+            if (labels.length) return labels.join(' / ');
+        }
+        return `未命名表格 ${index + 1}`;
+    }
+
+    function refreshTableInventory() {
+        const editor = S.editor;
+        const top = getTopLevelTables(editor);
+        const nested = getNestedTables(editor);
+        const empty = top.filter(isEmptyTable);
+        const narrow = top.filter(isNarrowTable);
+        const issues = [
+            ...nested.map(table => ({ type: '嵌套表格', table })),
+            ...empty.map(table => ({ type: '空表格', table })),
+            ...narrow.map(table => ({ type: '异常窄表', table }))
+        ];
+        S.tableCache = top;
+        S.health = { topLevel: top.length, nested: nested.length, empty: empty.length, narrow: narrow.length, issues };
+        refreshNavigator();
+        updateHealthUI();
+    }
+
+    function scheduleContentRefresh(delay = 100) {
+        clearTimeout(S.contentTimer);
+        S.contentTimer = window.setTimeout(() => {
+            if (S.dragging || S.pointerGesture) { S.pendingContentRefresh = true; return; }
+            syncEditor();
+            refreshTableInventory();
+        }, Math.max(0, Number(delay) || 0));
+    }
+
+    function ensureSettingsHost() {
+        const root = document.getElementById('att-toolbox-root');
+        const content = root?.querySelector('.att-content');
+        if (!root || !content) return null;
+
+        let host = document.getElementById(DTP.settingsHostId);
+        if (!host || host.parentElement !== content) {
+            host?.remove();
+            host = document.createElement('div');
+            host.id = DTP.settingsHostId;
+            host.setAttribute('data-lumatrace-ignore', '');
+            content.appendChild(host);
+        }
+        if (host.dataset.bound !== '1') {
+            host.dataset.bound = '1';
+            host.addEventListener('change', event => {
+                const input = event.target instanceof HTMLInputElement ? event.target : null;
+                const name = input?.dataset.dtpSetting;
+                if (!name) return;
+                saveSetting(name, input.checked);
+            });
+            host.addEventListener('click', event => {
+                const button = event.target instanceof Element ? event.target.closest('button[data-dtp-settings-action]') : null;
+                if (!button) return;
+                if (button.dataset.dtpSettingsAction === 'locate-issue') locateNextHealthIssue();
+                if (button.dataset.dtpSettingsAction === 'refresh-health') scheduleContentRefresh(0);
+            });
+        }
+        return host;
+    }
+
+    function ensureSettingsCard() {
+        const host = ensureSettingsHost();
+        if (!host) return null;
+        let card = document.getElementById(DTP.settingsCardId);
+        if (!card || card.parentElement !== host) {
+            card?.remove();
+            card = document.createElement('div');
+            card.id = DTP.settingsCardId;
+            card.className = 'att-card';
+            host.appendChild(card);
+        }
+        const signature = JSON.stringify(S.settings);
+        if (card.dataset.renderSignature !== signature) {
+            card.dataset.renderSignature = signature;
+            renderSettingsCard(card);
+        }
+        return card;
+    }
+
+    function toggleRow(name, title, desc) {
+        return `
+            <div class="att-row">
+                <div style="min-width:0;">
+                    <div class="att-label">${title}</div>
+                    <div class="att-sub-label">${desc}</div>
+                </div>
+                <label class="att-switch" title="${title}">
+                    <input type="checkbox" data-dtp-setting="${name}" ${S.settings[name] ? 'checked' : ''}>
+                    <span class="att-slider"></span>
+                </label>
+            </div>`;
+    }
+
+    function renderSettingsCard(card) {
+        if (!card) return;
+        const disabledClass = S.settings.enabled ? '' : ' att-dtp-disabled-v7170';
+        card.innerHTML = `
+            <div class="att-card-title">文档表格增强</div>
+            <div class="att-card-desc">点击起点后 Shift 点击终点即可选择多个单元格；也可用“选区域”或更多菜单选择整行、整列、整表。</div>
+            <div class="att-divider"></div>
+            ${toggleRow('enabled', '启用文档表格增强', '总开关；关闭后迷你工具栏、高亮、嵌套保护与表格导航全部停止。')}
+            <div class="att-dtp-settings-group-v7170${disabledClass}">
+                ${toggleRow('miniToolbar', '单元格迷你工具栏', '在表格边缘显示选择区域与行列操作；按住鼠标选区或调宽时暂时隐藏。')}
+                ${toggleRow('clipboard', '区域复制与矩形粘贴', '多格复制同时提供 TSV 与 HTML；Excel/WPS 区域粘贴支持确认扩行扩列，覆盖合并格时确认拆分。')}
+                ${toggleRow('edgeHandles', '行列选择柄与边缘加号', '点击数字选择整行或整列；可拖动数字排序，合并格覆盖的行列作为一组移动，末尾加号快速扩展。')}
+                ${toggleRow('contextMenu', '表格右键菜单', '右键显示选区操作；按住 Shift 右键保留浏览器菜单。')}
+                ${toggleRow('dragCells', '跨单元格拖选', '同一格内选文字，跨格时建立矩形选区；拖选期间按 Esc 停止扩展，松开鼠标结束。保留 Shift 点击和选区域入口。')}
+                ${toggleRow('preventCellMove', '防止单元格误移动', '拦截原生单元格或整表的拖动；不影响选文字、矩形选区与原生列宽调整。按住 Alt 开始拖动或关闭此项可放行。')}
+                ${toggleRow('assistHighlight', '当前行列辅助高亮', '仅作为编辑视觉辅助，不写入文档内容。')}
+                ${toggleRow('resizeHit', '扩大列宽拖拽热区', '边界附近显示 2px 细线和 12px 命中区；拖动仅预览，松开保存列宽，Esc 取消。')}
+                ${toggleRow('nestedGuard', '防止误插嵌套表格', '在现有表格中点击“插入表格”时先确认，避免误建嵌套表。')}
+                ${toggleRow('navigator', '在文档导航中显示表格', '在文档大纲侧栏显示表格入口，点击直接定位。')}
+                ${toggleRow('navigationHierarchy', '标题与表格合并成层级导航', '需开启自动文档大纲和表格导航。开启后表格归入所属标题；关闭后表格单独显示，大纲仍保留层级、折叠与标题标识。')}
+            </div>
+            <div class="att-divider"></div>
+            <div class="att-dtp-health-v7170">
+                <div>
+                    <b>表格健康检查</b>
+                    <span id="att-dtp-health-summary-v7170">正在检测…</span>
+                </div>
+                <div class="att-dtp-health-actions-v7170">
+                    <button type="button" data-dtp-settings-action="refresh-health">刷新</button>
+                    <button type="button" data-dtp-settings-action="locate-issue" id="att-dtp-locate-issue-v7170">定位问题</button>
+                </div>
+            </div>
+            <div class="att-doc-tools-note">选择区域无需按住鼠标拖动。选区保留原生复制、删除和撤销行为；按 Esc 取消选区域模式。合并格按实际行列跨度参与选择。</div>
+        `;
+        updateHealthUI();
+    }
+
+    function updateSettingsCardState() {
+        const card = document.getElementById(DTP.settingsCardId);
+        if (card) renderSettingsCard(card);
+    }
+
+    function updateHealthUI() {
+        const summary = document.getElementById('att-dtp-health-summary-v7170');
+        if (summary) {
+            const h = S.health;
+            summary.textContent = `顶层 ${h.topLevel} · 嵌套 ${h.nested} · 空表 ${h.empty} · 窄表 ${h.narrow}`;
+        }
+        const button = document.getElementById('att-dtp-locate-issue-v7170');
+        if (button instanceof HTMLButtonElement) button.disabled = !S.health.issues.length;
+    }
+
+    function emitDocumentNavigation(type, detail) {
+        if (typeof CustomEvent === 'function') document.dispatchEvent(new CustomEvent(type, {detail}));
+    }
+
+    function publishNavigationSettings() {
+        emitDocumentNavigation('att-document-navigation-settings-v7184', {
+            enabled: S.settings.enabled && S.settings.navigator && S.settings.navigationHierarchy
+        });
+    }
+
+    function bindTableNavigationEvents() {
+        document.addEventListener('att-document-navigation-rendered-v7184', () => {
+            refreshNavigator();
+            updateNavigatorActive();
+        });
+        document.addEventListener('att-document-table-navigate-v7184', event => {
+            const table = event.detail?.table;
+            if (!S.settings.enabled || !S.settings.navigator || !(table instanceof HTMLTableElement) ||
+                !table.isConnected || !S.editor?.contains(table) || table.parentElement?.closest('table')) return;
+            locateElement(table);
+            emitDocumentNavigation('att-document-table-active-v7184', {table});
+        });
+    }
+
+    function ensureNavigator() {
+        if (!S.settings.enabled || !S.settings.navigator) {
+            removeNavigator();
+            return null;
+        }
+        const outline = document.getElementById('att-document-outline');
+        if (!outline) return null;
+        if (S.settings.navigationHierarchy && outline.dataset.attNavigationMerged === '1') {
+            removeNavigator();
+            return null;
+        }
+        let nav = document.getElementById(DTP.navId);
+        if (!nav || nav.parentElement !== outline) {
+            nav?.remove();
+            nav = document.createElement('div');
+            nav.id = DTP.navId;
+            nav.setAttribute('data-lumatrace-ignore', '');
+            nav.innerHTML = `<div class="att-dtp-nav-head-v7170"><b>表格</b><span>0</span></div><div class="att-dtp-nav-list-v7170"></div>`;
+            nav.addEventListener('pointerdown', event => {
+                if (event.button === 0 && event.target?.closest?.('button[data-dtp-table-index]')) event.preventDefault();
+            });
+            nav.addEventListener('click', event => {
+                const button = event.target instanceof Element ? event.target.closest('button[data-dtp-table-index]') : null;
+                if (!button) return;
+                event.preventDefault();
+                const index = Number(button.dataset.dtpTableIndex);
+                const table = getTopLevelTables()[index];
+                if (table) {globalThis.__attDocumentWorkspaceV7190?.noteTarget(table); locateElement(table);}
+            });
+            outline.appendChild(nav);
+        }
+        return nav;
+    }
+
+    function refreshNavigator() {
+        const nav = ensureNavigator();
+        if (!nav) return;
+        const allTables = getTopLevelTables();
+        const tables = allTables.filter(table => !globalThis.__attDocumentWorkspaceV7190 || globalThis.__attDocumentWorkspaceV7190.allowStandalone(table));
+        const workspace = globalThis.__attDocumentWorkspaceV7190;
+        nav.style.display = workspace?.navigationMode === 'headings' || workspace?.navigationPane === 'bookmarks' || workspace?.navigationCollapsed ? 'none' : '';
+        const count = nav.querySelector('.att-dtp-nav-head-v7170 span');
+        const list = nav.querySelector('.att-dtp-nav-list-v7170');
+        if (count) count.textContent = String(tables.length);
+        if (!list) return;
+        if (!tables.length) {
+            list.innerHTML = '<div class="att-dtp-nav-empty-v7170">当前文档没有顶层表格</div>';
+            return;
+        }
+        list.innerHTML = tables.map(table => {
+            const index = allTables.indexOf(table);
+            const rows = table.rows.length;
+            const cols = Array.from(table.rows).reduce((maximum, row) => Math.max(maximum,
+                Array.from(row.cells).reduce((total, cell) => total + Math.max(1, Number(cell.colSpan) || 1), 0)), 0);
+            const label = tableLabel(table, index);
+            const active = table === S.table ? ' is-active' : '';
+            return `<button type="button" class="att-dtp-nav-item-v7170${active}" data-dtp-table-index="${index}" title="${escapeAttr(label)} · ${rows}行 × ${cols}列"><svg class="att-doc-nav-table-icon-v7184" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="2" y="3" width="12" height="10" rx="1"/><path d="M2 6h12M2 9h12M6 3v10M10 3v10"/></svg><b>${escapeHtml(label)}</b><em>${rows}×${cols}</em></button>`;
+        }).join('');
+    }
+
+    function updateNavigatorActive() {
+        emitDocumentNavigation('att-document-table-active-v7184', {table: S.table});
+        const nav = document.getElementById(DTP.navId);
+        if (!nav) return;
+        const tables = getTopLevelTables();
+        nav.querySelectorAll('button[data-dtp-table-index]').forEach(button => {
+            const table = tables[Number(button.dataset.dtpTableIndex)];
+            button.classList.toggle('is-active', table === S.table);
+        });
+    }
+
+    function removeNavigator() {
+        document.getElementById(DTP.navId)?.remove();
+    }
+
+    function locateNextHealthIssue() {
+        const issues = S.health.issues.filter(issue => issue.table?.isConnected);
+        if (!issues.length) {
+            showToast('当前没有检测到表格结构问题');
+            return;
+        }
+        const index = S.healthIssueCursor % issues.length;
+        S.healthIssueCursor = (index + 1) % issues.length;
+        const issue = issues[index];
+        locateElement(issue.table);
+        showToast(`${issue.type} · ${index + 1}/${issues.length}`);
+    }
+
+    function getScrollHost(el) {
+        for (let node=el?.parentElement; node && node!==document.body && node!==document.documentElement; node=node.parentElement) {
+            if (node===document.scrollingElement || node.scrollHeight<=node.clientHeight+2) continue;
+            const style=getComputedStyle(node), overflow=String(style.overflowY || style.overflow || '');
+            if (/(auto|scroll|overlay)/.test(overflow)) return node;
+            if (overflow==='hidden' && node.matches('.document-editor-shell,.document-editor,.document-view-shell,.document-view-page,.main-panel--grid,.main-panel')) return node;
+        }
+        return null;
+    }
+
+    function locateElement(el) {
+        if (!(el instanceof Element) || !el.isConnected) return;
+        const host=getScrollHost(el), clip=editorClipRect(), er=el.getBoundingClientRect();
+        if (host) {
+            const hr=host.getBoundingClientRect(), scale=host.offsetHeight?hr.height/host.offsetHeight || 1:1;
+            const top=Math.max(clip.top,hr.top+host.clientTop*scale),
+                bottom=Math.min(clip.bottom,hr.top+host.clientTop+host.clientHeight*scale);
+            const available=bottom-top, tall=er.height>available;
+            // A fully visible table, or the visible start of a long table, needs no scrolling.
+            const visible=er.top>=top-1 && (tall?er.top<bottom-1:er.bottom<=bottom+1);
+            if (available>0 && !visible) {
+                const delta=tall || er.top<top?er.top-top-12:er.bottom-bottom+12;
+                const next=Math.max(0,Math.min(host.scrollHeight-host.clientHeight,host.scrollTop+delta/scale));
+                if (Math.abs(next-host.scrollTop)>1) {
+                    try {host.scrollTo({top:next,behavior:'smooth'});}
+                    catch (_) {host.scrollTop=next;}
+                }
+            }
+        }
+        // Never scroll html/body or invoke scrollIntoView when the document has no scroll host.
+        const table=el instanceof HTMLTableElement?el:el.closest('table');
+        if (table) {
+            table.classList.add('att-dtp-locate-flash-v7170');
+            window.setTimeout(()=>table.classList.remove('att-dtp-locate-flash-v7170'),1300);
+        }
+        schedulePosition();
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function escapeAttr(value) {
+        return escapeHtml(value).replace(/`/g, '&#96;');
+    }
+
+    function applyFeatureClasses() {
+        const root = document.documentElement;
+        root.classList.toggle('att-dtp-enabled-v7170', S.settings.enabled);
+        root.classList.toggle('att-dtp-resize-hit-v7170', S.settings.enabled && S.settings.resizeHit);
+    }
+
+    function addStyles() {
+        if (document.getElementById(DTP.styleId)) return;
+        const style = document.createElement('style');
+        style.id = DTP.styleId;
+        style.textContent = `
+            #att-dtp-edges-v7180 {position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;z-index:2147482540;display:none;}
+            #att-dtp-edges-v7180 button {position:absolute;box-sizing:border-box;width:18px;height:18px;padding:0;border:1px solid #94a3b8;border-radius:4px;background:#f1f5f9;color:#334155;font:10px sans-serif;pointer-events:auto;cursor:pointer;}
+            #att-dtp-edges-v7180 button.is-target {background:#2563eb;color:#fff;}
+            #att-dtp-edges-v7180 button:disabled {opacity:.4;cursor:default;}
+            #att-dtp-context-v7180 {position:fixed;display:none;z-index:2147482600;width:180px;max-height:calc(100vh - 16px);overflow:auto;padding:6px;gap:3px;background:#181b20;border:1px solid #64748b;border-radius:9px;color:#e7eaf0;font:12px sans-serif;box-shadow:0 10px 28px #0005;}
+            #att-dtp-context-v7180 button {text-align:left;padding:7px;border:0;border-radius:5px;background:transparent;color:inherit;cursor:pointer;}
+            #att-dtp-context-v7180 button:hover {background:#334155;}
+            #att-dtp-dialog-v7180 {position:fixed;inset:0;z-index:2147482700;background:#0005;display:grid;place-items:center;}
+            #att-dtp-dialog-v7180>div {max-width:min(380px,calc(100vw - 32px));padding:20px;background:#181b20;color:#e7eaf0;border-radius:12px;font:14px/1.6 sans-serif;}
+            #att-dtp-dialog-v7180 button {padding:7px 14px;margin-right:8px;border:1px solid #64748b;border-radius:6px;background:#334155;color:inherit;cursor:pointer;}
+            #att-dtp-dialog-v7180 button[data-choice="confirm"] {background:#2563eb;}
+            #${MORE_POPUP_ID} {
+                position:fixed;display:none;z-index:2147482600;width:230px;max-height:min(65vh,460px);overflow:auto;
+                overscroll-behavior:contain;scrollbar-gutter:stable;box-sizing:border-box;align-content:start;
+                gap:3px;padding:5px;border:1px solid #414853;border-radius:8px;background:#22272d;color:#e7eaf0;
+                box-shadow:0 12px 28px rgba(0,0,0,.30);font:12px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+            }
+            #${MORE_POPUP_ID}, #${MORE_POPUP_ID} * {translate:none!important;scale:none!important;transform:none!important;animation:none!important;}
+            #${MORE_POPUP_ID} button {width:100%;text-align:left;border:1px solid #40464f;border-radius:6px;background:#2a2f36;color:#e8edf4;cursor:pointer;font:inherit;}
+            #${MORE_POPUP_ID} button:hover {background:#343b44;border-color:#556170;}
+            #${MORE_POPUP_ID} button:disabled {opacity:.4;cursor:default;}
+            #${MORE_POPUP_ID} button[aria-pressed="true"] {background:#1d4ed8;color:white;}
+            #${MORE_POPUP_ID} button.danger {color:#ffaaa5;}
+            #${MORE_POPUP_ID} button.confirming {color:#fff;background:#7f1d1d;border-color:#a33;}
+            #att-dtp-context-v7180 {box-sizing:border-box;overscroll-behavior:contain;scrollbar-gutter:stable;align-content:start;}
+            #${MORE_POPUP_ID} button, #att-dtp-context-v7180 button {
+                display:flex;align-items:center;gap:9px;min-height:28px;height:auto;padding:6px 8px;box-sizing:border-box;
+            }
+            .att-dtp-item-icon-v7183 {flex:0 0 16px;width:16px;height:16px;pointer-events:none;opacity:.88;}
+            .att-dtp-item-label-v7183 {min-width:0;white-space:normal;text-align:left;line-height:1.35;overflow-wrap:anywhere;}
+            #att-dtp-context-v7180 button.danger {color:#ffaaa5;}
+            #att-dtp-context-v7180 button.confirming {color:#fff;background:#7f1d1d;}
+            #att-dtp-frozen-v7180, #att-dtp-frozen-v7180 * {
+                pointer-events:none!important;transition:none!important;animation:none!important;translate:none!important;scale:none!important;
+            }
+            #${DTP.toolbarId} button:disabled {opacity:.4;cursor:default;}
+
+            .document-editor__content.att-dtp-selecting-v7173,
+            .document-editor__content.att-dtp-selecting-v7173 * { user-select:none!important; }
+            #${SCROLL_LAYER_ID} *, #${SCROLL_LAYER_ID} *:hover, #${SCROLL_LAYER_ID} *:active {
+                translate:none!important;scale:none!important;
+                transition-property:background-color,border-color,color,box-shadow,opacity!important;
+            }
+            #${DTP.toolbarId} {
+                position: absolute;
+                width: max-content;
+                pointer-events: auto;
+                z-index: 2147482550;
+                display: none;
+                align-items: center;
+                gap: 7px;
+                min-height: 36px;
+                max-width: min(520px, calc(100vw - 16px));flex-wrap:wrap;
+                padding: 5px 6px 5px 9px;
+                box-sizing: border-box;
+                border: 1px solid rgba(148,163,184,.34);
+                border-radius: 10px;
+                background: rgba(24,27,32,.97);
+                color: #e7eaf0;
+                box-shadow: 0 10px 28px rgba(0,0,0,.28);
+                font: 11px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+                user-select: none;
+            }
+            #${DTP.toolbarId}.is-visible { display: flex; }
+            #${DTP.toolbarId} .att-dtp-status-v7170 {
+                max-width: 150px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                color: #aeb7c3;
+                font-size: 10.5px;
+            }
+            #${DTP.toolbarId} .att-dtp-actions-v7170 { display:flex; align-items:center; gap:3px; flex-wrap:wrap; }
+            #${DTP.toolbarId} button[aria-pressed="true"] { background:#1d4ed8; color:white; }
+            #${DTP.toolbarId} button {
+                height: 26px;
+                padding: 0 7px;
+                border: 1px solid #40464f;
+                border-radius: 6px;
+                background: #2a2f36;
+                color: #e8edf4;
+                cursor: pointer;
+                font: inherit;
+            }
+            #${DTP.toolbarId} button:hover { background:#343b44; border-color:#556170; }
+            #${DTP.toolbarId} .att-dtp-more-v7170 { min-width:27px; padding:0 6px; font-size:15px; }
+            #${DTP.toolbarId} .att-dtp-more-menu-v7170 {
+                position:absolute;
+                right:0;
+                top:calc(100% + 5px);
+                display:none;
+                width:230px;
+                padding:5px;
+                border:1px solid #414853;
+                border-radius:8px;
+                background:#22272d;
+                box-shadow:0 12px 28px rgba(0,0,0,.30);
+            }
+            #${DTP.toolbarId}.att-dtp-more-open-v7170 .att-dtp-more-menu-v7170 { display:grid; gap:3px; }
+            #${DTP.toolbarId} .att-dtp-more-menu-v7170 button { width:100%; text-align:left; }
+            #${DTP.toolbarId} .att-dtp-more-menu-v7170 button.danger { color:#ffaaa5; }
+            #${DTP.toolbarId} .att-dtp-more-menu-v7170 button.confirming { color:#fff; background:#7f1d1d; border-color:#a33; }
+
+            #${DTP.guardId} {
+                position: fixed;
+                z-index: 2147482700;
+                display: none;
+                width: min(340px, calc(100vw - 20px));
+                box-sizing: border-box;
+                padding: 12px;
+                border: 1px solid rgba(245,158,11,.38);
+                border-radius: 11px;
+                background: rgba(31,34,39,.98);
+                color: #e7eaf0;
+                box-shadow: 0 16px 38px rgba(0,0,0,.32);
+                font: 12px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+            }
+            #${DTP.guardId}.is-visible { display:block; }
+            #${DTP.guardId} .att-dtp-guard-title-v7170 { font-weight:800; color:#ffd38a; }
+            #${DTP.guardId} .att-dtp-guard-text-v7170 { margin-top:6px; color:#b8c0cb; }
+            #${DTP.guardId} .att-dtp-guard-actions-v7170 { display:flex; justify-content:flex-end; gap:6px; margin-top:10px; }
+            #${DTP.guardId} button { height:28px; padding:0 9px; border:1px solid #454c55; border-radius:6px; background:#2b3037; color:#e7eaf0; cursor:pointer; }
+            #${DTP.guardId} button.danger { color:#ffb4ad; border-color:#68433f; }
+
+            #${DTP.toastId} {
+                position:fixed;
+                left:50%;
+                bottom:28px;
+                z-index:2147482750;
+                transform:translate(-50%,8px);
+                opacity:0;
+                pointer-events:none;
+                padding:7px 11px;
+                border:1px solid rgba(148,163,184,.28);
+                border-radius:8px;
+                background:rgba(28,31,36,.96);
+                color:#e9edf3;
+                font:11px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+                transition:opacity .14s ease,transform .14s ease;
+            }
+            #${DTP.toastId}.is-visible { opacity:1; transform:translate(-50%,0); }
+
+            html.att-dtp-enabled-v7170 .document-editor__content table.att-dtp-active-table-v7170 {
+                outline: 1px solid rgba(59,130,246,.18);
+                outline-offset: 1px;
+            }
+            html.att-dtp-enabled-v7170 .document-editor__content td.att-dtp-current-row-v7170,
+            html.att-dtp-enabled-v7170 .document-editor__content th.att-dtp-current-row-v7170 {
+                background-image: linear-gradient(rgba(59,130,246,.035),rgba(59,130,246,.035));
+            }
+            html.att-dtp-enabled-v7170 .document-editor__content td.att-dtp-current-col-v7170,
+            html.att-dtp-enabled-v7170 .document-editor__content th.att-dtp-current-col-v7170 {
+                box-shadow: inset 0 0 0 999px rgba(59,130,246,.025);
+            }
+            html.att-dtp-enabled-v7170 .document-editor__content td.att-dtp-current-cell-v7170,
+            html.att-dtp-enabled-v7170 .document-editor__content th.att-dtp-current-cell-v7170 {
+                box-shadow: inset 0 0 0 2px rgba(59,130,246,.58) !important;
+            }
+            html.att-dtp-enabled-v7170 .document-editor__content table.att-dtp-locate-flash-v7170 {
+                outline: 2px solid rgba(59,130,246,.72) !important;
+                outline-offset: 3px !important;
+                transition: outline-color .25s ease;
+            }
+
+            /* V7.18.1：提示层不占用命中区域，选区/移动/调宽均保留原生命中判断。 */
+            html.att-dtp-resize-hit-v7170 .document-editor__content .column-resize-handle {
+                overflow: visible !important;
+                pointer-events: none !important;
+            }
+            html.att-dtp-resize-hit-v7170 .document-editor__content .column-resize-handle::before {
+                content:"";
+                position:absolute;
+                top:0;
+                bottom:0;
+                left:-5px;
+                right:-5px;
+                pointer-events:none !important;
+                background:rgba(59,130,246,.08);
+            }
+
+            #${DTP.settingsHostId} { display:none; margin-top:7px; }
+            #att-toolbox-root:has(.att-tab[data-tab="document-tools"].att-active) .att-content > #${DTP.settingsHostId} { display:block; }
+            #${DTP.settingsCardId} .att-dtp-settings-group-v7170.att-dtp-disabled-v7170 { opacity:.48; }
+            #${DTP.settingsCardId} .att-dtp-health-v7170 { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+            #${DTP.settingsCardId} .att-dtp-health-v7170 > div:first-child { min-width:0; display:flex; flex-direction:column; gap:3px; }
+            #${DTP.settingsCardId} .att-dtp-health-v7170 b { font-size:11.5px; color:var(--att-ui-text-2,#344054); }
+            #${DTP.settingsCardId} .att-dtp-health-v7170 span { font-size:10.5px; color:var(--att-ui-muted,#667085); }
+            #${DTP.settingsCardId} .att-dtp-health-actions-v7170 { display:flex; gap:5px; flex:0 0 auto; }
+            #${DTP.settingsCardId} .att-dtp-health-actions-v7170 button { height:27px; padding:0 8px; border:1px solid var(--att-ui-border,#e4e7ec); border-radius:6px; background:var(--att-ui-surface,#fff); color:var(--att-ui-text-2,#344054); cursor:pointer; font-size:10.5px; }
+            #${DTP.settingsCardId} .att-dtp-health-actions-v7170 button:disabled { opacity:.42; cursor:not-allowed; }
+
+            #${DTP.navId} {
+                flex:0 0 auto;
+                max-height:38%;
+                min-height:0;
+                display:flex;
+                flex-direction:column;
+                border-top:1px solid var(--border-color,rgba(148,163,184,.18));
+                background:var(--bg-panel,var(--bg-card,#fff));
+            }
+            #${DTP.navId} .att-dtp-nav-head-v7170 { display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:30px; padding:0 10px 0 13px; color:var(--text-muted,#64748b); font-size:10.5px; }
+            #${DTP.navId} .att-dtp-nav-head-v7170 b { color:var(--text-secondary,#475569); font-size:11px; }
+            #${DTP.navId} .att-dtp-nav-list-v7170 { min-height:0; overflow:auto; padding:2px 5px 7px; }
+            #${DTP.navId} .att-dtp-nav-item-v7170 { width:100%; min-width:0; min-height:30px; box-sizing:border-box; margin:1px 0; padding:6px 7px; display:grid; grid-template-columns:13px minmax(0,1fr) auto; align-items:center; gap:6px; border:0; border-radius:6px; background:transparent; color:var(--text-secondary,#475569); text-align:left; cursor:pointer; font:inherit; font-size:11px; line-height:1.45; }
+            #${DTP.navId} .att-dtp-nav-item-v7170:hover { background:var(--bg-hover,rgba(148,163,184,.10)); color:var(--text-main,#1f2937); }
+            #${DTP.navId} .att-dtp-nav-item-v7170.is-active { background:var(--primary-bg,rgba(22,119,255,.10)); color:var(--primary,var(--ant-color-primary,#1677ff)); }
+            #${DTP.navId} .att-dtp-nav-item-v7170 b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:400; }
+            #${DTP.navId} .att-dtp-nav-item-v7170 em { font-style:normal; font-size:9px; opacity:.65; }
+            #${DTP.navId} .att-dtp-nav-item-v7170:focus-visible { outline:1px solid var(--primary,#1677ff); outline-offset:-1px; }
+            body.att-native-dark #${DTP.navId} .att-dtp-nav-item-v7170 {color:var(--text-secondary,var(--edge-text-2,#d2d2d2));}
+            body.att-native-dark #${DTP.navId} .att-dtp-nav-item-v7170:hover {color:var(--text-main,var(--edge-text,#f3f3f3));}
+            body.att-native-dark #${DTP.navId} .att-dtp-nav-item-v7170.is-active {color:var(--primary,var(--edge-blue,#60cdff));background:var(--primary-bg,rgba(96,205,255,.12));}
+            #${DTP.navId} .att-dtp-nav-empty-v7170 { padding:8px 10px 11px; color:var(--text-muted,#94a3b8); font-size:10px; text-align:center; }
+        `;
+        document.documentElement.appendChild(style);
+    }
+
+    function structureMutationRelevant(record) {
+        const target = record.target instanceof Element ? record.target : record.target?.parentElement;
+        if (target?.closest?.(`#${SCROLL_LAYER_ID},#${MORE_POPUP_ID},#${DTP.toolbarId},#${DTP.guardId},#${DTP.settingsHostId},#${DTP.navId},#${PLUS.edgeId},#${PLUS.menuId},#${PLUS.dialogId},#att-dtp-frozen-v7180,#att-dtp-column-hit-v7181`)) return false;
+        if (target?.closest?.('.grid-virtual-body')) return false;
+
+        const nodes = [...(record.addedNodes || []), ...(record.removedNodes || [])];
+        return nodes.some(node => {
+            if (!(node instanceof Element)) return false;
+            if (node.matches?.('.column-resize-handle')) return false;
+            return node.matches?.('.document-view-page,.document-editor__content,.tableWrapper,table,tbody,tr,td,th,#att-toolbox-root,#att-document-outline') ||
+                Boolean(node.querySelector?.('.document-view-page,.document-editor__content,.tableWrapper,table,#att-toolbox-root,#att-document-outline'));
+        });
+    }
+
+    function scheduleStructureSync(delay = 20) {
+        clearTimeout(S.structureTimer);
+        S.structureTimer = window.setTimeout(() => {
+            if (S.dragging || S.pointerGesture) { S.pendingStructureSync = true; return; }
+            syncEditor();
+            ensureSettingsCard();
+            scheduleContextRefresh();
+            scheduleContentRefresh(0);
+        }, Math.max(0, delay));
+    }
+
+    function bindGlobalEvents() {
+        if (document.documentElement.dataset.attDocTablePlusBoundV7170 === '1') return;
+        document.documentElement.dataset.attDocTablePlusBoundV7170 = '1';
+
+        document.addEventListener('pointerdown', invalidatePendingSelection, true);
+        document.addEventListener('keydown', event => {
+            if (/^(Escape|Arrow.*|Home|End|PageUp|PageDown|Backspace|Delete|Enter|Tab)$/.test(event.key) ||
+                ((event.ctrlKey || event.metaKey) && /^[zy]$/i.test(event.key))) {
+                invalidatePendingSelection(event);
+                if (event.key !== 'Escape') finishDrag();
+            }
+        }, true);
+        document.addEventListener('beforeinput', event => {
+            if (S.editor?.contains(event.target)) { invalidatePendingSelection(); finishDrag(); }
+        }, true);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') invalidatePendingSelection();
+        });
+
+        document.addEventListener('pointermove', handleCellPointerMove, {capture: true, passive: false});
+        document.addEventListener('mousemove', event => {
+            if (!S.pointerGesture?.cellSelecting && !S.pointerGesture?.cancelled) return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        }, true);
+        document.addEventListener('pointerup', finishPointerGesture, true);
+        document.addEventListener('pointercancel', finishPointerGesture, true);
+        document.addEventListener('dragend', () => finishPointerGesture(), true);
+        window.addEventListener('blur', () => finishPointerGesture());
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') finishPointerGesture();
+        });
+
+        document.addEventListener('pointerdown', onSelectionPointerDown, true);
+        document.addEventListener('mousedown', swallowSelectionCompatibilityEvent, true);
+        document.addEventListener('click', swallowSelectionCompatibilityEvent, true);
+        window.addEventListener('pointerup', event => {
+            if (S.pointerGesture) finishPointerGesture(event);
+            else if (S.dragging && event.pointerId === S.dragPointerId) finishDrag();
+        }, true);
+        window.addEventListener('pointercancel', finishDrag, true);
+        window.addEventListener('dragend', finishDrag, true);
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') finishDrag(); });
+        window.addEventListener('blur', () => { invalidatePendingSelection(); finishDrag(); S.rangeMode=false; scheduleContextRefresh(); });
+        window.addEventListener('pointermove', event => {
+            if (S.dragging && event.buttons === 0) finishDrag();
+        }, {capture:true,passive:true});
+        document.addEventListener('keydown', event => {
+            const gesture = S.pointerGesture;
+            if (event.key === 'Escape' && (S.rangeMode || gesture?.cellSelecting || gesture?.cancelled)) {
+                S.rangeMode=false;
+                if (gesture) {
+                    cancelSelectionFrame();
+                    gesture.endCell = gesture.appliedCell || gesture.endCell;
+                    gesture.cancelled = true;
+                    gesture.disabled = true;
+                    gesture.cellSelecting = false;
+                    gesture.epoch = S.interactionEpoch;
+                }
+                consumeSelectionEvent(event);
+                scheduleContextRefresh();
+            }
+        }, true);
+
+        document.addEventListener('selectionchange', () => {
+            if (!S.settings.enabled || !S.editor || S.dragging) return;
+            const cell = getSelectionCell(S.editor);
+            if (cell || S.selectedCells.length || (S.cell && getNativeTableContextActive())) scheduleContextRefresh();
+        }, { passive: true });
+
+        document.addEventListener('pointerdown', event => {
+            if (!S.settings.enabled) return;
+            const target = event.target instanceof Element ? event.target : null;
+            const insideEditor = Boolean(target && S.editor?.contains?.(target));
+            const insideOwnUi = Boolean(target?.closest?.(`#${MORE_POPUP_ID},#${DTP.toolbarId},#${DTP.guardId},#${PLUS.edgeId},#${PLUS.menuId},#${PLUS.dialogId},#att-dtp-column-hit-v7181`));
+            const insideNativeDocToolbar = Boolean(target?.closest?.('.document-toolbar'));
+            if (!insideEditor && !insideOwnUi && !insideNativeDocToolbar) {
+                S.contextStickyUntil = 0;
+                S.rangeMode = false;
+                S.rangeAnchor = null;
+                scheduleContextRefresh();
+            }
+            maybeBlockInsertTable(event);
+        }, true);
+
+        document.addEventListener('click', event => {
+            if (!S.settings.enabled) return;
+            maybeBlockInsertTable(event);
+        }, true);
+
+        document.addEventListener('scroll', event => {
+            const target=event.target;
+            if (target instanceof Element && target!==S.editor && !target.contains(S.editor)) return;
+            closeTableMenus();
+            refreshDragAfterScroll();
+            if (S.frozenTable || S.table || document.getElementById(DTP.toolbarId)?.classList.contains('is-visible') || S.assistOverlay?.style.display === 'block') schedulePosition();
+        }, { capture: true, passive: true });
+        window.addEventListener('resize', schedulePosition, { passive: true });
+        window.addEventListener('popstate', () => scheduleStructureSync(40));
+
+        S.observer = new MutationObserver(records => {
+            let selectionChanged=false, structureChanged=false;
+            for (const record of records) {
+                if (record.type === 'attributes') {
+                    const target=record.target;
+                    if (S.editor?.contains(target) && target.matches?.('td,th') &&
+                        target.classList.contains('selectedCell') !== /(?:^|\s)selectedCell(?:\s|$)/.test(record.oldValue || '')) {
+                        selectionChanged=true;
+                    }
+                } else if (structureMutationRelevant(record)) {
+                    structureChanged=true;
+                    const table=record.target?.closest?.('table');
+                    if (table) S.gridCache.delete(table);
+                }
+            }
+            if (selectionChanged) scheduleContextRefresh();
+            if (structureChanged) scheduleStructureSync(18);
+        });
+        S.observer.observe(document.documentElement, { childList: true, subtree: true });
+    }
+
+    function exposeDiagnostics() {
+        const api = {
+            version: DTP.version,
+            snapshot() {
+                return {
+                    enabled: S.settings.enabled,
+                    navigationHierarchy: S.settings.navigationHierarchy,
+                    preventCellMove: S.settings.preventCellMove,
+                    dragCells: S.settings.dragCells,
+                    nativeRectAvailable: S.nativeRectAvailable,
+                    rectangleSelecting: Boolean(S.pointerGesture?.cellSelecting),
+                    dragCancelled: Boolean(S.pointerGesture?.cancelled),
+                    pointerGestureActive: Boolean(S.pointerGesture),
+                    blockedCellDrags: S.blockedCellDrags,
+                    editorFound: Boolean(S.editor?.isConnected),
+                    editorFocused: editorOwnsFocus(S.editor),
+                    tableFound: Boolean(S.table?.isConnected),
+                    cellFound: Boolean(S.cell?.isConnected),
+                    selectionMode: S.selectionMode,
+                    selectedCells: S.selectedCells.filter(c => c?.isConnected).length,
+                    rowIndex: S.rowIndex,
+                    colIndex: S.colIndex,
+                    nativeTableContext: getNativeTableContextActive(),
+                    lastCellAgeMs: S.lastCellAt ? Math.round(performance.now() - S.lastCellAt) : null,
+                    stickyRemainingMs: Math.max(0, Math.round(S.contextStickyUntil - performance.now())),
+                    rangeMode: S.rangeMode,
+                    dragging: S.dragging,
+                    editorViewFound: Boolean(getEditorView()),
+                    selectionError: S.selectionError || null,
+                    scrollingUiAttached: Boolean(S.scrollLayer?.isConnected),
+                    documentScrollHostFound: Boolean(getScrollHost(S.table || S.editor)),
+                    metrics: {...S.metrics}
+                };
+            },
+            refresh() { scheduleContextRefresh(); scheduleContentRefresh(0); }
+        };
+        try { globalThis.__attDocTablePlus = api; } catch (_) {}
+        try { if (typeof unsafeWindow !== 'undefined') unsafeWindow.__attDocTablePlus = api; } catch (_) {}
+    }
+
+    function init() {
+        addStyles();
+        applyFeatureClasses();
+        bindGlobalEvents();
+        bindTableNavigationEvents();
+        publishNavigationSettings();
+        bindProductivityEvents();
+        bindColumnResize();
+        syncEditor();
+        ensureToolbar();
+        ensureGuard();
+        ensureToast();
+        exposeDiagnostics();
+        ensureSettingsCard();
+        refreshTableInventory();
+        scheduleContextRefresh();
+        window.setTimeout(() => {
+            syncEditor();
+            ensureSettingsCard();
+            refreshTableInventory();
+            scheduleContextRefresh();
+        }, 180);
+        console.log('[AutoTable Document Table Plus] V7.19.0 已加载：两种模式统一标题树与折叠 / 标题与表格层级导航 / 菜单边界与图标 / 冻结表头样式和停靠修复 / 表格内部跳转 / 滚动内容锚定浮层 / 跨格矩形拖选 / 设置卡增量更新 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 编辑器外高亮 / 保留防误移动');
+    }
+
+    if (document.body) init();
+    else window.addEventListener('DOMContentLoaded', init, { once: true });
+})();
+
