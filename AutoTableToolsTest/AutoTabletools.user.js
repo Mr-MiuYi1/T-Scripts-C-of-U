@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.17.4
-// @description  AutoTable 一体化效率增强工具：文档表格增强（跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.18.1
+// @description  AutoTable 一体化效率增强工具：文档表格增强（跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.17.4
+ * AutoTable 工具集 V7.18.1
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，规则组/规则分层管理，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -54,7 +54,7 @@
     'use strict';
 
     const KEY = '__attPerfStats';
-    const VERSION = 'V7.17.4';
+    const VERSION = 'V7.18.1';
     const makeCounters = () => ({
         panelFullRenders: 0,
         panelSectionRenderCalls: 0,
@@ -215,7 +215,7 @@
     const PERF = globalThis.__attPerfStats || null;
 
     const APP = {
-        version: 'V7.17.4',
+        version: 'V7.18.1',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -19812,7 +19812,7 @@
                 // V7.16.5：表格虚拟行复用不可能改变文档编辑上下文，直接早退。
                 if (target?.closest?.('.grid-virtual-body')) return false;
                 if (!(target instanceof Element)) return true;
-                return !target.closest('#att-toolbox-root, #att-document-outline, #att-doc-table-mini-toolbar-v7170, #att-doc-table-nested-guard-v7170, #att-doc-table-toast-v7170, #att-doc-table-assist-overlay-v7172');
+                return !target.closest('#att-toolbox-root, #att-document-outline, #att-doc-table-mini-toolbar-v7170, #att-doc-table-nested-guard-v7170, #att-doc-table-toast-v7170, #att-doc-table-assist-overlay-v7172,#att-dtp-edges-v7180,#att-dtp-context-v7180,#att-dtp-dialog-v7180,#att-dtp-frozen-v7180,#att-dtp-column-hit-v7181');
             });
 
             if (hasExternalMutation) scheduleContextSync(80);
@@ -31973,20 +31973,16 @@
 })();
 
 /* ============================================================================
- * AutoTable Document Table Plus V7.17.4 · 文档表格增强第一阶段
+ * AutoTable Document Table Plus V7.18.1 · 文档表格完整交互增强
  * --------------------------------------------------------------------------
  * 目标：不重做 ProseMirror 表格引擎，只给原生表格能力增加一层稳定的交互外壳。
  *
- * 本阶段：
- * 1) ContextController：识别当前表 / 当前单元格 / selectedCell / 原生“表格编辑”上下文；
- * 2) CommandAdapter：优先复用 AutoTable 原生表格命令，不直接篡改 ProseMirror 表格结构；
- * 3) 单元格迷你工具栏：上方插行 / 插入列 / 删除行 / 删除列 / 删除表格；
- * 4) 行列辅助高亮与动态 CellSelection 状态提示；
- * 5) 列宽拖拽热区增强：只扩大透明命中区，不替换原生 resize widget；
- * 6) 防误嵌套表格：表格内点击“插入表格”时先给出轻量确认层；
- * 7) 文档表格导航：复用现有文档大纲侧栏，列出顶层表格并支持定位；
- * 8) 表格健康检查：统计顶层表 / 嵌套表 / 空表 / 异常窄表，并支持逐项定位；
- * 9) 所有增强均为 DOM Overlay / 原生命令桥接，不写入文档正文，不污染 Markdown/PDF。
+ * 已实现：原生矩形选择、整行/整列/整表入口、四方向插入、区域复制和粘贴、
+ * 扩展确认、列宽设置、选区清空、右键菜单、行列柄排序、表头与冻结首行、
+ * 表格前后插入、防误移动与误嵌套、表格导航和健康检查。
+ * 合并/拆分支持原生命令与跨度校验后的模型适配；选区样式按 schema 属性显示。
+ * 内容修改仅通过原生 commands 或 schema 校验后的 transaction 完成。
+ * 行列柄、高亮、冻结表头和菜单均在编辑器外绘制，视觉设置不进入文档正文。
  *
  * 性能边界：无 setInterval；一个结构 MutationObserver；交互更新按 RAF 合并。
  * ========================================================================== */
@@ -31994,7 +31990,7 @@
     'use strict';
 
     const DTP = {
-        version: 'V7.17.4',
+        version: 'V7.18.1',
         styleId: 'att-doc-table-plus-style-v7170',
         toolbarId: 'att-doc-table-mini-toolbar-v7170',
         guardId: 'att-doc-table-nested-guard-v7170',
@@ -32016,7 +32012,10 @@
             nestedGuard: 'att_doc_table_plus_nested_guard_v7170',
             navigator: 'att_doc_table_plus_navigator_v7170',
             preventCellMove: 'att_doc_table_plus_prevent_cell_move_v7172',
-            dragCells: 'att_doc_table_plus_drag_cells_v7173'
+            dragCells: 'att_doc_table_plus_drag_cells_v7173',
+            clipboard:'att_doc_table_plus_clipboard_v7180',
+            edgeHandles:'att_doc_table_plus_edge_handles_v7180',
+            contextMenu:'att_doc_table_plus_context_menu_v7180'
         }
     };
 
@@ -32028,7 +32027,8 @@
         nestedGuard: true,
         navigator: true,
         preventCellMove: true,
-        dragCells: true
+        dragCells: true,
+        clipboard:true, edgeHandles:true, contextMenu:true
     };
 
     const S = {
@@ -32070,7 +32070,7 @@
         dragPointerId: null,
         dragTimer: 0,
         gridCache: new WeakMap(),
-        metrics: { contextRefreshes: 0, dragRefreshSkips: 0, rangeSelections: 0 },
+        metrics: { contextRefreshes: 0, dragRefreshSkips: 0, rangeSelections: 0, dragApplySkips: 0 },
         selectionError: '',
         pointerGesture: null,
         blockedCellDrags: 0,
@@ -32078,7 +32078,9 @@
         selectionRaf: 0,
         rectEnd: null,
         pendingStructureSync: false,
-        pendingContentRefresh: false
+        pendingContentRefresh: false,
+        interactionEpoch: 0,
+        editorOwner:null, frozenTable:null, edgeGesture:null, edgeSignature:null, edgeTable:null, tableDialog:null
     };
 
     function safeGet(key, fallback) {
@@ -32103,6 +32105,8 @@
         S.settings[name] = Boolean(value);
         safeSet(DTP.keys[name], S.settings[name]);
         applyFeatureClasses();
+        if (!S.settings.enabled || !S.settings.resizeHit) {cancelColumnResize();finishDrag();}
+        if (!S.settings.enabled) { S.frozenTable=null; hideProductivityUi(); closeTableDialog(); updateFrozenHeader(); }
         if (!S.settings.enabled) {
             S.rangeMode = false;
             S.rangeAnchor = null;
@@ -32458,7 +32462,25 @@
         event.stopImmediatePropagation();
     }
 
-    function finishDrag() {
+    function cancelSelectionFrame() {
+        if (S.selectionRaf) cancelAnimationFrame(S.selectionRaf);
+        S.selectionRaf = 0;
+    }
+
+    function invalidatePendingSelection(event) {
+        if (event?.target?.closest?.(`#${PLUS.dialogId}`)) return;
+        S.interactionEpoch++;
+        S.rectEnd = null;
+    }
+
+    function isInteractiveCellTarget(target) {
+        const el = target instanceof Element ? target : target?.parentElement;
+        return Boolean(el?.closest('a,button,input,textarea,select,option,img,video,audio,iframe,[data-type="image"],[data-type="attachment"]') ||
+            el?.closest('[contenteditable]')?.getAttribute('contenteditable') === 'false');
+    }
+
+    function finishDrag(refresh = true) {
+        cancelSelectionFrame();
         if (!S.dragging && !S.pointerGesture) return;
         S.dragging = false;
         S.editor?.classList.remove('att-dtp-selecting-v7173');
@@ -32468,7 +32490,7 @@
         S.dragTimer = 0;
         if (S.pendingStructureSync) { S.pendingStructureSync = false; scheduleStructureSync(0); }
         if (S.pendingContentRefresh) { S.pendingContentRefresh = false; scheduleContentRefresh(0); }
-        scheduleContextRefresh();
+        if (refresh) scheduleContextRefresh();
     }
 
     function onSelectionPointerDown(event) {
@@ -32478,7 +32500,7 @@
         const cell = cellFromEventTarget(event.target);
         if (!cell) return;
         const target = event.target instanceof Element ? event.target : null;
-        if (target?.closest('a,button,input,textarea,select,[contenteditable="false"],.column-resize-handle') ||
+        if (isInteractiveCellTarget(target) || target?.closest('.column-resize-handle') ||
             isNativeResizeTarget(target)) return;
         const anchor = S.rangeMode ? S.rangeAnchor : (S.rangeAnchor || S.cell);
         if ((S.rangeMode || event.shiftKey) && anchor?.isConnected && getTopTable(anchor) === getTopTable(cell) &&
@@ -32570,6 +32592,7 @@
         applyAssistClasses();
         updateToolbar();
         updateNavigatorActive();
+        positionEdgeHandles(); updateFrozenHeader();
     }
 
     function scheduleContextRefresh() {
@@ -32584,6 +32607,7 @@
             S.positionRaf = 0;
             positionToolbar();
             applyAssistClasses();
+            positionEdgeHandles(); updateFrozenHeader();
         });
     }
 
@@ -32592,6 +32616,8 @@
         if (next === S.editor) return;
 
         try { S.editorAbort?.abort(); } catch (_) {}
+        invalidatePendingSelection();
+        S.editor?.classList.remove('att-dtp-selecting-v7173');
         S.pointerGesture = null;
         S.editorAbort = null;
         S.editor = next;
@@ -32601,6 +32627,11 @@
         S.cell = null;
         S.selectedCells = [];
         S.editorView = null;
+        S.editorOwner = null;
+        S.frozenTable = null;
+        cancelColumnResize();
+        S.edgeGesture = null;
+        hideProductivityUi(); closeTableDialog(); updateFrozenHeader();
         S.selectionBase = null;
         S.cellSelectionType = null;
         S.rangeAnchor = null;
@@ -32624,6 +32655,7 @@
             S.rectEnd = null;
             const cell = cellFromEventTarget(event.target, next);
             const target = event.target instanceof Element ? event.target : event.target?.parentElement;
+            if (isInteractiveCellTarget(target)) return;
             const table = cell?.closest('table') || target?.closest('table') ||
                 target?.closest('.tableWrapper')?.querySelector('table');
             if (cell) rememberInteractionCell(cell);
@@ -32643,7 +32675,13 @@
                     resize: isNativeResizeTarget(target, next),
                     endCell: cell,
                     cellSelecting: false,
-                    disabled: false
+                    disabled: false,
+                    cancelled: false,
+                    epoch: S.interactionEpoch,
+                    appliedCell: null,
+                    appliedDoc: null,
+                    appliedSelection: null,
+                    lastPointer: null
                 };
                 clearAssistClasses();
                 hideToolbar();
@@ -32700,18 +32738,23 @@
         if (!gesture) return;
         if (event?.pointerId != null && gesture.pointerId != null &&
             event.pointerId !== gesture.pointerId) return;
-        const finalize = gesture.cellSelecting && event?.type === 'pointerup';
+        const finalize = (gesture.cellSelecting || gesture.cancelled) && event?.type === 'pointerup' &&
+            gesture.epoch === S.interactionEpoch && S.settings.enabled && S.settings.dragCells;
+        let completed = null;
         if (finalize) {
-            const end = cellAtPointer(event, gesture);
-            if (end) gesture.endCell = end;
-            S.rectEnd = {table: gesture.table, until: performance.now() + 250};
+            if (!gesture.cancelled) {
+                const end = cellAtPointer(event, gesture);
+                if (end) gesture.endCell = end;
+            }
+            completed = S.rectEnd = {table: gesture.table, until: performance.now() + 250, epoch: S.interactionEpoch};
         }
         S.editor?.classList.remove('att-dtp-selecting-v7173');
         S.pointerGesture = null;
-        finishDrag();
-        // 在原生 mouseup/click 处理结束后恢复最终 CellSelection，防止其退回文本选择。
-        if (finalize) requestAnimationFrame(() => {
-            if (!S.pointerGesture && S.rectEnd?.table === gesture.table) setNativeCellSelection(gesture, gesture.endCell);
+        finishDrag(false);
+        // 只恢复这次松开对应的选区。新的点击/键盘操作会使旧任务失效。
+        if (completed) requestAnimationFrame(() => {
+            if (!S.pointerGesture && S.rectEnd === completed && S.interactionEpoch === completed.epoch &&
+                S.settings.enabled && S.settings.dragCells) setNativeCellSelection(gesture, gesture.endCell);
         });
         if (S.pendingStructureSync) { S.pendingStructureSync = false; scheduleStructureSync(0); }
         if (S.pendingContentRefresh) { S.pendingContentRefresh = false; scheduleContentRefresh(0); }
@@ -32719,10 +32762,31 @@
     }
 
     function setNativeCellSelection(gesture, end) {
-        if (!gesture?.cell?.isConnected || !end?.isConnected || end.closest('table') !== gesture.table) return false;
+        if (!S.settings.enabled || !gesture?.cell?.isConnected || !end?.isConnected ||
+            end.closest('table') !== gesture.table) return false;
         const ok = selectCellRange(gesture.cell, end, false);
         S.nativeRectAvailable = ok;
+        if (ok) {
+            const view = getEditorView();
+            gesture.appliedCell = end;
+            gesture.appliedDoc = view?.state.doc;
+            gesture.appliedSelection = view?.state.selection;
+        }
         return ok;
+    }
+
+    function selectionIsApplied(gesture, end) {
+        const view = getEditorView();
+        if (!view || gesture.appliedCell !== end || gesture.appliedDoc !== view.state.doc) return false;
+        const applied = gesture.appliedSelection, current = view.state.selection;
+        return current === applied || Boolean(applied?.$anchorCell && current?.$anchorCell &&
+            applied.$anchorCell.pos === current.$anchorCell.pos && applied.$headCell.pos === current.$headCell?.pos);
+    }
+
+    function releaseFailedSelection(gesture) {
+        gesture.cellSelecting = false;
+        gesture.disabled = true;
+        S.editor?.classList.remove('att-dtp-selecting-v7173');
     }
 
     function cellAtPointer(event, gesture) {
@@ -32740,21 +32804,36 @@
             gesture.resize || gesture.allowCellMove || gesture.textOnly || !gesture.cell) return;
         if (event.pointerId != null && gesture.pointerId != null && event.pointerId !== gesture.pointerId) return;
         if (event.buttons != null && !(event.buttons & 1)) { finishPointerGesture(); return; }
+        if (Number.isFinite(event.clientX) && Number.isFinite(event.clientY)) {
+            gesture.lastPointer = {clientX: event.clientX, clientY: event.clientY, pointerId: gesture.pointerId};
+        }
         const end = cellAtPointer(event, gesture);
         if (!end || (!gesture.cellSelecting && end === gesture.cell)) return;
-        // 首次跨格时先验证页面的真实 CellSelection 能力；不支持则保留原生交互。
         if (!gesture.cellSelecting) {
-            if (!setNativeCellSelection(gesture, end)) { gesture.disabled = true; return; }
+            if (!setNativeCellSelection(gesture, end)) { releaseFailedSelection(gesture); return; }
             gesture.cellSelecting = true;
             S.editor.classList.add('att-dtp-selecting-v7173');
         }
-        if (end !== gesture.endCell) gesture.endCell = end;
         event.preventDefault();
         event.stopImmediatePropagation();
+        gesture.endCell = end;
+        if (selectionIsApplied(gesture, end)) { S.metrics.dragApplySkips++; return; }
         if (S.selectionRaf) return;
-        S.selectionRaf = requestAnimationFrame(() => {
+        const frameId = requestAnimationFrame(() => {
+            if (S.selectionRaf !== frameId) return;
             S.selectionRaf = 0;
-            if (S.pointerGesture === gesture) setNativeCellSelection(gesture, gesture.endCell);
+            if (S.pointerGesture === gesture && !gesture.cancelled && gesture.epoch === S.interactionEpoch &&
+                !setNativeCellSelection(gesture, gesture.endCell)) releaseFailedSelection(gesture);
+        });
+        S.selectionRaf = frameId;
+    }
+
+    function refreshDragAfterScroll() {
+        const gesture = S.pointerGesture;
+        if (!gesture?.cellSelecting || !gesture.lastPointer) return;
+        handleCellPointerMove({
+            ...gesture.lastPointer, target: S.editor, buttons: 1,
+            preventDefault() {}, stopImmediatePropagation() {}
         });
     }
 
@@ -32820,7 +32899,10 @@
             <div class="att-dtp-actions-v7170">
                 <button type="button" data-dtp-action="select-range" title="以当前格为起点，点击终点选择矩形区域；Esc 取消">选区域</button>
                 <button type="button" data-dtp-cmd="insertRowAbove" title="在当前行上方插入一行">＋行↑</button>
-                <button type="button" data-dtp-cmd="insertColumn" title="调用 AutoTable 原生插入列">＋列</button>
+                <button type="button" data-dtp-cmd="insertRowBelow" title="在当前行下方插入一行">＋行↓</button>
+                <button type="button" data-dtp-cmd="insertColumnBefore" title="在当前列左侧插入一列">＋列←</button>
+                <button type="button" data-dtp-cmd="insertColumnAfter" title="在当前列右侧插入一列">＋列→</button>
+                <button type="button" data-dtp-cmd="insertColumn" title="调用原生插入列">＋列</button>
                 <button type="button" data-dtp-cmd="deleteRow" title="删除当前行">－行</button>
                 <button type="button" data-dtp-cmd="deleteColumn" title="删除当前列">－列</button>
                 <button type="button" data-dtp-action="more" class="att-dtp-more-v7170" title="更多表格操作">⋯</button>
@@ -32830,6 +32912,25 @@
                 <button type="button" data-dtp-action="select-column">选择整列</button>
                 <button type="button" data-dtp-action="select-table">选择整个表格</button>
                 <button type="button" data-dtp-action="copy-cell">复制当前单元格</button>
+                <button type="button" data-dtp-action="copy-area">复制区域（TSV / HTML）</button>
+                <button type="button" data-dtp-action="clear-area">清空选区内容</button>
+                <button type="button" data-dtp-action="align-left">选区左对齐</button>
+                <button type="button" data-dtp-action="align-center">选区居中</button>
+                <button type="button" data-dtp-action="align-right">选区右对齐</button>
+                <button type="button" data-dtp-action="background-yellow">选区浅黄背景</button>
+                <button type="button" data-dtp-action="background-clear">清除选区背景</button>
+                <button type="button" data-dtp-action="width-page">表格适应页面</button>
+                <button type="button" data-dtp-action="width-content">列宽适应内容</button>
+                <button type="button" data-dtp-action="width-equal">平均列宽</button>
+                <button type="button" data-dtp-action="width-reset">重置列宽</button>
+                <button type="button" data-dtp-action="header-first">首行转表头 / 取消表头</button>
+                <button type="button" data-dtp-action="freeze-first">冻结 / 取消冻结首行</button>
+                <button type="button" data-dtp-cmd="mergeCells">合并单元格</button>
+                <button type="button" data-dtp-cmd="splitCell">拆分单元格</button>
+                <button type="button" data-dtp-action="move-row-up">当前行上移</button>
+                <button type="button" data-dtp-action="move-row-down">当前行下移</button>
+                <button type="button" data-dtp-action="move-column-left">当前列左移</button>
+                <button type="button" data-dtp-action="move-column-right">当前列右移</button>
                 <button type="button" data-dtp-action="locate-table">定位当前表格</button>
                 <button type="button" data-dtp-action="delete-table" class="danger">删除整个表格</button>
             </div>
@@ -32853,6 +32954,7 @@
             }
 
             const action = button.dataset.dtpAction;
+            if (action && executePlusAction(action)) return;
             if (action === 'select-range') {
                 toggleRangeMode();
             } else if (['select-row','select-column','select-table'].includes(action)) {
@@ -32905,7 +33007,7 @@
             const cols = cached?.width || tableColumnCount(S.table);
             const cellText = S.rowIndex >= 0 && S.colIndex >= 0 ? `R${S.rowIndex + 1}C${S.colIndex + 1}` : '当前格';
             const text = S.rangeMode ? '请选择终点 · Esc 取消' : selected > 1
-                ? `表格 ${rows}×${cols} · 已选 ${selected} 格`
+                ? `表格 ${rows}×${cols} · 选中 ${selectionDimensions()} · ${selected} 格`
                 : `表格 ${rows}×${cols} · ${cellText}`;
             if (status.textContent !== text) status.textContent = text;
             const rangeButton = bar.querySelector('[data-dtp-action="select-range"]');
@@ -32916,11 +33018,25 @@
             }
         }
 
+        const appearance=appearanceSupport();
+        bar.querySelectorAll('[data-dtp-action]').forEach(button=>{
+            const action=button.dataset.dtpAction;
+            if(action?.startsWith('align-'))button.style.display=appearance.align?'':'none';
+            if(action?.startsWith('background-'))button.style.display=appearance.background?'':'none';
+        });
+        bar.querySelectorAll('[data-dtp-cmd]').forEach(button => {
+            const available=nativeCommandAvailable(button.dataset.dtpCmd);
+            button.disabled=!available;
+            button.style.display=button.dataset.dtpCmd==='insertColumn' &&
+                (nativeCommandAvailable('insertColumnBefore') || nativeCommandAvailable('insertColumnAfter'))?'none':
+                ['mergeCells','splitCell'].includes(button.dataset.dtpCmd) && !available?'none':'';
+        });
         bar.classList.add('is-visible');
         schedulePosition();
     }
 
     function hideToolbar() {
+        hideProductivityUi();
         const bar = document.getElementById(DTP.toolbarId);
         if (!bar) return;
         bar.classList.remove('is-visible', 'att-dtp-more-open-v7170');
@@ -32980,23 +33096,35 @@
     }
 
     const COMMANDS = {
-        insertRowAbove: () => findNativeButton(['插入行'], 'anticon-insert-row-above'),
+        insertRowAbove: () => findNativeButton(['插入行','上方插行','在上方插入行'], 'anticon-insert-row-above'),
+        insertRowBelow: () => findDirectedButton(['下方插行','在下方插入行'],'anticon-insert-row-below'),
         insertColumn: () => findNativeButton(['插入列']),
-        deleteRow: () => findNativeButton(['删行', '删除行'], 'anticon-delete-row'),
-        deleteColumn: () => findNativeButton(['删列', '删除列'], 'anticon-delete-column'),
-        deleteTable: () => findNativeButton(['删除表格'])
+        insertColumnBefore: () => findDirectedButton(['左侧插列','在左侧插入列'],'anticon-insert-column-left'),
+        insertColumnAfter: () => findDirectedButton(['右侧插列','在右侧插入列'],'anticon-insert-column-right'),
+        deleteRow: () => findNativeButton(['删行','删除行'], 'anticon-delete-row'),
+        deleteColumn: () => findNativeButton(['删列','删除列'], 'anticon-delete-column'),
+        deleteTable: () => findNativeButton(['删除表格']),
+        mergeCells: () => findNativeButton(['合并单元格']),
+        splitCell: () => findNativeButton(['拆分单元格'])
     };
+
+    function findDirectedButton(aliases,icon) {
+        const buttons=Array.from(document.querySelectorAll('.document-toolbar button.document-toolbar__button'));
+        return buttons.find(button=>button.querySelector(`.${icon}`) || aliases.includes(button.title) ||
+            aliases.includes(button.getAttribute('title')) || aliases.includes(button.getAttribute('aria-label'))) || null;
+    }
+
+    function selectionDimensions() {
+        try {const info=modelTableInfo(),b=info && selectedBounds(info);return b?`${b.height}×${b.width}`:'区域';}
+        catch (_) {return '区域';}
+    }
 
     function runCommand(name) {
         const resolver = COMMANDS[name];
         if (!resolver) return false;
-        const button = resolver();
-        if (!button || button.disabled || button.getAttribute('aria-disabled') === 'true') {
-            showToast('当前页面的对应原生表格命令不可用');
-            return false;
-        }
         if (S.pointerGesture || !S.cell?.isConnected || !S.table?.isConnected ||
             !S.editor?.contains(S.cell)) return false;
+        if (getEditorView()?.editable===false || S.editor?.getAttribute('contenteditable')==='false') return false;
         const liveCell = getSelectionCell();
         const liveCells = getSelectedCells();
         if ((liveCell && liveCell.closest('table') !== S.table) ||
@@ -33006,7 +33134,20 @@
         }
 
         try {
-            button.click();
+            const owner=getEditorOwner(),native=OWNER_COMMANDS[name];
+            let done=false;
+            if(native && typeof owner?.commands?.[native]==='function') {
+                const can=owner.can?.();
+                if(typeof can?.[native]==='function' && !can[native]()) {
+                    showToast('当前选择不支持此操作');return false;
+                }
+                done=owner.commands[native]()!==false;
+            } else {
+                const button=resolver();
+                if(button && !button.disabled && button.getAttribute('aria-disabled')!=='true') {button.click();done=true;}
+                else if(!button) done=simpleModelCommand(name);
+            }
+            if(!done) {showToast('当前表格或选择不支持此操作');return false;}
             hideMoreMenuSoon();
             window.setTimeout(() => {
                 syncEditor();
@@ -33027,7 +33168,7 @@
 
     function handleDeleteTable(button) {
         const now = performance.now();
-        if (now < S.deleteConfirmUntil) {
+        if (now < S.deleteConfirmUntil && S.deleteConfirmTable===S.table && S.deleteConfirmButton===button) {
             S.deleteConfirmUntil = 0;
             clearTimeout(S.deleteConfirmTimer);
             button.textContent = '删除整个表格';
@@ -33036,6 +33177,7 @@
         }
 
         S.deleteConfirmUntil = now + 2400;
+        S.deleteConfirmTable=S.table;S.deleteConfirmButton=button;
         button.textContent = '再次点击确认删除';
         button.classList.add('confirming');
         clearTimeout(S.deleteConfirmTimer);
@@ -33065,6 +33207,994 @@
         }
     }
 
+    // V7.18.1：操作入口与剪贴板统一使用 EditorState，不改正文表格 DOM。
+    const PLUS = { edgeId:'att-dtp-edges-v7180', menuId:'att-dtp-context-v7180', dialogId:'att-dtp-dialog-v7180' };
+    const OWNER_COMMANDS = { insertRowAbove:'addRowBefore', insertRowBelow:'addRowAfter',
+        insertColumnBefore:'addColumnBefore', insertColumnAfter:'addColumnAfter',
+        deleteRow:'deleteRow', deleteColumn:'deleteColumn', deleteTable:'deleteTable',
+        mergeCells:'mergeCells', splitCell:'splitCell' };
+    const CELL_LIMIT = 10000;
+
+    function getEditorOwner() {
+        const view = getEditorView();
+        const accept = value => {
+            try {
+                const owner = value?.value || value;
+                return owner?.commands && owner.view === view ? owner : null;
+            } catch (_) { return null; }
+        };
+        const cached = accept(S.editorOwner) || accept(S.editor?.editor) || accept(view?.editor);
+        if (cached) return S.editorOwner=cached;
+        if (!view) return null;
+        if(S.ownerProbeView===view && performance.now()<(S.ownerProbeUntil||0))return null;
+        S.ownerProbeView=view;S.ownerProbeUntil=performance.now()+1200;
+        for (let el=S.editor, depth=0; el && depth<6; el=el.parentElement,depth++) {
+            for (const key of Object.getOwnPropertyNames(el)) {
+                let value; try { value=el[key]; } catch (_) { continue; }
+                const direct = accept(value) || accept(value?.editor);
+                if (direct) return S.editorOwner=direct;
+                if (/^__react(?:Fiber|InternalInstance|Props)\$/.test(key)) {
+                    for (let f=value,n=0; f && n<18; f=f.return,n++) {
+                        const found=accept(f.memoizedProps?.editor) || accept(f.pendingProps?.editor);
+                        if (found) return S.editorOwner=found;
+                    }
+                }
+            }
+            for (let c=el.__vueParentComponent,n=0; c && n<14; c=c.parent,n++) {
+                for (const data of [c.setupState,c.props,c.ctx]) {
+                    const found=accept(data?.editor);
+                    if (found) return S.editorOwner=found;
+                }
+            }
+        }
+        return null;
+    }
+
+    function modelTableInfo() {
+        const view=getEditorView(), cell=S.cell;
+        if (!S.settings.enabled || !view || view.editable===false || !cell?.isConnected || !S.table?.isConnected) return null;
+        const cached=S.modelInfoCache;
+        if(cached && cached.view===view && cached.doc===view.state.doc && cached.table===S.table && cached.cell===cell)
+            return {...cached.info,epoch:S.interactionEpoch};
+        const cellPos=cellPmPosition(view,cell);
+        if (cellPos===null) return null;
+        const $pos=view.state.doc.resolve(cellPos+1);
+        let node=null,pos=null;
+        for (let d=$pos.depth; d>0; d--) if ($pos.node(d).type.spec.tableRole==='table') {
+            node=$pos.node(d); pos=$pos.before(d); break;
+        }
+        if (!node || node.childCount!==S.table.rows.length) return null;
+        const map=getTableGrid(S.table), rows=[], entries=[];
+        let offset=pos+1, simple=true;
+        for (let r=0;r<node.childCount;r++) {
+            const row=node.child(r), cells=[];
+            let at=offset+1;
+            for (let c=0;c<row.childCount;c++) {
+                const item=row.child(c),dom=S.table.rows[r].cells[c];
+                const grid=map.cells.get(dom);
+                if (!grid || !['cell','header_cell'].includes(item.type.spec.tableRole)) return null;
+                cells.push(item); entries.push({node:item,pos:at,dom,...grid});
+                if ((item.attrs.rowspan||1)!==1 || (item.attrs.colspan||1)!==1 || grid.height!==1 || grid.width!==1) simple=false;
+                at+=item.nodeSize;
+            }
+            if (cells.length!==map.width) simple=false;
+            rows.push({node:row,cells}); offset+=row.nodeSize;
+        }
+        const info={view,doc:view.state.doc,node,pos,rows,entries,map,simple,table:S.table,cell,epoch:S.interactionEpoch};
+        S.modelInfoCache={view,doc:info.doc,table:info.table,cell,info};
+        return info;
+    }
+
+    function ensureModelContext(info) {
+        return Boolean(info && S.settings.enabled && !S.pointerGesture && info.view===getEditorView() &&
+            info.view.editable!==false && info.view.state.doc===info.doc && info.table===S.table &&
+            info.table.isConnected && S.editor?.contains(info.table));
+    }
+
+    function commitModelTable(info, rows, target={row:0,col:0}) {
+        if (!ensureModelContext(info)) return false;
+        const nodes=rows.map((cells,r)=>{
+            const original=rows.rowTemplates?.[r] || info.rows[Math.min(r,info.rows.length-1)].node;
+            const attrs={...original.attrs};
+            if(!rows.rowTemplates?.[r] && r>=info.rows.length && 'id' in attrs)attrs.id=original.type.spec.attrs?.id?.default ?? null;
+            return original.type.createChecked(attrs,cells,original.marks);
+        });
+        const next=info.node.type.createChecked(info.node.attrs,nodes,info.node.marks);
+        next.check?.();
+        if (next.eq(info.node)) return true;
+        const tr=info.view.state.tr.replaceWith(info.pos,info.pos+info.node.nodeSize,next);
+        const at=positionInSpanRows(nodes,info.pos,target);
+        const base=getSelectionBase(info.view);
+        if (base?.near) tr.setSelection(base.near(tr.doc.resolve(at+1)));
+        tr.setMeta('addToHistory',true).setMeta('attDocumentTablePlus',true);
+        invalidatePendingSelection();
+        info.view.dispatch(tr);
+        if (!info.view.hasFocus?.()) info.view.focus();
+        S.gridCache.delete(info.table);
+        hideProductivityUi();
+        scheduleContextRefresh(); scheduleContentRefresh(0);
+        return true;
+    }
+
+    function blankCell(template) {
+        const attrs={...template.attrs,colspan:1,rowspan:1};
+        if ('id' in attrs) attrs.id=template.type.spec.attrs?.id?.default ?? null;
+        const cell=template.type.createAndFill(attrs);
+        if (!cell) throw new Error('当前单元格类型无法创建空内容');
+        return cell;
+    }
+
+    function simpleModelCommand(name) {return spanModelCommand(name);}
+
+    function nativeCommandAvailable(name) {
+        if(getEditorView()?.editable===false || S.editor?.getAttribute('contenteditable')==='false')return false;
+        const native=OWNER_COMMANDS[name],owner=getEditorOwner();
+        try {
+            if (native && typeof owner?.commands?.[native]==='function') {
+                const can=owner.can?.();
+                return typeof can?.[native]==='function' ? Boolean(can[native]()) : true;
+            }
+        } catch (_) {}
+        const button=COMMANDS[name]?.();
+        if (button) return !button.disabled && button.getAttribute('aria-disabled')!=='true';
+        return spanModelAvailable(name);
+    }
+
+    function selectedBounds(info, useCurrent=true) {
+        const selected=getSelectedCells().filter(cell=>getTopTable(cell)===info.table);
+        const cells=selected.length?selected:(useCurrent?[S.cell]:[]);
+        const entries=info.entries.filter(entry=>cells.includes(entry.dom));
+        if (!entries.length) return null;
+        const minRow=Math.min(...entries.map(e=>e.row)),maxRow=Math.max(...entries.map(e=>e.row+e.height-1));
+        const minCol=Math.min(...entries.map(e=>e.col)),maxCol=Math.max(...entries.map(e=>e.col+e.width-1));
+        return {cells,entries,minRow,maxRow,minCol,maxCol,height:maxRow-minRow+1,width:maxCol-minCol+1};
+    }
+
+    function cellPlainText(cell) {
+        if(!cell.isConnected && cell.childNodes) {
+            const read=node=>{
+                if(node.nodeType===3)return node.nodeValue || '';
+                if(node.nodeType!==1)return '';
+                if(['SCRIPT','STYLE'].includes(node.tagName))return '';
+                if(node.tagName==='BR')return '\n';
+                let value=Array.from(node.childNodes).map(read).join('');
+                if(['P','DIV','LI'].includes(node.tagName) && !value.endsWith('\n'))value+='\n';
+                return value;
+            };
+            return Array.from(cell.childNodes).map(read).join('').replace(/\u200b/g,'').replace(/\r\n?/g,'\n').replace(/\n$/,'');
+        }
+        const text=String(cell.innerText ?? cell.textContent ?? '').replace(/\u200b/g,'');
+        return text.replace(/\r\n?/g,'\n').replace(/\n$/,'');
+    }
+    function encodeTSV(matrix) {
+        return matrix.map(row=>row.map(value=>/[\t\n\r"]/.test(String(value))?
+            '"'+String(value).replace(/"/g,'""')+'"':String(value)).join('\t')).join('\r\n');
+    }
+    function parseTSV(text) {
+        if (text.length>2000000) throw new Error('粘贴内容过大，请分批粘贴');
+        const rows=[],row=[]; let value='',quoted=false,start=true;
+        for(let i=0;i<text.length;i++) {
+            const ch=text[i];
+            if (quoted) {
+                if(ch==='"') { if(text[i+1]==='"'){value+='"';i++;} else quoted=false; }
+                else value+=ch;
+            } else if(ch==='"' && start) {quoted=true;start=false;}
+            else if(ch==='\t') {row.push(value);value='';start=true;}
+            else if(ch==='\n' || ch==='\r') {
+                if(ch==='\r' && text[i+1]==='\n')i++;
+                row.push(value);rows.push(row.splice(0));value='';start=true;
+            } else {value+=ch;start=false;}
+            if (rows.length + row.length>CELL_LIMIT) throw new Error('粘贴内容超过处理范围');
+        }
+        if(quoted) throw new Error('剪贴板引号未闭合，请检查内容');
+        if(value!=='' || row.length || !rows.length) {row.push(value);rows.push(row);}
+        const width=Math.max(...rows.map(r=>r.length));
+        if(rows.length*width>CELL_LIMIT) throw new Error('最多支持一次粘贴 10000 格');
+        return rows.map(r=>Array.from({length:width},(_,c)=>r[c]??''));
+    }
+    function clipboardPayload() {
+        const info=modelTableInfo(); if(!info)return null;
+        const bounds=selectedBounds(info); if(!bounds)return null;
+        const matrix=[]; let html='<table><tbody>';
+        for(let r=bounds.minRow;r<=bounds.maxRow;r++) {
+            const row=[]; html+='<tr>';
+            for(let c=bounds.minCol;c<=bounds.maxCol;c++) {
+                const dom=info.map.grid[r]?.[c],entry=info.map.cells.get(dom);
+                const topLeft=entry && entry.row===r && entry.col===c;
+                const text=topLeft?cellPlainText(dom):'';row.push(text);
+                if (topLeft) {
+                    const tag=dom.tagName==='TH'?'th':'td';
+                    html+=`<${tag} rowspan="${entry.height}" colspan="${entry.width}">${escapeHtml(text).replace(/\n/g,'<br>')}</${tag}>`;
+                }
+            }
+            html+='</tr>';matrix.push(row);
+        }
+        return {text:encodeTSV(matrix),html:html+'</tbody></table>',bounds};
+    }
+
+    async function copyArea() {
+        try {
+            const payload=clipboardPayload();if(!payload)return;
+            if(navigator.clipboard?.write && typeof ClipboardItem!=='undefined') {
+                await navigator.clipboard.write([new ClipboardItem({'text/plain':new Blob([payload.text],{type:'text/plain'}),
+                    'text/html':new Blob([payload.html],{type:'text/html'})})]);
+            } else {
+                S.copyPayload=payload;
+                try {if(!document.execCommand('copy'))throw new Error('copy unavailable');}
+                finally {S.copyPayload=null;}
+            }
+            showToast(`已复制 ${payload.bounds.height}×${payload.bounds.width} 区域`);
+        } catch (_) { showToast('复制失败，请在选区中使用 Ctrl+C'); }
+    }
+
+    function clipboardMatrix(data) {
+        const plain=data.getData('text/plain') || '';
+        if(plain.includes('\t')) return parseTSV(plain);
+        const html=data.getData('text/html') || '';
+        if(html && html.length<=2000000 && typeof DOMParser!=='undefined') {
+            const dom=new DOMParser().parseFromString(html,'text/html'),table=dom.querySelector('table');
+            if(table && !table.querySelector('table')) {
+                const grid=[];let slots=0,width=0;
+                Array.from(table.rows).forEach((row,r)=>{
+                    grid[r] ||= [];let c=0;
+                    for(const cell of Array.from(row.cells)) {
+                        while(grid[r][c]!==undefined)c++;
+                        const h=cell.rowSpan || table.rows.length-r,w=cell.colSpan || 1;
+                        if((slots+=h*w)>CELL_LIMIT)throw new Error('粘贴内容超过 10000 格');
+                        for(let y=r;y<r+h;y++) {grid[y] ||= [];for(let x=c;x<c+w;x++)grid[y][x]=y===r && x===c?cellPlainText(cell):'';}
+                        c+=w;width=Math.max(width,c);
+                    }
+                });
+                if(grid.length*width>CELL_LIMIT)throw new Error('粘贴内容超过 10000 格');
+                return grid.map(r=>Array.from({length:width},(_,c)=>r[c]??''));
+            }
+        }
+        return null;
+    }
+
+    function textCell(template,text,schema) {
+        const paragraph=schema.nodes.paragraph;
+        if(!paragraph)throw new Error('当前编辑器不支持普通段落');
+        const content=String(text).replace(/\r\n?/g,'\n').split('\n').map(line=>paragraph.createChecked(null,line?schema.text(line):null));
+        return template.type.createChecked(template.attrs,content,template.marks);
+    }
+    function fillMatrix(info,matrix,start,allowSplit=false) {
+        return fillSpanMatrix(info,matrix,start,allowSplit);
+    }
+
+    function clearArea() {
+        try {
+            const info=modelTableInfo(),bounds=info && selectedBounds(info);if(!bounds || !ensureModelContext(info))return false;
+            const tr=info.view.state.tr;
+            for(const entry of [...bounds.entries].sort((a,b)=>b.pos-a.pos)) {
+                const empty=entry.node.type.createAndFill(entry.node.attrs);
+                if(!empty)throw new Error('无法清空当前单元格');
+                tr.replaceWith(entry.pos+1,entry.pos+entry.node.nodeSize-1,empty.content);
+            }
+            if(!tr.docChanged)return true;
+            invalidatePendingSelection();tr.setMeta('addToHistory',true);info.view.dispatch(tr);
+            info.view.focus();scheduleContextRefresh();scheduleContentRefresh(0);showToast('已清空选区内容');return true;
+        } catch (_) {showToast('当前选区无法清空');return false;}
+    }
+
+    function setColumnWidths(mode) {
+        try {
+            const info=modelTableInfo();if(!info || !ensureModelContext(info))return false;
+            if(!info.entries.every(e=>'colwidth' in e.node.attrs)) {showToast('当前编辑器未开放列宽属性');return false;}
+            const count=info.map.width,tableRect=info.table.getBoundingClientRect();
+            const page=Math.max(40,S.editor.clientWidth-24),width=mode==='page'?page:tableRect.width;
+            const canvas=mode==='content'?document.createElement('canvas'):null,ctx=canvas?.getContext('2d');
+            const widths=Array.from({length:count},(_,c)=>{
+                if(mode!=='content')return Math.max(25,Math.floor(width/count));
+                let measured=40;
+                for(const entry of info.entries.filter(e=>e.col===c && e.width===1)) {
+                    if(ctx)ctx.font=getComputedStyle(entry.dom).font;
+                    const line=cellPlainText(entry.dom).split('\n');
+                    for(const text of line)measured=Math.max(measured,(ctx?ctx.measureText(text.slice(0,512)).width:Math.min(512,text.length)*12)+24);
+                }
+                return Math.round(Math.min(Math.max(60,page*.65),measured));
+            });
+            const tr=info.view.state.tr;
+            for(const e of info.entries)tr.setNodeMarkup(e.pos,null,{...e.node.attrs,colwidth:mode==='reset'?null:widths.slice(e.col,e.col+e.width)});
+            invalidatePendingSelection();tr.setMeta('addToHistory',true);info.view.dispatch(tr);
+            info.view.focus();scheduleContextRefresh();showToast(mode==='reset'?'已重置列宽':'已调整列宽');return true;
+        } catch (_) {showToast('当前表格无法调整列宽');return false;}
+    }
+
+    function toggleFirstHeader() {
+        try {
+            const info=modelTableInfo();if(!info)return false;
+            const nodes=Object.values(info.view.state.schema.nodes),header=nodes.find(t=>t.spec.tableRole==='header_cell'),
+                ordinary=nodes.find(t=>t.spec.tableRole==='cell');
+            if(!header || !ordinary) {showToast('当前编辑器未开放表头类型');return false;}
+            const rows=info.rows.map(r=>[...r.cells]),allHeader=rows[0].every(c=>c.type.spec.tableRole==='header_cell');
+            rows[0]=rows[0].map(c=>(allHeader?ordinary:header).createChecked(c.attrs,c.content,c.marks));
+            return commitModelTable(info,rows,{row:0,col:0});
+        } catch (_) {showToast('无法切换首行表头');return false;}
+    }
+
+    function appearanceSupport() {
+        try {
+            const info=modelTableInfo();if(!info)return {align:false,background:false};
+            return {align:Boolean(info.view.state.schema.nodes.paragraph?.spec.attrs?.textAlign),
+                background:info.entries.some(e=>['backgroundColor','background','bgcolor'].some(key=>key in e.node.attrs))};
+        } catch (_) {return {align:false,background:false};}
+    }
+    function setAreaAppearance(kind,value) {
+        try {
+            const info=modelTableInfo(),bounds=info && selectedBounds(info);
+            if(!bounds || !ensureModelContext(info))return false;
+            const tr=info.view.state.tr;let applied=0;
+            for(const entry of bounds.entries) {
+                if(kind==='background') {
+                    const key=['backgroundColor','background','bgcolor'].find(key=>key in entry.node.attrs);
+                    if(!key)continue;
+                    tr.setNodeMarkup(entry.pos,null,{...entry.node.attrs,[key]:value || entry.node.type.spec.attrs?.[key]?.default || null});applied++;
+                } else {
+                    entry.node.descendants((node,offset)=>{
+                        if(node.isTextblock && 'textAlign' in node.attrs) {
+                            tr.setNodeMarkup(entry.pos+1+offset,null,{...node.attrs,textAlign:value});applied++;
+                        }
+                    });
+                }
+            }
+            if(!applied) {showToast('当前编辑器未开放此样式属性');return false;}
+            invalidatePendingSelection();tr.setMeta('addToHistory',true);info.view.dispatch(tr);info.view.focus();
+            scheduleContextRefresh();showToast('已更新选区样式');return true;
+        } catch (_) {showToast('当前选区无法调整样式');return false;}
+    }
+
+    function moveAxis(part,from,to) {
+        try {return moveSpanAxis(part,from,to);}
+        catch(err) {showToast(err.message || '表格结构异常，无法排序');return false;}
+    }
+
+    function hideProductivityUi() {
+        for(const id of [PLUS.edgeId,PLUS.menuId]) {const el=document.getElementById(id);if(el)el.style.display='none';}
+    }
+    function closeTableDialog() {
+        const dialog=document.getElementById(PLUS.dialogId),restore=dialog?.contains(document.activeElement);
+        dialog?.remove();S.tableDialog=null;
+        if(restore && S.editor?.isConnected)getEditorView()?.focus();
+    }
+    function showTableDialog(message,confirmLabel,confirm) {
+        closeTableDialog();
+        const dialog=document.createElement('div');dialog.id=PLUS.dialogId;dialog.setAttribute('data-lumatrace-ignore','');
+        dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-label','表格操作确认');
+        dialog.innerHTML=`<div><p>${escapeHtml(message)}</p><button type="button" data-choice="cancel">取消</button>
+            <button type="button" data-choice="confirm">${escapeHtml(confirmLabel)}</button></div>`;
+        S.tableDialog={epoch:S.interactionEpoch,confirm};
+        dialog.addEventListener('pointerdown',e=>e.stopPropagation());
+        dialog.addEventListener('click',e=>{
+            const button=e.target.closest('button');if(!button)return;
+            const action=S.tableDialog;closeTableDialog();
+            if(button.dataset.choice==='confirm') {try {action?.confirm();}catch(err){showToast(err.message || '操作失败');}}
+        });
+        document.body.appendChild(dialog);dialog.querySelector('[data-choice="cancel"]')?.focus();
+    }
+
+    function insertTableOutside(direction) {
+        try {
+            const info=modelTableInfo();if(!info || !ensureModelContext(info))return false;
+            const view=info.view,$cell=view.state.doc.resolve(cellPmPosition(view,S.cell)+1);
+            let outer=info.node,at=info.pos;
+            for(let d=1;d<=$cell.depth;d++)if($cell.node(d).type.spec.tableRole==='table') {
+                outer=$cell.node(d);at=$cell.before(d);break;
+            }
+            const type=Object.values(view.state.schema.nodes).find(t=>t.spec.tableRole==='cell');
+            const header=Object.values(view.state.schema.nodes).find(t=>t.spec.tableRole==='header_cell') || type;
+            if(!type)return false;
+            const rowType=info.rows[0].node.type,rows=[];
+            for(let r=0;r<3;r++) {
+                const cells=[];
+                for(let c=0;c<3;c++) {const cell=(r===0?header:type).createAndFill();if(!cell)return false;cells.push(cell);}
+                rows.push(rowType.createChecked(null,cells));
+            }
+            const next=info.node.type.createChecked(null,rows);next.check?.();
+            const position=direction==='before'?at:at+outer.nodeSize,$insert=view.state.doc.resolve(position),index=$insert.index();
+            if(!$insert.parent.canReplaceWith(index,index,next.type)) {showToast('此位置无法插入表格');return false;}
+            const tr=view.state.tr.insert(position,next),base=getSelectionBase(view);
+            if(base?.near)tr.setSelection(base.near(tr.doc.resolve(position+3)));
+            invalidatePendingSelection();tr.setMeta('addToHistory',true);view.dispatch(tr);view.focus();
+            scheduleContextRefresh();scheduleContentRefresh(0);return true;
+        } catch (_) {showToast('无法在表格外插入，请先点击正文位置');return false;}
+    }
+
+    function handleAreaPaste(event) {
+        if(!S.settings.enabled || !S.settings.clipboard || !S.editor?.contains(event.target) || !event.clipboardData ||
+            isInteractiveCellTarget(event.target))return;
+        const live=cellFromEventTarget(event.target) || getSelectionCell();
+        if(live) {S.cell=live;S.table=getTopTable(live);rememberInteractionCell(live);}
+        try {
+            const matrix=clipboardMatrix(event.clipboardData);
+            if(!matrix || (matrix.length===1 && matrix[0].length===1))return;
+            const info=modelTableInfo(),start=info?.map.cells.get(S.cell);if(!info || !start)return;
+            const plan=spanPastePlan(info,matrix,start);
+            event.preventDefault();event.stopImmediatePropagation();
+            invalidatePendingSelection();info.epoch=S.interactionEpoch;
+            if(plan.extraRows || plan.extraCols || plan.splits.length) {
+                const changes=[];
+                if(plan.extraRows || plan.extraCols)changes.push(`增加 ${plan.extraRows} 行、${plan.extraCols} 列`);
+                if(plan.splits.length)changes.push(`拆分覆盖区域的 ${plan.splits.length} 个合并格（各格原内容保留在左上格）`);
+                showTableDialog(`粘贴 ${matrix.length}×${matrix[0].length} 区域，需要${changes.join('，')}。拆分与填充可以一起撤销。`, '确认并粘贴',()=>{
+                    if(!fillMatrix(info,matrix,start,true))showToast('表格或选择已变化，请重新粘贴');
+                });
+            } else if(!fillMatrix(info,matrix,start))showToast('当前表格无法粘贴此区域');
+        } catch(err) {event.preventDefault();event.stopImmediatePropagation();showToast(err.message || '无法识别表格剪贴板');}
+    }
+
+    function handleAreaCopy(event) {
+        if(!S.settings.enabled || !S.settings.clipboard || !event.clipboardData)return;
+        const selected=getSelectedCells(),explicit=S.copyPayload;
+        if(!explicit && (!S.editor?.contains(event.target) || selected.length<2 ||
+            new Set(selected.map(getTopTable)).size!==1))return;
+        try {
+            const payload=explicit || clipboardPayload();if(!payload)return;
+            event.clipboardData.setData('text/plain',payload.text);event.clipboardData.setData('text/html',payload.html);
+            event.preventDefault();event.stopImmediatePropagation();
+        } catch (_) {}
+    }
+
+    function executePlusAction(action) {
+        if(action==='copy-area')copyArea();
+        else if(action==='clear-area')clearArea();
+        else if(action.startsWith('width-'))setColumnWidths(action.slice(6));
+        else if(action==='header-first')toggleFirstHeader();
+        else if(action.startsWith('align-'))setAreaAppearance('align',action.slice(6));
+        else if(action==='background-yellow')setAreaAppearance('background','#fff3c4');
+        else if(action==='background-clear')setAreaAppearance('background',null);
+        else if(action==='freeze-first') { S.frozenTable=S.frozenTable===S.table?null:S.table;updateFrozenHeader(); }
+        else if(action.startsWith('move-')) {
+            const info=modelTableInfo(),active=info?.map.cells.get(S.cell);if(!active)return;
+            const part=/row/.test(action)?'row':'column',from=part==='row'?active.row:active.col,
+                delta=/up|left/.test(action)?-1:1;
+            moveAxis(part,from,from+delta);
+        } else return false;
+        hideMoreMenuSoon();return true;
+    }
+
+    function buildContextMenu() {
+        let menu=document.getElementById(PLUS.menuId);if(menu)return menu;
+        menu=document.createElement('div');menu.id=PLUS.menuId;menu.setAttribute('data-lumatrace-ignore','');menu.setAttribute('role','menu');
+        isolateToolbarEvents(menu);
+        menu.addEventListener('click',event=>{
+            const button=event.target.closest('button');if(!button || button.disabled)return;
+            event.preventDefault();event.stopPropagation();
+            const action=button.dataset.dtpAction,cmd=button.dataset.dtpCmd;
+            if(cmd)runCommand(cmd);
+            else if(['select-row','select-column','select-table'].includes(action))selectTablePart(action.slice(7));
+            else if(action==='delete-table') {handleDeleteTable(button);return;}
+            else executePlusAction(action);
+            menu.style.display='none';
+        });document.body.appendChild(menu);return menu;
+    }
+    function openContextMenu(event) {
+        if(!S.settings.enabled || !S.settings.contextMenu || event.shiftKey || getEditorView()?.editable===false)return;
+        const cell=cellFromEventTarget(event.target);if(!cell || isInteractiveCellTarget(event.target))return;
+        finishDrag();invalidatePendingSelection();rememberInteractionCell(cell);S.cell=cell;S.table=getTopTable(cell);
+        const selected=getSelectedCells().filter(c=>getTopTable(c)===S.table);
+        if(!selected.includes(cell))selectCellRange(cell,cell,false);
+        S.cell=cell;S.table=getTopTable(cell);snapshotStableContext();event.preventDefault();
+        const menu=buildContextMenu();
+        menu.innerHTML=`<b>${selected.includes(cell) && selected.length>1?`已选择 ${selected.length} 格`:'单元格操作'}</b>
+            <button data-dtp-action="copy-area">复制区域</button><button data-dtp-action="clear-area">清空内容</button>
+            <button data-dtp-action="select-row">选择整行</button><button data-dtp-action="select-column">选择整列</button>
+            <button data-dtp-action="select-table">选择整个表格</button>
+            ${[['insertRowAbove','上方插行'],['insertRowBelow','下方插行'],['insertColumnBefore','左侧插列'],
+                ['insertColumnAfter','右侧插列'],['mergeCells','合并单元格'],['splitCell','拆分单元格']].filter(([cmd])=>nativeCommandAvailable(cmd))
+                .map(([cmd,label])=>`<button data-dtp-cmd="${cmd}">${label}</button>`).join('')}
+            <button data-dtp-action="delete-table">删除整个表格</button>`;
+        menu.style.display='grid';menu.style.left=`${Math.max(8,Math.min(event.clientX,window.innerWidth-190))}px`;
+        menu.style.top=`${Math.max(8,Math.min(event.clientY,window.innerHeight-(menu.offsetHeight||380)-8))}px`;
+    }
+
+    function ensureEdgeHandles() {
+        let host=document.getElementById(PLUS.edgeId);if(host)return host;
+        host=document.createElement('div');host.id=PLUS.edgeId;host.setAttribute('data-lumatrace-ignore','');
+        host.setAttribute('contenteditable','false');isolateToolbarEvents(host);
+        host.addEventListener('click',event=>{
+            if(S.edgeGesture?.moved)return;
+            const button=event.target.closest('button');if(!button)return;
+            event.preventDefault();event.stopPropagation();
+            const part=button.dataset.part,index=Number(button.dataset.index),map=getTableGrid(S.table),
+                cell=part==='row'?map.grid[index]?.[0]:map.grid[0]?.[index];
+            if(cell) {S.cell=cell;rememberInteractionCell(cell);selectTablePart(part);}
+            if(button.dataset.command)runCommand(button.dataset.command);
+        });
+        host.addEventListener('pointerdown',event=>{
+            const button=event.target.closest('button');if(!button || button.dataset.command || event.button!==0)return;
+            const info=modelTableInfo();if(!info || !spanModelAvailable('deleteTable'))return;
+            S.edgeGesture={pointerId:event.pointerId,part:button.dataset.part,index:Number(button.dataset.index),
+                x:event.clientX,y:event.clientY,moved:false,info,target:null};
+        });document.body.appendChild(host);return host;
+    }
+    function positionEdgeHandles() {
+        const host=document.getElementById(PLUS.edgeId);
+        if(!S.settings.enabled || !S.settings.edgeHandles || S.pointerGesture || S.dragging || !S.cell?.isConnected || !S.table?.isConnected) {
+            if(host)host.style.display='none';return;
+        }
+        const el=ensureEdgeHandles(),map=getTableGrid(S.table),clip=editorClipRect(),rect=S.table.getBoundingClientRect();
+        if(map.height>300 || map.width>100) {el.style.display='none';return;}
+        const signature=`${map.height}:${map.width}`;
+        if(S.edgeSignature!==signature || S.edgeTable!==S.table) {
+            el.innerHTML=Array.from({length:map.height},(_,i)=>`<button data-part="row" data-index="${i}" title="选择第 ${i+1} 行；拖动可排序，合并格覆盖的行列一起移动">${i+1}</button>`).join('')+
+                Array.from({length:map.width},(_,i)=>`<button data-part="column" data-index="${i}" title="选择第 ${i+1} 列；拖动可排序，合并格覆盖的行列一起移动">${i+1}</button>`).join('')+
+                '<button data-part="row" data-index="0" data-command="insertRowBelow" title="在末尾增加一行">＋</button>'+
+                '<button data-part="column" data-index="0" data-command="insertColumnAfter" title="在末尾增加一列">＋</button>';
+            S.edgeSignature=signature;S.edgeTable=S.table;
+        }
+        el.style.display='block';
+        el.querySelectorAll('button').forEach(button=>{
+            const part=button.dataset.part,index=button.dataset.command?(part==='row'?map.height-1:map.width-1):Number(button.dataset.index);
+            button.dataset.index=String(index);
+            const cell=part==='row'?map.grid[index]?.[0]:map.grid[0]?.[index];if(!cell)return;
+            const r=cell.getBoundingClientRect();
+            const left=part==='row'?rect.left-19:r.left+(r.width-18)/2,
+                top=part==='row'?r.top+(r.height-18)/2:rect.top-19;
+            const x=button.dataset.command?(part==='row'?rect.left-19:rect.right+1):left,
+                y=button.dataset.command?(part==='row'?rect.bottom+1:rect.top-19):top;
+            button.style.left=`${x}px`;button.style.top=`${y}px`;
+            button.style.display=x>=Math.max(0,clip.left-19) && x+18<=clip.right+19 && y>=Math.max(0,clip.top-19) && y+18<=clip.bottom+19 &&
+                (part==='row'?r.bottom>clip.top && r.top<clip.bottom:rect.top>=clip.top)?'block':'none';
+            if(button.dataset.command)button.disabled=!nativeCommandAvailable(button.dataset.command);
+        });
+    }
+
+    function updateFrozenHeader() {
+        let host=document.getElementById('att-dtp-frozen-v7180');
+        const table=S.frozenTable;
+        if(!S.settings.enabled || !table?.isConnected || !S.editor?.contains(table)) {host?.remove();S.frozenTable=null;return;}
+        const clip=editorClipRect(),rect=table.getBoundingClientRect(),row=table.rows[0],r=row?.getBoundingClientRect();
+        if(!r || r.top>=clip.top || rect.bottom<=clip.top+r.height) {if(host)host.style.display='none';return;}
+        if(!host) {host=document.createElement('div');host.id='att-dtp-frozen-v7180';host.setAttribute('data-lumatrace-ignore','');
+            host.style.cssText='position:fixed;pointer-events:none;z-index:2147482510;overflow:hidden;background:var(--bg-primary,#fff);';document.body.appendChild(host);}
+        const signature=Array.from(row.cells).map(c=>cellPlainText(c)).join('\u0000');
+        const sourceDoc=getEditorView()?.state.doc;
+        if(host.dataset.signature!==signature || host._sourceDoc!==sourceDoc || host._sourceTable!==table) {
+            const clone=table.cloneNode(false),body=document.createElement('tbody');clone.removeAttribute('id');
+            const cloneRow=row.cloneNode(true);
+            cloneRow.querySelectorAll('script,style,iframe,video,audio,input,button,.column-resize-handle,.ProseMirror-widget').forEach(n=>n.remove());
+            for(const node of [cloneRow,...cloneRow.querySelectorAll('*')]) {
+                node.classList.remove('selectedCell','ProseMirror-selectednode');
+                node.removeAttribute('id');node.removeAttribute('contenteditable');node.removeAttribute('draggable');
+                for(const attr of Array.from(node.attributes))if(/^on/i.test(attr.name))node.removeAttribute(attr.name);
+            }
+            body.appendChild(cloneRow);clone.appendChild(body);host.replaceChildren(clone);host.dataset.signature=signature;
+            host._sourceDoc=sourceDoc;host._sourceTable=table;
+        }
+        const clone=host.firstElementChild;clone.style.width=`${rect.width}px`;clone.style.tableLayout='fixed';
+        Array.from(clone.rows[0].cells).forEach((c,i)=>{c.style.width=`${row.cells[i].getBoundingClientRect().width}px`;});
+        const left=Math.max(clip.left,rect.left),right=Math.min(clip.right,rect.right);
+        host.style.display=right>left?'block':'none';host.style.left=`${left}px`;host.style.top=`${clip.top}px`;
+        host.style.width=`${Math.max(0,right-left)}px`;host.style.height=`${r.height}px`;clone.style.marginLeft=`${rect.left-left}px`;
+    }
+
+    function bindProductivityEvents() {
+        document.addEventListener('copy',handleAreaCopy,true);
+        document.addEventListener('paste',handleAreaPaste,true);
+        document.addEventListener('contextmenu',openContextMenu,true);
+        document.addEventListener('pointerdown',event=>{
+            S.edgeGesture=null;
+            const el=event.target instanceof Element?event.target:null;
+            const own=el?.closest(`#${PLUS.edgeId},#${PLUS.menuId},#${PLUS.dialogId},#${DTP.toolbarId},#${DTP.guardId},#att-dtp-column-hit-v7181`);
+            if(!own) {const menu=document.getElementById(PLUS.menuId);if(menu)menu.style.display='none';closeTableDialog();}
+        },true);
+        document.addEventListener('keydown',event=>{
+            if(event.key==='Escape') {hideProductivityUi();closeTableDialog();S.edgeGesture=null;}
+        },true);
+        document.addEventListener('pointermove',event=>{
+            const gesture=S.edgeGesture;if(!gesture || gesture.pointerId!==event.pointerId)return;
+            if(Math.hypot(event.clientX-gesture.x,event.clientY-gesture.y)<6 && !gesture.moved)return;
+            gesture.moved=true;event.preventDefault();event.stopImmediatePropagation();
+            let nearest=null,distance=Infinity;
+            const map=gesture.info.map,limit=gesture.part==='row'?map.height:map.width;
+            for(let i=0;i<limit;i++) {
+                const cell=gesture.part==='row'?map.grid[i]?.[0]:map.grid[0]?.[i];if(!cell)continue;
+                const r=cell.getBoundingClientRect(),d=Math.abs(gesture.part==='row'?event.clientY-(r.top+r.bottom)/2:event.clientX-(r.left+r.right)/2);
+                if(d<distance) {nearest=i;distance=d;}
+            }
+            gesture.target=nearest;
+            const host=document.getElementById(PLUS.edgeId);
+            host?.querySelectorAll('button').forEach(b=>b.classList.toggle('is-target',b.dataset.part===gesture.part && Number(b.dataset.index)===nearest));
+        },{capture:true,passive:false});
+        window.addEventListener('pointerup',event=>{
+            const gesture=S.edgeGesture;if(!gesture || gesture.pointerId!==event.pointerId)return;
+            S.edgeGesture=null;
+            if(gesture.moved) {
+                S.edgeClickUntil=performance.now()+600;
+                if(ensureModelContext(gesture.info) && S.interactionEpoch===gesture.info.epoch && gesture.target!==null)
+                    moveAxis(gesture.part,gesture.index,gesture.target);
+                event.preventDefault();event.stopImmediatePropagation();
+            }
+        },true);
+        document.addEventListener('click',event=>{
+            if(performance.now()<(S.edgeClickUntil||0) && event.target?.closest?.(`#${PLUS.edgeId}`)) {
+                event.preventDefault();event.stopImmediatePropagation();S.edgeClickUntil=0;
+            }
+        },true);
+        for(const type of ['blur','pointercancel'])window.addEventListener(type,()=>{S.edgeGesture=null;});
+    }
+
+    // V7.18.1：用矩形跨度校验保护每一次模型操作；原生命令仍优先。
+    function spanGrid(entries,height,width) {
+        if(!Number.isInteger(height) || !Number.isInteger(width) || height<1 || width<1 || height*width>CELL_LIMIT)
+            throw new Error('表格超过处理范围或尺寸异常');
+        const grid=Array.from({length:height},()=>Array(width));
+        for(const entry of entries) {
+            const {row,col,height:h,width:w}=entry;
+            if(![row,col,h,w].every(Number.isInteger) || row<0 || col<0 || h<1 || w<1 || row+h>height || col+w>width)
+                throw new Error('单元格跨度超出表格范围');
+            if((entry.node.attrs.rowspan || 1)!==h || (entry.node.attrs.colspan || 1)!==w)
+                throw new Error('单元格跨度与编辑器状态不一致');
+            const widths=entry.node.attrs.colwidth;
+            if(widths && (!Array.isArray(widths) || widths.length!==w || !widths.every(v=>Number.isFinite(v) && v>=0)))
+                throw new Error('单元格列宽属性异常');
+            for(let y=row;y<row+h;y++)for(let x=col;x<col+w;x++) {
+                if(grid[y][x])throw new Error('单元格跨度重叠');
+                grid[y][x]=entry;
+            }
+        }
+        if(grid.some(row=>row.some(value=>!value)))throw new Error('表格存在缺失单元格');
+        // Array.some 跳过空槽，显式遍历每个逻辑格。
+        for(let y=0;y<height;y++)for(let x=0;x<width;x++)if(!grid[y][x])throw new Error('表格存在缺失单元格');
+        return grid;
+    }
+
+    function spanTable(info) {
+        if(!info)return null;
+        const entries=info.entries.map(e=>({node:e.node,row:e.row,col:e.col,height:e.height,width:e.width}));
+        const table={height:info.map.height,width:info.map.width,entries,rowTemplates:info.rows.map(r=>r.node)};
+        table.grid=spanGrid(entries,table.height,table.width);
+        return table;
+    }
+    function spanAttrs(entry,h=entry.height,w=entry.width,widths=entry.node.attrs.colwidth) {
+        const attrs={...entry.node.attrs,rowspan:h,colspan:w};
+        if('colwidth' in attrs)attrs.colwidth=widths?Array.from({length:w},(_,i)=>widths[i] || 0):null;
+        return attrs;
+    }
+    function resizeSpan(entry,h,w,widths=entry.node.attrs.colwidth) {
+        const node=entry.node.type.createChecked(spanAttrs(entry,h,w,widths),entry.node.content,entry.node.marks);
+        return {...entry,height:h,width:w,node};
+    }
+    function blankSpan(template,row,col,columnOffset=0,ordinary=false) {
+        let node=blankCell(template);
+        const attrs={...node.attrs};
+        if('colwidth' in attrs)attrs.colwidth=template.attrs.colwidth?[template.attrs.colwidth[columnOffset] || 0]:null;
+        if(ordinary && template.type.spec.tableRole==='header_cell') {
+            const type=Object.values(getEditorView().state.schema.nodes).find(t=>t.spec.tableRole==='cell');
+            if(type)node=type.createAndFill(attrs);
+        } else node=node.type.createChecked(attrs,node.content,node.marks);
+        if(!node)throw new Error('无法创建普通单元格');
+        return {row,col,height:1,width:1,node};
+    }
+    function commitSpanTable(info,table,target={row:0,col:0}) {
+        if(!ensureModelContext(info))return false;
+        spanGrid(table.entries,table.height,table.width);
+        const rows=Array.from({length:table.height},(_,r)=>table.entries.filter(e=>e.row===r)
+            .sort((a,b)=>a.col-b.col).map(e=>e.node));
+        rows.rowTemplates=table.rowTemplates;
+        return commitModelTable(info,rows,target);
+    }
+
+    function positionInSpanRows(nodes,pos,target) {
+        const occupied=[],fallback=pos+2;let rowPos=pos+1;
+        for(let r=0;r<nodes.length;r++) {
+            occupied[r] ||= [];let col=0,at=rowPos+1;
+            for(let i=0;i<nodes[r].childCount;i++) {
+                const node=nodes[r].child(i),h=node.attrs.rowspan || 1,w=node.attrs.colspan || 1;
+                while(occupied[r][col])col++;
+                if(target.row>=r && target.row<r+h && target.col>=col && target.col<col+w)return at;
+                for(let y=r;y<r+h;y++){occupied[y] ||= [];for(let x=col;x<col+w;x++)occupied[y][x]=true;}
+                col+=w;at+=node.nodeSize;
+            }
+            rowPos+=nodes[r].nodeSize;
+        }
+        return fallback;
+    }
+
+    function mergeBounds(info) {
+        const bounds=selectedBounds(info,false);
+        if(!bounds || bounds.entries.length<2)return null;
+        const table=spanTable(info),selected=new Set(bounds.entries.map(e=>e.node));
+        for(let y=bounds.minRow;y<=bounds.maxRow;y++)for(let x=bounds.minCol;x<=bounds.maxCol;x++)
+            if(!selected.has(table.grid[y][x].node))return null;
+        const first=table.grid[bounds.minRow][bounds.minCol];
+        if(!('rowspan' in first.node.attrs) || !('colspan' in first.node.attrs))return null;
+        // 混合表头与普通格会丢失单元格语义，因此先要求统一类型。
+        if(bounds.entries.some(e=>e.node.type!==first.node.type))return null;
+        return {bounds,table,first};
+    }
+    function mergeSpanCells(info=modelTableInfo()) {
+        const merge=info && mergeBounds(info);if(!merge || !ensureModelContext(info))return false;
+        const {bounds,table,first}=merge;
+        const selected=new Set(bounds.entries.map(e=>e.node)),content=[];
+        for(const e of [...bounds.entries].sort((a,b)=>a.row-b.row || a.col-b.col))
+            for(let i=0;i<e.node.childCount;i++)content.push(e.node.child(i));
+        let widths=[];
+        for(let c=bounds.minCol;c<=bounds.maxCol;c++) {
+            const entry=table.grid[bounds.minRow][c];widths.push(entry.node.attrs.colwidth?.[c-entry.col] || 0);
+        }
+        if(!widths.some(Boolean))widths=null;
+        const node=first.node.type.createChecked(spanAttrs(first,bounds.height,bounds.width,widths),content,first.node.marks);
+        table.entries=table.entries.filter(e=>!selected.has(e.node));
+        table.entries.push({row:bounds.minRow,col:bounds.minCol,height:bounds.height,width:bounds.width,node});
+        return commitSpanTable(info,table,{row:bounds.minRow,col:bounds.minCol});
+    }
+    function splitEntries(table,entries) {
+        const selected=new Set(entries),next=[];
+        for(const entry of table.entries) {
+            if(!selected.has(entry) || (entry.height===1 && entry.width===1)){next.push(entry);continue;}
+            if(!('rowspan' in entry.node.attrs) || !('colspan' in entry.node.attrs))throw new Error('编辑器未开放跨度属性');
+            for(let y=0;y<entry.height;y++)for(let x=0;x<entry.width;x++) {
+                const blank=blankSpan(entry.node,entry.row+y,entry.col+x,x);
+                if(y===0 && x===0)blank.node=entry.node.type.createChecked(
+                    {...blank.node.attrs,id:entry.node.attrs.id},entry.node.content,entry.node.marks);
+                // 只保留已注册属性；无 id 的 schema 不写入 id。
+                if(y===0 && x===0 && !('id' in entry.node.attrs)) {
+                    const attrs={...blank.node.attrs};delete attrs.id;
+                    blank.node=entry.node.type.createChecked(attrs,entry.node.content,entry.node.marks);
+                }
+                next.push(blank);
+            }
+        }
+        table.entries=next;return table;
+    }
+    function splitSpanCells(info=modelTableInfo()) {
+        if(!info || !ensureModelContext(info))return false;
+        const table=spanTable(info),bounds=selectedBounds(info),selected=new Set(bounds?.entries.map(e=>e.node));
+        const entries=table.entries.filter(e=>selected.has(e.node) && (e.height>1 || e.width>1));
+        if(!entries.length)return false;
+        splitEntries(table,entries);return commitSpanTable(info,table,{row:bounds.minRow,col:bounds.minCol});
+    }
+
+    function insertSpanAxis(table,part,index,info) {
+        const row=part==='row',axis=row?'row':'col',size=row?'height':'width',limit=row?table.height:table.width;
+        if(index<0 || index>limit)throw new Error('插入位置异常');
+        const oldGrid=table.grid;
+        table.entries=table.entries.map(e=>{
+            if(e[axis]>=index)return {...e,[axis]:e[axis]+1};
+            if(e[axis]+e[size]>index) {
+                let widths=e.node.attrs.colwidth;
+                if(!row && widths){widths=[...widths];widths.splice(index-e.col,0,0);}
+                return resizeSpan(e,row?e.height+1:e.height,row?e.width:e.width+1,widths);
+            }
+            return e;
+        });
+        if(row) {
+            const template=table.rowTemplates[Math.min(index,limit-1)],attrs={...template.attrs};
+            if('id' in attrs)attrs.id=template.type.spec.attrs?.id?.default ?? null;
+            table.rowTemplates.splice(index,0,template.type.createChecked(attrs,[],template.marks));
+            table.height++;
+        } else table.width++;
+        const covered=Array.from({length:row?table.width:table.height},()=>false);
+        for(const e of table.entries)if(e[axis]<=index && e[axis]+e[size]>index) {
+            const start=row?e.col:e.row,span=row?e.width:e.height;for(let j=start;j<start+span;j++)covered[j]=true;
+        }
+        for(let j=0;j<covered.length;j++)if(!covered[j]) {
+            const source=row?oldGrid[Math.min(index,limit-1)][j]:oldGrid[j][Math.min(index,limit-1)];
+            table.entries.push(blankSpan(source.node,row?index:j,row?j:index,row?j-source.col:Math.min(index,limit-1)-source.col,
+                row && index>0));
+        }
+        table.grid=spanGrid(table.entries,table.height,table.width);return table;
+    }
+    function deleteSpanAxis(table,part,start,end) {
+        const row=part==='row',axis=row?'row':'col',size=row?'height':'width',count=end-start;
+        if(count<1 || start<0 || end>(row?table.height:table.width))throw new Error('删除范围异常');
+        if(count===(row?table.height:table.width))return null;
+        const next=[];
+        for(const e of table.entries) {
+            const overlap=Math.max(0,Math.min(e[axis]+e[size],end)-Math.max(e[axis],start)),span=e[size]-overlap;
+            if(!span)continue;
+            const origin=e[axis]>=end?e[axis]-count:e[axis]>=start?start:e[axis];
+            let widths=e.node.attrs.colwidth;
+            if(!row && widths)widths=widths.filter((_,i)=>e.col+i<start || e.col+i>=end);
+            const entry=overlap?resizeSpan(e,row?span:e.height,row?e.width:span,widths):{...e};
+            entry[axis]=origin;next.push(entry);
+        }
+        table.entries=next;
+        if(row){table.height-=count;table.rowTemplates.splice(start,count);}else table.width-=count;
+        table.grid=spanGrid(table.entries,table.height,table.width);return table;
+    }
+    function deleteModelTable(info) {
+        if(!ensureModelContext(info))return false;
+        const tr=info.view.state.tr.delete(info.pos,info.pos+info.node.nodeSize);
+        const base=getSelectionBase(info.view);
+        if(base?.near)tr.setSelection(base.near(tr.doc.resolve(Math.min(info.pos,tr.doc.content.size))));
+        invalidatePendingSelection();tr.setMeta('addToHistory',true);info.view.dispatch(tr);info.view.focus();
+        hideProductivityUi();scheduleContextRefresh();scheduleContentRefresh(0);return true;
+    }
+    function spanModelCommand(name) {
+        const info=modelTableInfo();if(!info || !ensureModelContext(info))return false;
+        if(name==='mergeCells')return mergeSpanCells(info);
+        if(name==='splitCell')return splitSpanCells(info);
+        if(name==='deleteTable')return deleteModelTable(info);
+        const bounds=selectedBounds(info),table=spanTable(info);if(!bounds)return false;
+        let part,index,next=table;
+        if(/^insertRow/.test(name)){part='row';index=name==='insertRowBelow'?bounds.maxRow+1:bounds.minRow;insertSpanAxis(table,part,index,info);}
+        else if(/^insertColumn/.test(name) && name!=='insertColumn') {part='column';index=name==='insertColumnAfter'?bounds.maxCol+1:bounds.minCol;insertSpanAxis(table,part,index,info);}
+        else if(name==='deleteRow'){part='row';index=bounds.minRow;next=deleteSpanAxis(table,part,index,bounds.maxRow+1);}
+        else if(name==='deleteColumn'){part='column';index=bounds.minCol;next=deleteSpanAxis(table,part,index,bounds.maxCol+1);}
+        else return false;
+        if(!next)return deleteModelTable(info);
+        return commitSpanTable(info,next,{row:part==='row'?Math.min(index,next.height-1):bounds.minRow,
+            col:part==='column'?Math.min(index,next.width-1):bounds.minCol});
+    }
+    function spanModelAvailable(name) {
+        try {
+            const info=modelTableInfo();if(!info)return false;
+            const table=spanTable(info);
+            if(name==='mergeCells')return Boolean(mergeBounds(info));
+            if(name==='splitCell') {
+                const bounds=selectedBounds(info);return Boolean(bounds?.entries.some(e=>e.height>1 || e.width>1));
+            }
+            return name==='deleteTable' || name==='deleteRow' || name==='deleteColumn' ||
+                (/^insert(?:Row|Column)/.test(name) && name!=='insertColumn' &&
+                    table.entries.every(e=>'rowspan' in e.node.attrs && 'colspan' in e.node.attrs));
+        } catch (_) {return false;}
+    }
+
+    function spanPastePlan(info,matrix,start) {
+        const table=spanTable(info),height=Math.max(table.height,start.row+matrix.length),width=Math.max(table.width,start.col+matrix[0].length);
+        if(height*width>CELL_LIMIT)throw new Error('扩展后的表格超过 10000 格');
+        const right=start.col+matrix[0].length,bottom=start.row+matrix.length;
+        const splits=table.entries.filter(e=>(e.height>1 || e.width>1) && e.row<bottom && e.row+e.height>start.row && e.col<right && e.col+e.width>start.col);
+        return {table,height,width,splits,extraRows:height-table.height,extraCols:width-table.width};
+    }
+    function fillSpanMatrix(info,matrix,start,allowSplit=false) {
+        if(!ensureModelContext(info) || info.epoch!==S.interactionEpoch)return false;
+        const plan=spanPastePlan(info,matrix,start),table=plan.table;
+        if(plan.splits.length && !allowSplit)return false;
+        splitEntries(table,plan.splits);
+        const oldGrid=spanGrid(table.entries,table.height,table.width),oldHeight=table.height,oldWidth=table.width;
+        for(let r=0;r<plan.height;r++)for(let c=0;c<plan.width;c++)if(r>=oldHeight || c>=oldWidth) {
+            const source=oldGrid[Math.min(r,oldHeight-1)][Math.min(c,oldWidth-1)];
+            table.entries.push(blankSpan(source.node,r,c,Math.min(c,oldWidth-1)-source.col,r>=oldHeight));
+        }
+        while(table.rowTemplates.length<plan.height) {
+            const source=info.rows.at(-1).node,attrs={...source.attrs};
+            if('id' in attrs)attrs.id=source.type.spec.attrs?.id?.default ?? null;
+            table.rowTemplates.push(source.type.createChecked(attrs,[],source.marks));
+        }
+        table.height=plan.height;table.width=plan.width;table.grid=spanGrid(table.entries,table.height,table.width);
+        for(let r=0;r<matrix.length;r++)for(let c=0;c<matrix[r].length;c++) {
+            const entry=table.grid[start.row+r][start.col+c];
+            entry.node=textCell(entry.node,matrix[r][c],info.view.state.schema);
+        }
+        return commitSpanTable(info,table,start);
+    }
+
+    function spanAxisGroups(table,part) {
+        const row=part==='row',axis=row?'row':'col',size=row?'height':'width',limit=row?table.height:table.width;
+        const breaks=Array.from({length:limit+1},()=>true);
+        for(const e of table.entries)for(let i=e[axis]+1;i<e[axis]+e[size];i++)breaks[i]=false;
+        const groups=[];let start=0;
+        for(let i=1;i<=limit;i++)if(breaks[i]){groups.push({start,end:i});start=i;}
+        return groups;
+    }
+    function moveSpanAxis(part,from,to) {
+        const info=modelTableInfo();if(!info || !ensureModelContext(info))return false;
+        const table=spanTable(info),row=part==='row',limit=row?table.height:table.width;
+        if(from<0 || to<0 || from>=limit || to>=limit || from===to)return false;
+        const groups=spanAxisGroups(table,part),a=groups.findIndex(g=>from>=g.start && from<g.end),b=groups.findIndex(g=>to>=g.start && to<g.end);
+        if(a===b){showToast('这几行或列属于同一组合并格，需要一起移动');return false;}
+        const reordered=[...groups];reordered.splice(b,0,reordered.splice(a,1)[0]);
+        const permutation=reordered.flatMap(g=>Array.from({length:g.end-g.start},(_,i)=>g.start+i));
+        const inverse=[];permutation.forEach((old,next)=>{inverse[old]=next;});
+        table.entries=table.entries.map(e=>({...e,[row?'row':'col']:inverse[row?e.row:e.col]}));
+        if(row)table.rowTemplates=permutation.map(old=>table.rowTemplates[old]);
+        const target={row:row?inverse[from]:0,col:row?0:inverse[from]},moved=groups[a].end-groups[a].start;
+        const ok=commitSpanTable(info,table,target);
+        if(ok && moved>1)showToast(`已一起移动合并格覆盖的 ${moved} ${row?'行':'列'}`);
+        return ok;
+    }
+
+    const RESIZE_ID='att-dtp-column-hit-v7181';
+    function cancelColumnResize() {
+        S.columnResizeGesture=null;S.resizeHover=null;
+        const handle=document.getElementById(RESIZE_ID);if(handle)handle.style.display='none';
+    }
+    function ensureColumnHit() {
+        let handle=document.getElementById(RESIZE_ID);if(handle)return handle;
+        handle=document.createElement('div');handle.id=RESIZE_ID;handle.setAttribute('data-lumatrace-ignore','');
+        handle.style.cssText='position:fixed;display:none;width:12px;cursor:col-resize;z-index:2147482580;touch-action:none;user-select:none;';
+        const line=document.createElement('div');line.style.cssText='position:absolute;left:5px;top:0;bottom:0;width:2px;background:#3b82f6;pointer-events:none;';handle.appendChild(line);
+        isolateToolbarEvents(handle);
+        handle.addEventListener('pointerdown',event=>{
+            if(event.button!==0 || !S.settings.enabled || !S.settings.resizeHit || !S.resizeHover)return;
+            const info=modelTableInfo();if(!info || !ensureModelContext(info) || !info.entries.every(e=>'colwidth' in e.node.attrs))return;
+            const widths=measuredColumnWidths(info),column=S.resizeHover.column;
+            S.columnResizeGesture={info,column,widths,startX:event.clientX,pointerId:event.pointerId,epoch:S.interactionEpoch,
+                delta:0,lineX:S.resizeHover.x,changed:false};
+            S.dragging=true;S.dragPointerId=event.pointerId;hideToolbar();clearAssistClasses();
+            event.preventDefault();event.stopImmediatePropagation();
+        });document.body.appendChild(handle);return handle;
+    }
+    function measuredColumnWidths(info) {
+        const widths=Array(info.map.width).fill(null);
+        for(const entry of info.entries) {
+            const rect=entry.dom.getBoundingClientRect();
+            for(let i=0;i<entry.width;i++) {
+                const known=entry.node.attrs.colwidth?.[i];
+                if(known>0)widths[entry.col+i]=known;
+                else if(widths[entry.col+i]===null || entry.width===1)widths[entry.col+i]=rect.width/entry.width;
+            }
+        }
+        return widths.map(w=>Math.max(25,Math.round(w || 40)));
+    }
+    function commitColumnResize(gesture) {
+        const {info,column,widths,delta}=gesture;
+        if(!S.settings.enabled || !S.settings.resizeHit || !ensureModelContext(info) || gesture.epoch!==S.interactionEpoch ||
+            !gesture.changed)return false;
+        const value=Math.max(25,Math.round(widths[column]+delta)),tr=info.view.state.tr;
+        for(const entry of info.entries)if(entry.col<=column && entry.col+entry.width>column) {
+            const next=Array.from({length:entry.width},(_,i)=>entry.node.attrs.colwidth?.[i] || widths[entry.col+i]);
+            next[column-entry.col]=value;tr.setNodeMarkup(entry.pos,null,{...entry.node.attrs,colwidth:next});
+        }
+        if(!tr.docChanged)return false;
+        invalidatePendingSelection();tr.setMeta('addToHistory',true);info.view.dispatch(tr);info.view.focus();
+        scheduleContextRefresh();return true;
+    }
+    function updateColumnHit(event) {
+        const gesture=S.columnResizeGesture;
+        if(gesture) {
+            if(event.pointerId!==gesture.pointerId)return;
+            if(!S.settings.enabled || !S.settings.resizeHit || gesture.epoch!==S.interactionEpoch ||
+                infoIsStale(gesture.info)) {cancelColumnResize();finishDrag();return;}
+            event.preventDefault();event.stopImmediatePropagation();
+            gesture.delta=Math.max(25-gesture.widths[gesture.column],event.clientX-gesture.startX);
+            gesture.changed=Math.abs(gesture.delta)>=1;
+            const handle=document.getElementById(RESIZE_ID);if(handle)handle.style.left=`${gesture.lineX+gesture.delta-6}px`;
+            return;
+        }
+        if(!S.settings.enabled || !S.settings.resizeHit || S.dragging || S.pointerGesture || event.buttons ||
+            (event.pointerType && event.pointerType!=='mouse')) {cancelColumnResize();return;}
+        const target=event.target instanceof Element?event.target:null;
+        if(target?.closest(`#${RESIZE_ID}`) && S.resizeHover)return;
+        const cell=cellFromEventTarget(target);
+        if(!cell || getTopTable(cell)!==S.table || isInteractiveCellTarget(target)) {cancelColumnResize();return;}
+        const info=modelTableInfo(),entry=info?.map.cells.get(cell);
+        if(!entry || !info.entries.every(e=>'colwidth' in e.node.attrs)) {cancelColumnResize();return;}
+        const r=cell.getBoundingClientRect(),clip=editorClipRect(),table=info.table.getBoundingClientRect(),
+            left=Math.abs(event.clientX-r.left),right=Math.abs(event.clientX-r.right);
+        let x,column;
+        if(right<=6) {x=r.right;column=entry.col+entry.width-1;}
+        else if(left<=6 && entry.col>0) {x=r.left;column=entry.col-1;}
+        else {cancelColumnResize();return;}
+        if(x<clip.left+6 || x>clip.right-6) {cancelColumnResize();return;}
+        const top=Math.max(table.top,clip.top),bottom=Math.min(table.bottom,clip.bottom);
+        if(bottom<=top)return;
+        S.resizeHover={x,column};const handle=ensureColumnHit();handle.style.display='block';
+        handle.style.left=`${x-6}px`;handle.style.top=`${top}px`;handle.style.height=`${bottom-top}px`;
+    }
+    function infoIsStale(info) {
+        return info.view!==getEditorView() || info.view.state.doc!==info.doc || !info.table.isConnected ||
+            info.table!==S.table || info.view.editable===false;
+    }
+    function finishColumnResize(event) {
+        const gesture=S.columnResizeGesture;if(!gesture)return;
+        if(event?.pointerId!=null && event.pointerId!==gesture.pointerId)return;
+        cancelColumnResize();finishDrag();
+        if(event?.type==='pointerup') {
+            event.preventDefault();event.stopImmediatePropagation();
+            try {if(!commitColumnResize(gesture) && gesture.changed)showToast('表格或选择已变化，未保存列宽');}
+            catch (_) {showToast('列宽调整失败，未改动单元格内容');}
+        }
+    }
+    function bindColumnResize() {
+        document.addEventListener('pointermove',updateColumnHit,{capture:true,passive:false});
+        window.addEventListener('pointerup',finishColumnResize,true);
+        window.addEventListener('pointercancel',finishColumnResize,true);
+        window.addEventListener('blur',()=>{cancelColumnResize();finishDrag();});
+        document.addEventListener('scroll',()=>{if(!S.columnResizeGesture)cancelColumnResize();},{capture:true,passive:true});
+        window.addEventListener('resize',()=>{cancelColumnResize();finishDrag();});
+        document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){cancelColumnResize();finishDrag();}});
+        document.addEventListener('keydown',event=>{
+            if(event.key==='Escape' && S.columnResizeGesture) {
+                cancelColumnResize();finishDrag();event.preventDefault();event.stopImmediatePropagation();
+            }
+        },true);
+    }
+
     function ensureGuard() {
         let guard = document.getElementById(DTP.guardId);
         if (guard) return guard;
@@ -33073,8 +34203,10 @@
         guard.setAttribute('data-lumatrace-ignore', '');
         guard.innerHTML = `
             <div class="att-dtp-guard-title-v7170">当前光标位于表格中</div>
-            <div class="att-dtp-guard-text-v7170">继续“插入表格”会创建嵌套表格。若不是有意嵌套，请先把光标移动到当前表格之外。</div>
+            <div class="att-dtp-guard-text-v7170">继续“插入表格”会创建嵌套表格。可直接选择在当前表格前后插入。</div>
             <div class="att-dtp-guard-actions-v7170">
+                <button type="button" data-dtp-guard="before">在当前表格之前插入</button>
+                <button type="button" data-dtp-guard="after">在当前表格之后插入</button>
                 <button type="button" data-dtp-guard="cancel">取消</button>
                 <button type="button" data-dtp-guard="allow" class="danger">仍然嵌套</button>
             </div>
@@ -33087,6 +34219,9 @@
             if (!button) return;
             event.preventDefault();
             event.stopPropagation();
+            if (['before','after'].includes(button.dataset.dtpGuard)) {
+                insertTableOutside(button.dataset.dtpGuard);hideGuard();return;
+            }
             if (button.dataset.dtpGuard === 'cancel') {
                 hideGuard();
                 return;
@@ -33320,10 +34455,13 @@
             ${toggleRow('enabled', '启用文档表格增强', '总开关；关闭后迷你工具栏、高亮、嵌套保护与表格导航全部停止。')}
             <div class="att-dtp-settings-group-v7170${disabledClass}">
                 ${toggleRow('miniToolbar', '单元格迷你工具栏', '在表格边缘显示选择区域与行列操作；按住鼠标选区或调宽时暂时隐藏。')}
-                ${toggleRow('dragCells', '跨单元格拖选', '同一格内选文字，跨到其他格时建立原生矩形选区；关闭后恢复页面原生拖选。保留 Shift 点击和选区域入口。')}
+                ${toggleRow('clipboard', '区域复制与矩形粘贴', '多格复制同时提供 TSV 与 HTML；Excel/WPS 区域粘贴支持确认扩行扩列，覆盖合并格时确认拆分。')}
+                ${toggleRow('edgeHandles', '行列选择柄与边缘加号', '点击数字选择整行或整列；可拖动数字排序，合并格覆盖的行列作为一组移动，末尾加号快速扩展。')}
+                ${toggleRow('contextMenu', '表格右键菜单', '右键显示选区操作；按住 Shift 右键保留浏览器菜单。')}
+                ${toggleRow('dragCells', '跨单元格拖选', '同一格内选文字，跨格时建立矩形选区；拖选期间按 Esc 停止扩展，松开鼠标结束。保留 Shift 点击和选区域入口。')}
                 ${toggleRow('preventCellMove', '防止单元格误移动', '拦截原生单元格或整表的拖动；不影响选文字、矩形选区与原生列宽调整。按住 Alt 开始拖动或关闭此项可放行。')}
                 ${toggleRow('assistHighlight', '当前行列辅助高亮', '仅作为编辑视觉辅助，不写入文档内容。')}
-                ${toggleRow('resizeHit', '列宽边界提示', '只扩展视觉提示，不占用单元格命中区域；调宽继续使用原生边界。')}
+                ${toggleRow('resizeHit', '扩大列宽拖拽热区', '边界附近显示 2px 细线和 12px 命中区；拖动仅预览，松开保存列宽，Esc 取消。')}
                 ${toggleRow('nestedGuard', '防止误插嵌套表格', '在现有表格中点击“插入表格”时先确认，避免误建嵌套表。')}
                 ${toggleRow('navigator', '在文档导航中显示表格', '在现有文档大纲侧栏下方追加表格列表，点击直接定位。')}
             </div>
@@ -33486,6 +34624,20 @@
         const style = document.createElement('style');
         style.id = DTP.styleId;
         style.textContent = `
+            #att-dtp-edges-v7180 {position:fixed;inset:0;pointer-events:none;z-index:2147482540;display:none;}
+            #att-dtp-edges-v7180 button {position:fixed;width:18px;height:18px;padding:0;border:1px solid #94a3b8;border-radius:4px;background:#f1f5f9;color:#334155;font:10px sans-serif;pointer-events:auto;cursor:pointer;}
+            #att-dtp-edges-v7180 button.is-target {background:#2563eb;color:#fff;}
+            #att-dtp-edges-v7180 button:disabled {opacity:.4;cursor:default;}
+            #att-dtp-context-v7180 {position:fixed;display:none;z-index:2147482600;width:180px;max-height:calc(100vh - 16px);overflow:auto;padding:6px;gap:3px;background:#181b20;border:1px solid #64748b;border-radius:9px;color:#e7eaf0;font:12px sans-serif;box-shadow:0 10px 28px #0005;}
+            #att-dtp-context-v7180 button {text-align:left;padding:7px;border:0;border-radius:5px;background:transparent;color:inherit;cursor:pointer;}
+            #att-dtp-context-v7180 button:hover {background:#334155;}
+            #att-dtp-dialog-v7180 {position:fixed;inset:0;z-index:2147482700;background:#0005;display:grid;place-items:center;}
+            #att-dtp-dialog-v7180>div {max-width:min(380px,calc(100vw - 32px));padding:20px;background:#181b20;color:#e7eaf0;border-radius:12px;font:14px/1.6 sans-serif;}
+            #att-dtp-dialog-v7180 button {padding:7px 14px;margin-right:8px;border:1px solid #64748b;border-radius:6px;background:#334155;color:inherit;cursor:pointer;}
+            #att-dtp-dialog-v7180 button[data-choice="confirm"] {background:#2563eb;}
+            #${DTP.toolbarId} .att-dtp-more-menu-v7170 {max-height:min(65vh,450px);overflow:auto;}
+            #${DTP.toolbarId} button:disabled {opacity:.4;cursor:default;}
+
             .document-editor__content.att-dtp-selecting-v7173,
             .document-editor__content.att-dtp-selecting-v7173 * { user-select:none!important; }
             #${DTP.toolbarId} {
@@ -33607,7 +34759,7 @@
                 transition: outline-color .25s ease;
             }
 
-            /* V7.17.4：提示层不占用命中区域，选区/移动/调宽均保留原生命中判断。 */
+            /* V7.18.1：提示层不占用命中区域，选区/移动/调宽均保留原生命中判断。 */
             html.att-dtp-resize-hit-v7170 .document-editor__content .column-resize-handle {
                 overflow: visible !important;
                 pointer-events: none !important;
@@ -33658,7 +34810,7 @@
 
     function structureMutationRelevant(record) {
         const target = record.target instanceof Element ? record.target : record.target?.parentElement;
-        if (target?.closest?.(`#${DTP.toolbarId},#${DTP.guardId},#${DTP.settingsHostId},#${DTP.navId}`)) return false;
+        if (target?.closest?.(`#${DTP.toolbarId},#${DTP.guardId},#${DTP.settingsHostId},#${DTP.navId},#${PLUS.edgeId},#${PLUS.menuId},#${PLUS.dialogId},#att-dtp-frozen-v7180,#att-dtp-column-hit-v7181`)) return false;
         if (target?.closest?.('.grid-virtual-body')) return false;
 
         const nodes = [...(record.addedNodes || []), ...(record.removedNodes || [])];
@@ -33685,9 +34837,24 @@
         if (document.documentElement.dataset.attDocTablePlusBoundV7170 === '1') return;
         document.documentElement.dataset.attDocTablePlusBoundV7170 = '1';
 
+        document.addEventListener('pointerdown', invalidatePendingSelection, true);
+        document.addEventListener('keydown', event => {
+            if (/^(Escape|Arrow.*|Home|End|PageUp|PageDown|Backspace|Delete|Enter|Tab)$/.test(event.key) ||
+                ((event.ctrlKey || event.metaKey) && /^[zy]$/i.test(event.key))) {
+                invalidatePendingSelection(event);
+                if (event.key !== 'Escape') finishDrag();
+            }
+        }, true);
+        document.addEventListener('beforeinput', event => {
+            if (S.editor?.contains(event.target)) { invalidatePendingSelection(); finishDrag(); }
+        }, true);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') invalidatePendingSelection();
+        });
+
         document.addEventListener('pointermove', handleCellPointerMove, {capture: true, passive: false});
         document.addEventListener('mousemove', event => {
-            if (!S.pointerGesture?.cellSelecting) return;
+            if (!S.pointerGesture?.cellSelecting && !S.pointerGesture?.cancelled) return;
             event.preventDefault();
             event.stopImmediatePropagation();
         }, true);
@@ -33709,13 +34876,22 @@
         window.addEventListener('pointercancel', finishDrag, true);
         window.addEventListener('dragend', finishDrag, true);
         document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') finishDrag(); });
-        window.addEventListener('blur', () => { finishDrag(); S.rangeMode=false; scheduleContextRefresh(); });
+        window.addEventListener('blur', () => { invalidatePendingSelection(); finishDrag(); S.rangeMode=false; scheduleContextRefresh(); });
         window.addEventListener('pointermove', event => {
             if (S.dragging && event.buttons === 0) finishDrag();
         }, {capture:true,passive:true});
         document.addEventListener('keydown', event => {
-            if (event.key === 'Escape' && S.rangeMode) {
+            const gesture = S.pointerGesture;
+            if (event.key === 'Escape' && (S.rangeMode || gesture?.cellSelecting || gesture?.cancelled)) {
                 S.rangeMode=false;
+                if (gesture) {
+                    cancelSelectionFrame();
+                    gesture.endCell = gesture.appliedCell || gesture.endCell;
+                    gesture.cancelled = true;
+                    gesture.disabled = true;
+                    gesture.cellSelecting = false;
+                    gesture.epoch = S.interactionEpoch;
+                }
                 consumeSelectionEvent(event);
                 scheduleContextRefresh();
             }
@@ -33731,7 +34907,7 @@
             if (!S.settings.enabled) return;
             const target = event.target instanceof Element ? event.target : null;
             const insideEditor = Boolean(target && S.editor?.contains?.(target));
-            const insideOwnUi = Boolean(target?.closest?.(`#${DTP.toolbarId},#${DTP.guardId}`));
+            const insideOwnUi = Boolean(target?.closest?.(`#${DTP.toolbarId},#${DTP.guardId},#${PLUS.edgeId},#${PLUS.menuId},#${PLUS.dialogId},#att-dtp-column-hit-v7181`));
             const insideNativeDocToolbar = Boolean(target?.closest?.('.document-toolbar'));
             if (!insideEditor && !insideOwnUi && !insideNativeDocToolbar) {
                 S.contextStickyUntil = 0;
@@ -33748,7 +34924,8 @@
         }, true);
 
         document.addEventListener('scroll', () => {
-            if (document.getElementById(DTP.toolbarId)?.classList.contains('is-visible') || S.assistOverlay?.style.display === 'block') schedulePosition();
+            refreshDragAfterScroll();
+            if (S.frozenTable || S.table || document.getElementById(DTP.toolbarId)?.classList.contains('is-visible') || S.assistOverlay?.style.display === 'block') schedulePosition();
         }, { capture: true, passive: true });
         window.addEventListener('resize', schedulePosition, { passive: true });
         window.addEventListener('popstate', () => scheduleStructureSync(40));
@@ -33784,6 +34961,7 @@
                     dragCells: S.settings.dragCells,
                     nativeRectAvailable: S.nativeRectAvailable,
                     rectangleSelecting: Boolean(S.pointerGesture?.cellSelecting),
+                    dragCancelled: Boolean(S.pointerGesture?.cancelled),
                     pointerGestureActive: Boolean(S.pointerGesture),
                     blockedCellDrags: S.blockedCellDrags,
                     editorFound: Boolean(S.editor?.isConnected),
@@ -33814,6 +34992,8 @@
         addStyles();
         applyFeatureClasses();
         bindGlobalEvents();
+        bindProductivityEvents();
+        bindColumnResize();
         syncEditor();
         ensureToolbar();
         ensureGuard();
@@ -33828,7 +35008,7 @@
             refreshTableInventory();
             scheduleContextRefresh();
         }, 180);
-        console.log('[AutoTable Document Table Plus] V7.17.4 已加载：跨格矩形拖选 / 设置卡增量更新 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 编辑器外高亮 / 保留防误移动');
+        console.log('[AutoTable Document Table Plus] V7.18.1 已加载：跨格矩形拖选 / 设置卡增量更新 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 编辑器外高亮 / 保留防误移动');
     }
 
     if (document.body) init();
