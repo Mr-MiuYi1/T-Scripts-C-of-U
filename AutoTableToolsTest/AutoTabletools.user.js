@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.18.4
-// @description  AutoTable 一体化效率增强工具：文档表格增强（标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.18.5
+// @description  AutoTable 一体化效率增强工具：文档表格增强（两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.18.4
+ * AutoTable 工具集 V7.18.5
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，规则组/规则分层管理，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -18898,11 +18898,13 @@
             rows: table.rows.length, columns, index, kind: 'table', children: []};
     }
 
-    function buildDocumentNavigation(editor, headings) {
+    function buildDocumentNavigation(editor, headings, includeTables = true) {
         const roots = [], stack = [], tables = [];
         const headingMap = new Map(headings.map((heading, index) => [heading.element, {...heading, index}]));
         if (!editor) return {roots, tables};
-        for (const element of editor.querySelectorAll('h1,h2,h3,h4,h5,h6,table')) {
+        const elements = includeTables ? editor.querySelectorAll('h1,h2,h3,h4,h5,h6,table')
+            : headings.map(heading => heading.element);
+        for (const element of elements) {
             // Content inside a table belongs to that table, not to a new chapter.
             if (element.parentElement?.closest('table')) continue;
             const heading = headingMap.get(element);
@@ -18910,7 +18912,7 @@
             if (heading) {
                 node = {...heading, kind: 'heading', children: []};
                 while (stack.length && stack[stack.length - 1].level >= node.level) stack.pop();
-            } else if (element.tagName === 'TABLE') {
+            } else if (includeTables && element.tagName === 'TABLE') {
                 node = navigationTableInfo(element, tables.length);
                 tables.push(node);
             } else continue;
@@ -19225,8 +19227,8 @@
             #att-document-outline .att-doc-outline-item[data-level="5"] { padding-left: 50px; }
             #att-document-outline .att-doc-outline-item[data-level="6"] { padding-left: 60px; }
 
-            #att-document-outline[data-att-navigation-merged="1"] .att-doc-nav-row-v7184 {display:flex;align-items:center;min-width:0;}
-            #att-document-outline[data-att-navigation-merged="1"] .att-doc-outline-item {display:flex;align-items:center;gap:6px;flex:1;min-width:0;width:auto;padding:6px;}
+            #att-document-outline[data-att-navigation-tree="1"] .att-doc-nav-row-v7184 {display:flex;align-items:center;min-width:0;}
+            #att-document-outline[data-att-navigation-tree="1"] .att-doc-outline-item {display:flex;align-items:center;gap:6px;flex:1;min-width:0;width:auto;padding:6px;}
             #att-document-outline .att-doc-nav-label-v7184 {flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
             #att-document-outline .att-doc-nav-heading-level-v7184 {flex:none;font-size:9px;font-weight:500;opacity:.65;}
             #att-document-outline .att-doc-nav-group-v7184 {margin-left:10px;padding-left:5px;border-left:1px solid var(--border-color,rgba(148,163,184,.22));}
@@ -19458,13 +19460,13 @@
         card.dataset.renderSignature = signature;
         card.innerHTML = `
                 <div class="att-card-title">文档大纲</div>
-                <div class="att-card-desc">仅在 AutoTable 文档视图中生效。开启后自动读取正文里的 H1–H6 标题，并随文档内容实时更新。</div>
+                <div class="att-card-desc">仅在 AutoTable 文档视图中生效。H1–H6 标题按章节层级排列，支持展开与折叠，并随正文实时更新。</div>
                 <div class="att-divider"></div>
 
                 <div class="att-row">
                     <div style="min-width:0;">
                         <div class="att-label">自动文档大纲视图</div>
-                        <div class="att-sub-label">在文档区域左侧嵌入原生风格大纲；点击标题可直接定位到正文。</div>
+                        <div class="att-sub-label">在文档左侧显示层级大纲；点击箭头折叠章节，点击标题定位正文。</div>
                     </div>
                     <label class="att-switch" title="自动文档大纲视图">
                         <input type="checkbox"
@@ -19494,7 +19496,7 @@
                     当前检测到 ${headingCount} 个标题
                 </div>
                 <div class="att-doc-tools-note">
-                    V5 保留 V4 的内部容器定点跳转；开启“大纲滑动跟随”后，正文滚动到新章节时，大纲会自动跟随当前标题。
+                    标题层级与折叠在两种导航模式下均可使用；开启“大纲滑动跟随”后，大纲会跟随当前章节，已折叠的章节保持收起。
                 </div>
         `;
     }
@@ -19504,7 +19506,7 @@
         if (!editor) return [];
 
         return Array.from(editor.querySelectorAll('h1,h2,h3,h4,h5,h6'))
-            .filter(heading => isVisibleElement(heading) && (!docState.navigationMerged || !heading.parentElement?.closest('table')))
+            .filter(heading => isVisibleElement(heading) && !heading.parentElement?.closest('table'))
             .map(heading => ({
                 element: heading,
                 level: Number(heading.tagName.slice(1)) || 1,
@@ -19536,7 +19538,7 @@
             });
             panel.addEventListener('click', event => {
                 const toggle = event.target?.closest?.('button[data-att-nav-toggle]');
-                if (toggle && docState.navigationMerged) {
+                if (toggle) {
                     event.preventDefault(); event.stopPropagation();
                     toggleNavigationChapter(panel, toggle);
                     return;
@@ -19609,25 +19611,20 @@
 
         const merged = docState.navigationMerged;
         panel.dataset.attNavigationMerged = merged ? '1' : '0';
+        panel.dataset.attNavigationTree = '1';
         const title = panel.querySelector('.att-doc-outline-title');
         if (title) title.textContent = merged ? '文档导航' : '文档大纲';
         panel.setAttribute('aria-label', merged ? '文档导航：标题与表格' : '文档大纲');
         updateHeadingCountInToolbox(docState.headings.length);
         if (!list) return;
         const scrollTop = list.scrollTop;
-        if (merged) {
-            const navigation = buildDocumentNavigation(docState.editor, docState.headings);
-            docState.navigationTables = navigation.tables;
-            list.innerHTML = navigation.roots.length ? renderDocumentNavigationNodes(navigation.roots)
-                : '<div class="att-doc-outline-empty">当前文档还没有标题或表格</div>';
-            document.getElementById('att-doc-table-nav-v7170')?.remove();
-        } else {
-            docState.navigationTables = [];
-            list.innerHTML = docState.headings.length ? docState.headings.map((item, index) => `
-                <button type="button" class="att-doc-outline-item" data-index="${index}" data-level="${item.level}"
-                        title="${escapeAttr(item.text)}">${escapeHtml(item.text)}</button>`).join('')
-                : '<div class="att-doc-outline-empty">当前文档还没有 H1–H6 标题</div>';
-        }
+        // Both modes use the same heading tree and disclosure controls.
+        // The merge switch only decides where table entries are displayed.
+        const navigation = buildDocumentNavigation(docState.editor, docState.headings, merged);
+        docState.navigationTables = navigation.tables;
+        list.innerHTML = navigation.roots.length ? renderDocumentNavigationNodes(navigation.roots)
+            : `<div class="att-doc-outline-empty">${merged ? '当前文档还没有标题或表格' : '当前文档还没有 H1–H6 标题'}</div>`;
+        if (merged) document.getElementById('att-doc-table-nav-v7170')?.remove();
         list.scrollTop = scrollTop;
         if (count) {
             count.textContent = merged ? `${docState.headings.length} / ${docState.navigationTables.length}` : String(docState.headings.length);
@@ -32147,7 +32144,7 @@
 })();
 
 /* ============================================================================
- * AutoTable Document Table Plus V7.18.4 · 文档表格完整交互增强
+ * AutoTable Document Table Plus V7.18.5 · 文档表格完整交互增强
  * --------------------------------------------------------------------------
  * 目标：不重做 ProseMirror 表格引擎，只给原生表格能力增加一层稳定的交互外壳。
  *
@@ -32164,7 +32161,7 @@
     'use strict';
 
     const DTP = {
-        version: 'V7.18.4',
+        version: 'V7.18.5',
         styleId: 'att-doc-table-plus-style-v7170',
         toolbarId: 'att-doc-table-mini-toolbar-v7170',
         guardId: 'att-doc-table-nested-guard-v7170',
@@ -33122,7 +33119,7 @@
         showToast('已阻止单元格误拖动；需要移动时可关闭防误移动');
     }
 
-    // V7.18.4: keep menus inside the document viewport and preserve header paint.
+    // V7.18.5: keep menus inside the document viewport and preserve header paint.
     const MENU_ICONS = {
         'select-row':'M3 3h18v18H3z M3 9h18 M3 15h18 M3 12h18',
         'select-column':'M3 3h18v18H3z M9 3v18 M15 3v18 M12 3v18',
@@ -34864,9 +34861,6 @@
     }
 
     function tableLabel(table, index) {
-        const wrapper = table.closest('.tableWrapper');
-        const heading = getPreviousHeading(wrapper);
-        if (heading) return heading;
         const first = table.rows[0];
         if (first) {
             const labels = Array.from(first.cells)
@@ -34987,7 +34981,7 @@
                 ${toggleRow('resizeHit', '扩大列宽拖拽热区', '边界附近显示 2px 细线和 12px 命中区；拖动仅预览，松开保存列宽，Esc 取消。')}
                 ${toggleRow('nestedGuard', '防止误插嵌套表格', '在现有表格中点击“插入表格”时先确认，避免误建嵌套表。')}
                 ${toggleRow('navigator', '在文档导航中显示表格', '在文档大纲侧栏显示表格入口，点击直接定位。')}
-                ${toggleRow('navigationHierarchy', '标题与表格合并成层级导航', '将表格归入所属标题，支持折叠章节。需开启自动文档大纲和表格导航；关闭后恢复独立表格列表。')}
+                ${toggleRow('navigationHierarchy', '标题与表格合并成层级导航', '需开启自动文档大纲和表格导航。开启后表格归入所属标题；关闭后表格单独显示，大纲仍保留层级、折叠与标题标识。')}
             </div>
             <div class="att-divider"></div>
             <div class="att-dtp-health-v7170">
@@ -35092,9 +35086,11 @@
         }
         list.innerHTML = tables.map((table, index) => {
             const rows = table.rows.length;
-            const cols = tableColumnCount(table);
+            const cols = Array.from(table.rows).reduce((maximum, row) => Math.max(maximum,
+                Array.from(row.cells).reduce((total, cell) => total + Math.max(1, Number(cell.colSpan) || 1), 0)), 0);
+            const label = tableLabel(table, index);
             const active = table === S.table ? ' is-active' : '';
-            return `<button type="button" class="att-dtp-nav-item-v7170${active}" data-dtp-table-index="${index}" title="${escapeAttr(tableLabel(table, index))}"><span>▦</span><b>${escapeHtml(tableLabel(table, index))}</b><em>${rows}×${cols}</em></button>`;
+            return `<button type="button" class="att-dtp-nav-item-v7170${active}" data-dtp-table-index="${index}" title="${escapeAttr(label)} · ${rows}行 × ${cols}列"><svg class="att-doc-nav-table-icon-v7184" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="2" y="3" width="12" height="10" rx="1"/><path d="M2 6h12M2 9h12M6 3v10M10 3v10"/></svg><b>${escapeHtml(label)}</b><em>${rows}×${cols}</em></button>`;
         }).join('');
     }
 
@@ -35391,11 +35387,15 @@
             #${DTP.navId} .att-dtp-nav-head-v7170 { display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:30px; padding:0 10px 0 13px; color:var(--text-muted,#64748b); font-size:10.5px; }
             #${DTP.navId} .att-dtp-nav-head-v7170 b { color:var(--text-secondary,#475569); font-size:11px; }
             #${DTP.navId} .att-dtp-nav-list-v7170 { min-height:0; overflow:auto; padding:2px 5px 7px; }
-            #${DTP.navId} .att-dtp-nav-item-v7170 { width:100%; min-height:28px; margin:1px 0; padding:4px 6px; display:grid; grid-template-columns:16px minmax(0,1fr) auto; align-items:center; gap:4px; border:0; border-radius:6px; background:transparent; color:var(--text-secondary,#475569); text-align:left; cursor:pointer; font:inherit; font-size:10.5px; line-height:1.3; }
-            #${DTP.navId} .att-dtp-nav-item-v7170:hover { background:rgba(148,163,184,.10); }
-            #${DTP.navId} .att-dtp-nav-item-v7170.is-active { background:rgba(59,130,246,.10); color:#2563eb; }
-            #${DTP.navId} .att-dtp-nav-item-v7170 b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
-            #${DTP.navId} .att-dtp-nav-item-v7170 em { font-style:normal; color:var(--text-muted,#94a3b8); font-size:9.5px; }
+            #${DTP.navId} .att-dtp-nav-item-v7170 { width:100%; min-width:0; min-height:30px; box-sizing:border-box; margin:1px 0; padding:6px 7px; display:grid; grid-template-columns:13px minmax(0,1fr) auto; align-items:center; gap:6px; border:0; border-radius:6px; background:transparent; color:var(--text-secondary,#475569); text-align:left; cursor:pointer; font:inherit; font-size:11px; line-height:1.45; }
+            #${DTP.navId} .att-dtp-nav-item-v7170:hover { background:var(--bg-hover,rgba(148,163,184,.10)); color:var(--text-main,#1f2937); }
+            #${DTP.navId} .att-dtp-nav-item-v7170.is-active { background:var(--primary-bg,rgba(22,119,255,.10)); color:var(--primary,var(--ant-color-primary,#1677ff)); }
+            #${DTP.navId} .att-dtp-nav-item-v7170 b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:400; }
+            #${DTP.navId} .att-dtp-nav-item-v7170 em { font-style:normal; font-size:9px; opacity:.65; }
+            #${DTP.navId} .att-dtp-nav-item-v7170:focus-visible { outline:1px solid var(--primary,#1677ff); outline-offset:-1px; }
+            body.att-native-dark #${DTP.navId} .att-dtp-nav-item-v7170 {color:var(--text-secondary,var(--edge-text-2,#d2d2d2));}
+            body.att-native-dark #${DTP.navId} .att-dtp-nav-item-v7170:hover {color:var(--text-main,var(--edge-text,#f3f3f3));}
+            body.att-native-dark #${DTP.navId} .att-dtp-nav-item-v7170.is-active {color:var(--primary,var(--edge-blue,#60cdff));background:var(--primary-bg,rgba(96,205,255,.12));}
             #${DTP.navId} .att-dtp-nav-empty-v7170 { padding:8px 10px 11px; color:var(--text-muted,#94a3b8); font-size:10px; text-align:center; }
         `;
         document.documentElement.appendChild(style);
@@ -35609,7 +35609,7 @@
             refreshTableInventory();
             scheduleContextRefresh();
         }, 180);
-        console.log('[AutoTable Document Table Plus] V7.18.4 已加载：标题与表格层级导航 / 菜单边界与图标 / 冻结表头样式和停靠修复 / 表格内部跳转 / 滚动内容锚定浮层 / 跨格矩形拖选 / 设置卡增量更新 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 编辑器外高亮 / 保留防误移动');
+        console.log('[AutoTable Document Table Plus] V7.18.5 已加载：两种模式统一标题树与折叠 / 标题与表格层级导航 / 菜单边界与图标 / 冻结表头样式和停靠修复 / 表格内部跳转 / 滚动内容锚定浮层 / 跨格矩形拖选 / 设置卡增量更新 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 编辑器外高亮 / 保留防误移动');
     }
 
     if (document.body) init();
