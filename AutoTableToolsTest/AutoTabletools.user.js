@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.18.5
-// @description  AutoTable 一体化效率增强工具：文档表格增强（两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.19.0
+// @description  AutoTable 一体化效率增强工具：文档表格增强（大纲搜索筛选 / 批量展开折叠 / 文档阅读与折叠记忆 / 自定义书签 / 章节复制与导出 / 范围查找与替换预览 / 两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.18.5
+ * AutoTable 工具集 V7.19.0
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，规则组/规则分层管理，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -18854,6 +18854,8 @@
     const docState = {
         outlineEnabled: readOutlineEnabled(),
         outlineFollowEnabled: readOutlineFollowEnabled(),
+        rememberReading: workspaceReadMemorySetting('reading'),
+        rememberFold: workspaceReadMemorySetting('fold'),
         editor: null,
         headings: [],
         navigationMerged: readMergedNavigationEnabled(),
@@ -18875,6 +18877,708 @@
         navigate: 'att-document-table-navigate-v7184',
         active: 'att-document-table-active-v7184'
     };
+
+    // V7.19.0: UI state belongs to the document; editor content is read only here.
+    const WS_KEY = 'att_doc_workspace_state_v7190';
+    const W = {
+        key: '', editor: null, record: null, query: '', mode: 'all', fullRoots: [], roots: [],
+        tables: [], tableMatches: new Set(), filterCollapsed: new WeakSet(), appliedFolds: new WeakSet(),
+        contextTarget: null, selectionRanges: [], selectionEditor: null, scope: 'document', scopeRanges: [],
+        scopeToken: 0, saveTimer: 0, restoreTimer: 0, restoreAttempts: 0, readingPending: null,
+        userNavigated: false, restoringUntil: 0, dialog: null, menu: null, view: null, initialized: false
+    };
+
+    function workspaceRead(key, fallback) {
+        try { return GM_getValue(key, fallback); } catch (_) { return fallback; }
+    }
+    function workspaceReadMemorySetting(kind) {
+        return Boolean(workspaceRead(`att_doc_tools_${kind}_memory_v7190`, true));
+    }
+    function workspaceStore() {
+        const value = workspaceRead(WS_KEY, {});
+        return value && typeof value === 'object' && value.version === 1 && value.documents &&
+            typeof value.documents === 'object' ? value : {version: 1, documents: {}};
+    }
+    function workspaceDocumentKey(editor) {
+        const page = editor?.closest('.document-view-page');
+        const identity = page?.getAttribute('data-document-id') || page?.getAttribute('data-record-id') ||
+            editor?.getAttribute('data-document-id') || '';
+        return `doc:${location.origin || ''}${location.pathname || ''}${location.search || ''}|${identity}`;
+    }
+    function workspaceSyncDocument(editor) {
+        if (!editor) return;
+        const key = workspaceDocumentKey(editor);
+        if (W.key === key && W.editor === editor) return;
+        workspaceFlushMemory();
+        closeWorkspaceDialog(); closeChapterMenu();
+        const stored = workspaceStore().documents[key];
+        W.key = key; W.editor = editor; W.view = null;
+        W.record = stored && typeof stored === 'object' ? {
+            collapsed: Array.isArray(stored.collapsed) ? stored.collapsed : [],
+            bookmarks: Array.isArray(stored.bookmarks) ? stored.bookmarks.slice(0, 200) : [],
+            reading: stored.reading || null, updatedAt: stored.updatedAt || 0
+        } : {collapsed: [], bookmarks: [], reading: null, updatedAt: 0};
+        W.appliedFolds = new WeakSet(); W.filterCollapsed = new WeakSet();
+        docState.navigationCollapsed = new WeakSet();
+        W.query = ''; W.mode = 'all'; W.contextTarget = null;
+        W.selectionRanges = []; W.selectionEditor = null; W.scope = 'document'; W.scopeRanges = [];
+        W.scopeToken++; W.userNavigated = false; W.restoreAttempts = 0;
+        W.readingPending = docState.rememberReading ? W.record.reading : null;
+    }
+    function workspaceNormalize(value) { return String(value || '').replace(/\s+/g, ' ').trim(); }
+    function headingMemoryDescriptor(heading, index, headings = docState.headings) {
+        const occurrence = headings.slice(0, index).filter(item => item.level === heading.level && item.text === heading.text).length;
+        return {text: heading.text, level: heading.level, occurrence};
+    }
+    function workspaceRestoreFolds() {
+        if (!W.record || !docState.rememberFold) return;
+        docState.headings.forEach((heading, index) => {
+            if (W.appliedFolds.has(heading.element)) return;
+            W.appliedFolds.add(heading.element);
+            const key = headingMemoryDescriptor(heading, index);
+            if (W.record.collapsed.some(saved => saved && saved.text === key.text && saved.level === key.level && saved.occurrence === key.occurrence)) {
+                docState.navigationCollapsed.add(heading.element);
+            }
+        });
+    }
+    function workspaceIsFiltering() { return Boolean(W.query.trim() || W.mode !== 'all'); }
+    function workspaceChapterCollapsed(element) {
+        return (workspaceIsFiltering() ? W.filterCollapsed : docState.navigationCollapsed).has(element);
+    }
+    function filterWorkspaceNodes(nodes, query = W.query, mode = W.mode) {
+        const needle = workspaceNormalize(query).toLocaleLowerCase();
+        return nodes.flatMap(node => {
+            const children = filterWorkspaceNodes(node.children || [], query, mode);
+            const allowed = mode === 'all' || (mode === 'headings' ? node.kind === 'heading' : node.kind === 'table');
+            const ownMatch = allowed && (!needle || String(node.text).toLocaleLowerCase().includes(needle));
+            return ownMatch || children.length ? [{...node, children, contextOnly: !ownMatch}] : [];
+        });
+    }
+    function workspaceWithoutTables(nodes) {
+        return nodes.filter(node => node.kind === 'heading').map(node => ({...node, children: workspaceWithoutTables(node.children)}));
+    }
+    function workspaceNavigation(merged) {
+        const full = buildDocumentNavigation(docState.editor, docState.headings, true);
+        W.fullRoots = full.roots; W.tables = full.tables;
+        const filtered = filterWorkspaceNodes(full.roots);
+        W.tableMatches = new Set();
+        const visit = nodes => nodes.forEach(node => {
+            if (node.kind === 'table') W.tableMatches.add(node.element);
+            visit(node.children);
+        });
+        visit(filtered);
+        W.roots = merged ? filtered : workspaceWithoutTables(filtered);
+        return {roots: W.roots, tables: merged ? full.tables : []};
+    }
+    function workspaceBatchFold(action, level = 2) {
+        const apply = (set, heading) => {
+            const collapsed = action === 'collapse' || (action === 'level' && heading.level >= level);
+            if (collapsed) set.add(heading.element); else set.delete(heading.element);
+        };
+        docState.headings.forEach(heading => {
+            apply(docState.navigationCollapsed, heading); apply(W.filterCollapsed, heading);
+        });
+        workspaceRememberFolds(); rebuildOutline();
+    }
+    function workspaceRememberFolds() {
+        if (W.record && docState.rememberFold) {
+            const collapsed = docState.headings.flatMap((heading, index) => docState.navigationCollapsed.has(heading.element)
+                ? [headingMemoryDescriptor(heading, index)] : []);
+            if (JSON.stringify(collapsed) !== JSON.stringify(W.record.collapsed)) {
+                W.record.collapsed = collapsed; workspaceScheduleSave();
+            }
+        }
+    }
+    function workspaceNotice(text, warn = false) {
+        const status = document.getElementById('att-doc-workspace-status-v7190');
+        if (status) {status.textContent = text; status.classList.toggle('is-warning', warn);}
+        const searchStatus = document.getElementById('att-doc-search-scope-status-v7190');
+        if (searchStatus && warn) {searchStatus.textContent = text; searchStatus.classList.add('is-warning');}
+    }
+    function workspaceEnsureControls(panel) {
+        const list = panel.querySelector(`#${DOC_TOOLS.outlineListId}`);
+        if (!list) return;
+        let controls = panel.querySelector('#att-doc-workspace-controls-v7190');
+        if (!controls) {
+            controls = document.createElement('div'); controls.id = 'att-doc-workspace-controls-v7190';
+            controls.innerHTML = `<div class="att-doc-ws-search-v7190"><input type="search" data-att-ws-query placeholder="搜索标题或表格名称…" aria-label="搜索标题或表格名称"><button type="button" data-att-ws-action="clear-filter" title="清除导航搜索">×</button></div>
+                <select data-att-ws-mode aria-label="导航显示范围"><option value="all">标题与表格</option><option value="headings">只看标题</option><option value="tables">只看表格（保留标题路径）</option></select>
+                <div class="att-doc-ws-actions-v7190"><button type="button" data-att-ws-action="expand">全部展开</button><button type="button" data-att-ws-action="collapse">全部折叠</button><select data-att-ws-level aria-label="展开到指定标题层级"><option value="">展开到…</option>${[1,2,3,4,5,6].map(level => `<option value="${level}">H${level}</option>`).join('')}</select></div>
+                <div id="att-doc-workspace-status-v7190" role="status" aria-live="polite"></div>`;
+            controls.addEventListener('input', event => {
+                if (!event.target?.hasAttribute?.('data-att-ws-query')) return;
+                W.query = event.target.value; W.filterCollapsed = new WeakSet(); scheduleOutlineRebuild(80);
+            });
+            controls.addEventListener('change', event => {
+                if (event.target?.hasAttribute?.('data-att-ws-mode')) {
+                    W.mode = ['all','headings','tables'].includes(event.target.value) ? event.target.value : 'all';
+                    W.filterCollapsed = new WeakSet(); rebuildOutline();
+                }
+                if (event.target?.hasAttribute?.('data-att-ws-level') && event.target.value) {
+                    workspaceBatchFold('level', Number(event.target.value)); event.target.value = '';
+                }
+            });
+            controls.addEventListener('click', event => {
+                const action = event.target?.closest?.('button[data-att-ws-action]')?.dataset.attWsAction;
+                if (!action) return;
+                if (action === 'clear-filter') {W.query = ''; W.filterCollapsed = new WeakSet(); rebuildOutline();}
+                else workspaceBatchFold(action);
+            });
+            panel.insertBefore(controls, list);
+        }
+        const input = controls.querySelector('[data-att-ws-query]');
+        if (input && input !== document.activeElement) input.value = W.query;
+        const mode = controls.querySelector('[data-att-ws-mode]'); if (mode) mode.value = W.mode;
+        workspaceRenderBookmarks(panel);
+    }
+    function workspaceAnchor(element, selectedQuote = '') {
+        const editor = W.editor;
+        if (!(element instanceof Element) || !editor?.contains(element)) return null;
+        const target = element.closest('p,pre,li,td,th,h1,h2,h3,h4,h5,h6,blockquote') || element;
+        const path = []; for (let node = target; node && node !== editor; node = node.parentElement) {
+            path.unshift(Array.from(node.parentElement?.children || []).indexOf(node));
+        }
+        const quote = workspaceNormalize(target.textContent).slice(0, 240);
+        return {path, tag: target.tagName, quote, selectedQuote: workspaceNormalize(selectedQuote).slice(0, 240)};
+    }
+    function workspaceResolveAnchor(anchor, editor = W.editor) {
+        if (!anchor || !editor?.isConnected || !Array.isArray(anchor.path)) return null;
+        let candidate = editor;
+        for (const index of anchor.path) {candidate = candidate?.children?.[index]; if (!candidate) break;}
+        const matches = node => node instanceof Element && node.tagName === anchor.tag &&
+            (anchor.quote ? workspaceNormalize(node.textContent).startsWith(anchor.quote)
+                : !workspaceNormalize(node.textContent));
+        if (matches(candidate)) return candidate;
+        const candidates = Array.from(editor.querySelectorAll('p,pre,li,td,th,h1,h2,h3,h4,h5,h6,blockquote')).filter(matches);
+        // Ambiguous moved content is left unresolved instead of jumping elsewhere.
+        return candidates.length === 1 ? candidates[0] : null;
+    }
+    function workspaceVisibleTop(host) {
+        const hr = host.getBoundingClientRect(); let top = Math.max(0, hr.top) + 12;
+        const toolbar = W.editor?.closest('.document-view-page')?.querySelector('.document-toolbar');
+        if (toolbar) {
+            const tr = toolbar.getBoundingClientRect();
+            if (tr.height > 0 && tr.bottom > top && tr.top < hr.bottom && tr.bottom < hr.bottom) top = tr.bottom + 12;
+        }
+        return top;
+    }
+    function workspaceReadingSnapshot() {
+        const editor = W.editor, host = findDocumentScrollContainer(editor?.firstElementChild || editor);
+        if (!editor?.isConnected || !host) return null;
+        const top = workspaceVisibleTop(host), bottom = Math.min(window.innerHeight, host.getBoundingClientRect().bottom);
+        const elements = Array.from(editor.querySelectorAll('p,pre,li,td,th,h1,h2,h3,h4,h5,h6,blockquote'));
+        const target = elements.find(el => {const r = el.getBoundingClientRect(); return r.height > 0 && r.bottom > top && r.top < bottom;});
+        const maximum = Math.max(0, host.scrollHeight - host.clientHeight);
+        return {anchor: target ? workspaceAnchor(target) : null, offset: target ? target.getBoundingClientRect().top - top : 0,
+            ratio: maximum ? host.scrollTop / maximum : 0, scrollTop: host.scrollTop};
+    }
+    function workspaceFlushMemory() {
+        clearTimeout(W.saveTimer); W.saveTimer = 0;
+        if (!W.key || !W.record) return;
+        if (docState.rememberReading && performance.now() >= W.restoringUntil && !W.readingPending) {
+            const reading = workspaceReadingSnapshot(); if (reading) W.record.reading = reading;
+        }
+        W.record.updatedAt = Date.now();
+        try {
+            const store = workspaceStore(); store.documents[W.key] = W.record;
+            const keys = Object.keys(store.documents).sort((a,b) => (store.documents[b]?.updatedAt || 0) - (store.documents[a]?.updatedAt || 0));
+            for (const key of keys.slice(100)) delete store.documents[key];
+            GM_setValue(WS_KEY, store);
+        } catch (_) {workspaceNotice('暂时无法保存文档记忆', true);}
+    }
+    function workspaceScheduleSave() {
+        clearTimeout(W.saveTimer); W.saveTimer = window.setTimeout(workspaceFlushMemory, 400);
+    }
+    function workspaceRestoreReading() {
+        if (!W.readingPending || !docState.rememberReading || W.userNavigated || !W.editor?.isConnected) {
+            if (W.userNavigated || !docState.rememberReading) W.readingPending = null;
+            return;
+        }
+        const saved = W.readingPending, target = workspaceResolveAnchor(saved.anchor);
+        const host = findDocumentScrollContainer(target || W.editor.firstElementChild || W.editor);
+        if (!host || host.scrollHeight <= host.clientHeight + 2) {
+            if (W.restoreAttempts++ < 3) {
+                clearTimeout(W.restoreTimer); W.restoreTimer = window.setTimeout(workspaceRestoreReading, 250);
+            } else if (workspaceNormalize(W.editor.textContent)) W.readingPending = null;
+            return;
+        }
+        const max = Math.max(0, host.scrollHeight - host.clientHeight), hr = host.getBoundingClientRect();
+        const scale = host.offsetHeight ? hr.height / host.offsetHeight || 1 : 1;
+        const destination = target ? host.scrollTop + (target.getBoundingClientRect().top - workspaceVisibleTop(host) - (Number(saved.offset) || 0)) / scale
+            : Math.max(0, Math.min(1, Number(saved.ratio) || 0)) * max;
+        W.restoringUntil = performance.now() + 500;
+        host.scrollTop = Math.max(0, Math.min(max, destination));
+        // A toolbar in normal flow may leave the viewport after this scroll.
+        if (target) {
+            const correction = (target.getBoundingClientRect().top - workspaceVisibleTop(host) - (Number(saved.offset) || 0)) / scale;
+            if (Math.abs(correction) > 1) host.scrollTop = Math.max(0, Math.min(max, host.scrollTop + correction));
+        }
+        W.readingPending = null;
+        scheduleActiveHeadingUpdate();
+    }
+    function workspaceNoteTarget(element) {
+        if (!W.editor?.contains(element)) return;
+        W.contextTarget = element; W.userNavigated = true; W.readingPending = null; W.restoringUntil = 0;
+    }
+    function workspaceSafeLocate(element) {
+        if (!W.editor?.contains(element) || !element.isConnected) return false;
+        workspaceNoteTarget(element);
+        const host = findDocumentScrollContainer(element);
+        if (host) {
+            const r = element.getBoundingClientRect(), hr = host.getBoundingClientRect(), top = workspaceVisibleTop(host);
+            if (r.top < top || r.bottom > Math.min(window.innerHeight, hr.bottom) - 12) {
+                const scale = host.offsetHeight ? hr.height / host.offsetHeight || 1 : 1;
+                host.scrollTop = Math.max(0, Math.min(host.scrollHeight - host.clientHeight, host.scrollTop + (r.top - top) / scale));
+            }
+        }
+        element.classList.add('att-doc-outline-target');
+        window.setTimeout(() => element.classList.remove('att-doc-outline-target'), 1300);
+        workspaceScheduleSave(); return true;
+    }
+    function closeWorkspaceDialog() {
+        const dialog = W.dialog; W.dialog = null;
+        if (!dialog) return;
+        dialog.element.remove();
+        if (dialog.previous?.isConnected) {try {dialog.previous.focus({preventScroll:true});} catch (_) {}}
+    }
+    function workspaceDialog(title, content, actions) {
+        closeWorkspaceDialog(); closeChapterMenu();
+        const element = document.createElement('div'); element.id = 'att-doc-workspace-dialog-v7190';
+        element.setAttribute('role', 'dialog'); element.setAttribute('aria-modal', 'true');
+        element.setAttribute('aria-label', title);
+        element.innerHTML = `<div class="att-doc-ws-dialog-shell-v7190"><header><b>${escapeHtml(title)}</b><button type="button" data-att-ws-dialog-action="cancel" aria-label="关闭">×</button></header><div class="att-doc-ws-dialog-body-v7190">${content}</div><footer>${actions}</footer></div>`;
+        W.dialog = {element, previous: document.activeElement}; document.body.appendChild(element);
+        element.addEventListener('click', event => {
+            if (event.target?.closest?.('[data-att-ws-dialog-action="cancel"]')) closeWorkspaceDialog();
+        });
+        element.addEventListener('keydown', event => {
+            if (event.key === 'Escape') {event.preventDefault(); event.stopPropagation(); closeWorkspaceDialog();}
+            if (event.key === 'Tab') {
+                const items = Array.from(element.querySelectorAll('button,input,select,a[href],textarea')).filter(item => !item.disabled);
+                if (!items.length) return;
+                if (event.shiftKey && document.activeElement === items[0]) {event.preventDefault(); items[items.length - 1].focus();}
+                else if (!event.shiftKey && document.activeElement === items[items.length - 1]) {event.preventDefault(); items[0].focus();}
+            }
+        });
+        const focus = element.querySelector('input') || element.querySelector('button');
+        try {focus?.focus({preventScroll:true});} catch (_) {}
+        return element;
+    }
+    function workspaceEditBookmark(id = null) {
+        const existing = id ? W.record?.bookmarks.find(bookmark => bookmark.id === id) : null;
+        const selected = W.selectionRanges[0];
+        const target = existing ? null : W.contextTarget || docState.headings[0]?.element || W.editor?.firstElementChild;
+        const anchor = existing?.anchor || workspaceAnchor(target, selected?.toString?.() || '');
+        if (!anchor) {workspaceNotice('请先点击或选中文档内容，再添加书签', true); return;}
+        const key = W.key;
+        const name = existing?.name || anchor.selectedQuote.slice(0, 60) || anchor.quote.slice(0, 60) || '新书签';
+        const dialog = workspaceDialog(existing ? '编辑书签名称' : '添加文档书签', `<label>书签名称<input type="text" maxlength="120" data-att-ws-bookmark-name value="${escapeAttr(name)}"></label><p class="att-doc-ws-muted-v7190">定位内容：${escapeHtml(anchor.quote.slice(0, 100) || '空段落')}</p>`, '<button type="button" data-att-ws-dialog-action="cancel">取消</button><button type="button" data-att-ws-bookmark-save>保存书签</button>');
+        const save = () => {
+            const label = dialog.querySelector('[data-att-ws-bookmark-name]')?.value?.trim();
+            if (!label || key !== W.key) return;
+            if (existing) existing.name = label.slice(0, 120);
+            else if (W.record.bookmarks.length < 200) W.record.bookmarks.push({id: `b${Date.now()}-${Math.random().toString(36).slice(2,8)}`, name: label.slice(0, 120), anchor});
+            else {workspaceNotice('当前文档的书签已达到 200 个', true); return;}
+            closeWorkspaceDialog(); workspaceFlushMemory(); workspaceRenderBookmarks(document.getElementById(DOC_TOOLS.outlineId));
+        };
+        dialog.addEventListener('click', event => {if (event.target?.closest?.('[data-att-ws-bookmark-save]')) save();});
+        dialog.addEventListener('keydown', event => {if (event.key === 'Enter' && event.target?.hasAttribute?.('data-att-ws-bookmark-name')) {event.preventDefault(); save();}});
+    }
+    function workspaceRenderBookmarks(panel) {
+        if (!panel || !W.record) return;
+        let section = panel.querySelector('#att-doc-workspace-bookmarks-v7190');
+        if (!section) {
+            section = document.createElement('section'); section.id = 'att-doc-workspace-bookmarks-v7190';
+            section.addEventListener('click', event => {
+                const button = event.target?.closest?.('button[data-att-ws-bookmark-action]'); if (!button) return;
+                const action = button.dataset.attWsBookmarkAction, id = button.dataset.bookmarkId;
+                const bookmark = W.record.bookmarks.find(item => item.id === id);
+                if (action === 'add' || action === 'rename') workspaceEditBookmark(action === 'rename' ? id : null);
+                if (action === 'locate' && bookmark) {
+                    const target = workspaceResolveAnchor(bookmark.anchor);
+                    if (!target) workspaceNotice('书签内容已变化或位置不明确，可点击 ↻ 更新位置', true);
+                    else workspaceSafeLocate(target);
+                }
+                if (action === 'update' && bookmark) {
+                    const anchor = workspaceAnchor(W.contextTarget, W.selectionRanges[0]?.toString?.() || '');
+                    if (anchor) {bookmark.anchor = anchor; workspaceFlushMemory(); workspaceNotice('书签位置已更新');}
+                    else workspaceNotice('请先点击新的书签位置', true);
+                }
+                if (action === 'delete' && bookmark) {
+                    W.record.bookmarks = W.record.bookmarks.filter(item => item.id !== id);
+                    workspaceFlushMemory(); workspaceRenderBookmarks(panel);
+                }
+            });
+            panel.appendChild(section);
+        }
+        const signature = JSON.stringify(W.record.bookmarks);
+        if (section.dataset.signature === signature) return;
+        section.dataset.signature = signature;
+        section.innerHTML = `<div class="att-doc-ws-bookmarks-head-v7190"><b>书签 <span>${W.record.bookmarks.length}</span></b><button type="button" data-att-ws-bookmark-action="add" title="为当前内容添加书签">＋书签</button></div><div class="att-doc-ws-bookmarks-list-v7190">${W.record.bookmarks.length ? W.record.bookmarks.map(bookmark => `<div class="att-doc-ws-bookmark-row-v7190"><button type="button" data-att-ws-bookmark-action="locate" data-bookmark-id="${escapeAttr(bookmark.id)}" title="${escapeAttr(bookmark.name)}">☆ ${escapeHtml(bookmark.name)}</button><button type="button" data-att-ws-bookmark-action="rename" data-bookmark-id="${escapeAttr(bookmark.id)}" title="修改名称" aria-label="修改书签名称">✎</button><button type="button" data-att-ws-bookmark-action="update" data-bookmark-id="${escapeAttr(bookmark.id)}" title="更新为当前内容位置" aria-label="更新书签位置">↻</button><button type="button" data-att-ws-bookmark-action="delete" data-bookmark-id="${escapeAttr(bookmark.id)}" title="删除书签" aria-label="删除书签">×</button></div>`).join('') : '<div class="att-doc-ws-muted-v7190">点击正文内容后添加书签</div>'}</div>`;
+    }
+    function workspaceHeadingForTarget(target) {
+        const headings = collectHeadings(); let result = null;
+        if (!target || !W.editor?.contains(target)) return null;
+        for (const heading of headings) {
+            if (heading.element === target || heading.element.contains(target) ||
+                (heading.element.compareDocumentPosition(target) & 4)) result = heading;
+            else break;
+        }
+        return result;
+    }
+    function workspaceChapterRange(heading) {
+        const editor = W.editor; if (!editor || !heading?.element?.isConnected || !editor.contains(heading.element)) return null;
+        const headings = collectHeadings(), index = headings.findIndex(item => item.element === heading.element);
+        const boundary = headings.slice(index + 1).find(item => item.level <= heading.level)?.element;
+        const range = document.createRange(); range.setStartBefore(heading.element);
+        if (boundary) range.setEndBefore(boundary); else range.setEnd(editor, editor.childNodes.length);
+        return range;
+    }
+    function workspaceSanitize(fragment) {
+        const box = document.createElement('div'); box.appendChild(fragment);
+        box.querySelectorAll('script,style,iframe,object,embed,form,input,button,svg,math,link,meta,base,video,audio,source,[contenteditable="false"],.ProseMirror-widget').forEach(node => node.remove());
+        box.querySelectorAll('*').forEach(node => {
+            for (const attribute of Array.from(node.attributes)) {
+                const name = attribute.name.toLowerCase(), value = attribute.value;
+                const allowed = ['href','src','alt','title','colspan','rowspan','width','height','style','start','type','scope'];
+                if (!allowed.includes(name) ||
+                    (['href','src'].includes(name) && !/^(https?:|mailto:|tel:|data:image\/(?:png|jpeg|gif|webp);|\/|#)/i.test(value))) node.removeAttribute(attribute.name);
+                if (name === 'style' && /url\s*\(|expression\s*\(|position\s*:|transform\s*:|z-index\s*:/i.test(value)) node.removeAttribute('style');
+            }
+        });
+        return box;
+    }
+    function workspaceTableText(table) {
+        const grid = [];
+        Array.from(table.rows).forEach((row, r) => {
+            grid[r] ||= []; let column = 0;
+            for (const cell of Array.from(row.cells)) {
+                while (grid[r][column] !== undefined) column++;
+                const width = Math.max(1, cell.colSpan || 1), height = Math.max(1, cell.rowSpan || 1);
+                for (let dy = 0; dy < height; dy++) {grid[r+dy] ||= []; for (let dx = 0; dx < width; dx++) grid[r+dy][column+dx] = dy || dx ? '' : workspaceNormalize(cell.innerText || cell.textContent);}
+                column += width;
+            }
+        });
+        const width = Math.max(0, ...grid.map(row => row.length));
+        const quote = value => /[\t\r\n"]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+        return grid.map(row => Array.from({length:width}, (_,i) => quote(row[i] || '')).join('\t')).join('\n');
+    }
+    function workspacePlainText(box) {
+        const parts = [];
+        for (const node of Array.from(box.childNodes)) {
+            if (node.nodeType === 3) {if (node.nodeValue?.trim()) parts.push(node.nodeValue); continue;}
+            if (node.tagName === 'TABLE') parts.push(workspaceTableText(node));
+            else if (node.querySelector?.('table') || node.matches?.('div,section,article,ul,ol,blockquote')) parts.push(workspacePlainText(node));
+            else parts.push(node.innerText || node.textContent || '');
+        }
+        return parts.filter(Boolean).join('\n\n');
+    }
+    async function workspaceCopy(text, html) {
+        if (navigator.clipboard?.write && typeof ClipboardItem === 'function') {
+            try {await navigator.clipboard.write([new ClipboardItem({'text/plain':new Blob([text], {type:'text/plain'}), 'text/html':new Blob([html], {type:'text/html'})})]); return;} catch (_) {}
+        }
+        const previous = document.activeElement;
+        const area = document.createElement('textarea'); area.value = text; area.style.cssText = 'position:fixed;left:-10000px;top:0;';
+        const handler = event => {if (event.clipboardData) {event.preventDefault(); event.clipboardData.setData('text/plain',text); event.clipboardData.setData('text/html',html);}};
+        document.addEventListener('copy',handler); document.body.appendChild(area);
+        let copied = false;
+        try {area.select(); copied = Boolean(document.execCommand('copy'));}
+        finally {document.removeEventListener('copy',handler); area.remove(); try {previous?.focus({preventScroll:true});} catch (_) {}}
+        if (!copied && navigator.clipboard?.writeText) {await navigator.clipboard.writeText(text); return;}
+        if (!copied) throw new Error('无法写入剪贴板，请重试');
+    }
+    function workspaceDownload(name, content, type) {
+        const url = URL.createObjectURL(new Blob(['\ufeff',content], {type})); const link = document.createElement('a');
+        link.href = url; link.download = name; document.body.appendChild(link); link.click(); link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+    async function workspaceChapterAction(heading, action) {
+        const range = workspaceChapterRange(heading); if (!range) {workspaceNotice('章节已变化，请重新打开菜单',true); return;}
+        const box = workspaceSanitize(range.cloneContents()); const name = heading.text.replace(/[<>:"/\\|?*\u0000-\u001f]/g,'_').slice(0,100) || '章节';
+        try {
+            if (action === 'copy-chapter') await workspaceCopy(workspacePlainText(box), box.innerHTML);
+            if (action === 'copy-tables') {
+                const tables = Array.from(box.querySelectorAll('table')).filter(table => !table.parentElement?.closest('table'));
+                if (!tables.length) {workspaceNotice('当前章节没有表格',true); return;}
+                await workspaceCopy(tables.map(workspaceTableText).join('\n\n'), tables.map(table => table.outerHTML).join('<p></p>'));
+            }
+            if (action === 'export-text') workspaceDownload(`${name}.txt`,workspacePlainText(box),'text/plain;charset=utf-8');
+            if (action === 'export-html') workspaceDownload(`${name}.html`, `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>${escapeHtml(heading.text)}</title><style>body{max-width:960px;margin:32px auto;padding:0 20px;font:15px/1.7 sans-serif}table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:8px}pre{white-space:pre-wrap;overflow-wrap:anywhere}img{max-width:100%}</style></head><body>${box.innerHTML}</body></html>`,'text/html;charset=utf-8');
+            workspaceNotice(action.startsWith('copy') ? '章节内容已复制' : '章节文件已导出');
+        } catch (error) {workspaceNotice(error.message || '章节操作失败',true);}
+    }
+    function closeChapterMenu() {W.menu?.remove(); W.menu = null;}
+    function openChapterMenu(event, heading) {
+        closeChapterMenu(); if (!heading?.element?.isConnected) return;
+        workspaceNoteTarget(heading.element);
+        const menu = document.createElement('div'); menu.id = 'att-doc-workspace-chapter-menu-v7190';
+        menu.setAttribute('role','menu'); menu.innerHTML = `<b>${escapeHtml(heading.text)}</b>${[
+            ['copy-chapter','▤','复制整章内容'],['copy-tables','▦','复制章节内表格'],['export-text','↓','导出章节为文本'],['export-html','⌘','导出章节为 HTML'],['bookmark','☆','为章节添加书签']
+        ].map(([action,icon,label]) => `<button type="button" role="menuitem" data-att-ws-chapter-action="${action}"><span aria-hidden="true">${icon}</span>${label}</button>`).join('')}`;
+        document.body.appendChild(menu); W.menu = menu;
+        menu.style.maxHeight = `${Math.max(40,window.innerHeight-16)}px`;
+        const rect = menu.getBoundingClientRect();
+        menu.style.left = `${Math.max(8,Math.min(event.clientX,window.innerWidth-rect.width-8))}px`;
+        menu.style.top = `${Math.max(8,Math.min(event.clientY,window.innerHeight-rect.height-8))}px`;
+        menu.addEventListener('click', e => {
+            const action = e.target?.closest?.('button[data-att-ws-chapter-action]')?.dataset.attWsChapterAction;
+            if (!action) return; closeChapterMenu();
+            if (action === 'bookmark') workspaceEditBookmark(); else workspaceChapterAction(heading,action);
+        });
+        try {menu.querySelector('button')?.focus({preventScroll:true});} catch (_) {}
+    }
+
+    function workspaceCaptureSelection() {
+        const selection = window.getSelection();
+        if (!W.editor || !selection?.rangeCount) return;
+        const element = selection.anchorNode instanceof Element ? selection.anchorNode : selection.anchorNode?.parentElement;
+        if (!element || !W.editor.contains(element)) return;
+        W.contextTarget = element;
+        W.selectionEditor = W.editor; W.selectionRanges = [];
+        for (let i = 0; i < selection.rangeCount; i++) {
+            const range = selection.getRangeAt(i);
+            if (!range.collapsed && W.editor.contains(range.startContainer) && W.editor.contains(range.endContainer)) {
+                W.selectionRanges.push(range.cloneRange());
+            }
+        }
+    }
+    function workspaceSetScope(scope) {
+        W.scope = ['document','chapter','table','selection'].includes(scope) ? scope : 'document';
+        W.scopeRanges = []; W.scopeToken++;
+        const target = W.contextTarget;
+        if (W.scope === 'chapter') {
+            const heading = workspaceHeadingForTarget(target);
+            const range = workspaceChapterRange(heading); if (range) W.scopeRanges.push(range);
+        } else if (W.scope === 'table') {
+            const table = target?.closest?.('table');
+            if (table && W.editor?.contains(table)) {const range = document.createRange(); range.selectNodeContents(table); W.scopeRanges.push(range);}
+        } else if (W.scope === 'selection') {
+            const cells = Array.from(W.editor?.querySelectorAll('td.selectedCell,th.selectedCell') || []);
+            if (cells.length) W.scopeRanges = cells.map(cell => {const range = document.createRange(); range.selectNodeContents(cell); return range;});
+            else if (W.selectionEditor === W.editor) W.scopeRanges = W.selectionRanges.map(range => range.cloneRange());
+        }
+        workspaceScopeStatus();
+        document.dispatchEvent(new CustomEvent('att-doc-search-scope-v7190'));
+    }
+    function workspaceScopeStatus() {
+        const status = document.getElementById('att-doc-search-scope-status-v7190');
+        if (!status) return;
+        const labels = {document:'全文',chapter:'当前章节',table:'当前表格',selection:'选区'};
+        status.textContent = W.scope !== 'document' && !W.scopeRanges.length ? '范围为空：先点击正文或选中内容，再点“更新范围”' : `查找范围：${labels[W.scope]}${W.scope !== 'document' ? '（已锁定，更新范围可重新选取）' : ''}`;
+        status.classList.toggle('is-warning', W.scope !== 'document' && !W.scopeRanges.length);
+    }
+    function workspaceAttachSearchBar(bar) {
+        if (!bar) return;
+        const existing = bar.querySelector('#att-doc-search-scope-v7190');
+        if (existing) {existing.querySelector('select').value = W.scope; workspaceScopeStatus(); return;}
+        const controls = document.createElement('div'); controls.id = 'att-doc-search-scope-v7190';
+        controls.innerHTML = '<label>范围 <select data-att-ws-search-scope aria-label="正文查找范围"><option value="document">全文</option><option value="chapter">当前章节</option><option value="table">当前表格</option><option value="selection">选区</option></select></label><button type="button" data-att-ws-refresh-scope>↻ 更新范围</button><span id="att-doc-search-scope-status-v7190" role="status" aria-live="polite"></span>';
+        controls.querySelector('select').value = W.scope;
+        controls.addEventListener('change', event => {if (event.target?.hasAttribute?.('data-att-ws-search-scope')) {event.stopPropagation(); workspaceSetScope(event.target.value);}});
+        controls.addEventListener('click', event => {if (event.target?.closest?.('[data-att-ws-refresh-scope]')) {event.stopPropagation(); workspaceSetScope(W.scope);}});
+        bar.appendChild(controls); workspaceScopeStatus();
+    }
+    function workspaceBuildSearchIndex(editor) {
+        if (editor && (editor !== W.editor || workspaceDocumentKey(editor) !== W.key)) workspaceSyncDocument(editor);
+        const index = {text:'',entries:[],segments:[]};
+        if (!editor || (W.scope !== 'document' && !W.scopeRanges.length)) return index;
+        const ranges = W.scope === 'document' ? null : W.scopeRanges.filter(range => editor.contains(range.startContainer) && editor.contains(range.endContainer));
+        let previousBlock = null, previousNode = null, previousEnd = -1;
+        const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, {acceptNode(node) {
+            if (!node.nodeValue || !node.parentElement || node.parentElement.closest('[contenteditable="false"],.ProseMirror-widget,script,style')) return NodeFilter.FILTER_REJECT;
+            return NodeFilter.FILTER_ACCEPT;
+        }});
+        let node;
+        while ((node = walker.nextNode())) {
+            let pieces = ranges ? ranges.flatMap(range => {
+                try {
+                    if (!range.intersectsNode(node)) return [];
+                    const from = range.startContainer === node ? range.startOffset : 0;
+                    const to = range.endContainer === node ? range.endOffset : node.nodeValue.length;
+                    return to > from ? [{from,to}] : [];
+                } catch (_) {return [];}
+            }) : [{from:0,to:node.nodeValue.length}];
+            pieces.sort((a,b) => a.from - b.from);
+            const merged = [];
+            for (const piece of pieces) {
+                const last = merged[merged.length-1];
+                if (last && piece.from <= last.to) last.to = Math.max(last.to,piece.to); else merged.push({...piece});
+            }
+            for (const piece of merged) {
+                const block = node.parentElement.closest('p,pre,li,h1,h2,h3,h4,h5,h6,td,th,blockquote') || node.parentElement;
+                const start = index.text.length;
+                index.text += node.nodeValue.slice(piece.from,piece.to);
+                index.entries.push({node,start,end:index.text.length,nodeFrom:piece.from,nodeTo:piece.to});
+                const continuous = previousBlock === block && (previousNode !== node || previousEnd === piece.from);
+                if (continuous && index.segments.length) index.segments[index.segments.length-1].end = index.text.length;
+                else index.segments.push({start,end:index.text.length});
+                previousBlock = block; previousNode = node; previousEnd = piece.to;
+            }
+            if (!merged.length) previousBlock = null;
+        }
+        return index;
+    }
+    function workspaceLiteralMatches(index, query, caseSensitive) {
+        if (!query) return [];
+        const matches = [], needle = caseSensitive ? String(query) : String(query).toLowerCase();
+        for (const segment of index.segments || [{start:0,end:index.text.length}]) {
+            const raw = index.text.slice(segment.start,segment.end), text = caseSensitive ? raw : raw.toLowerCase();
+            let offset = 0;
+            while (matches.length < 5000) {
+                const pos = text.indexOf(needle,offset); if (pos < 0) break;
+                matches.push({start:segment.start+pos,end:segment.start+pos+needle.length,text:raw.slice(pos,pos+needle.length)});
+                offset = pos + Math.max(1,needle.length);
+            }
+        }
+        return matches;
+    }
+    function workspaceRegexMatches(index, regex) {
+        const matches = [];
+        for (const segment of index.segments || [{start:0,end:index.text.length}]) {
+            const text = index.text.slice(segment.start,segment.end);
+            const rx = new RegExp(regex.source,regex.flags.includes('g') ? regex.flags : regex.flags+'g');
+            let match;
+            while (matches.length < 5000 && (match = rx.exec(text))) {
+                const value = String(match[0]);
+                matches.push({start:segment.start+match.index,end:segment.start+match.index+value.length,text:value,
+                    captures:Array.from(match),groups:Array.from(match).slice(1),namedGroups:match.groups ? {...match.groups} : null,zeroLength:!value.length});
+                if (!value.length) {const cp = text.codePointAt(rx.lastIndex); rx.lastIndex += cp > 0xFFFF ? 2 : 1;}
+            }
+        }
+        return matches;
+    }
+    function workspacePoint(index, offset, next) {
+        const entry = next ? index.entries.find(item => offset >= item.start && offset < item.end)
+            : index.entries.find(item => offset > item.start && offset <= item.end);
+        return entry ? {node:entry.node,offset:(entry.nodeFrom || 0)+offset-entry.start} : null;
+    }
+    function workspaceRange(index, match) {
+        const start = workspacePoint(index,match.start,true), end = workspacePoint(index,match.end,false);
+        if (!start || !end) return null;
+        try {const range = document.createRange(); range.setStart(start.node,start.offset); range.setEnd(end.node,end.offset); return range;} catch (_) {return null;}
+    }
+    function workspaceReplacement(template, match) {
+        return String(template ?? '').replace(/\$(\$|&|\d{1,2}|<[^>]+>)/g, (token,key) => {
+            if (key === '$') return '$'; if (key === '&') return match.text;
+            if (key[0] === '<') return match.namedGroups ? match.namedGroups[key.slice(1,-1)] ?? '' : token;
+            const number = Number(key);
+            if (number > 0 && number < match.captures.length) return match.captures[number] ?? '';
+            if (key.length === 2 && Number(key[0]) > 0 && Number(key[0]) < match.captures.length) return (match.captures[Number(key[0])] ?? '')+key[1];
+            return token;
+        });
+    }
+    function workspaceEditorView(editor) {
+        if (!editor) return null;
+        const valid = value => value && value.state?.doc && typeof value.dispatch === 'function' && typeof value.posAtDOM === 'function' && value.dom === editor ? value : null;
+        if (valid(W.view)) return W.view;
+        const inspect = value => valid(value) || valid(value?.view) || valid(value?.editorView) || valid(value?.editor?.view);
+        try {
+            let desc = editor.pmViewDesc;
+            for (let depth=0; desc && depth<8; depth++,desc=desc.parent) {const view = inspect(desc); if (view) return W.view = view;}
+            for (const key of Object.getOwnPropertyNames(editor)) {
+                let value; try {value = editor[key];} catch (_) {continue;}
+                const direct = inspect(value); if (direct) return W.view = direct;
+                if (key.startsWith('__react')) {
+                    for (let depth=0,fiber=value; fiber && depth<18; depth++,fiber=fiber.return) {
+                        const view = inspect(fiber.memoizedProps) || inspect(fiber.pendingProps); if (view) return W.view = view;
+                    }
+                }
+            }
+        } catch (_) {}
+        return null;
+    }
+    function workspacePrepareOperations(editor, view, index, matches, replacement, regex) {
+        if (!view || view.dom !== editor) throw new Error('无法连接当前编辑器的事务接口；可以查看预览，暂不能提交批量替换。');
+        const operations = matches.map(match => {
+            const range = workspaceRange(index,match);
+            const expected = index.text.slice(match.start,match.end);
+            if (!range || range.toString() !== expected) throw new Error('匹配内容的位置已变化，请重新查找。');
+            const from = view.posAtDOM(range.startContainer,range.startOffset,-1), to = view.posAtDOM(range.endContainer,range.endOffset,1);
+            if (!Number.isInteger(from) || !Number.isInteger(to) || from >= to || view.state.doc.textBetween(from,to,'','') !== expected) throw new Error('匹配内容与编辑器状态不一致，请重新查找。');
+            if (view.state.doc.resolve(from).parent !== view.state.doc.resolve(to).parent) throw new Error('匹配跨越了正文结构，不能安全批量替换。');
+            return {from,to,text:regex ? workspaceReplacement(replacement,match) : String(replacement ?? ''),match};
+        });
+        operations.sort((a,b) => b.from-a.from || b.to-a.to);
+        for (let i=1;i<operations.length;i++) if (operations[i].to > operations[i-1].from) throw new Error('匹配范围存在重叠，不能批量替换。');
+        return operations;
+    }
+    function workspaceApplyOperations(view, operations, snapshot) {
+        if (W.key !== snapshot.key || W.editor !== snapshot.editor || W.scopeToken !== snapshot.scopeToken || view.state.doc !== snapshot.doc) throw new Error('正文或查找范围已变化，请重新预览。');
+        let transaction = view.state.tr;
+        for (const operation of operations) transaction = transaction.insertText(operation.text,operation.from,operation.to);
+        transaction = transaction.setMeta('addToHistory',true);
+        view.dispatch(transaction);
+        return operations.length;
+    }
+    function workspaceRequestReplaceAll(options) {
+        const editor = options.editor || W.editor;
+        const index = workspaceBuildSearchIndex(editor);
+        let matches;
+        try {matches = options.regex ? workspaceRegexMatches(index,new RegExp(options.query,options.caseSensitive ? 'g':'gi')) : workspaceLiteralMatches(index,options.query,options.caseSensitive);} catch (error) {workspaceNotice(`正则表达式无效：${error.message}`,true); return;}
+        if (!matches.length) {workspaceNotice('所选范围内没有匹配内容',true); return;}
+        if (matches.some(match => match.zeroLength)) {workspaceNotice('正则可匹配空字符串，已禁用批量替换',true); return;}
+        const view = options.view?.dom === editor ? options.view : workspaceEditorView(editor);
+        let operations = [], failure = '';
+        try {operations = workspacePrepareOperations(editor,view,index,matches,options.replacement,options.regex);} catch (error) {failure = error.message;}
+        const snapshot = {key:W.key,editor,scopeToken:W.scopeToken,doc:view?.state.doc};
+        const querySignature = JSON.stringify([options.query,options.replacement,!!options.regex,!!options.caseSensitive]);
+        const labels = {document:'全文',chapter:'当前章节',table:'当前表格',selection:'选区'};
+        const dialog = workspaceDialog('批量替换预览',`<p>范围：${labels[W.scope]} · 共 <b>${matches.length}</b> 处${matches.length === 5000 ? '（达到单次 5000 处上限）' : ''}</p><p class="att-doc-ws-preview-note-v7190" role="status">${escapeHtml(failure || '确认后统一提交，可通过一次撤销恢复。')}</p><div class="att-doc-ws-preview-list-v7190"></div><button type="button" data-att-ws-preview-more>显示更多</button>`, `<button type="button" data-att-ws-dialog-action="cancel">取消</button><button type="button" data-att-ws-preview-apply ${failure ? 'disabled' : ''}>确认替换 ${matches.length} 处</button>`);
+        let visible = 0;
+        const render = () => {
+            visible = Math.min(matches.length,visible+50);
+            dialog.querySelector('.att-doc-ws-preview-list-v7190').innerHTML = matches.slice(0,visible).map((match,i) => {
+                const segment = index.segments.find(part => part.start <= match.start && part.end >= match.end);
+                const prefix = index.text.slice(Math.max(segment?.start || 0,match.start-35),match.start);
+                const suffix = index.text.slice(match.end,Math.min(segment?.end ?? index.text.length,match.end+35));
+                const after = options.regex ? workspaceReplacement(options.replacement,match) : String(options.replacement ?? '');
+                return `<div class="att-doc-ws-preview-item-v7190"><b>${i+1}</b><div><span>修改前</span><pre>${escapeHtml(prefix)}<del>${escapeHtml(index.text.slice(match.start,match.end))}</del>${escapeHtml(suffix)}</pre><span>修改后</span><pre>${escapeHtml(prefix)}<ins>${escapeHtml(after)}</ins>${escapeHtml(suffix)}</pre></div></div>`;
+            }).join('');
+            dialog.querySelector('[data-att-ws-preview-more]').hidden = visible >= matches.length;
+        };
+        render();
+        dialog.addEventListener('click', event => {
+            if (event.target?.closest?.('[data-att-ws-preview-more]')) render();
+            const button = event.target?.closest?.('[data-att-ws-preview-apply]');
+            if (!button || button.disabled) return;
+            try {
+                if (options.getCurrent && JSON.stringify(options.getCurrent()) !== querySignature) throw new Error('查找或替换内容已变化，请重新预览。');
+                const count = workspaceApplyOperations(view,operations,snapshot);
+                button.disabled = true; closeWorkspaceDialog(); workspaceNotice(`已替换 ${count} 处`);
+                options.afterApply?.(count); scheduleOutlineRebuild(60); workspaceScheduleSave();
+            } catch (error) {button.disabled = true; dialog.querySelector('.att-doc-ws-preview-note-v7190').textContent = error.message;}
+        });
+    }
+    function workspaceInit() {
+        if (W.initialized) return; W.initialized = true;
+        globalThis.__attDocumentWorkspaceV7190 = {
+            buildSearchIndex:workspaceBuildSearchIndex,literalMatches:workspaceLiteralMatches,regexMatches:workspaceRegexMatches,
+            requestReplaceAll:workspaceRequestReplaceAll,attachSearchBar:workspaceAttachSearchBar,noteTarget:workspaceNoteTarget,
+            allowStandalone:table => W.mode !== 'headings' && (!W.record || W.tableMatches.has(table)),
+            get navigationMode() {return W.mode;}
+        };
+        document.addEventListener('selectionchange',workspaceCaptureSelection);
+        const capture = event => {
+            const target = event.target instanceof Element ? event.target : event.target?.parentElement;
+            if (target && W.editor?.contains(target)) {workspaceNoteTarget(target); if (event.type !== 'pointerdown') workspaceCaptureSelection();}
+            if (event.type === 'pointerdown' && W.menu && !W.menu.contains(target)) closeChapterMenu();
+        };
+        for (const name of ['pointerdown','pointerup','keyup','focusin']) document.addEventListener(name,capture,true);
+        document.addEventListener('scroll',event => {
+            if (W.menu) closeChapterMenu();
+            if (event.target instanceof Element && event.target !== document.body && event.target !== document.documentElement && event.target.contains(W.editor)) workspaceScheduleSave();
+        },true);
+        const readingIntent = event => {const target = event.target instanceof Element ? event.target : null; if (target && (W.editor?.contains(target) || target.contains(W.editor))) {W.userNavigated=true; W.readingPending=null; W.restoringUntil=0;}};
+        document.addEventListener('wheel',readingIntent,{capture:true,passive:true});
+        document.addEventListener('touchmove',readingIntent,{capture:true,passive:true});
+        document.addEventListener(DOCUMENT_NAV_EVENTS.navigate,event => {if (event.detail?.table) workspaceNoteTarget(event.detail.table);});
+        document.addEventListener('keydown',event => {if (event.key === 'Escape' && W.menu) {event.preventDefault();closeChapterMenu();}});
+        window.addEventListener('resize',closeChapterMenu,{passive:true});
+        window.addEventListener('pagehide',workspaceFlushMemory);
+        window.addEventListener('beforeunload',workspaceFlushMemory);
+        document.addEventListener('visibilitychange',() => {if (document.visibilityState === 'hidden') workspaceFlushMemory();});
+    }
+
 
     function readMergedNavigationEnabled() {
         try {
@@ -18933,7 +19637,7 @@
                     <span class="att-doc-nav-size-v7184">${node.rows}×${node.columns}</span></button>`;
             }
             const hasChildren = node.children.length > 0;
-            const collapsed = hasChildren && docState.navigationCollapsed.has(node.element);
+            const collapsed = hasChildren && workspaceChapterCollapsed(node.element);
             const groupId = `att-doc-nav-group-v7184-${node.index}`;
             const disclosure = hasChildren
                 ? `<button type="button" class="att-doc-nav-toggle-v7184" data-att-nav-toggle="${node.index}"
@@ -18953,8 +19657,10 @@
         const group = panel.querySelector(`#att-doc-nav-group-v7184-${index}`);
         if (!heading || !group) return;
         group.hidden = !group.hidden;
-        if (group.hidden) docState.navigationCollapsed.add(heading.element);
-        else docState.navigationCollapsed.delete(heading.element);
+        const collapsedSet = workspaceIsFiltering() ? W.filterCollapsed : docState.navigationCollapsed;
+        if (group.hidden) collapsedSet.add(heading.element);
+        else collapsedSet.delete(heading.element);
+        if (!workspaceIsFiltering()) workspaceRememberFolds();
         button.setAttribute('aria-expanded', String(!group.hidden));
         button.setAttribute('aria-label', `${group.hidden ? '展开' : '收起'}章节：${heading.text}`);
         button.setAttribute('title', group.hidden ? '展开章节' : '收起章节');
@@ -19018,6 +19724,23 @@
         if (document.getElementById(DOC_TOOLS.styleId)) return;
 
         const css = `
+            #att-doc-workspace-controls-v7190 {flex:0 0 auto;padding:7px 8px;border-bottom:1px solid var(--border-color,#3b424b);font-size:11px;}
+            #att-doc-workspace-controls-v7190 input,#att-doc-workspace-controls-v7190 select,#att-doc-workspace-controls-v7190 button,
+            #att-doc-workspace-bookmarks-v7190 button,#att-doc-search-scope-v7190 select,#att-doc-search-scope-v7190 button {box-sizing:border-box;min-width:0;border:1px solid var(--border-color,#475569);border-radius:5px;background:var(--surface-subtle,#27313a);color:var(--text-main,var(--text-primary,#e2e8f0));font:inherit;padding:5px;}
+            .att-doc-ws-search-v7190 {display:flex;gap:4px;margin-bottom:5px;}.att-doc-ws-search-v7190 input {width:100%;}.att-doc-ws-search-v7190 button {flex:0 0 24px;}
+            #att-doc-workspace-controls-v7190>select {width:100%;}.att-doc-ws-actions-v7190 {display:flex;gap:4px;margin-top:5px;}.att-doc-ws-actions-v7190>* {flex:1 1 0;white-space:nowrap;padding:5px 2px!important;}
+            #att-doc-workspace-status-v7190 {color:var(--text-muted,#94a3b8);margin-top:4px;font-size:10px;overflow-wrap:anywhere;}#att-doc-workspace-status-v7190:empty {display:none;}.is-warning {color:#e9aa56!important;}
+            #att-doc-workspace-bookmarks-v7190 {flex:0 1 auto;max-height:26%;min-height:40px;overflow:auto;padding:6px;border-top:1px solid var(--border-color,#3b424b);font-size:11px;overscroll-behavior:contain;}
+            .att-doc-ws-bookmarks-head-v7190 {display:flex;align-items:center;justify-content:space-between;margin:0 2px 5px;}.att-doc-ws-bookmark-row-v7190 {display:flex;gap:3px;margin-top:4px;}.att-doc-ws-bookmark-row-v7190 button:first-child {flex:1 1 auto;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}.att-doc-ws-bookmark-row-v7190 button:not(:first-child) {flex:0 0 22px;}.att-doc-ws-muted-v7190 {color:var(--text-muted,#94a3b8);font-size:11px;line-height:1.5;}
+            #att-doc-search-scope-v7190 {flex:1 0 100%;display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:11px;color:var(--text-main,var(--text-primary,#e2e8f0));}#att-doc-search-scope-status-v7190 {color:var(--text-muted,#94a3b8);font-size:10px;}
+            #att-doc-workspace-dialog-v7190 {position:fixed;inset:0;z-index:2147483610;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);padding:12px;box-sizing:border-box;}
+            .att-doc-ws-dialog-shell-v7190 {width:min(760px,100%);max-height:calc(100vh - 24px);display:flex;flex-direction:column;min-height:0;border:1px solid var(--border-color,#475569);border-radius:10px;background:var(--surface-main,var(--bg-primary,#202830));color:var(--text-main,var(--text-primary,#e2e8f0));box-shadow:0 12px 50px #0008;font:13px/1.5 system-ui,sans-serif;}
+            .att-doc-ws-dialog-shell-v7190 header,.att-doc-ws-dialog-shell-v7190 footer {display:flex;align-items:center;gap:8px;padding:12px;flex:0 0 auto;}.att-doc-ws-dialog-shell-v7190 header {justify-content:space-between;border-bottom:1px solid var(--border-color,#475569);}.att-doc-ws-dialog-shell-v7190 footer {justify-content:flex-end;border-top:1px solid var(--border-color,#475569);flex-wrap:wrap;}
+            .att-doc-ws-dialog-body-v7190 {min-height:0;overflow:auto;padding:12px;overscroll-behavior:contain;}.att-doc-ws-dialog-shell-v7190 button,.att-doc-ws-dialog-shell-v7190 input {background:var(--surface-subtle,#2f3c49);border:1px solid var(--border-color,#536477);color:inherit;border-radius:5px;padding:7px 10px;font:inherit;}.att-doc-ws-dialog-shell-v7190 input {display:block;width:100%;box-sizing:border-box;margin-top:6px;}.att-doc-ws-dialog-shell-v7190 button:disabled {opacity:.45;cursor:not-allowed;}.att-doc-ws-dialog-shell-v7190 [data-att-ws-preview-apply],.att-doc-ws-dialog-shell-v7190 [data-att-ws-bookmark-save] {background:#2563eb;color:#fff;}
+            .att-doc-ws-preview-item-v7190 {display:flex;gap:10px;border-top:1px solid var(--border-color,#475569);padding:10px 0;}.att-doc-ws-preview-item-v7190>b {flex:0 0 30px;color:var(--text-muted,#94a3b8);}.att-doc-ws-preview-item-v7190>div {min-width:0;flex:1;}.att-doc-ws-preview-item-v7190 span {font-size:10px;color:var(--text-muted,#94a3b8);}.att-doc-ws-preview-item-v7190 pre {white-space:pre-wrap;overflow-wrap:anywhere;margin:3px 0 8px;font:12px/1.6 ui-monospace,monospace;}.att-doc-ws-preview-item-v7190 del {color:#ffc3c3;background:#a42a2a55;text-decoration:none;}.att-doc-ws-preview-item-v7190 ins {color:#b4f1c4;background:#167d3c55;text-decoration:none;}
+            #att-doc-workspace-chapter-menu-v7190 {position:fixed;z-index:2147483609;box-sizing:border-box;width:min(230px,calc(100vw - 16px));overflow:auto;overscroll-behavior:contain;background:var(--surface-main,var(--bg-primary,#202830));color:var(--text-main,var(--text-primary,#e2e8f0));border:1px solid var(--border-color,#475569);border-radius:8px;box-shadow:0 8px 30px #0006;padding:6px;font:12px/1.5 system-ui,sans-serif;}
+            #att-doc-workspace-chapter-menu-v7190>b {display:block;padding:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}#att-doc-workspace-chapter-menu-v7190 button {display:block;width:100%;text-align:left;background:transparent;border:0;color:inherit;font:inherit;padding:8px;border-radius:4px;cursor:pointer;}#att-doc-workspace-chapter-menu-v7190 button:hover,#att-doc-workspace-chapter-menu-v7190 button:focus-visible {background:#3b82f633;}#att-doc-workspace-controls-v7190 button:focus-visible,#att-doc-workspace-bookmarks-v7190 button:focus-visible {outline:2px solid #60a5fa;outline-offset:1px;}
+
             #att-toolbox-root.att-doc-tools-present .att-tabs {
                 grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
             }
@@ -19421,6 +20144,13 @@
             if (!(target instanceof HTMLInputElement)) return;
 
             const setting = target.dataset.attDocSetting;
+            if (setting === 'rememberReading' || setting === 'rememberFold') {
+                workspaceFlushMemory(); docState[setting] = target.checked;
+                GM_setValue(`att_doc_tools_${setting === 'rememberReading' ? 'reading' : 'fold'}_memory_v7190`, target.checked);
+                if (setting === 'rememberReading' && !target.checked) W.readingPending = null;
+                if (setting === 'rememberFold' && target.checked) workspaceRememberFolds();
+                renderDocumentToolsSection(); return;
+            }
 
             if (setting === 'outlineEnabled') {
                 docState.outlineEnabled = target.checked;
@@ -19452,7 +20182,7 @@
             card.dataset.attDocOutlineCard = '7173';
             section.appendChild(card);
         }
-        const signature = JSON.stringify([docState.outlineEnabled, docState.outlineFollowEnabled]);
+        const signature = JSON.stringify([docState.outlineEnabled, docState.outlineFollowEnabled, docState.rememberReading, docState.rememberFold]);
         if (card.dataset.renderSignature === signature) {
             updateHeadingCountInToolbox(headingCount);
             return;
@@ -19492,6 +20222,9 @@
                     </div>
                 </div>
 
+                <div class="att-divider"></div>
+                <div class="att-row"><div><div class="att-label">记住阅读位置</div><div class="att-sub-label">重新打开当前文档时，恢复上次阅读位置。</div></div><label class="att-switch"><input type="checkbox" data-att-doc-setting="rememberReading" ${docState.rememberReading ? 'checked' : ''}><span class="att-slider"></span></label></div>
+                <div class="att-row"><div><div class="att-label">记住章节折叠</div><div class="att-sub-label">标题大纲和合并导航共用章节折叠记忆。</div></div><label class="att-switch"><input type="checkbox" data-att-doc-setting="rememberFold" ${docState.rememberFold ? 'checked' : ''}><span class="att-slider"></span></label></div>
                 <div class="att-doc-tools-status" id="${DOC_TOOLS.headingCountId}">
                     当前检测到 ${headingCount} 个标题
                 </div>
@@ -19536,6 +20269,13 @@
             panel.addEventListener('pointerdown', event => {
                 if (event.button === 0 && event.target?.closest?.('button')) event.preventDefault();
             });
+            panel.addEventListener('contextmenu', event => {
+                if (event.shiftKey) return;
+                const button = event.target?.closest?.('.att-doc-outline-item[data-index]');
+                const heading = button && docState.headings[Number(button.dataset.index)];
+                if (!heading?.element?.isConnected) return;
+                event.preventDefault(); event.stopPropagation(); openChapterMenu(event,heading);
+            });
             panel.addEventListener('click', event => {
                 const toggle = event.target?.closest?.('button[data-att-nav-toggle]');
                 if (toggle) {
@@ -19568,6 +20308,7 @@
                     return;
                 }
 
+                workspaceNoteTarget(target);
                 jumpToHeading(target, index);
             });
         }
@@ -19601,7 +20342,10 @@
         }
 
         docState.editor = findDocumentEditor();
+        workspaceSyncDocument(docState.editor);
         docState.headings = collectHeadings();
+        workspaceRestoreFolds();
+        if (docState.headings.length || workspaceNormalize(docState.editor?.textContent)) workspaceRememberFolds();
 
         const panel = ensureOutlinePanel();
         if (!panel) return;
@@ -19609,6 +20353,7 @@
         const list = panel.querySelector(`#${DOC_TOOLS.outlineListId}`);
         const count = panel.querySelector('.att-doc-outline-count');
 
+        workspaceEnsureControls(panel);
         const merged = docState.navigationMerged;
         panel.dataset.attNavigationMerged = merged ? '1' : '0';
         panel.dataset.attNavigationTree = '1';
@@ -19620,10 +20365,10 @@
         const scrollTop = list.scrollTop;
         // Both modes use the same heading tree and disclosure controls.
         // The merge switch only decides where table entries are displayed.
-        const navigation = buildDocumentNavigation(docState.editor, docState.headings, merged);
+        const navigation = workspaceNavigation(merged);
         docState.navigationTables = navigation.tables;
         list.innerHTML = navigation.roots.length ? renderDocumentNavigationNodes(navigation.roots)
-            : `<div class="att-doc-outline-empty">${merged ? '当前文档还没有标题或表格' : '当前文档还没有 H1–H6 标题'}</div>`;
+            : `<div class="att-doc-outline-empty">${workspaceIsFiltering() ? '没有匹配的导航条目' : merged ? '当前文档还没有标题或表格' : '当前文档还没有 H1–H6 标题'}</div>`;
         if (merged) document.getElementById('att-doc-table-nav-v7170')?.remove();
         list.scrollTop = scrollTop;
         if (count) {
@@ -19631,6 +20376,8 @@
             count.setAttribute('title', merged ? `${docState.headings.length} 个标题 · ${docState.navigationTables.length} 张表格` : `${docState.headings.length} 个标题`);
         }
         dispatchNavigationEvent(DOCUMENT_NAV_EVENTS.rendered, {merged});
+        workspaceRestoreReading();
+        if (workspaceIsFiltering()) workspaceNotice(`筛选中：${W.mode === 'headings' ? '只看标题' : W.mode === 'tables' ? '只看表格' : '标题与表格'}${W.query ? ` · ${W.query}` : ''}`);
         scheduleActiveHeadingUpdate();
     }
 
@@ -19660,11 +20407,12 @@
         const items = Array.from(panel.querySelectorAll('.att-doc-outline-item[data-index]'));
 
         items.forEach((item, itemIndex) => {
-            item.classList.toggle('att-doc-outline-active', itemIndex === index);
+            item.classList.toggle('att-doc-outline-active', Number(item.dataset.index) === index);
         });
 
-        if (keepItemVisible && list && items[index]) {
-            let visibleItem = items[index];
+        const activeItem = items.find(item => Number(item.dataset.index) === index);
+        if (keepItemVisible && !workspaceIsFiltering() && list && activeItem) {
+            let visibleItem = activeItem;
             // A collapsed chapter stays collapsed. Follow its visible parent row
             // rather than measuring a hidden child as a zero-sized rectangle.
             for (let ancestor = visibleItem.parentElement; ancestor && ancestor !== list; ancestor = ancestor.parentElement) {
@@ -19905,6 +20653,8 @@
     }
 
     function bindEditorObserver(editor) {
+        if (editor) workspaceSyncDocument(editor);
+        else {workspaceFlushMemory(); W.editor = null; W.view = null; closeWorkspaceDialog(); closeChapterMenu();}
         if (docState.editor === editor && docState.headingObserver) return;
 
         docState.headingObserver?.disconnect();
@@ -19973,6 +20723,7 @@
     }
 
     function initDocumentTools() {
+        workspaceInit();
         bindDocumentNavigationEvents();
         addStyles();
         syncDocumentContext();
@@ -19983,7 +20734,7 @@
                 // V7.16.5：表格虚拟行复用不可能改变文档编辑上下文，直接早退。
                 if (target?.closest?.('.grid-virtual-body')) return false;
                 if (!(target instanceof Element)) return true;
-                return !target.closest('#att-toolbox-root, #att-document-outline, #att-doc-table-mini-toolbar-v7170, #att-doc-table-nested-guard-v7170, #att-doc-table-toast-v7170, #att-doc-table-assist-overlay-v7172,#att-dtp-edges-v7180,#att-dtp-context-v7180,#att-dtp-dialog-v7180,#att-dtp-frozen-v7180,#att-dtp-column-hit-v7181,#att-dtp-scroll-layer-v7182,#att-dtp-more-popup-v7183');
+                return !target.closest('#att-toolbox-root, #att-document-outline, #att-doc-table-mini-toolbar-v7170, #att-doc-table-nested-guard-v7170, #att-doc-table-toast-v7170, #att-doc-table-assist-overlay-v7172,#att-dtp-edges-v7180,#att-dtp-context-v7180,#att-dtp-dialog-v7180,#att-dtp-frozen-v7180,#att-dtp-column-hit-v7181,#att-dtp-scroll-layer-v7182,#att-dtp-more-popup-v7183,#att-doc-workspace-dialog-v7190,#att-doc-workspace-chapter-menu-v7190');
             });
 
             if (hasExternalMutation) scheduleContextSync(80);
@@ -20313,6 +21064,7 @@
     }
 
     function buildTextIndex(editor) {
+        if (globalThis.__attDocumentWorkspaceV7190) return globalThis.__attDocumentWorkspaceV7190.buildSearchIndex(editor);
         const entries = [];
         let text = '';
         if (!editor) return { text, entries };
@@ -20345,6 +21097,7 @@
     }
 
     function computeMatches(index) {
+        if (globalThis.__attDocumentWorkspaceV7190) return globalThis.__attDocumentWorkspaceV7190.literalMatches(index,searchState.query,searchState.caseSensitive);
         const query = String(searchState.query || '');
         if (!query || !index.text) return [];
 
@@ -20376,18 +21129,18 @@
 
             if (offset >= item.start && offset <= item.end) {
                 if (preferNext && offset === item.end && i + 1 < entries.length && entries[i + 1].start === offset) {
-                    return { node: entries[i + 1].node, offset: 0 };
+                    return { node: entries[i + 1].node, offset: entries[i + 1].nodeFrom || 0 };
                 }
                 return {
                     node: item.node,
-                    offset: Math.max(0, Math.min(item.node.nodeValue?.length || 0, offset - item.start))
+                    offset: Math.max(0, Math.min(item.node.nodeValue?.length || 0, offset - item.start + (item.nodeFrom || 0)))
                 };
             }
         }
 
         const last = entries[entries.length - 1];
         if (offset === last.end) {
-            return { node: last.node, offset: last.node.nodeValue?.length || 0 };
+            return { node: last.node, offset: last.nodeTo ?? last.node.nodeValue?.length ?? 0 };
         }
         return null;
     }
@@ -20746,6 +21499,13 @@
     }
 
     function replaceAll() {
+        if (globalThis.__attDocumentWorkspaceV7190) {
+            if (!(!searchState.replacing && searchState.query)) return;
+            const editor = findEditor(); if (!editor) return;
+            globalThis.__attDocumentWorkspaceV7190.requestReplaceAll({editor,query:searchState.query,replacement:searchState.replacement,caseSensitive:searchState.caseSensitive,regex:false,
+                getCurrent:() => [searchState.query,searchState.replacement,false,!!searchState.caseSensitive],
+                afterApply:count => {searchState.currentIndex=0; showMessage(`已替换 ${count} 处。`); scheduleSearch(70,{resetIndex:true});}}); return;
+        }
         if (searchState.replacing) return;
         if (!searchState.query) {
             showMessage('请先输入要查找的内容。', true);
@@ -21668,6 +22428,7 @@
 
         bindEditor(editor);
         updateUi();
+        globalThis.__attDocumentWorkspaceV7190?.attachSearchBar(bar);
         return bar;
     }
 
@@ -21689,6 +22450,7 @@
     }
 
     function buildTextIndex(editor) {
+        if (globalThis.__attDocumentWorkspaceV7190) return globalThis.__attDocumentWorkspaceV7190.buildSearchIndex(editor);
         const entries = [];
         let text = '';
         if (!editor) return { text, entries };
@@ -21720,6 +22482,7 @@
     }
 
     function computeMatches(index) {
+        if (globalThis.__attDocumentWorkspaceV7190) return globalThis.__attDocumentWorkspaceV7190.literalMatches(index,S.query,S.caseSensitive);
         const needleRaw = String(S.query || '');
         if (!needleRaw || !index.text) return [];
         const haystack = normalize(index.text);
@@ -21745,16 +22508,16 @@
             if (offset < entry.start) break;
             if (offset >= entry.start && offset <= entry.end) {
                 if (preferNext && offset === entry.end && i + 1 < entries.length && entries[i + 1].start === offset) {
-                    return { node: entries[i + 1].node, offset: 0 };
+                    return { node: entries[i + 1].node, offset: entries[i + 1].nodeFrom || 0 };
                 }
                 return {
                     node: entry.node,
-                    offset: Math.max(0, Math.min(entry.node.nodeValue?.length || 0, offset - entry.start))
+                    offset: Math.max(0, Math.min(entry.node.nodeValue?.length || 0, offset - entry.start + (entry.nodeFrom || 0)))
                 };
             }
         }
         const last = entries[entries.length - 1];
-        if (offset === last.end) return { node: last.node, offset: last.node.nodeValue?.length || 0 };
+        if (offset === last.end) return { node: last.node, offset: last.nodeTo ?? last.node.nodeValue?.length ?? 0 };
         return null;
     }
 
@@ -22197,6 +22960,13 @@
     }
 
     function replaceAll() {
+        if (globalThis.__attDocumentWorkspaceV7190) {
+            if (!(!S.replacing && S.query)) return;
+            const editor = findEditor(); if (!editor) return;
+            globalThis.__attDocumentWorkspaceV7190.requestReplaceAll({editor,view:getEditorView(editor),query:S.query,replacement:S.replacement,caseSensitive:S.caseSensitive,regex:false,
+                getCurrent:() => [S.query,S.replacement,false,!!S.caseSensitive],
+                afterApply:count => {S.currentIndex=0; setMessage(`已替换 ${count} 处。`); scheduleSearch(70,{resetIndex:true});}}); return;
+        }
         if (S.replacing || !S.query) return;
         const editor = findEditor();
         if (!editor) return;
@@ -22270,6 +23040,7 @@
     }
 
     function bindEvents() {
+        document.addEventListener('att-doc-search-scope-v7190',() => scheduleSearch(0,{resetIndex:true}));
         if (document.documentElement.dataset.attDocPageSearchV62Bound === '1') return;
         document.documentElement.dataset.attDocPageSearchV62Bound = '1';
 
@@ -23038,6 +23809,7 @@
     }
 
     function buildTextIndex(editor) {
+        if (globalThis.__attDocumentWorkspaceV7190) return globalThis.__attDocumentWorkspaceV7190.buildSearchIndex(editor);
         const entries = [];
         let text = '';
         if (!editor) return { text, entries };
@@ -23070,16 +23842,16 @@
             if (offset < entry.start) break;
             if (offset >= entry.start && offset <= entry.end) {
                 if (preferNext && offset === entry.end && i + 1 < entries.length && entries[i + 1].start === offset) {
-                    return { node: entries[i + 1].node, offset: 0 };
+                    return { node: entries[i + 1].node, offset: entries[i + 1].nodeFrom || 0 };
                 }
                 return {
                     node: entry.node,
-                    offset: Math.max(0, Math.min(entry.node.nodeValue?.length || 0, offset - entry.start))
+                    offset: Math.max(0, Math.min(entry.node.nodeValue?.length || 0, offset - entry.start + (entry.nodeFrom || 0)))
                 };
             }
         }
         const last = entries[entries.length - 1];
-        if (offset === last.end) return { node: last.node, offset: last.node.nodeValue?.length || 0 };
+        if (offset === last.end) return { node: last.node, offset: last.nodeTo ?? last.node.nodeValue?.length ?? 0 };
         return null;
     }
 
@@ -23140,6 +23912,10 @@
         const regex = compileRegex();
         state.zeroLength = false;
         if (!regex || !index.text) return [];
+        if (globalThis.__attDocumentWorkspaceV7190) {
+            const matches = globalThis.__attDocumentWorkspaceV7190.regexMatches(index,regex);
+            state.zeroLength = matches.some(match => match.zeroLength); return matches;
+        }
 
         const matches = [];
         regex.lastIndex = 0;
@@ -23564,6 +24340,13 @@
     }
 
     function replaceAll() {
+        if (globalThis.__attDocumentWorkspaceV7190) {
+            if (!(state.enabled && !state.replacing && state.query)) return;
+            const editor = findEditor(); if (!editor) return;
+            globalThis.__attDocumentWorkspaceV7190.requestReplaceAll({editor,view:getEditorView(editor),query:state.query,replacement:state.replacement,caseSensitive:state.caseSensitive,regex:true,
+                getCurrent:() => [state.query,state.replacement,true,!!state.caseSensitive],
+                afterApply:count => {state.currentIndex=0; setMessage(`已替换 ${count} 处。`); scheduleSearch(70,{resetIndex:true});}}); return;
+        }
         if (!state.enabled || state.replacing || !state.query) return;
         const editor = findEditor();
         if (!editor) return;
@@ -23844,6 +24627,7 @@
     }
 
     function bindEvents() {
+        document.addEventListener('att-doc-search-scope-v7190',() => {if (state.enabled) scheduleSearch(0,{resetIndex:true});});
         document.addEventListener('click', event => {
             const target = event.target instanceof Element ? event.target : null;
             if (!target) return;
@@ -24323,6 +25107,7 @@
             return 0;
         }
 
+        if (globalThis.__attDocumentWorkspaceV7190) return globalThis.__attDocumentWorkspaceV7190.regexMatches(globalThis.__attDocumentWorkspaceV7190.buildSearchIndex(findEditor()),regex).length;
         const text = buildText(findEditor());
         if (!text) return 0;
 
@@ -24519,6 +25304,7 @@
     }
 
     function bindEvents() {
+        document.addEventListener('att-doc-search-scope-v7190',() => refreshComputed(true));
         document.addEventListener('input', event => {
             const target = event.target;
             if (!(target instanceof HTMLInputElement)) return;
@@ -32144,7 +32930,7 @@
 })();
 
 /* ============================================================================
- * AutoTable Document Table Plus V7.18.5 · 文档表格完整交互增强
+ * AutoTable Document Table Plus V7.19.0 · 文档表格完整交互增强
  * --------------------------------------------------------------------------
  * 目标：不重做 ProseMirror 表格引擎，只给原生表格能力增加一层稳定的交互外壳。
  *
@@ -32161,7 +32947,7 @@
     'use strict';
 
     const DTP = {
-        version: 'V7.18.5',
+        version: 'V7.19.0',
         styleId: 'att-doc-table-plus-style-v7170',
         toolbarId: 'att-doc-table-mini-toolbar-v7170',
         guardId: 'att-doc-table-nested-guard-v7170',
@@ -33119,7 +33905,7 @@
         showToast('已阻止单元格误拖动；需要移动时可关闭防误移动');
     }
 
-    // V7.18.5: keep menus inside the document viewport and preserve header paint.
+    // V7.19.0: keep menus inside the document viewport and preserve header paint.
     const MENU_ICONS = {
         'select-row':'M3 3h18v18H3z M3 9h18 M3 15h18 M3 12h18',
         'select-column':'M3 3h18v18H3z M9 3v18 M15 3v18 M12 3v18',
@@ -35065,7 +35851,7 @@
                 event.preventDefault();
                 const index = Number(button.dataset.dtpTableIndex);
                 const table = getTopLevelTables()[index];
-                if (table) locateElement(table);
+                if (table) {globalThis.__attDocumentWorkspaceV7190?.noteTarget(table); locateElement(table);}
             });
             outline.appendChild(nav);
         }
@@ -35075,7 +35861,9 @@
     function refreshNavigator() {
         const nav = ensureNavigator();
         if (!nav) return;
-        const tables = getTopLevelTables();
+        const allTables = getTopLevelTables();
+        const tables = allTables.filter(table => !globalThis.__attDocumentWorkspaceV7190 || globalThis.__attDocumentWorkspaceV7190.allowStandalone(table));
+        nav.style.display = globalThis.__attDocumentWorkspaceV7190?.navigationMode === 'headings' ? 'none' : '';
         const count = nav.querySelector('.att-dtp-nav-head-v7170 span');
         const list = nav.querySelector('.att-dtp-nav-list-v7170');
         if (count) count.textContent = String(tables.length);
@@ -35084,7 +35872,8 @@
             list.innerHTML = '<div class="att-dtp-nav-empty-v7170">当前文档没有顶层表格</div>';
             return;
         }
-        list.innerHTML = tables.map((table, index) => {
+        list.innerHTML = tables.map(table => {
+            const index = allTables.indexOf(table);
             const rows = table.rows.length;
             const cols = Array.from(table.rows).reduce((maximum, row) => Math.max(maximum,
                 Array.from(row.cells).reduce((total, cell) => total + Math.max(1, Number(cell.colSpan) || 1), 0)), 0);
@@ -35609,7 +36398,7 @@
             refreshTableInventory();
             scheduleContextRefresh();
         }, 180);
-        console.log('[AutoTable Document Table Plus] V7.18.5 已加载：两种模式统一标题树与折叠 / 标题与表格层级导航 / 菜单边界与图标 / 冻结表头样式和停靠修复 / 表格内部跳转 / 滚动内容锚定浮层 / 跨格矩形拖选 / 设置卡增量更新 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 编辑器外高亮 / 保留防误移动');
+        console.log('[AutoTable Document Table Plus] V7.19.0 已加载：两种模式统一标题树与折叠 / 标题与表格层级导航 / 菜单边界与图标 / 冻结表头样式和停靠修复 / 表格内部跳转 / 滚动内容锚定浮层 / 跨格矩形拖选 / 设置卡增量更新 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 编辑器外高亮 / 保留防误移动');
     }
 
     if (document.body) init();
