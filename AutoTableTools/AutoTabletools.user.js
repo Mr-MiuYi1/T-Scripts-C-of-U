@@ -9,8 +9,8 @@
 // @match        http://106.54.31.31/*
 // @match        https://106.54.31.31/*
 //
-// @updateURL    https://raw.githubusercontent.com/Mr-MiuYi1/T-Scripts-C-of-U/main/AutoTableTools/AutoTabletools.meta.js
-// @downloadURL  https://raw.githubusercontent.com/Mr-MiuYi1/T-Scripts-C-of-U/main/AutoTableTools/AutoTabletools.user.js
+// @updateURL    http://att.miuyi.xyz/down/AutoTabletools.meta.js
+// @downloadURL  http://att.miuyi.xyz/down//AutoTabletools.user.js
 //
 // @run-at       document-start
 // @grant        GM_getValue
