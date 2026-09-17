@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.18.2
-// @description  AutoTable 一体化效率增强工具：文档表格增强（表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.18.3
+// @description  AutoTable 一体化效率增强工具：文档表格增强（菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.18.2
+ * AutoTable 工具集 V7.18.3
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，规则组/规则分层管理，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -19812,7 +19812,7 @@
                 // V7.16.5：表格虚拟行复用不可能改变文档编辑上下文，直接早退。
                 if (target?.closest?.('.grid-virtual-body')) return false;
                 if (!(target instanceof Element)) return true;
-                return !target.closest('#att-toolbox-root, #att-document-outline, #att-doc-table-mini-toolbar-v7170, #att-doc-table-nested-guard-v7170, #att-doc-table-toast-v7170, #att-doc-table-assist-overlay-v7172,#att-dtp-edges-v7180,#att-dtp-context-v7180,#att-dtp-dialog-v7180,#att-dtp-frozen-v7180,#att-dtp-column-hit-v7181,#att-dtp-scroll-layer-v7182');
+                return !target.closest('#att-toolbox-root, #att-document-outline, #att-doc-table-mini-toolbar-v7170, #att-doc-table-nested-guard-v7170, #att-doc-table-toast-v7170, #att-doc-table-assist-overlay-v7172,#att-dtp-edges-v7180,#att-dtp-context-v7180,#att-dtp-dialog-v7180,#att-dtp-frozen-v7180,#att-dtp-column-hit-v7181,#att-dtp-scroll-layer-v7182,#att-dtp-more-popup-v7183');
             });
 
             if (hasExternalMutation) scheduleContextSync(80);
@@ -31973,7 +31973,7 @@
 })();
 
 /* ============================================================================
- * AutoTable Document Table Plus V7.18.2 · 文档表格完整交互增强
+ * AutoTable Document Table Plus V7.18.3 · 文档表格完整交互增强
  * --------------------------------------------------------------------------
  * 目标：不重做 ProseMirror 表格引擎，只给原生表格能力增加一层稳定的交互外壳。
  *
@@ -31990,7 +31990,7 @@
     'use strict';
 
     const DTP = {
-        version: 'V7.18.2',
+        version: 'V7.18.3',
         styleId: 'att-doc-table-plus-style-v7170',
         toolbarId: 'att-doc-table-mini-toolbar-v7170',
         guardId: 'att-doc-table-nested-guard-v7170',
@@ -32678,7 +32678,7 @@
             S.positionRaf = 0;
             positionToolbar();
             applyAssistClasses();
-            positionEdgeHandles(); updateFrozenHeader();
+            positionEdgeHandles(); updateFrozenHeader(); positionContextMenu();
         });
     }
 
@@ -32945,13 +32945,286 @@
         showToast('已阻止单元格误拖动；需要移动时可关闭防误移动');
     }
 
+    // V7.18.3: keep menus inside the document viewport and preserve header paint.
+    const MENU_ICONS = {
+        'select-row':'M3 3h18v18H3z M3 9h18 M3 15h18 M3 12h18',
+        'select-column':'M3 3h18v18H3z M9 3v18 M15 3v18 M12 3v18',
+        'select-table':'M3 3h18v18H3z M3 9h18 M3 15h18 M9 3v18 M15 3v18',
+        'copy-cell':'M9 9h12v12H9z M15 5V3H3v12h2',
+        'copy-area':'M9 9h12v12H9z M15 5V3H3v12h2 M9 15h12 M15 9v12',
+        'clear-area':'M3 15l9-11 9 8-7 8H8z M8 10l10 9 M14 20h7',
+        'align-left':'M3 4h18 M3 9h11 M3 14h18 M3 19h11',
+        'align-center':'M3 4h18 M6 9h12 M3 14h18 M6 19h12',
+        'align-right':'M3 4h18 M10 9h11 M3 14h18 M10 19h11',
+        'background-yellow':'M4 9l7-7 9 9-8 8z M4 9h15 M20 15c-3 3-3 5 0 5s3-2 0-5',
+        'background-clear':'M3 3l18 18 M4 9l7-7 9 9-8 8z M3 21h18',
+        'width-page':'M3 4v16 M21 4v16 M6 12h12 M9 9l-3 3 3 3 M15 9l3 3-3 3',
+        'width-content':'M7 3v18 M17 3v18 M3 12h4 M17 12h4 M10 8h4 M10 12h4 M10 16h4',
+        'width-equal':'M3 4h18v16H3z M9 4v16 M15 4v16 M3 12h18',
+        'width-reset':'M4 4v6h6 M4 10a8 8 0 1 1 0 5',
+        'header-first':'M3 3h18v18H3z M3 9h18 M8 5v2 M16 5v2 M9 9v12 M15 9v12',
+        'freeze-first':'M8 3h8 M9 3v6l-3 4v2h12v-2l-3-4V3 M12 15v7',
+        'mergeCells':'M3 3h18v18H3z M3 9h5 M16 9h5 M9 3v5 M9 16v5 M6 12h12 M9 9l3 3-3 3 M15 9l-3 3 3 3',
+        'splitCell':'M3 3h18v18H3z M12 3v18 M5 12h4 M15 12h4 M7 10l-2 2 2 2 M17 10l2 2-2 2',
+        'move-row-up':'M4 16h16v5H4z M12 13V3 M8 7l4-4 4 4',
+        'move-row-down':'M4 3h16v5H4z M12 11v10 M8 17l4 4 4-4',
+        'move-column-left':'M16 4h5v16h-5z M13 12H3 M7 8l-4 4 4 4',
+        'move-column-right':'M3 4h5v16H3z M11 12h10 M17 8l4 4-4 4',
+        'insertRowAbove':'M3 11h18v10H3z M3 16h18 M12 2v6 M9 5h6',
+        'insertRowBelow':'M3 3h18v10H3z M3 8h18 M12 16v6 M9 19h6',
+        'insertColumnBefore':'M11 3h10v18H11z M16 3v18 M2 12h6 M5 9v6',
+        'insertColumnAfter':'M3 3h10v18H3z M8 3v18 M16 12h6 M19 9v6',
+        'locate-table':'M12 2v4 M12 18v4 M2 12h4 M18 12h4 M12 6a6 6 0 1 0 0 12 6 6 0 1 0 0-12 M12 10a2 2 0 1 0 0 4 2 2 0 1 0 0-4',
+        'delete-table':'M3 6h18 M9 6V3h6v3 M5 6l1 15h12l1-15 M10 10v7 M14 10v7'
+    };
+
+    function menuIconMarkup(key) {
+        const path=MENU_ICONS[key];
+        return path?`<svg class="att-dtp-item-icon-v7183" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="${path}"></path></svg>`:'';
+    }
+
+    const MORE_POPUP_ID='att-dtp-more-popup-v7183';
+
+    function toolbarMenuControls(bar,selector) {
+        const popup=document.getElementById(MORE_POPUP_ID);
+        return [...bar.querySelectorAll(selector),...Array.from(popup?.querySelectorAll(selector) || [])];
+    }
+
+    function setMenuButtonLabel(button,text) {
+        const label=button.querySelector?.('.att-dtp-item-label-v7183');
+        if(label) label.textContent=text;
+        else button.textContent=text;
+    }
+
+    function decorateTableMenu(menu) {
+        if(!menu)return;
+        menu.setAttribute('role','menu');
+        menu.querySelectorAll('button').forEach(button=>{
+            const key=button.dataset.dtpAction || button.dataset.dtpCmd;
+            if(!MENU_ICONS[key] || button.dataset.dtpIcon===key)return;
+            const label=button.textContent;
+            button.innerHTML=menuIconMarkup(key)+`<span class="att-dtp-item-label-v7183">${escapeHtml(label)}</span>`;
+            button.dataset.dtpIcon=key;
+            button.setAttribute('role','menuitem');
+            if(key==='delete-table')button.classList.add('danger');
+        });
+    }
+
+    function tableUiViewportRect() {
+        const clip=editorClipRect();
+        const native=S.editor?.closest('.document-view-page,.document-view-shell')?.querySelector('.document-toolbar');
+        if(native && isVisible(native)) {
+            const r=native.getBoundingClientRect();
+            // A parent can pin a toolbar whose own position remains static.
+            if(r.bottom>clip.top && r.top<clip.bottom && r.right>clip.left && r.left<clip.right)
+                clip.top=Math.min(clip.bottom,Math.max(clip.top,r.bottom+1));
+        }
+        return clip;
+    }
+
+    function fitTableMenu(anchor,desiredHeight,desiredWidth,clip,margin=7,gap=5) {
+        const leftEdge=clip.left+margin,rightEdge=clip.right-margin,
+            topEdge=clip.top+margin,bottomEdge=clip.bottom-margin;
+        const width=Math.max(0,Math.min(desiredWidth,rightEdge-leftEdge));
+        const below=Math.max(0,bottomEdge-anchor.bottom-gap),above=Math.max(0,anchor.top-gap-topEdge);
+        const up=desiredHeight>below && above>below;
+        let height=Math.min(desiredHeight,up?above:below),top=up?anchor.top-gap-height:anchor.bottom+gap;
+        if(height<40) {height=Math.max(0,Math.min(desiredHeight,bottomEdge-topEdge));top=topEdge;}
+        height=Math.max(0,Math.min(height,bottomEdge-topEdge));
+        top=Math.max(topEdge,Math.min(top,bottomEdge-height));
+        return {left:Math.max(leftEdge,Math.min(anchor.right-width,rightEdge-width)),top,width,height,up};
+    }
+
+    function positionMoreMenu(bar,frame,clip) {
+        const menu=document.getElementById(MORE_POPUP_ID);
+        if(!menu)return;
+        if(!bar.classList.contains('att-dtp-more-open-v7170') || bar.style.visibility==='hidden') {
+            menu.style.display='none';return;
+        }
+        decorateTableMenu(menu);
+        menu.style.display='grid';
+        menu.style.width=`${Math.max(0,Math.min(230,clip.right-clip.left-14))}px`;
+        const r=bar.getBoundingClientRect(),natural=(menu.scrollHeight || 450)+2,
+            bounds=fitTableMenu(r,Math.min(natural,460),230,clip);
+        menu.style.display=bounds.width>0 && bounds.height>0?'grid':'none';
+        menu.style.right='auto';menu.style.bottom='auto';
+        menu.style.left=`${bounds.left}px`;
+        menu.style.top=`${bounds.top}px`;
+        menu.style.width=`${bounds.width}px`;
+        menu.style.maxHeight=`${bounds.height}px`;
+        menu.dataset.placement=bounds.up?'above':'below';
+    }
+
+    function hideMorePopup() {
+        const menu=document.getElementById(MORE_POPUP_ID);
+        if(menu)menu.style.display='none';
+    }
+
+    function positionContextMenu() {
+        const menu=document.getElementById(PLUS.menuId),anchor=S.contextMenuAnchor;
+        if(!menu || menu.style.display==='none' || !anchor)return;
+        const clip=tableUiViewportRect(),margin=7,width=Math.max(0,Math.min(210,clip.right-clip.left-2*margin)),
+            maxHeight=Math.max(0,clip.bottom-clip.top-2*margin);
+        menu.style.width=`${width}px`;menu.style.maxHeight=`${maxHeight}px`;
+        const height=Math.min(menu.offsetHeight || 380,maxHeight);
+        menu.style.left=`${Math.max(clip.left+margin,Math.min(anchor.x,clip.right-width-margin))}px`;
+        menu.style.top=`${Math.max(clip.top+margin,Math.min(anchor.y,clip.bottom-height-margin))}px`;
+        menu.style.display=width>0 && height>0?'grid':'none';
+    }
+
+    function closeTableMenus() {
+        const bar=document.getElementById(DTP.toolbarId);
+        bar?.classList.remove('att-dtp-more-open-v7170');
+        const more=document.getElementById(MORE_POPUP_ID);
+        if(more)more.style.display='none';
+        const context=document.getElementById(PLUS.menuId);
+        if(context)context.style.display='none';
+        S.contextMenuAnchor=null;
+    }
+
+    function updateFreezeMenuState(bar) {
+        const button=document.getElementById(MORE_POPUP_ID)?.querySelector('[data-dtp-action="freeze-first"]') || bar?.querySelector('[data-dtp-action="freeze-first"]');
+        if(!button)return;
+        const frozen=S.frozenTable===S.table;
+        setMenuButtonLabel(button,frozen?'取消冻结首行':'冻结首行');
+        button.setAttribute('aria-pressed',String(frozen));
+    }
+
+    function scrollbarPointer(event) {
+        const el=event.target;
+        if(!(el instanceof HTMLElement) || !Number.isFinite(event.clientX) ||
+            el.scrollHeight<=el.clientHeight || el.offsetWidth-el.clientWidth<5)return false;
+        const r=el.getBoundingClientRect(),scale=el.offsetWidth?r.width/el.offsetWidth:1;
+        return event.clientX>=r.left+(el.clientLeft+el.clientWidth)*scale ||
+            event.clientX<r.left+el.clientLeft*scale;
+    }
+
+    function opaqueColor(value) {
+        if(!value || value==='transparent')return false;
+        const rgba=value.match(/^rgba\([^)]*,\s*([\d.]+)\s*\)$/i);
+        const slash=value.match(/\/\s*([\d.]+)(%)?\s*\)$/);
+        return rgba?Number(rgba[1])>=.999:slash?Number(slash[1])/(slash[2]?100:1)>=.999:true;
+    }
+
+    function frozenBackdrop(table) {
+        for(let node=table.rows[0]?.parentElement || table;node;node=node.parentElement) {
+            const bg=getComputedStyle(node).backgroundColor;
+            if(opaqueColor(bg))return bg;
+        }
+        const style=getComputedStyle(S.editor || document.body),color=style.color || '';
+        const rgb=color.match(/\d+(?:\.\d+)?/g);
+        const lightText=rgb && rgb.slice(0,3).reduce((a,b)=>a+Number(b),0)>384;
+        return style.colorScheme==='dark' || lightText?'#25282e':'#ffffff';
+    }
+
+    const HEADER_PAINT_PROPS = ['color','background-color','background-image','font-family','font-size','font-weight','font-style',
+        'line-height','letter-spacing','text-align','vertical-align','white-space','word-break','overflow-wrap','text-decoration','text-indent','text-transform','display',
+        'margin-top','margin-right','margin-bottom','margin-left',
+        'padding-top','padding-right','padding-bottom','padding-left','border-top-width','border-right-width','border-bottom-width',
+        'border-left-width','border-top-style','border-right-style','border-bottom-style','border-left-style',
+        'border-top-color','border-right-color','border-bottom-color','border-left-color','border-collapse','border-spacing','box-sizing'];
+
+    function copyHeaderPaint(source,clone) {
+        const style=getComputedStyle(source);
+        for(const property of HEADER_PAINT_PROPS) {
+            const value=style.getPropertyValue?style.getPropertyValue(property):style[property.replace(/-([a-z])/g,(_,c)=>c.toUpperCase())];
+            if(value)clone.style.setProperty(property,value,'important');
+        }
+        const sourceChildren=Array.from(source.children),children=Array.from(clone.children);
+        children.forEach((child,index)=>{if(sourceChildren[index])copyHeaderPaint(sourceChildren[index],child);});
+    }
+
+    function frozenColumnWidths(table,row) {
+        const widths=[];
+        for(const cell of Array.from(row.cells)) {
+            const r=cell.getBoundingClientRect(),span=Math.max(1,cell.colSpan),
+                known=String(cell.getAttribute('colwidth') || '').split(',').map(Number),
+                total=known.reduce((sum,w)=>sum+w,0),weighted=known.length===span && known.every(w=>w>0);
+            for(let i=0;i<span;i++)widths.push(r.width*(weighted?known[i]/total:1/span));
+        }
+        const map=getTableGrid(table);
+        for(let c=0;c<map.width;c++) {
+            const single=map.grid.map(r=>r[c]).find(cell=>cell && map.cells.get(cell)?.width===1);
+            if(single)widths[c]=single.getBoundingClientRect().width;
+        }
+        return widths;
+    }
+
+    function frozenHeaderPlacement(rect,row,clip) {
+        const left=Math.max(clip.left,rect.left),right=Math.min(clip.right,rect.right),
+            top=clip.top,height=Math.max(0,Math.min(row.height,clip.bottom-top,rect.bottom-top));
+        return {visible:row.top<top && right>left && height>0,left,top,width:Math.max(0,right-left),height,
+            contentLeft:rect.left-left,contentTop:Math.min(0,rect.bottom-row.height-top)};
+    }
+
+    function sanitizeFrozenRow(row) {
+        row.querySelectorAll('script,style,iframe,video,audio,input,button,.column-resize-handle,.ProseMirror-widget').forEach(n=>n.remove());
+        for(const node of [row,...row.querySelectorAll('*')]) {
+            node.classList.remove('selectedCell','ProseMirror-selectednode');
+            for(const attribute of Array.from(node.attributes)) {
+                if(/^on/i.test(attribute.name) || ['id','contenteditable','draggable','tabindex','autofocus'].includes(attribute.name))node.removeAttribute(attribute.name);
+            }
+        }
+        Array.from(row.cells).forEach(cell=>{cell.rowSpan=1;});
+    }
+
+    function updateFrozenHeader() {
+        let host=document.getElementById('att-dtp-frozen-v7180');
+        const table=S.frozenTable;
+        if(!S.settings.enabled || !table?.isConnected || !S.editor?.contains(table)) {host?.remove();S.frozenTable=null;return;}
+        const clip=tableUiViewportRect(),rect=table.getBoundingClientRect(),row=table.rows[0],r=row?.getBoundingClientRect();
+        if(!r) {if(host)host.style.display='none';return;}
+        const placement=frozenHeaderPlacement(rect,r,clip);
+        if(!placement.visible) {if(host)host.style.display='none';return;}
+        if(!host) {
+            host=document.createElement('div');host.id='att-dtp-frozen-v7180';
+            host.setAttribute('data-lumatrace-ignore','');host.setAttribute('aria-hidden','true');host.setAttribute('contenteditable','false');
+            host.style.cssText='position:fixed;pointer-events:none;z-index:2147482510;overflow:hidden;box-sizing:border-box;';
+            document.body.appendChild(host);
+        }
+        const backdrop=frozenBackdrop(table),firstPaint=getComputedStyle(row.cells[0] || row),
+            paintKey=[backdrop,firstPaint.color,firstPaint.backgroundColor,firstPaint.fontFamily,firstPaint.fontSize,firstPaint.borderColor,
+                document.documentElement.className,document.body.className].join('|'),
+            signature=row.innerHTML,sourceDoc=getEditorView()?.state.doc;
+        if(host.dataset.signature!==signature || host._sourceDoc!==sourceDoc || host._sourceTable!==table || host._paintKey!==paintKey) {
+            const clone=table.cloneNode(false),body=document.createElement('tbody'),cloneRow=row.cloneNode(true),
+                group=document.createElement('colgroup'),content=document.createElement('div');
+            clone.removeAttribute('id');clone.removeAttribute('contenteditable');clone.removeAttribute('draggable');
+            for(const attr of Array.from(clone.attributes))if(/^on/i.test(attr.name))clone.removeAttribute(attr.name);
+            copyHeaderPaint(table,clone);copyHeaderPaint(row.parentElement,body);copyHeaderPaint(row,cloneRow);sanitizeFrozenRow(cloneRow);
+            body.appendChild(cloneRow);clone.appendChild(group);clone.appendChild(body);content.appendChild(clone);host.replaceChildren(content);
+            content.style.cssText='position:absolute;transform-origin:top left;pointer-events:none;';
+            host.dataset.signature=signature;host._sourceDoc=sourceDoc;host._sourceTable=table;host._paintKey=paintKey;
+        }
+        const sx=table.offsetWidth?rect.width/table.offsetWidth || 1:1,sy=row.offsetHeight?r.height/row.offsetHeight || 1:1,
+            content=host.firstElementChild,clone=content.firstElementChild,group=clone.querySelector('colgroup');
+        let widths;
+        try {widths=frozenColumnWidths(table,row);} catch(_) {host.style.display='none';return;}
+        while(group.children.length<widths.length)group.appendChild(document.createElement('col'));
+        while(group.children.length>widths.length)group.lastElementChild.remove();
+        widths.forEach((width,index)=>group.children[index].style.setProperty('width',`${width/sx}px`,'important'));
+        clone.style.setProperty('width',`${rect.width/sx}px`,'important');clone.style.setProperty('table-layout','fixed','important');
+        clone.style.setProperty('height','auto','important');clone.style.setProperty('min-height','0','important');
+        clone.style.setProperty('position','static','important');clone.style.setProperty('transform','none','important');
+        clone.style.setProperty('margin','0','important');clone.rows[0].style.setProperty('height',`${r.height/sy}px`,'important');
+        Array.from(clone.rows[0].cells).forEach((cell,index)=>{
+            cell.style.setProperty('width',`${row.cells[index].getBoundingClientRect().width/sx}px`,'important');
+            cell.style.setProperty('height',`${r.height/sy}px`,'important');
+        });
+        content.style.left=`${placement.contentLeft}px`;content.style.top=`${placement.contentTop}px`;
+        content.style.transform=`scale(${sx},${sy})`;
+        host.style.backgroundColor=backdrop;host.style.display='block';host.style.left=`${placement.left}px`;host.style.top=`${placement.top}px`;
+        host.style.width=`${placement.width}px`;host.style.height=`${placement.height}px`;
+    }
+
     function isolateToolbarEvents(bar) {
         // 工具栏是独立控件；阻止页面把它的按下/拖动理解为表格操作。
         for (const type of ['pointerdown', 'mousedown', 'pointerup', 'mouseup']) {
             bar.addEventListener(type, event => {
                 if (event.button !== 0) return;
-                event.preventDefault();
                 event.stopPropagation();
+                if (scrollbarPointer(event)) return;
+                event.preventDefault();
                 if (type === 'pointerdown' || type === 'mousedown') snapshotStableContext();
             }, true);
         }
@@ -33010,11 +33283,12 @@
             </div>
         `;
 
+        decorateTableMenu(bar.querySelector('[data-dtp-role="more-menu"]'));
         bar.setAttribute('contenteditable', 'false');
         bar.setAttribute('draggable', 'false');
         isolateToolbarEvents(bar);
 
-        bar.addEventListener('click', event => {
+        const toolbarClick = event => {
             const button = event.target instanceof Element ? event.target.closest('button') : null;
             if (!button) return;
             event.preventDefault();
@@ -33024,6 +33298,7 @@
             if (cmd) {
                 snapshotStableContext();
                 runCommand(cmd);
+                closeTableMenus();
                 return;
             }
 
@@ -33036,7 +33311,8 @@
                 bar.classList.remove('att-dtp-more-open-v7170');
             } else if (action === 'more') {
                 bar.classList.toggle('att-dtp-more-open-v7170');
-                schedulePosition();
+                updateFreezeMenuState(bar);
+                positionToolbar();
             } else if (action === 'copy-cell') {
                 copyCurrentCell();
                 bar.classList.remove('att-dtp-more-open-v7170');
@@ -33046,7 +33322,15 @@
             } else if (action === 'delete-table') {
                 handleDeleteTable(button);
             }
-        });
+            if(action !== 'more' && action !== 'delete-table')closeTableMenus();
+        };
+        bar.addEventListener('click',toolbarClick);
+        const popup=bar.querySelector('[data-dtp-role="more-menu"]');
+        if(popup) {
+            popup.id=MORE_POPUP_ID;popup.setAttribute('contenteditable','false');
+            popup.setAttribute('data-lumatrace-ignore','');document.body.appendChild(popup);
+            isolateToolbarEvents(popup);popup.addEventListener('click',toolbarClick);
+        }
 
         attachScrollingUi(bar);
         return bar;
@@ -33093,23 +33377,25 @@
         }
 
         const appearance=appearanceSupport();
-        bar.querySelectorAll('[data-dtp-action]').forEach(button=>{
+        toolbarMenuControls(bar,'[data-dtp-action]').forEach(button=>{
             const action=button.dataset.dtpAction;
             if(action?.startsWith('align-'))button.style.display=appearance.align?'':'none';
             if(action?.startsWith('background-'))button.style.display=appearance.background?'':'none';
         });
-        bar.querySelectorAll('[data-dtp-cmd]').forEach(button => {
+        toolbarMenuControls(bar,'[data-dtp-cmd]').forEach(button => {
             const available=nativeCommandAvailable(button.dataset.dtpCmd);
             button.disabled=!available;
             button.style.display=button.dataset.dtpCmd==='insertColumn' &&
                 (nativeCommandAvailable('insertColumnBefore') || nativeCommandAvailable('insertColumnAfter'))?'none':
                 ['mergeCells','splitCell'].includes(button.dataset.dtpCmd) && !available?'none':'';
         });
+        updateFreezeMenuState(bar);
         bar.classList.add('is-visible');
         schedulePosition();
     }
 
     function hideToolbar() {
+        closeTableMenus();
         hideProductivityUi();
         const bar = document.getElementById(DTP.toolbarId);
         if (!bar) return;
@@ -33119,12 +33405,12 @@
     function positionToolbar() {
         if (S.pointerGesture) return;
         const bar = document.getElementById(DTP.toolbarId);
-        if (!bar?.classList.contains('is-visible')) return;
+        if (!bar?.classList.contains('is-visible')) {hideMorePopup();return;}
         attachScrollingUi(bar);
-        const frame = scrollingUiFrame(), anchor = getToolbarAnchorRect(), clip = editorClipRect();
+        const frame = scrollingUiFrame(), anchor = getToolbarAnchorRect(), clip = tableUiViewportRect();
         if (!anchor || anchor.bottom <= clip.top || anchor.top >= clip.bottom ||
             anchor.right <= clip.left || anchor.left >= clip.right) {
-            bar.style.visibility = 'hidden'; return;
+            bar.style.visibility = 'hidden';hideMorePopup();return;
         }
         const margin = 7;
         bar.style.maxWidth = `${Math.max(0,clip.right-clip.left-2*margin)/frame.scaleX}px`;
@@ -33136,18 +33422,19 @@
             // pinning an unrelated toolbar to the page chrome.
             if (!cell || cell.top < clip.top || cell.bottom > clip.bottom ||
                 cell.right <= clip.left || cell.left >= clip.right) {
-                bar.style.visibility = 'hidden'; return;
+                bar.style.visibility = 'hidden';hideMorePopup();return;
             }
             top = cell.bottom+margin;
             left = Math.min(left,cell.right-w);
             if (top+h > clip.bottom-margin) top = cell.top-h-margin;
         }
         if (top < clip.top+margin || top+h > clip.bottom-margin || w > clip.right-clip.left-2*margin) {
-            bar.style.visibility = 'hidden'; return;
+            bar.style.visibility = 'hidden';hideMorePopup();return;
         }
         bar.style.visibility = '';
         left = Math.max(clip.left+margin, Math.min(left,clip.right-w-margin));
         setScrollingUiPosition(bar,left,top,frame);
+        positionMoreMenu(bar,frame,clip);
     }
 
     function findNativeButton(aliases, iconClass = '') {
@@ -33233,7 +33520,7 @@
     }
 
     function hideMoreMenuSoon() {
-        requestAnimationFrame(() => document.getElementById(DTP.toolbarId)?.classList.remove('att-dtp-more-open-v7170'));
+        requestAnimationFrame(closeTableMenus);
     }
 
     function handleDeleteTable(button) {
@@ -33241,19 +33528,21 @@
         if (now < S.deleteConfirmUntil && S.deleteConfirmTable===S.table && S.deleteConfirmButton===button) {
             S.deleteConfirmUntil = 0;
             clearTimeout(S.deleteConfirmTimer);
-            button.textContent = '删除整个表格';
+            setMenuButtonLabel(button, '删除整个表格');
+            button.classList.remove('confirming');
             runCommand('deleteTable');
+            closeTableMenus();
             return;
         }
 
         S.deleteConfirmUntil = now + 2400;
         S.deleteConfirmTable=S.table;S.deleteConfirmButton=button;
-        button.textContent = '再次点击确认删除';
+        setMenuButtonLabel(button, '再次点击确认删除');
         button.classList.add('confirming');
         clearTimeout(S.deleteConfirmTimer);
         S.deleteConfirmTimer = window.setTimeout(() => {
             S.deleteConfirmUntil = 0;
-            button.textContent = '删除整个表格';
+            setMenuButtonLabel(button, '删除整个表格');
             button.classList.remove('confirming');
         }, 2500);
     }
@@ -33620,6 +33909,7 @@
     }
 
     function hideProductivityUi() {
+        S.contextMenuAnchor=null;
         for(const id of [PLUS.edgeId,PLUS.menuId]) {const el=document.getElementById(id);if(el)el.style.display='none';}
     }
     function closeTableDialog() {
@@ -33713,7 +34003,7 @@
         else if(action.startsWith('align-'))setAreaAppearance('align',action.slice(6));
         else if(action==='background-yellow')setAreaAppearance('background','#fff3c4');
         else if(action==='background-clear')setAreaAppearance('background',null);
-        else if(action==='freeze-first') { S.frozenTable=S.frozenTable===S.table?null:S.table;updateFrozenHeader(); }
+        else if(action==='freeze-first') { S.frozenTable=S.frozenTable===S.table?null:S.table;updateFrozenHeader();updateFreezeMenuState(document.getElementById(DTP.toolbarId)); }
         else if(action.startsWith('move-')) {
             const info=modelTableInfo(),active=info?.map.cells.get(S.cell);if(!active)return;
             const part=/row/.test(action)?'row':'column',from=part==='row'?active.row:active.col,
@@ -33754,8 +34044,10 @@
                 ['insertColumnAfter','右侧插列'],['mergeCells','合并单元格'],['splitCell','拆分单元格']].filter(([cmd])=>nativeCommandAvailable(cmd))
                 .map(([cmd,label])=>`<button data-dtp-cmd="${cmd}">${label}</button>`).join('')}
             <button data-dtp-action="delete-table">删除整个表格</button>`;
-        menu.style.display='grid';menu.style.left=`${Math.max(8,Math.min(event.clientX,window.innerWidth-190))}px`;
-        menu.style.top=`${Math.max(8,Math.min(event.clientY,window.innerHeight-(menu.offsetHeight||380)-8))}px`;
+        decorateTableMenu(menu);
+        menu.style.display='grid';
+        S.contextMenuAnchor={x:event.clientX,y:event.clientY};
+        positionContextMenu();
     }
 
     function ensureEdgeHandles() {
@@ -33823,35 +34115,6 @@
         });
     }
 
-    function updateFrozenHeader() {
-        let host=document.getElementById('att-dtp-frozen-v7180');
-        const table=S.frozenTable;
-        if(!S.settings.enabled || !table?.isConnected || !S.editor?.contains(table)) {host?.remove();S.frozenTable=null;return;}
-        const clip=editorClipRect(),rect=table.getBoundingClientRect(),row=table.rows[0],r=row?.getBoundingClientRect();
-        if(!r || r.top>=clip.top || rect.bottom<=clip.top+r.height) {if(host)host.style.display='none';return;}
-        if(!host) {host=document.createElement('div');host.id='att-dtp-frozen-v7180';host.setAttribute('data-lumatrace-ignore','');
-            host.style.cssText='position:fixed;pointer-events:none;z-index:2147482510;overflow:hidden;background:var(--bg-primary,#fff);';document.body.appendChild(host);}
-        const signature=Array.from(row.cells).map(c=>cellPlainText(c)).join('\u0000');
-        const sourceDoc=getEditorView()?.state.doc;
-        if(host.dataset.signature!==signature || host._sourceDoc!==sourceDoc || host._sourceTable!==table) {
-            const clone=table.cloneNode(false),body=document.createElement('tbody');clone.removeAttribute('id');
-            const cloneRow=row.cloneNode(true);
-            cloneRow.querySelectorAll('script,style,iframe,video,audio,input,button,.column-resize-handle,.ProseMirror-widget').forEach(n=>n.remove());
-            for(const node of [cloneRow,...cloneRow.querySelectorAll('*')]) {
-                node.classList.remove('selectedCell','ProseMirror-selectednode');
-                node.removeAttribute('id');node.removeAttribute('contenteditable');node.removeAttribute('draggable');
-                for(const attr of Array.from(node.attributes))if(/^on/i.test(attr.name))node.removeAttribute(attr.name);
-            }
-            body.appendChild(cloneRow);clone.appendChild(body);host.replaceChildren(clone);host.dataset.signature=signature;
-            host._sourceDoc=sourceDoc;host._sourceTable=table;
-        }
-        const clone=host.firstElementChild;clone.style.width=`${rect.width}px`;clone.style.tableLayout='fixed';
-        Array.from(clone.rows[0].cells).forEach((c,i)=>{c.style.width=`${row.cells[i].getBoundingClientRect().width}px`;});
-        const left=Math.max(clip.left,rect.left),right=Math.min(clip.right,rect.right);
-        host.style.display=right>left?'block':'none';host.style.left=`${left}px`;host.style.top=`${clip.top}px`;
-        host.style.width=`${Math.max(0,right-left)}px`;host.style.height=`${r.height}px`;clone.style.marginLeft=`${rect.left-left}px`;
-    }
-
     function bindProductivityEvents() {
         document.addEventListener('copy',handleAreaCopy,true);
         document.addEventListener('paste',handleAreaPaste,true);
@@ -33859,11 +34122,11 @@
         document.addEventListener('pointerdown',event=>{
             S.edgeGesture=null;
             const el=event.target instanceof Element?event.target:null;
-            const own=el?.closest(`#${PLUS.edgeId},#${PLUS.menuId},#${PLUS.dialogId},#${DTP.toolbarId},#${DTP.guardId},#att-dtp-column-hit-v7181`);
-            if(!own) {const menu=document.getElementById(PLUS.menuId);if(menu)menu.style.display='none';closeTableDialog();}
+            const own=el?.closest(`#${PLUS.edgeId},#${PLUS.menuId},#${PLUS.dialogId},#${MORE_POPUP_ID},#${DTP.toolbarId},#${DTP.guardId},#att-dtp-column-hit-v7181`);
+            if(!own) {closeTableMenus();closeTableDialog();}
         },true);
         document.addEventListener('keydown',event=>{
-            if(event.key==='Escape') {hideProductivityUi();closeTableDialog();S.edgeGesture=null;}
+            if(event.key==='Escape') {closeTableMenus();hideProductivityUi();closeTableDialog();S.edgeGesture=null;}
         },true);
         document.addEventListener('pointermove',event=>{
             const gesture=S.edgeGesture;if(!gesture || gesture.pointerId!==event.pointerId)return;
@@ -34729,7 +34992,30 @@
             #att-dtp-dialog-v7180>div {max-width:min(380px,calc(100vw - 32px));padding:20px;background:#181b20;color:#e7eaf0;border-radius:12px;font:14px/1.6 sans-serif;}
             #att-dtp-dialog-v7180 button {padding:7px 14px;margin-right:8px;border:1px solid #64748b;border-radius:6px;background:#334155;color:inherit;cursor:pointer;}
             #att-dtp-dialog-v7180 button[data-choice="confirm"] {background:#2563eb;}
-            #${DTP.toolbarId} .att-dtp-more-menu-v7170 {max-height:min(65vh,450px);overflow:auto;}
+            #${MORE_POPUP_ID} {
+                position:fixed;display:none;z-index:2147482600;width:230px;max-height:min(65vh,460px);overflow:auto;
+                overscroll-behavior:contain;scrollbar-gutter:stable;box-sizing:border-box;align-content:start;
+                gap:3px;padding:5px;border:1px solid #414853;border-radius:8px;background:#22272d;color:#e7eaf0;
+                box-shadow:0 12px 28px rgba(0,0,0,.30);font:12px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+            }
+            #${MORE_POPUP_ID}, #${MORE_POPUP_ID} * {translate:none!important;scale:none!important;transform:none!important;animation:none!important;}
+            #${MORE_POPUP_ID} button {width:100%;text-align:left;border:1px solid #40464f;border-radius:6px;background:#2a2f36;color:#e8edf4;cursor:pointer;font:inherit;}
+            #${MORE_POPUP_ID} button:hover {background:#343b44;border-color:#556170;}
+            #${MORE_POPUP_ID} button:disabled {opacity:.4;cursor:default;}
+            #${MORE_POPUP_ID} button[aria-pressed="true"] {background:#1d4ed8;color:white;}
+            #${MORE_POPUP_ID} button.danger {color:#ffaaa5;}
+            #${MORE_POPUP_ID} button.confirming {color:#fff;background:#7f1d1d;border-color:#a33;}
+            #att-dtp-context-v7180 {box-sizing:border-box;overscroll-behavior:contain;scrollbar-gutter:stable;align-content:start;}
+            #${MORE_POPUP_ID} button, #att-dtp-context-v7180 button {
+                display:flex;align-items:center;gap:9px;min-height:28px;height:auto;padding:6px 8px;box-sizing:border-box;
+            }
+            .att-dtp-item-icon-v7183 {flex:0 0 16px;width:16px;height:16px;pointer-events:none;opacity:.88;}
+            .att-dtp-item-label-v7183 {min-width:0;white-space:normal;text-align:left;line-height:1.35;overflow-wrap:anywhere;}
+            #att-dtp-context-v7180 button.danger {color:#ffaaa5;}
+            #att-dtp-context-v7180 button.confirming {color:#fff;background:#7f1d1d;}
+            #att-dtp-frozen-v7180, #att-dtp-frozen-v7180 * {
+                pointer-events:none!important;transition:none!important;animation:none!important;translate:none!important;scale:none!important;
+            }
             #${DTP.toolbarId} button:disabled {opacity:.4;cursor:default;}
 
             .document-editor__content.att-dtp-selecting-v7173,
@@ -34786,7 +35072,7 @@
                 right:0;
                 top:calc(100% + 5px);
                 display:none;
-                width:168px;
+                width:230px;
                 padding:5px;
                 border:1px solid #414853;
                 border-radius:8px;
@@ -34910,7 +35196,7 @@
 
     function structureMutationRelevant(record) {
         const target = record.target instanceof Element ? record.target : record.target?.parentElement;
-        if (target?.closest?.(`#${SCROLL_LAYER_ID},#${DTP.toolbarId},#${DTP.guardId},#${DTP.settingsHostId},#${DTP.navId},#${PLUS.edgeId},#${PLUS.menuId},#${PLUS.dialogId},#att-dtp-frozen-v7180,#att-dtp-column-hit-v7181`)) return false;
+        if (target?.closest?.(`#${SCROLL_LAYER_ID},#${MORE_POPUP_ID},#${DTP.toolbarId},#${DTP.guardId},#${DTP.settingsHostId},#${DTP.navId},#${PLUS.edgeId},#${PLUS.menuId},#${PLUS.dialogId},#att-dtp-frozen-v7180,#att-dtp-column-hit-v7181`)) return false;
         if (target?.closest?.('.grid-virtual-body')) return false;
 
         const nodes = [...(record.addedNodes || []), ...(record.removedNodes || [])];
@@ -35007,7 +35293,7 @@
             if (!S.settings.enabled) return;
             const target = event.target instanceof Element ? event.target : null;
             const insideEditor = Boolean(target && S.editor?.contains?.(target));
-            const insideOwnUi = Boolean(target?.closest?.(`#${DTP.toolbarId},#${DTP.guardId},#${PLUS.edgeId},#${PLUS.menuId},#${PLUS.dialogId},#att-dtp-column-hit-v7181`));
+            const insideOwnUi = Boolean(target?.closest?.(`#${MORE_POPUP_ID},#${DTP.toolbarId},#${DTP.guardId},#${PLUS.edgeId},#${PLUS.menuId},#${PLUS.dialogId},#att-dtp-column-hit-v7181`));
             const insideNativeDocToolbar = Boolean(target?.closest?.('.document-toolbar'));
             if (!insideEditor && !insideOwnUi && !insideNativeDocToolbar) {
                 S.contextStickyUntil = 0;
@@ -35026,6 +35312,7 @@
         document.addEventListener('scroll', event => {
             const target=event.target;
             if (target instanceof Element && target!==S.editor && !target.contains(S.editor)) return;
+            closeTableMenus();
             refreshDragAfterScroll();
             if (S.frozenTable || S.table || document.getElementById(DTP.toolbarId)?.classList.contains('is-visible') || S.assistOverlay?.style.display === 'block') schedulePosition();
         }, { capture: true, passive: true });
@@ -35112,7 +35399,7 @@
             refreshTableInventory();
             scheduleContextRefresh();
         }, 180);
-        console.log('[AutoTable Document Table Plus] V7.18.2 已加载：表格内部跳转 / 滚动内容锚定浮层 / 跨格矩形拖选 / 设置卡增量更新 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 编辑器外高亮 / 保留防误移动');
+        console.log('[AutoTable Document Table Plus] V7.18.3 已加载：菜单边界与图标 / 冻结表头样式和停靠修复 / 表格内部跳转 / 滚动内容锚定浮层 / 跨格矩形拖选 / 设置卡增量更新 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 编辑器外高亮 / 保留防误移动');
     }
 
     if (document.body) init();
