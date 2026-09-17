@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.18.1
-// @description  AutoTable 一体化效率增强工具：文档表格增强（跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.18.2
+// @description  AutoTable 一体化效率增强工具：文档表格增强（表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -23,7 +23,7 @@
 // ==/UserScript==
 
 /* ============================================================================
- * AutoTable 工具集 V7.18.1
+ * AutoTable 工具集 V7.18.2
  * 当前整合能力：
  * - 表格：智能复制、行列聚焦、字段组合、左右列置顶、置顶列列宽记忆、全部表字段集中管理、可自定义置顶边界/当前格/行列高亮视觉样式、字段条件高亮（单元格/整行，支持规则组与快捷切换，规则组/规则分层管理，整行上下强调边缘可独立配置）、快捷表头置顶、分页增强、滚轮横纵轴反转
  * - 批量：已选行批量追加进展；快捷短语与文本编辑共用统一规则中心
@@ -19812,7 +19812,7 @@
                 // V7.16.5：表格虚拟行复用不可能改变文档编辑上下文，直接早退。
                 if (target?.closest?.('.grid-virtual-body')) return false;
                 if (!(target instanceof Element)) return true;
-                return !target.closest('#att-toolbox-root, #att-document-outline, #att-doc-table-mini-toolbar-v7170, #att-doc-table-nested-guard-v7170, #att-doc-table-toast-v7170, #att-doc-table-assist-overlay-v7172,#att-dtp-edges-v7180,#att-dtp-context-v7180,#att-dtp-dialog-v7180,#att-dtp-frozen-v7180,#att-dtp-column-hit-v7181');
+                return !target.closest('#att-toolbox-root, #att-document-outline, #att-doc-table-mini-toolbar-v7170, #att-doc-table-nested-guard-v7170, #att-doc-table-toast-v7170, #att-doc-table-assist-overlay-v7172,#att-dtp-edges-v7180,#att-dtp-context-v7180,#att-dtp-dialog-v7180,#att-dtp-frozen-v7180,#att-dtp-column-hit-v7181,#att-dtp-scroll-layer-v7182');
             });
 
             if (hasExternalMutation) scheduleContextSync(80);
@@ -31973,7 +31973,7 @@
 })();
 
 /* ============================================================================
- * AutoTable Document Table Plus V7.18.1 · 文档表格完整交互增强
+ * AutoTable Document Table Plus V7.18.2 · 文档表格完整交互增强
  * --------------------------------------------------------------------------
  * 目标：不重做 ProseMirror 表格引擎，只给原生表格能力增加一层稳定的交互外壳。
  *
@@ -31990,7 +31990,7 @@
     'use strict';
 
     const DTP = {
-        version: 'V7.18.1',
+        version: 'V7.18.2',
         styleId: 'att-doc-table-plus-style-v7170',
         toolbarId: 'att-doc-table-mini-toolbar-v7170',
         guardId: 'att-doc-table-nested-guard-v7170',
@@ -32218,6 +32218,67 @@
     }
 
 
+    // Scroll with the editor in the browser compositor, outside ProseMirror's document.
+    const SCROLL_LAYER_ID = 'att-dtp-scroll-layer-v7182';
+
+    function releaseScrollLayer() {
+        const root = S.scrollLayer;
+        if (root) {
+            for (const child of Array.from(root.children)) document.body.appendChild(child);
+            root.remove();
+        }
+        const parent = S.scrollLayerParent;
+        if (parent && S.scrollLayerPosition && parent.style.position === 'relative') {
+            const saved = S.scrollLayerPosition;
+            if (saved.value) parent.style.setProperty('position', saved.value, saved.priority);
+            else parent.style.removeProperty('position');
+        }
+        S.scrollLayer = S.scrollLayerParent = S.scrollLayerPosition = null;
+    }
+
+    function ensureScrollLayer() {
+        const parent = S.editor?.parentElement;
+        if (!parent || parent === document.body || parent === document.documentElement) return null;
+        if (S.scrollLayer?.isConnected && S.scrollLayerParent === parent) return S.scrollLayer;
+        releaseScrollLayer();
+        if (getComputedStyle(parent).position === 'static') {
+            S.scrollLayerPosition = {value:parent.style.getPropertyValue('position'), priority:parent.style.getPropertyPriority('position')};
+            parent.style.setProperty('position', 'relative');
+        }
+        const root = document.createElement('div');
+        root.id = SCROLL_LAYER_ID;
+        root.setAttribute('contenteditable', 'false');
+        root.setAttribute('data-lumatrace-ignore', '');
+        root.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;overflow:visible;pointer-events:none;z-index:2;';
+        parent.appendChild(root);
+        S.scrollLayer = root;
+        S.scrollLayerParent = parent;
+        return root;
+    }
+
+    function attachScrollingUi(el) {
+        const root = ensureScrollLayer();
+        const parent = root || document.body;
+        if (el.parentElement !== parent) parent.appendChild(el);
+        el.style.position = root ? 'absolute' : 'fixed';
+        return el;
+    }
+
+    function scrollingUiFrame() {
+        const root = ensureScrollLayer();
+        if (!root) return {left:0, top:0, scaleX:1, scaleY:1};
+        const r = root.getBoundingClientRect(), parent = S.scrollLayerParent,
+            p = parent.getBoundingClientRect();
+        return {left:r.left, top:r.top,
+            scaleX:parent.offsetWidth ? p.width / parent.offsetWidth || 1 : 1,
+            scaleY:parent.offsetHeight ? p.height / parent.offsetHeight || 1 : 1};
+    }
+
+    function setScrollingUiPosition(el, left, top, frame) {
+        el.style.left = `${(left-frame.left)/frame.scaleX}px`;
+        el.style.top = `${(top-frame.top)/frame.scaleY}px`;
+    }
+
     function clearAssistClasses() {
         // 高亮独立绘制在编辑器之外，不改 td/th 的 class，避免触发文档 Observer 和保存。
         if (S.assistOverlay) S.assistOverlay.style.display = 'none';
@@ -32229,7 +32290,7 @@
         const host = document.createElement('div');
         host.id = 'att-doc-table-assist-overlay-v7172';
         host.setAttribute('data-lumatrace-ignore', '');
-        host.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2147482500;display:none;';
+        host.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;z-index:0;display:none;';
         const styles = [
             'background:rgba(59,130,246,.035);',
             'background:rgba(59,130,246,.025);',
@@ -32240,7 +32301,7 @@
             box.style.cssText = 'position:absolute;box-sizing:border-box;pointer-events:none;' + css;
             host.appendChild(box);
         }
-        document.body.appendChild(host);
+        attachScrollingUi(host);
         S.assistOverlay = host;
         return host;
     }
@@ -32250,13 +32311,22 @@
         for (let node = S.editor?.parentElement; node && node !== document.body; node = node.parentElement) {
             const style = getComputedStyle(node);
             const r = node.getBoundingClientRect();
-            if (/(auto|scroll|hidden|clip)/.test(style.overflowX)) {
-                clip.left = Math.max(clip.left, r.left + node.clientLeft);
-                clip.right = Math.min(clip.right, r.left + node.clientLeft + node.clientWidth);
+            const sx=node.offsetWidth?r.width/node.offsetWidth || 1:1,
+                sy=node.offsetHeight?r.height/node.offsetHeight || 1:1;
+            if (/(auto|scroll|overlay|hidden|clip)/.test(style.overflowX)) {
+                clip.left = Math.max(clip.left, r.left + node.clientLeft*sx);
+                clip.right = Math.min(clip.right, r.left + (node.clientLeft + node.clientWidth)*sx);
             }
-            if (/(auto|scroll|hidden|clip)/.test(style.overflowY)) {
-                clip.top = Math.max(clip.top, r.top + node.clientTop);
-                clip.bottom = Math.min(clip.bottom, r.top + node.clientTop + node.clientHeight);
+            if (/(auto|scroll|overlay|hidden|clip)/.test(style.overflowY)) {
+                clip.top = Math.max(clip.top, r.top + node.clientTop*sy);
+                clip.bottom = Math.min(clip.bottom, r.top + (node.clientTop + node.clientHeight)*sy);
+            }
+        }
+        const toolbar = S.editor?.closest('.document-view-page,.document-view-shell')?.querySelector('.document-toolbar');
+        if (toolbar && isVisible(toolbar)) {
+            const style = getComputedStyle(toolbar), r = toolbar.getBoundingClientRect();
+            if (['sticky','fixed'].includes(style.position) && r.top <= clip.top + 2 && r.bottom > clip.top) {
+                clip.top = Math.min(clip.bottom, r.bottom);
             }
         }
         return clip;
@@ -32272,17 +32342,18 @@
         const row = S.cell.parentElement.getBoundingClientRect();
         const clip = editorClipRect();
         const rects = [row, { left:cell.left, right:cell.right, top:table.top, bottom:table.bottom }, cell];
-        const host = ensureAssistOverlay();
+        const host = attachScrollingUi(ensureAssistOverlay());
+        const frame = scrollingUiFrame();
         const boxes = host.children;
         rects.forEach((r, index) => {
             const left = Math.max(r.left, clip.left), top = Math.max(r.top, clip.top);
             const right = Math.min(r.right, clip.right), bottom = Math.min(r.bottom, clip.bottom);
             const box = boxes[index];
             box.style.display = right > left && bottom > top ? 'block' : 'none';
-            box.style.left = `${left}px`;
-            box.style.top = `${top}px`;
-            box.style.width = `${Math.max(0,right-left)}px`;
-            box.style.height = `${Math.max(0,bottom-top)}px`;
+            // Keep the complete geometry; native overflow clips it during scrolling.
+            setScrollingUiPosition(box, r.left, r.top, frame);
+            box.style.width = `${Math.max(0,r.right-r.left)/frame.scaleX}px`;
+            box.style.height = `${Math.max(0,r.bottom-r.top)/frame.scaleY}px`;
         });
         host.style.display = 'block';
     }
@@ -32616,6 +32687,9 @@
         if (next === S.editor) return;
 
         try { S.editorAbort?.abort(); } catch (_) {}
+        hideToolbar();
+        clearAssistClasses();
+        releaseScrollLayer();
         invalidatePendingSelection();
         S.editor?.classList.remove('att-dtp-selecting-v7173');
         S.pointerGesture = null;
@@ -32889,7 +32963,7 @@
 
     function ensureToolbar() {
         let bar = document.getElementById(DTP.toolbarId);
-        if (bar) return bar;
+        if (bar) return attachScrollingUi(bar);
 
         bar = document.createElement('div');
         bar.id = DTP.toolbarId;
@@ -32974,7 +33048,7 @@
             }
         });
 
-        document.body.appendChild(bar);
+        attachScrollingUi(bar);
         return bar;
     }
 
@@ -33046,38 +33120,34 @@
         if (S.pointerGesture) return;
         const bar = document.getElementById(DTP.toolbarId);
         if (!bar?.classList.contains('is-visible')) return;
-        const cellAnchor = getToolbarAnchorRect();
-        const tableRect = S.table?.getBoundingClientRect?.() || null;
-        const tableUsable = tableRect && tableRect.width > 0 && tableRect.height > 0;
-        const anchor = tableUsable ? tableRect : cellAnchor;
-        if (!anchor) return;
-        const clip = editorClipRect();
-        if (anchor.bottom <= clip.top || anchor.top >= clip.bottom || anchor.right <= clip.left || anchor.left >= clip.right) {
-            bar.style.visibility = 'hidden';
-            return;
+        attachScrollingUi(bar);
+        const frame = scrollingUiFrame(), anchor = getToolbarAnchorRect(), clip = editorClipRect();
+        if (!anchor || anchor.bottom <= clip.top || anchor.top >= clip.bottom ||
+            anchor.right <= clip.left || anchor.left >= clip.right) {
+            bar.style.visibility = 'hidden'; return;
+        }
+        const margin = 7;
+        bar.style.maxWidth = `${Math.max(0,clip.right-clip.left-2*margin)/frame.scaleX}px`;
+        const w = (bar.offsetWidth || 300)*frame.scaleX, h = (bar.offsetHeight || 38)*frame.scaleY;
+        let left = anchor.right-w, top = anchor.top-h-margin;
+        if (top < clip.top+margin) {
+            const cell = S.cell?.getBoundingClientRect();
+            // When both the table header and active cell leave view, hide instead of
+            // pinning an unrelated toolbar to the page chrome.
+            if (!cell || cell.top < clip.top || cell.bottom > clip.bottom ||
+                cell.right <= clip.left || cell.left >= clip.right) {
+                bar.style.visibility = 'hidden'; return;
+            }
+            top = cell.bottom+margin;
+            left = Math.min(left,cell.right-w);
+            if (top+h > clip.bottom-margin) top = cell.top-h-margin;
+        }
+        if (top < clip.top+margin || top+h > clip.bottom-margin || w > clip.right-clip.left-2*margin) {
+            bar.style.visibility = 'hidden'; return;
         }
         bar.style.visibility = '';
-
-        const w = bar.offsetWidth || 300;
-        const h = bar.offsetHeight || 38;
-        const margin = 8;
-
-        // 工具栏固定跟随“当前表格”的右上边缘，而不是跟着每个单元格跳来跳去。
-        // 这样切格、键盘输入、多格选择时位置稳定，也不会覆盖当前正在编辑的文字。
-        let left = anchor.right - w;
-        let top = anchor.top - h - 7;
-
-        // 表格离视口顶部太近时，退到当前单元格下方；仍然避免压住正在输入的格子。
-        if (top < margin) {
-            const cellRect = S.cell?.getBoundingClientRect?.() || cellAnchor;
-            top = (cellRect?.bottom || anchor.bottom) + 7;
-            left = Math.min(anchor.right - w, cellRect?.right ? cellRect.right - w : left);
-        }
-
-        left = Math.max(margin, Math.min(left, window.innerWidth - w - margin));
-        top = Math.max(margin, Math.min(top, window.innerHeight - h - margin));
-        bar.style.left = `${Math.round(left)}px`;
-        bar.style.top = `${Math.round(top)}px`;
+        left = Math.max(clip.left+margin, Math.min(left,clip.right-w-margin));
+        setScrollingUiPosition(bar,left,top,frame);
     }
 
     function findNativeButton(aliases, iconClass = '') {
@@ -33689,7 +33759,7 @@
     }
 
     function ensureEdgeHandles() {
-        let host=document.getElementById(PLUS.edgeId);if(host)return host;
+        let host=document.getElementById(PLUS.edgeId);if(host)return attachScrollingUi(host);
         host=document.createElement('div');host.id=PLUS.edgeId;host.setAttribute('data-lumatrace-ignore','');
         host.setAttribute('contenteditable','false');isolateToolbarEvents(host);
         host.addEventListener('click',event=>{
@@ -33706,14 +33776,14 @@
             const info=modelTableInfo();if(!info || !spanModelAvailable('deleteTable'))return;
             S.edgeGesture={pointerId:event.pointerId,part:button.dataset.part,index:Number(button.dataset.index),
                 x:event.clientX,y:event.clientY,moved:false,info,target:null};
-        });document.body.appendChild(host);return host;
+        });attachScrollingUi(host);return host;
     }
     function positionEdgeHandles() {
         const host=document.getElementById(PLUS.edgeId);
         if(!S.settings.enabled || !S.settings.edgeHandles || S.pointerGesture || S.dragging || !S.cell?.isConnected || !S.table?.isConnected) {
             if(host)host.style.display='none';return;
         }
-        const el=ensureEdgeHandles(),map=getTableGrid(S.table),clip=editorClipRect(),rect=S.table.getBoundingClientRect();
+        const el=ensureEdgeHandles(),map=getTableGrid(S.table),clip=editorClipRect(),rect=S.table.getBoundingClientRect(),frame=scrollingUiFrame();
         if(map.height>300 || map.width>100) {el.style.display='none';return;}
         const signature=`${map.height}:${map.width}`;
         if(S.edgeSignature!==signature || S.edgeTable!==S.table) {
@@ -33728,13 +33798,26 @@
             const part=button.dataset.part,index=button.dataset.command?(part==='row'?map.height-1:map.width-1):Number(button.dataset.index);
             button.dataset.index=String(index);
             const cell=part==='row'?map.grid[index]?.[0]:map.grid[0]?.[index];if(!cell)return;
-            const r=cell.getBoundingClientRect();
-            const left=part==='row'?rect.left-19:r.left+(r.width-18)/2,
-                top=part==='row'?r.top+(r.height-18)/2:rect.top-19;
-            const x=button.dataset.command?(part==='row'?rect.left-19:rect.right+1):left,
-                y=button.dataset.command?(part==='row'?rect.bottom+1:rect.top-19):top;
-            button.style.left=`${x}px`;button.style.top=`${y}px`;
-            button.style.display=x>=Math.max(0,clip.left-19) && x+18<=clip.right+19 && y>=Math.max(0,clip.top-19) && y+18<=clip.bottom+19 &&
+            // Rowspans share cells, but each physical row needs its own handle.
+            let r=part==='row'?S.table.rows[index].getBoundingClientRect():cell.getBoundingClientRect();
+            let center=r.left+r.width/2;
+            if(part==='column') {
+                const single=map.grid.map(row=>row[index]).find(c=>c && map.cells.get(c)?.width===1);
+                if(single) {r=single.getBoundingClientRect();center=r.left+r.width/2;}
+                else {
+                    const span=map.cells.get(cell),offset=index-span.col;
+                    const known=String(cell.getAttribute('colwidth') || '').split(',').map(Number);
+                    const total=known.reduce((sum,w)=>sum+w,0);
+                    const weighted=known.length===span.width && known.every(w=>w>0);
+                    center=r.left+r.width*(weighted?(known.slice(0,offset).reduce((sum,w)=>sum+w,0)+known[offset]/2)/total:(offset+.5)/span.width);
+                }
+            }
+            const left=part==='row'?rect.left-19*frame.scaleX:center-9*frame.scaleX,
+                top=part==='row'?r.top+(r.height-18*frame.scaleY)/2:rect.top-19*frame.scaleY;
+            const x=button.dataset.command?(part==='row'?rect.left-19*frame.scaleX:rect.right+frame.scaleX):left,
+                y=button.dataset.command?(part==='row'?rect.bottom+frame.scaleY:rect.top-19*frame.scaleY):top;
+            setScrollingUiPosition(button,x,y,frame);
+            button.style.display=x>=clip.left && x+18*frame.scaleX<=clip.right && y>=clip.top && y+18*frame.scaleY<=clip.bottom &&
                 (part==='row'?r.bottom>clip.top && r.top<clip.bottom:rect.top>=clip.top)?'block':'none';
             if(button.dataset.command)button.disabled=!nativeCommandAvailable(button.dataset.command);
         });
@@ -34510,9 +34593,13 @@
             nav.id = DTP.navId;
             nav.setAttribute('data-lumatrace-ignore', '');
             nav.innerHTML = `<div class="att-dtp-nav-head-v7170"><b>表格</b><span>0</span></div><div class="att-dtp-nav-list-v7170"></div>`;
+            nav.addEventListener('pointerdown', event => {
+                if (event.button === 0 && event.target?.closest?.('button[data-dtp-table-index]')) event.preventDefault();
+            });
             nav.addEventListener('click', event => {
                 const button = event.target instanceof Element ? event.target.closest('button[data-dtp-table-index]') : null;
                 if (!button) return;
+                event.preventDefault();
                 const index = Number(button.dataset.dtpTableIndex);
                 const table = getTopLevelTables()[index];
                 if (table) locateElement(table);
@@ -34570,34 +34657,41 @@
     }
 
     function getScrollHost(el) {
-        let node = el?.parentElement || null;
-        while (node && node !== document.body) {
-            const style = getComputedStyle(node);
-            if (/(auto|scroll)/.test(style.overflowY) && node.scrollHeight > node.clientHeight + 2) return node;
-            node = node.parentElement;
+        for (let node=el?.parentElement; node && node!==document.body && node!==document.documentElement; node=node.parentElement) {
+            if (node===document.scrollingElement || node.scrollHeight<=node.clientHeight+2) continue;
+            const style=getComputedStyle(node), overflow=String(style.overflowY || style.overflow || '');
+            if (/(auto|scroll|overlay)/.test(overflow)) return node;
+            if (overflow==='hidden' && node.matches('.document-editor-shell,.document-editor,.document-view-shell,.document-view-page,.main-panel--grid,.main-panel')) return node;
         }
         return null;
     }
 
     function locateElement(el) {
         if (!(el instanceof Element) || !el.isConnected) return;
-        const host = getScrollHost(el);
-        try {
-            if (host) {
-                const er = el.getBoundingClientRect();
-                const hr = host.getBoundingClientRect();
-                host.scrollTo({ top: host.scrollTop + er.top - hr.top - 86, behavior: 'smooth' });
-            } else {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const host=getScrollHost(el), clip=editorClipRect(), er=el.getBoundingClientRect();
+        if (host) {
+            const hr=host.getBoundingClientRect(), scale=host.offsetHeight?hr.height/host.offsetHeight || 1:1;
+            const top=Math.max(clip.top,hr.top+host.clientTop*scale),
+                bottom=Math.min(clip.bottom,hr.top+host.clientTop+host.clientHeight*scale);
+            const available=bottom-top, tall=er.height>available;
+            // A fully visible table, or the visible start of a long table, needs no scrolling.
+            const visible=er.top>=top-1 && (tall?er.top<bottom-1:er.bottom<=bottom+1);
+            if (available>0 && !visible) {
+                const delta=tall || er.top<top?er.top-top-12:er.bottom-bottom+12;
+                const next=Math.max(0,Math.min(host.scrollHeight-host.clientHeight,host.scrollTop+delta/scale));
+                if (Math.abs(next-host.scrollTop)>1) {
+                    try {host.scrollTo({top:next,behavior:'smooth'});}
+                    catch (_) {host.scrollTop=next;}
+                }
             }
-        } catch (_) {
-            try { el.scrollIntoView({ block: 'center' }); } catch (_) {}
         }
-        const table = el instanceof HTMLTableElement ? el : el.closest('table');
+        // Never scroll html/body or invoke scrollIntoView when the document has no scroll host.
+        const table=el instanceof HTMLTableElement?el:el.closest('table');
         if (table) {
             table.classList.add('att-dtp-locate-flash-v7170');
-            window.setTimeout(() => table.classList.remove('att-dtp-locate-flash-v7170'), 1300);
+            window.setTimeout(()=>table.classList.remove('att-dtp-locate-flash-v7170'),1300);
         }
+        schedulePosition();
     }
 
     function escapeHtml(value) {
@@ -34624,8 +34718,8 @@
         const style = document.createElement('style');
         style.id = DTP.styleId;
         style.textContent = `
-            #att-dtp-edges-v7180 {position:fixed;inset:0;pointer-events:none;z-index:2147482540;display:none;}
-            #att-dtp-edges-v7180 button {position:fixed;width:18px;height:18px;padding:0;border:1px solid #94a3b8;border-radius:4px;background:#f1f5f9;color:#334155;font:10px sans-serif;pointer-events:auto;cursor:pointer;}
+            #att-dtp-edges-v7180 {position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;z-index:2147482540;display:none;}
+            #att-dtp-edges-v7180 button {position:absolute;box-sizing:border-box;width:18px;height:18px;padding:0;border:1px solid #94a3b8;border-radius:4px;background:#f1f5f9;color:#334155;font:10px sans-serif;pointer-events:auto;cursor:pointer;}
             #att-dtp-edges-v7180 button.is-target {background:#2563eb;color:#fff;}
             #att-dtp-edges-v7180 button:disabled {opacity:.4;cursor:default;}
             #att-dtp-context-v7180 {position:fixed;display:none;z-index:2147482600;width:180px;max-height:calc(100vh - 16px);overflow:auto;padding:6px;gap:3px;background:#181b20;border:1px solid #64748b;border-radius:9px;color:#e7eaf0;font:12px sans-serif;box-shadow:0 10px 28px #0005;}
@@ -34640,8 +34734,14 @@
 
             .document-editor__content.att-dtp-selecting-v7173,
             .document-editor__content.att-dtp-selecting-v7173 * { user-select:none!important; }
+            #${SCROLL_LAYER_ID} *, #${SCROLL_LAYER_ID} *:hover, #${SCROLL_LAYER_ID} *:active {
+                translate:none!important;scale:none!important;
+                transition-property:background-color,border-color,color,box-shadow,opacity!important;
+            }
             #${DTP.toolbarId} {
-                position: fixed;
+                position: absolute;
+                width: max-content;
+                pointer-events: auto;
                 z-index: 2147482550;
                 display: none;
                 align-items: center;
@@ -34810,7 +34910,7 @@
 
     function structureMutationRelevant(record) {
         const target = record.target instanceof Element ? record.target : record.target?.parentElement;
-        if (target?.closest?.(`#${DTP.toolbarId},#${DTP.guardId},#${DTP.settingsHostId},#${DTP.navId},#${PLUS.edgeId},#${PLUS.menuId},#${PLUS.dialogId},#att-dtp-frozen-v7180,#att-dtp-column-hit-v7181`)) return false;
+        if (target?.closest?.(`#${SCROLL_LAYER_ID},#${DTP.toolbarId},#${DTP.guardId},#${DTP.settingsHostId},#${DTP.navId},#${PLUS.edgeId},#${PLUS.menuId},#${PLUS.dialogId},#att-dtp-frozen-v7180,#att-dtp-column-hit-v7181`)) return false;
         if (target?.closest?.('.grid-virtual-body')) return false;
 
         const nodes = [...(record.addedNodes || []), ...(record.removedNodes || [])];
@@ -34923,7 +35023,9 @@
             maybeBlockInsertTable(event);
         }, true);
 
-        document.addEventListener('scroll', () => {
+        document.addEventListener('scroll', event => {
+            const target=event.target;
+            if (target instanceof Element && target!==S.editor && !target.contains(S.editor)) return;
             refreshDragAfterScroll();
             if (S.frozenTable || S.table || document.getElementById(DTP.toolbarId)?.classList.contains('is-visible') || S.assistOverlay?.style.display === 'block') schedulePosition();
         }, { capture: true, passive: true });
@@ -34979,6 +35081,8 @@
                     dragging: S.dragging,
                     editorViewFound: Boolean(getEditorView()),
                     selectionError: S.selectionError || null,
+                    scrollingUiAttached: Boolean(S.scrollLayer?.isConnected),
+                    documentScrollHostFound: Boolean(getScrollHost(S.table || S.editor)),
                     metrics: {...S.metrics}
                 };
             },
@@ -35008,7 +35112,7 @@
             refreshTableInventory();
             scheduleContextRefresh();
         }, 180);
-        console.log('[AutoTable Document Table Plus] V7.18.1 已加载：跨格矩形拖选 / 设置卡增量更新 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 编辑器外高亮 / 保留防误移动');
+        console.log('[AutoTable Document Table Plus] V7.18.2 已加载：表格内部跳转 / 滚动内容锚定浮层 / 跨格矩形拖选 / 设置卡增量更新 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 编辑器外高亮 / 保留防误移动');
     }
 
     if (document.body) init();
