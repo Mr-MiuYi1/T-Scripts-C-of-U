@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.20.4
+// @version      7.20.5
 // @description  AutoTable 一体化效率增强工具：表格内容居中显示与独立开关、菜单使用说明书图标与居中对齐修复、表格联系信息显示优化与独立开关（手机号分组显示，原始值保持不变）、文档表格增强（大纲可见高度与底部滚动修复 / 查找范围同行布局 / 书签独立开关 / 导航与书签分栏切换及侧栏收起 / 查找替换布局修复 / 大纲搜索筛选 / 批量展开折叠 / 文档阅读与折叠记忆 / 自定义书签 / 章节复制与导出 / 范围查找与替换预览 / 两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
@@ -215,7 +215,7 @@
     const PERF = globalThis.__attPerfStats || null;
 
     const APP = {
-        version: 'V7.20.4',
+        version: 'V7.20.5',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -34477,6 +34477,11 @@
             menu.style.display='none';return;
         }
         decorateTableMenu(menu);
+        const appearance=appearanceSupport();
+        menu.querySelectorAll('[data-dtp-action^="align-"]').forEach(button=>{
+            button.disabled=!appearance.align;
+            button.title=appearance.align?'应用到当前单元格或多格选区，可撤销':'当前编辑器未开放可保存的文本对齐属性';
+        });
         menu.style.display='grid';
         menu.style.width=`${Math.max(0,Math.min(230,clip.right-clip.left-14))}px`;
         const r=bar.getBoundingClientRect(),natural=(menu.scrollHeight || 450)+2,
@@ -34697,7 +34702,7 @@
                 <button type="button" data-dtp-action="copy-area">复制区域（TSV / HTML）</button>
                 <button type="button" data-dtp-action="clear-area">清空选区内容</button>
                 <button type="button" data-dtp-action="align-left">选区左对齐</button>
-                <button type="button" data-dtp-action="align-center">选区居中</button>
+                <button type="button" data-dtp-action="align-center">单元格内容居中</button>
                 <button type="button" data-dtp-action="align-right">选区右对齐</button>
                 <button type="button" data-dtp-action="background-yellow">选区浅黄背景</button>
                 <button type="button" data-dtp-action="background-clear">清除选区背景</button>
@@ -34814,7 +34819,10 @@
         const appearance=appearanceSupport();
         toolbarMenuControls(bar,'[data-dtp-action]').forEach(button=>{
             const action=button.dataset.dtpAction;
-            if(action?.startsWith('align-'))button.style.display=appearance.align?'':'none';
+            if(action?.startsWith('align-')) {
+                button.style.display='';button.disabled=!appearance.align;
+                button.title=appearance.align?'应用到当前单元格或多格选区，可撤销':'当前编辑器未开放可保存的文本对齐属性';
+            }
             if(action?.startsWith('background-'))button.style.display=appearance.background?'':'none';
         });
         toolbarMenuControls(bar,'[data-dtp-cmd]').forEach(button => {
@@ -35310,7 +35318,7 @@
     function appearanceSupport() {
         try {
             const info=modelTableInfo();if(!info)return {align:false,background:false};
-            return {align:Boolean(info.view.state.schema.nodes.paragraph?.spec.attrs?.textAlign),
+            return {align:Object.values(info.view.state.schema.nodes).some(type=>(type.isTextblock || type===info.view.state.schema.nodes.paragraph) && Object.prototype.hasOwnProperty.call(type.spec.attrs || {},'textAlign')),
                 background:info.entries.some(e=>['backgroundColor','background','bgcolor'].some(key=>key in e.node.attrs))};
         } catch (_) {return {align:false,background:false};}
     }
@@ -35475,6 +35483,9 @@
             <button data-dtp-action="copy-area">复制区域</button><button data-dtp-action="clear-area">清空内容</button>
             <button data-dtp-action="select-row">选择整行</button><button data-dtp-action="select-column">选择整列</button>
             <button data-dtp-action="select-table">选择整个表格</button>
+            <button data-dtp-action="align-left">单元格左对齐</button>
+            <button data-dtp-action="align-center">单元格内容居中</button>
+            <button data-dtp-action="align-right">单元格右对齐</button>
             ${[['insertRowAbove','上方插行'],['insertRowBelow','下方插行'],['insertColumnBefore','左侧插列'],
                 ['insertColumnAfter','右侧插列'],['mergeCells','合并单元格'],['splitCell','拆分单元格']].filter(([cmd])=>nativeCommandAvailable(cmd))
                 .map(([cmd,label])=>`<button data-dtp-cmd="${cmd}">${label}</button>`).join('')}
