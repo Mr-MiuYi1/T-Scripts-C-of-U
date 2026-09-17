@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.19.0
-// @description  AutoTable 一体化效率增强工具：文档表格增强（大纲搜索筛选 / 批量展开折叠 / 文档阅读与折叠记忆 / 自定义书签 / 章节复制与导出 / 范围查找与替换预览 / 两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.19.1
+// @description  AutoTable 一体化效率增强工具：文档表格增强（书签独立开关 / 导航与书签分栏切换及侧栏收起 / 查找替换布局修复 / 大纲搜索筛选 / 批量展开折叠 / 文档阅读与折叠记忆 / 自定义书签 / 章节复制与导出 / 范围查找与替换预览 / 两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -18856,6 +18856,7 @@
         outlineFollowEnabled: readOutlineFollowEnabled(),
         rememberReading: workspaceReadMemorySetting('reading'),
         rememberFold: workspaceReadMemorySetting('fold'),
+        bookmarksEnabled: Boolean(workspaceRead('att_doc_tools_bookmarks_enabled_v7191',true)),
         editor: null,
         headings: [],
         navigationMerged: readMergedNavigationEnabled(),
@@ -18885,8 +18886,84 @@
         tables: [], tableMatches: new Set(), filterCollapsed: new WeakSet(), appliedFolds: new WeakSet(),
         contextTarget: null, selectionRanges: [], selectionEditor: null, scope: 'document', scopeRanges: [],
         scopeToken: 0, saveTimer: 0, restoreTimer: 0, restoreAttempts: 0, readingPending: null,
-        userNavigated: false, restoringUntil: 0, dialog: null, menu: null, view: null, initialized: false
+        userNavigated: false, restoringUntil: 0, dialog: null, menu: null, view: null, initialized: false,
+        pane: workspaceRead('att_doc_tools_nav_pane_v7191','outline') === 'bookmarks' ? 'bookmarks' : 'outline',
+        panelCollapsed: Boolean(workspaceRead('att_doc_tools_nav_collapsed_v7191',false))
     };
+
+    function workspaceSetPane(pane) {
+        W.pane = pane === 'bookmarks' && docState.bookmarksEnabled !== false ? 'bookmarks' : 'outline';
+        try {GM_setValue('att_doc_tools_nav_pane_v7191', W.pane);} catch (_) {}
+        workspaceUpdatePane(document.getElementById(DOC_TOOLS.outlineId));
+    }
+    function workspaceUpdatePane(panel) {
+        if (!panel) return;
+        if (docState.bookmarksEnabled === false) W.pane = 'outline';
+        panel.dataset.attWsPane = W.pane;
+        panel.dataset.attWsCollapsed = W.panelCollapsed ? '1' : '0';
+        const bookmarks = panel.querySelector('#att-doc-workspace-bookmarks-v7190');
+        const list = panel.querySelector(`#${DOC_TOOLS.outlineListId}`);
+        const controls = panel.querySelector('#att-doc-workspace-controls-v7190');
+        if (list) list.hidden = W.pane !== 'outline' || W.panelCollapsed;
+        if (controls) controls.hidden = W.pane !== 'outline' || W.panelCollapsed;
+        if (bookmarks) bookmarks.hidden = W.pane !== 'bookmarks' || W.panelCollapsed;
+        const tableList = panel.querySelector('#att-doc-table-nav-v7170');
+        if (tableList) tableList.style.display = W.pane !== 'outline' || W.panelCollapsed || W.mode === 'headings' ? 'none' : '';
+        panel.querySelectorAll('button[data-att-ws-pane]').forEach(button => {
+            const active = button.dataset.attWsPane === W.pane;
+            button.setAttribute('aria-selected',String(active));
+            button.classList.toggle('is-active',active); button.tabIndex = active ? 0 : -1;
+            if (button.dataset.attWsPane === 'bookmarks') {
+                button.hidden = docState.bookmarksEnabled === false;
+                button.textContent = `☆ 书签 ${W.record?.bookmarks.length || 0}`;
+            }
+        });
+        const collapse = panel.querySelector('[data-att-ws-panel-collapse]');
+        if (collapse) {
+            collapse.textContent = W.panelCollapsed ? '☰' : '‹';
+            collapse.title = W.panelCollapsed ? '展开文档导航' : '收起文档导航';
+            collapse.setAttribute('aria-label',collapse.title);
+            collapse.setAttribute('aria-expanded',String(!W.panelCollapsed));
+        }
+    }
+    function workspaceEnsurePaneControls(panel) {
+        const head = panel.querySelector('.att-doc-outline-head');
+        if (head && !head.querySelector('[data-att-ws-panel-collapse]')) {
+            const button = document.createElement('button'); button.type = 'button';
+            button.setAttribute('data-att-ws-panel-collapse','');
+            button.addEventListener('click',event => {
+                event.preventDefault(); W.panelCollapsed = !W.panelCollapsed;
+                try {GM_setValue('att_doc_tools_nav_collapsed_v7191',W.panelCollapsed);} catch (_) {}
+                workspaceUpdatePane(panel);
+                window.dispatchEvent(new Event('resize'));
+            });
+            head.appendChild(button);
+        }
+        let tabs = panel.querySelector('#att-doc-workspace-tabs-v7191');
+        if (!tabs) {
+            tabs = document.createElement('div'); tabs.id = 'att-doc-workspace-tabs-v7191';
+            tabs.setAttribute('role','tablist'); tabs.setAttribute('aria-label','文档导航面板');
+            tabs.innerHTML = `<button type="button" role="tab" id="att-doc-ws-outline-tab-v7191" data-att-ws-pane="outline" aria-controls="${DOC_TOOLS.outlineListId}">☷ 大纲</button><button type="button" role="tab" id="att-doc-ws-bookmark-tab-v7191" data-att-ws-pane="bookmarks" aria-controls="att-doc-workspace-bookmarks-v7190">☆ 书签</button>`;
+            tabs.addEventListener('click',event => {
+                const button = event.target?.closest?.('button[data-att-ws-pane]');
+                if (button) {event.preventDefault(); workspaceSetPane(button.dataset.attWsPane);}
+            });
+            tabs.addEventListener('keydown',event => {
+                if (!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+                const buttons = Array.from(tabs.querySelectorAll('button')).filter(button => !button.hidden);
+                if (!buttons.length) return;
+                event.preventDefault();
+                const index = buttons.findIndex(button => button === document.activeElement);
+                const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length-1 : (Math.max(0,index)+(event.key === 'ArrowRight' ? 1 : -1)+buttons.length)%buttons.length;
+                workspaceSetPane(buttons[next].dataset.attWsPane);
+                buttons[next].focus({preventScroll:true});
+            });
+            panel.insertBefore(tabs,panel.querySelector(`#${DOC_TOOLS.outlineListId}`));
+        }
+        const list = panel.querySelector(`#${DOC_TOOLS.outlineListId}`);
+        if (list) {list.setAttribute('role','tabpanel');list.setAttribute('aria-labelledby','att-doc-ws-outline-tab-v7191');}
+        workspaceUpdatePane(panel);
+    }
 
     function workspaceRead(key, fallback) {
         try { return GM_getValue(key, fallback); } catch (_) { return fallback; }
@@ -18998,12 +19075,13 @@
     function workspaceEnsureControls(panel) {
         const list = panel.querySelector(`#${DOC_TOOLS.outlineListId}`);
         if (!list) return;
+        workspaceEnsurePaneControls(panel);
         let controls = panel.querySelector('#att-doc-workspace-controls-v7190');
         if (!controls) {
             controls = document.createElement('div'); controls.id = 'att-doc-workspace-controls-v7190';
             controls.innerHTML = `<div class="att-doc-ws-search-v7190"><input type="search" data-att-ws-query placeholder="搜索标题或表格名称…" aria-label="搜索标题或表格名称"><button type="button" data-att-ws-action="clear-filter" title="清除导航搜索">×</button></div>
-                <select data-att-ws-mode aria-label="导航显示范围"><option value="all">标题与表格</option><option value="headings">只看标题</option><option value="tables">只看表格（保留标题路径）</option></select>
-                <div class="att-doc-ws-actions-v7190"><button type="button" data-att-ws-action="expand">全部展开</button><button type="button" data-att-ws-action="collapse">全部折叠</button><select data-att-ws-level aria-label="展开到指定标题层级"><option value="">展开到…</option>${[1,2,3,4,5,6].map(level => `<option value="${level}">H${level}</option>`).join('')}</select></div>
+                <details class="att-doc-ws-options-v7191"><summary>筛选与折叠</summary><select data-att-ws-mode aria-label="导航显示范围"><option value="all">标题与表格</option><option value="headings">只看标题</option><option value="tables">只看表格（保留标题路径）</option></select>
+                <div class="att-doc-ws-actions-v7190"><button type="button" data-att-ws-action="expand">全部展开</button><button type="button" data-att-ws-action="collapse">全部折叠</button><select data-att-ws-level aria-label="展开到指定标题层级"><option value="">展开到…</option>${[1,2,3,4,5,6].map(level => `<option value="${level}">H${level}</option>`).join('')}</select></div></details>
                 <div id="att-doc-workspace-status-v7190" role="status" aria-live="polite"></div>`;
             controls.addEventListener('input', event => {
                 if (!event.target?.hasAttribute?.('data-att-ws-query')) return;
@@ -19030,6 +19108,7 @@
         if (input && input !== document.activeElement) input.value = W.query;
         const mode = controls.querySelector('[data-att-ws-mode]'); if (mode) mode.value = W.mode;
         workspaceRenderBookmarks(panel);
+        workspaceUpdatePane(panel);
     }
     function workspaceAnchor(element, selectedQuote = '') {
         const editor = W.editor;
@@ -19165,6 +19244,7 @@
         return element;
     }
     function workspaceEditBookmark(id = null) {
+        if (docState.bookmarksEnabled === false) {workspaceNotice('文档书签已关闭，可在“文档”设置中启用',true);return;}
         const existing = id ? W.record?.bookmarks.find(bookmark => bookmark.id === id) : null;
         const selected = W.selectionRanges[0];
         const target = existing ? null : W.contextTarget || docState.headings[0]?.element || W.editor?.firstElementChild;
@@ -19186,9 +19266,14 @@
     }
     function workspaceRenderBookmarks(panel) {
         if (!panel || !W.record) return;
+        if (docState.bookmarksEnabled === false) {
+            panel.querySelector('#att-doc-workspace-bookmarks-v7190')?.remove();
+            workspaceUpdatePane(panel); return;
+        }
         let section = panel.querySelector('#att-doc-workspace-bookmarks-v7190');
         if (!section) {
             section = document.createElement('section'); section.id = 'att-doc-workspace-bookmarks-v7190';
+            section.setAttribute('role','tabpanel'); section.setAttribute('aria-labelledby','att-doc-ws-bookmark-tab-v7191');
             section.addEventListener('click', event => {
                 const button = event.target?.closest?.('button[data-att-ws-bookmark-action]'); if (!button) return;
                 const action = button.dataset.attWsBookmarkAction, id = button.dataset.bookmarkId;
@@ -19212,9 +19297,10 @@
             panel.appendChild(section);
         }
         const signature = JSON.stringify(W.record.bookmarks);
-        if (section.dataset.signature === signature) return;
+        if (section.dataset.signature === signature) {workspaceUpdatePane(panel);return;}
         section.dataset.signature = signature;
         section.innerHTML = `<div class="att-doc-ws-bookmarks-head-v7190"><b>书签 <span>${W.record.bookmarks.length}</span></b><button type="button" data-att-ws-bookmark-action="add" title="为当前内容添加书签">＋书签</button></div><div class="att-doc-ws-bookmarks-list-v7190">${W.record.bookmarks.length ? W.record.bookmarks.map(bookmark => `<div class="att-doc-ws-bookmark-row-v7190"><button type="button" data-att-ws-bookmark-action="locate" data-bookmark-id="${escapeAttr(bookmark.id)}" title="${escapeAttr(bookmark.name)}">☆ ${escapeHtml(bookmark.name)}</button><button type="button" data-att-ws-bookmark-action="rename" data-bookmark-id="${escapeAttr(bookmark.id)}" title="修改名称" aria-label="修改书签名称">✎</button><button type="button" data-att-ws-bookmark-action="update" data-bookmark-id="${escapeAttr(bookmark.id)}" title="更新为当前内容位置" aria-label="更新书签位置">↻</button><button type="button" data-att-ws-bookmark-action="delete" data-bookmark-id="${escapeAttr(bookmark.id)}" title="删除书签" aria-label="删除书签">×</button></div>`).join('') : '<div class="att-doc-ws-muted-v7190">点击正文内容后添加书签</div>'}</div>`;
+        workspaceUpdatePane(panel);
     }
     function workspaceHeadingForTarget(target) {
         const headings = collectHeadings(); let result = null;
@@ -19314,7 +19400,7 @@
         const menu = document.createElement('div'); menu.id = 'att-doc-workspace-chapter-menu-v7190';
         menu.setAttribute('role','menu'); menu.innerHTML = `<b>${escapeHtml(heading.text)}</b>${[
             ['copy-chapter','▤','复制整章内容'],['copy-tables','▦','复制章节内表格'],['export-text','↓','导出章节为文本'],['export-html','⌘','导出章节为 HTML'],['bookmark','☆','为章节添加书签']
-        ].map(([action,icon,label]) => `<button type="button" role="menuitem" data-att-ws-chapter-action="${action}"><span aria-hidden="true">${icon}</span>${label}</button>`).join('')}`;
+        ].filter(([action]) => action !== 'bookmark' || docState.bookmarksEnabled !== false).map(([action,icon,label]) => `<button type="button" role="menuitem" data-att-ws-chapter-action="${action}"><span aria-hidden="true">${icon}</span>${label}</button>`).join('')}`;
         document.body.appendChild(menu); W.menu = menu;
         menu.style.maxHeight = `${Math.max(40,window.innerHeight-16)}px`;
         const rect = menu.getBoundingClientRect();
@@ -19364,11 +19450,13 @@
         const status = document.getElementById('att-doc-search-scope-status-v7190');
         if (!status) return;
         const labels = {document:'全文',chapter:'当前章节',table:'当前表格',selection:'选区'};
-        status.textContent = W.scope !== 'document' && !W.scopeRanges.length ? '范围为空：先点击正文或选中内容，再点“更新范围”' : `查找范围：${labels[W.scope]}${W.scope !== 'document' ? '（已锁定，更新范围可重新选取）' : ''}`;
+        status.textContent = W.scope !== 'document' && !W.scopeRanges.length ? '范围为空：先点击正文或选中内容，再点“更新范围”' : `${labels[W.scope]}${W.scope !== 'document' ? ' · 已锁定' : ' · 搜索全部正文'}`;
+        status.title = W.scope !== 'document' ? '范围已锁定。先在正文中点击章节、表格或选择内容，再点“更新范围”重新选取。' : '搜索当前文档的全部正文';
         status.classList.toggle('is-warning', W.scope !== 'document' && !W.scopeRanges.length);
     }
     function workspaceAttachSearchBar(bar) {
         if (!bar) return;
+        bar.setAttribute('data-att-ws-layout','7191');
         const existing = bar.querySelector('#att-doc-search-scope-v7190');
         if (existing) {existing.querySelector('select').value = W.scope; workspaceScopeStatus(); return;}
         const controls = document.createElement('div'); controls.id = 'att-doc-search-scope-v7190';
@@ -19555,7 +19643,9 @@
             buildSearchIndex:workspaceBuildSearchIndex,literalMatches:workspaceLiteralMatches,regexMatches:workspaceRegexMatches,
             requestReplaceAll:workspaceRequestReplaceAll,attachSearchBar:workspaceAttachSearchBar,noteTarget:workspaceNoteTarget,
             allowStandalone:table => W.mode !== 'headings' && (!W.record || W.tableMatches.has(table)),
-            get navigationMode() {return W.mode;}
+            get navigationMode() {return W.mode;},
+            get navigationPane() {return W.pane;},
+            get navigationCollapsed() {return W.panelCollapsed;}
         };
         document.addEventListener('selectionchange',workspaceCaptureSelection);
         const capture = event => {
@@ -19724,6 +19814,68 @@
         if (document.getElementById(DOC_TOOLS.styleId)) return;
 
         const css = `
+            /* The two panes use all available height instead of competing for it. */
+            #att-document-outline[data-att-ws-pane] {flex-basis:280px!important;width:280px!important;max-width:32vw;min-height:160px;max-height:none;height:calc(100dvh - 164px);font-size:13px;}
+            #att-document-outline[data-att-ws-pane] .att-doc-outline-head {min-height:44px;padding:0 10px 0 12px;gap:7px;}
+            #att-document-outline[data-att-ws-pane] .att-doc-outline-title {flex:1;font-size:13px;}
+            #att-document-outline [data-att-ws-panel-collapse] {width:27px;height:28px;flex:none;border:0;border-radius:5px;background:transparent;color:inherit;font:22px/1 system-ui;cursor:pointer;}
+            #att-document-outline [data-att-ws-panel-collapse]:hover {background:var(--bg-hover,#94a3b822);}
+            #att-doc-workspace-tabs-v7191 {flex:none;display:flex;gap:4px;padding:8px 10px 0;}
+            #att-doc-workspace-tabs-v7191 button {flex:1;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--text-secondary,#64748b);padding:7px;font-family:inherit;font-size:12px;line-height:1.3;cursor:pointer;}
+            #att-doc-workspace-tabs-v7191 button.is-active {color:var(--primary,#60a5fa);border-color:var(--border-color,#475569);background:var(--primary-bg,#3b82f622);}
+            #att-document-outline[data-att-ws-pane] #att-doc-workspace-controls-v7190 {padding:10px;font-size:12px;border-bottom:0;}
+            #att-document-outline[data-att-ws-pane] .att-doc-ws-search-v7190 input {height:32px;padding:6px 8px;font-size:12px;}
+            #att-document-outline .att-doc-ws-options-v7191 {margin-top:7px;}
+            #att-document-outline .att-doc-ws-options-v7191 summary {cursor:pointer;user-select:none;padding:4px 2px;color:var(--text-muted,#94a3b8);font-size:11px;}
+            #att-document-outline .att-doc-ws-options-v7191 select[data-att-ws-mode] {width:100%;margin-top:7px;height:30px;}
+            #att-document-outline .att-doc-ws-options-v7191 .att-doc-ws-actions-v7190 {margin-top:6px;}
+            #att-document-outline[data-att-ws-pane] .att-doc-outline-item {min-height:34px;font-size:13px!important;line-height:1.5;padding-top:7px!important;padding-bottom:7px!important;}
+            #att-document-outline[data-att-ws-pane] .att-doc-nav-table-v7184 {min-height:34px;font-size:12px;}
+            #att-document-outline[data-att-ws-pane] .att-doc-nav-group-v7184 {margin-left:9px;padding-left:4px;}
+            #att-document-outline[data-att-ws-pane] #att-doc-workspace-bookmarks-v7190 {flex:1 1 auto;max-height:none;min-height:0;padding:10px;border-top:0;font-size:12px;}
+            #att-document-outline .att-doc-ws-bookmark-row-v7190 {gap:4px;margin-top:7px;align-items:center;}
+            #att-document-outline .att-doc-ws-bookmark-row-v7190 button:first-child {padding:8px;min-height:34px;font-size:12px;}
+            #att-document-outline .att-doc-ws-bookmark-row-v7190 button:not(:first-child) {display:none;width:24px;height:28px;flex-basis:24px;padding:2px;}
+            #att-document-outline .att-doc-ws-bookmark-row-v7190:hover button:not(:first-child),#att-document-outline .att-doc-ws-bookmark-row-v7190:focus-within button:not(:first-child) {display:block;}
+            #att-document-outline [hidden] {display:none!important;}
+            #att-document-outline[data-att-ws-collapsed="1"] {flex-basis:36px!important;width:36px!important;max-width:36px;}
+            #att-document-outline[data-att-ws-collapsed="1"] .att-doc-outline-head {justify-content:center;padding:7px 0;}
+            #att-document-outline[data-att-ws-collapsed="1"] .att-doc-outline-title,#att-document-outline[data-att-ws-collapsed="1"] .att-doc-outline-count,
+            #att-document-outline[data-att-ws-collapsed="1"] #att-doc-workspace-tabs-v7191,#att-document-outline[data-att-ws-collapsed="1"] #att-doc-table-nav-v7170 {display:none!important;}
+            #att-document-outline[data-att-ws-collapsed="1"] [data-att-ws-panel-collapse] {font-size:15px;}
+            @media (max-width:1200px) {#att-document-outline[data-att-ws-pane]:not([data-att-ws-collapsed="1"]) {flex-basis:250px!important;width:250px!important;}}
+            @media (max-width:900px) {#att-document-outline[data-att-ws-pane]:not([data-att-ws-collapsed="1"]) {flex-basis:220px!important;width:220px!important;}}
+
+            /* Explicit rows supersede the old compact nowrap rule. Controls keep
+               their original nodes, IDs and handlers in literal and regex modes. */
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 {display:grid!important;grid-template-columns:minmax(140px,1fr) auto auto auto auto 28px;align-items:center!important;gap:7px!important;padding:8px 9px!important;min-width:0;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63.att-doc-search-collapsed-v63 {display:none!important;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-find {grid-row:1;grid-column:1;min-width:0!important;width:100%;gap:5px!important;flex-wrap:nowrap;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-find .att-doc-page-search-input-wrap {min-width:0!important;flex:1 1 auto!important;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-case {grid-row:1;grid-column:2;margin:0;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-regex-toggle-v64 {grid-row:1;grid-column:3;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 :is([data-att-doc-page-search-act="clear"],[data-att-doc-regex-act-v64="clear"]) {grid-row:1;grid-column:4;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-search-replace-toggle-v63 {grid-row:1;grid-column:5;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-search-close-v63 {grid-row:1;grid-column:6;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 #att-doc-search-scope-v7190 {grid-row:2;grid-column:1/-1;min-width:0;gap:7px;flex-wrap:wrap;border-top:1px solid var(--border-color,#94a3b822);padding-top:7px;font-size:12px;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"] #att-doc-search-scope-status-v7190 {flex:1 1 180px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"] #att-doc-search-scope-status-v7190.is-warning {white-space:normal;overflow-wrap:anywhere;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-replace {grid-row:3;grid-column:1/-1;min-width:0!important;gap:6px;flex-wrap:nowrap;border-top:1px solid var(--border-color,#94a3b822);padding-top:7px;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-replace .att-doc-page-search-input-wrap {min-width:0!important;flex:1 1 auto!important;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-message {grid-row:4;grid-column:1/-1;max-width:none!important;margin:0;font-size:11px;white-space:normal;overflow-wrap:anywhere;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-message:empty {display:none!important;}
+            #att-doc-page-search-bar-v62[data-att-ws-layout="7191"] button {white-space:nowrap;}
+            @media (max-width:1100px) {
+                #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 {grid-template-columns:repeat(4,auto) minmax(0,1fr) 28px;}
+                #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-find {grid-row:1;grid-column:1/6;}
+                #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-case {grid-row:2;grid-column:1;}
+                #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-regex-toggle-v64 {grid-row:2;grid-column:2;}
+                #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 :is([data-att-doc-page-search-act="clear"],[data-att-doc-regex-act-v64="clear"]) {grid-row:2;grid-column:3;}
+                #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-search-replace-toggle-v63 {grid-row:2;grid-column:4;}
+                #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 #att-doc-search-scope-v7190 {grid-row:3;}
+                #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-replace {grid-row:4;}
+                #att-doc-page-search-bar-v62[data-att-ws-layout="7191"].att-doc-search-compact-v63 .att-doc-page-search-message {grid-row:5;}
+            }
             #att-doc-workspace-controls-v7190 {flex:0 0 auto;padding:7px 8px;border-bottom:1px solid var(--border-color,#3b424b);font-size:11px;}
             #att-doc-workspace-controls-v7190 input,#att-doc-workspace-controls-v7190 select,#att-doc-workspace-controls-v7190 button,
             #att-doc-workspace-bookmarks-v7190 button,#att-doc-search-scope-v7190 select,#att-doc-search-scope-v7190 button {box-sizing:border-box;min-width:0;border:1px solid var(--border-color,#475569);border-radius:5px;background:var(--surface-subtle,#27313a);color:var(--text-main,var(--text-primary,#e2e8f0));font:inherit;padding:5px;}
@@ -20144,6 +20296,12 @@
             if (!(target instanceof HTMLInputElement)) return;
 
             const setting = target.dataset.attDocSetting;
+            if (setting === 'bookmarksEnabled') {
+                docState.bookmarksEnabled = target.checked;
+                GM_setValue('att_doc_tools_bookmarks_enabled_v7191',target.checked);
+                if (!target.checked) {workspaceSetPane('outline');closeWorkspaceDialog();closeChapterMenu();}
+                rebuildOutline(); renderDocumentToolsSection(); return;
+            }
             if (setting === 'rememberReading' || setting === 'rememberFold') {
                 workspaceFlushMemory(); docState[setting] = target.checked;
                 GM_setValue(`att_doc_tools_${setting === 'rememberReading' ? 'reading' : 'fold'}_memory_v7190`, target.checked);
@@ -20182,14 +20340,14 @@
             card.dataset.attDocOutlineCard = '7173';
             section.appendChild(card);
         }
-        const signature = JSON.stringify([docState.outlineEnabled, docState.outlineFollowEnabled, docState.rememberReading, docState.rememberFold]);
+        const signature = JSON.stringify([docState.outlineEnabled, docState.outlineFollowEnabled, docState.rememberReading, docState.rememberFold, docState.bookmarksEnabled]);
         if (card.dataset.renderSignature === signature) {
             updateHeadingCountInToolbox(headingCount);
             return;
         }
         card.dataset.renderSignature = signature;
         card.innerHTML = `
-                <div class="att-card-title">文档大纲</div>
+                <div class="att-card-title">文档导航与书签</div>
                 <div class="att-card-desc">仅在 AutoTable 文档视图中生效。H1–H6 标题按章节层级排列，支持展开与折叠，并随正文实时更新。</div>
                 <div class="att-divider"></div>
 
@@ -20223,6 +20381,7 @@
                 </div>
 
                 <div class="att-divider"></div>
+                <div class="att-row"><div><div class="att-label">启用文档书签</div><div class="att-sub-label">在左侧“书签”页管理常用内容。关闭后保留已有书签。</div></div><label class="att-switch" title="启用文档书签"><input type="checkbox" data-att-doc-setting="bookmarksEnabled" ${docState.bookmarksEnabled ? 'checked' : ''}><span class="att-slider"></span></label></div>
                 <div class="att-row"><div><div class="att-label">记住阅读位置</div><div class="att-sub-label">重新打开当前文档时，恢复上次阅读位置。</div></div><label class="att-switch"><input type="checkbox" data-att-doc-setting="rememberReading" ${docState.rememberReading ? 'checked' : ''}><span class="att-slider"></span></label></div>
                 <div class="att-row"><div><div class="att-label">记住章节折叠</div><div class="att-sub-label">标题大纲和合并导航共用章节折叠记忆。</div></div><label class="att-switch"><input type="checkbox" data-att-doc-setting="rememberFold" ${docState.rememberFold ? 'checked' : ''}><span class="att-slider"></span></label></div>
                 <div class="att-doc-tools-status" id="${DOC_TOOLS.headingCountId}">
@@ -20411,7 +20570,7 @@
         });
 
         const activeItem = items.find(item => Number(item.dataset.index) === index);
-        if (keepItemVisible && !workspaceIsFiltering() && list && activeItem) {
+        if (keepItemVisible && !workspaceIsFiltering() && list && !list.hidden && activeItem) {
             let visibleItem = activeItem;
             // A collapsed chapter stays collapsed. Follow its visible parent row
             // rather than measuring a hidden child as a zero-sized rectangle.
@@ -35863,7 +36022,8 @@
         if (!nav) return;
         const allTables = getTopLevelTables();
         const tables = allTables.filter(table => !globalThis.__attDocumentWorkspaceV7190 || globalThis.__attDocumentWorkspaceV7190.allowStandalone(table));
-        nav.style.display = globalThis.__attDocumentWorkspaceV7190?.navigationMode === 'headings' ? 'none' : '';
+        const workspace = globalThis.__attDocumentWorkspaceV7190;
+        nav.style.display = workspace?.navigationMode === 'headings' || workspace?.navigationPane === 'bookmarks' || workspace?.navigationCollapsed ? 'none' : '';
         const count = nav.querySelector('.att-dtp-nav-head-v7170 span');
         const list = nav.querySelector('.att-dtp-nav-list-v7170');
         if (count) count.textContent = String(tables.length);
