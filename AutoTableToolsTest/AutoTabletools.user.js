@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.20.5
-// @description  AutoTable 一体化效率增强工具：表格内容居中显示与独立开关、菜单使用说明书图标与居中对齐修复、表格联系信息显示优化与独立开关（手机号分组显示，原始值保持不变）、文档表格增强（大纲可见高度与底部滚动修复 / 查找范围同行布局 / 书签独立开关 / 导航与书签分栏切换及侧栏收起 / 查找替换布局修复 / 大纲搜索筛选 / 批量展开折叠 / 文档阅读与折叠记忆 / 自定义书签 / 章节复制与导出 / 范围查找与替换预览 / 两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.21.0
+// @description  AutoTable 一体化效率增强工具：文档链接编辑、图片尺寸、代码块、列表快捷操作、原生表格修复、编辑器能力面板、专注阅读、选中文字工具栏与八项独立开关、表格内容居中显示与独立开关、菜单使用说明书图标与居中对齐修复、表格联系信息显示优化与独立开关（手机号分组显示，原始值保持不变）、文档表格增强（大纲可见高度与底部滚动修复 / 查找范围同行布局 / 书签独立开关 / 导航与书签分栏切换及侧栏收起 / 查找替换布局修复 / 大纲搜索筛选 / 批量展开折叠 / 文档阅读与折叠记忆 / 自定义书签 / 章节复制与导出 / 范围查找与替换预览 / 两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -215,7 +215,7 @@
     const PERF = globalThis.__attPerfStats || null;
 
     const APP = {
-        version: 'V7.20.5',
+        version: 'V7.21.0',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -19919,6 +19919,8 @@
     function workspaceInit() {
         if (W.initialized) return; W.initialized = true;
         globalThis.__attDocumentWorkspaceV7190 = {
+            get bookmarksEnabled() {return docState.bookmarksEnabled !== false;},
+            addBookmark() {workspaceCaptureSelection();workspaceEditBookmark();},
             buildSearchIndex:workspaceBuildSearchIndex,literalMatches:workspaceLiteralMatches,regexMatches:workspaceRegexMatches,
             requestReplaceAll:workspaceRequestReplaceAll,attachSearchBar:workspaceAttachSearchBar,noteTarget:workspaceNoteTarget,
             allowStandalone:table => W.mode !== 'headings' && (!W.record || W.tableMatches.has(table)),
@@ -33448,7 +33450,15 @@
             dragCells: 'att_doc_table_plus_drag_cells_v7173',
             clipboard:'att_doc_table_plus_clipboard_v7180',
             edgeHandles:'att_doc_table_plus_edge_handles_v7180',
-            contextMenu:'att_doc_table_plus_context_menu_v7180'
+            contextMenu:'att_doc_table_plus_context_menu_v7180',
+            doclinks:'att_doc_tools_links_enabled_v7210',
+            docimages:'att_doc_tools_images_enabled_v7210',
+            doccode:'att_doc_tools_code_enabled_v7210',
+            doclists:'att_doc_tools_lists_enabled_v7210',
+            docrepair:'att_doc_tools_repair_enabled_v7210',
+            doccapabilities:'att_doc_tools_capabilities_enabled_v7210',
+            docfocus:'att_doc_tools_focus_enabled_v7210',
+            docselection:'att_doc_tools_selection_enabled_v7210'
         }
     };
 
@@ -33462,7 +33472,15 @@
         navigationHierarchy: true,
         preventCellMove: true,
         dragCells: true,
-        clipboard:true, edgeHandles:true, contextMenu:true
+        clipboard:true, edgeHandles:true, contextMenu:true,
+        doclinks:true,
+        docimages:true,
+        doccode:true,
+        doclists:true,
+        docrepair:true,
+        doccapabilities:true,
+        docfocus:true,
+        docselection:true
     };
 
     const S = {
@@ -33555,6 +33573,7 @@
             scheduleContentRefresh(0);
         }
         updateSettingsCardState();
+        dxSettingsChanged();
     }
 
     function isDocumentView() {
@@ -34382,6 +34401,11 @@
 
     // V7.19.0: keep menus inside the document viewport and preserve header paint.
     const MENU_ICONS = {
+        'native-toggleHeaderRow':'M3 3h18v18H3z M3 9h18 M9 9v12 M15 9v12',
+        'native-toggleHeaderColumn':'M3 3h18v18H3z M9 3v18 M9 9h12 M9 15h12',
+        'native-toggleHeaderCell':'M3 3h18v18H3z M3 9h18 M9 3v18',
+        'native-goToPreviousCell':'M20 5v14H4V5z M15 12H8 M11 9l-3 3 3 3',
+        'native-goToNextCell':'M4 5v14h16V5z M9 12h7 M13 9l3 3-3 3',
         'select-row':'M3 3h18v18H3z M3 9h18 M3 15h18 M3 12h18',
         'select-column':'M3 3h18v18H3z M9 3v18 M15 3v18 M12 3v18',
         'select-table':'M3 3h18v18H3z M3 9h18 M3 15h18 M9 3v18 M15 3v18',
@@ -34477,6 +34501,7 @@
             menu.style.display='none';return;
         }
         decorateTableMenu(menu);
+        menu.querySelectorAll('[data-dtp-action^="native-"]').forEach(button=>{button.disabled=!registeredTableCommandAvailable(button.dataset.dtpAction.slice(7));});
         const appearance=appearanceSupport();
         menu.querySelectorAll('[data-dtp-action^="align-"]').forEach(button=>{
             button.disabled=!appearance.align;
@@ -34701,15 +34726,17 @@
                 <button type="button" data-dtp-action="copy-cell">复制当前单元格</button>
                 <button type="button" data-dtp-action="copy-area">复制区域（TSV / HTML）</button>
                 <button type="button" data-dtp-action="clear-area">清空选区内容</button>
-                <button type="button" data-dtp-action="align-left">选区左对齐</button>
-                <button type="button" data-dtp-action="align-center">单元格内容居中</button>
-                <button type="button" data-dtp-action="align-right">选区右对齐</button>
                 <button type="button" data-dtp-action="background-yellow">选区浅黄背景</button>
                 <button type="button" data-dtp-action="background-clear">清除选区背景</button>
                 <button type="button" data-dtp-action="width-page">表格适应页面</button>
                 <button type="button" data-dtp-action="width-content">列宽适应内容</button>
                 <button type="button" data-dtp-action="width-equal">平均列宽</button>
                 <button type="button" data-dtp-action="width-reset">重置列宽</button>
+                <button type="button" data-dtp-action="native-toggleHeaderRow">当前行表头 / 取消表头</button>
+                <button type="button" data-dtp-action="native-toggleHeaderColumn">当前列表头 / 取消表头</button>
+                <button type="button" data-dtp-action="native-toggleHeaderCell">当前格表头 / 取消表头</button>
+                <button type="button" data-dtp-action="native-goToPreviousCell">上一单元格</button>
+                <button type="button" data-dtp-action="native-goToNextCell">下一单元格</button>
                 <button type="button" data-dtp-action="header-first">首行转表头 / 取消表头</button>
                 <button type="button" data-dtp-action="freeze-first">冻结 / 取消冻结首行</button>
                 <button type="button" data-dtp-cmd="mergeCells">合并单元格</button>
@@ -34819,6 +34846,7 @@
         const appearance=appearanceSupport();
         toolbarMenuControls(bar,'[data-dtp-action]').forEach(button=>{
             const action=button.dataset.dtpAction;
+            if(action?.startsWith('native-'))button.disabled=!registeredTableCommandAvailable(action.slice(7));
             if(action?.startsWith('align-')) {
                 button.style.display='';button.disabled=!appearance.align;
                 button.title=appearance.align?'应用到当前单元格或多格选区，可撤销':'当前编辑器未开放可保存的文本对齐属性';
@@ -35026,8 +35054,24 @@
             } catch (_) { return null; }
         };
         const cached = accept(S.editorOwner) || accept(S.editor?.editor) || accept(view?.editor);
+
         if (cached) return S.editorOwner=cached;
         if (!view) return null;
+        const probe=seed=>{
+            const queue=[{value:seed,depth:0}],seen=new WeakSet();let count=0;
+            while(queue.length && count++<1200) {
+                const {value,depth}=queue.shift();
+                if(!value || typeof value!=='object' || seen.has(value) || value instanceof Node)continue;
+                seen.add(value);const found=accept(value);if(found)return found;
+                if(depth>=5)continue;
+                let descriptors;try {descriptors=Object.getOwnPropertyDescriptors(value);} catch (_) {continue;}
+                for(const [key,desc] of Object.entries(descriptors).slice(0,60)) {
+                    if(['window','document','ownerDocument','return','alternate'].includes(key) || !('value' in desc))continue;
+                    if(desc.value && typeof desc.value==='object')queue.push({value:desc.value,depth:depth+1});
+                }
+            }
+            return null;
+        };
         if(S.ownerProbeView===view && performance.now()<(S.ownerProbeUntil||0))return null;
         S.ownerProbeView=view;S.ownerProbeUntil=performance.now()+1200;
         for (let el=S.editor, depth=0; el && depth<6; el=el.parentElement,depth++) {
@@ -35037,7 +35081,7 @@
                 if (direct) return S.editorOwner=direct;
                 if (/^__react(?:Fiber|InternalInstance|Props)\$/.test(key)) {
                     for (let f=value,n=0; f && n<18; f=f.return,n++) {
-                        const found=accept(f.memoizedProps?.editor) || accept(f.pendingProps?.editor);
+                        const found=accept(f.memoizedProps?.editor) || accept(f.pendingProps?.editor) || probe(f.memoizedState);
                         if (found) return S.editorOwner=found;
                     }
                 }
@@ -35438,12 +35482,33 @@
         } catch (_) {}
     }
 
+    const REGISTERED_TABLE_COMMANDS = new Set(['toggleHeaderRow','toggleHeaderColumn','toggleHeaderCell','goToPreviousCell','goToNextCell']);
+    function registeredTableCommandAvailable(name) {
+        try {
+            if(!REGISTERED_TABLE_COMMANDS.has(name) || getEditorView()?.editable===false)return false;
+            const owner=getEditorOwner(),can=owner?.can?.();
+            return typeof owner?.commands?.[name]==='function' && typeof can?.[name]==='function' && Boolean(can[name]());
+        } catch (_) {return false;}
+    }
+    function runRegisteredTableCommand(name) {
+        try {
+            const info=modelTableInfo();
+            if(!info || !ensureModelContext(info) || !registeredTableCommandAvailable(name)) {
+                showToast('当前编辑器或选区不支持此操作');return false;
+            }
+            invalidatePendingSelection();
+            const owner=getEditorOwner();
+            const done=owner.commands[name]()!==false;
+            if(done) {info.view.focus();hideMoreMenuSoon();scheduleContextRefresh();scheduleContentRefresh(0);}
+            return done;
+        } catch (_) {showToast('无法执行当前表格操作');return false;}
+    }
     function executePlusAction(action) {
         if(action==='copy-area')copyArea();
         else if(action==='clear-area')clearArea();
         else if(action.startsWith('width-'))setColumnWidths(action.slice(6));
+        else if(action.startsWith('native-'))runRegisteredTableCommand(action.slice(7));
         else if(action==='header-first')toggleFirstHeader();
-        else if(action.startsWith('align-'))setAreaAppearance('align',action.slice(6));
         else if(action==='background-yellow')setAreaAppearance('background','#fff3c4');
         else if(action==='background-clear')setAreaAppearance('background',null);
         else if(action==='freeze-first') { S.frozenTable=S.frozenTable===S.table?null:S.table;updateFrozenHeader();updateFreezeMenuState(document.getElementById(DTP.toolbarId)); }
@@ -35483,9 +35548,12 @@
             <button data-dtp-action="copy-area">复制区域</button><button data-dtp-action="clear-area">清空内容</button>
             <button data-dtp-action="select-row">选择整行</button><button data-dtp-action="select-column">选择整列</button>
             <button data-dtp-action="select-table">选择整个表格</button>
-            <button data-dtp-action="align-left">单元格左对齐</button>
-            <button data-dtp-action="align-center">单元格内容居中</button>
-            <button data-dtp-action="align-right">单元格右对齐</button>
+                <button type="button" data-dtp-action="native-toggleHeaderRow">当前行表头 / 取消表头</button>
+                <button type="button" data-dtp-action="native-toggleHeaderColumn">当前列表头 / 取消表头</button>
+                <button type="button" data-dtp-action="native-toggleHeaderCell">当前格表头 / 取消表头</button>
+                <button type="button" data-dtp-action="native-goToPreviousCell">上一单元格</button>
+                <button type="button" data-dtp-action="native-goToNextCell">下一单元格</button>
+
             ${[['insertRowAbove','上方插行'],['insertRowBelow','下方插行'],['insertColumnBefore','左侧插列'],
                 ['insertColumnAfter','右侧插列'],['mergeCells','合并单元格'],['splitCell','拆分单元格']].filter(([cmd])=>nativeCommandAvailable(cmd))
                 .map(([cmd,label])=>`<button data-dtp-cmd="${cmd}">${label}</button>`).join('')}
@@ -36167,6 +36235,7 @@
             if (S.dragging || S.pointerGesture) { S.pendingContentRefresh = true; return; }
             syncEditor();
             refreshTableInventory();
+            dxSchedule();
         }, Math.max(0, Number(delay) || 0));
     }
 
@@ -36269,6 +36338,7 @@
             <div class="att-doc-tools-note">选择区域无需按住鼠标拖动。选区保留原生复制、删除和撤销行为；按 Esc 取消选区域模式。合并格按实际行列跨度参与选择。</div>
         `;
         updateHealthUI();
+        dxRenderSettings(card);
     }
 
     function updateSettingsCardState() {
@@ -36823,6 +36893,270 @@
         S.observer.observe(document.documentElement, { childList: true, subtree: true });
     }
 
+    // Document tools: native commands and schema transactions; no editor DOM writes.
+    const DX_FEATURES = {
+        links:['链接编辑菜单','设置、修改或取消选中文字的链接。'],
+        images:['图片尺寸调整','选择图片后设置宽高或恢复默认尺寸。'],
+        code:['代码块工具','转换代码块、设置语言、复制当前代码。'],
+        lists:['列表快捷操作','切换有序或无序列表，增加或减少列表缩进。'],
+        repair:['表格结构检查与修复','检查当前表格或文档表格，并调用原生修复。'],
+        capabilities:['编辑器能力面板','查看命令、节点属性和当前选区可用状态。'],
+        focus:['专注阅读模式','临时收起大纲和编辑工具，按 Esc 或按钮退出。'],
+        selection:['选中文字快捷工具栏','就近使用文字格式、链接、代码和书签。']
+    };
+    const DX = {bar:null,popup:null,dialog:null,raf:0,focusPage:null,token:null};
+    function dxEnabled(name) {return Boolean(S.settings['doc'+name]);}
+    function dxEsc(value) {return String(value ?? '').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+    function dxContext() {
+        const view=getEditorView();
+        return view && S.editor?.isConnected ? {view,doc:view.state.doc,selection:view.state.selection,editor:S.editor,owner:getEditorOwner()} : null;
+    }
+    function dxValid(context) {return Boolean(context && context.editor===S.editor && context.view===getEditorView() && context.doc===context.view.state.doc && context.view.editable!==false);}
+    function dxRestore(context) {
+        if(!dxValid(context)) {showToast('文档已变化，请重新选择后操作');return false;}
+        if(!context.selection.eq(context.view.state.selection))context.view.dispatch(context.view.state.tr.setSelection(context.selection).setMeta('addToHistory',false));
+        return true;
+    }
+    function dxCan(name,args=[]) {
+        try {
+            const owner=getEditorOwner(),can=owner?.can?.();
+            return getEditorView()?.editable!==false && typeof owner?.commands?.[name]==='function' && typeof can?.[name]==='function' && Boolean(can[name](...args));
+        } catch (_) {return false;}
+    }
+    function dxCommand(name,args=[],context=dxContext()) {
+        if(!dxRestore(context) || !dxCan(name,args)) {showToast('当前编辑器或选区不支持此操作');return false;}
+        try {
+            const done=context.owner.commands[name](...args)!==false;
+            if(done){context.view.focus();scheduleContextRefresh();scheduleContentRefresh(0);dxSchedule();}
+            return done;
+        } catch (_) {showToast('操作失败，未完成修改');return false;}
+    }
+    function dxNode(context,type) {
+        if(!context)return null;
+        const selection=context.selection;
+        if(selection.node?.type.name===type)return {node:selection.node,pos:selection.from};
+        for(let depth=selection.$from.depth;depth>0;depth--) {
+            const node=selection.$from.node(depth);
+            if(node.type.name===type)return {node,pos:selection.$from.before(depth)};
+        }
+        return null;
+    }
+    function dxWriteAttrs(context,target,attrs) {
+        if(!dxRestore(context) || !target || context.view.state.doc.nodeAt(target.pos)!==target.node)return false;
+        const permitted=target.node.type.spec.attrs || {};
+        if(Object.keys(attrs).some(key=>!Object.prototype.hasOwnProperty.call(permitted,key)))return false;
+        const tr=context.view.state.tr.setNodeMarkup(target.pos,null,{...target.node.attrs,...attrs}).setMeta('addToHistory',true);
+        context.view.dispatch(tr);context.view.focus();scheduleContentRefresh(0);dxSchedule();return true;
+    }
+    function dxCloseDialog() {DX.dialog?.remove();DX.dialog=null;}
+    function dxDialog(title,body,buttons,context) {
+        dxCloseDialog();const host=document.createElement('div');host.id='att-doc-tools-dialog-v7210';
+        host.setAttribute('data-lumatrace-ignore','');host.innerHTML=`<div role="dialog" aria-modal="true" aria-label="${dxEsc(title)}"><header><b>${dxEsc(title)}</b><button type="button" data-dx-close aria-label="关闭">×</button></header><div class="dx-body">${body}</div><footer>${buttons}<button type="button" data-dx-close>取消 / 关闭</button></footer></div>`;
+        host.addEventListener('pointerdown',event=>event.stopPropagation());
+        host.addEventListener('keydown',event=>{
+            event.stopPropagation();if(event.key==='Escape'){event.preventDefault();dxCloseDialog();context?.view.focus();}
+            if(event.key==='Tab') {
+                const items=[...host.querySelectorAll('button:not(:disabled),input,select,textarea,[tabindex="0"]')];
+                if(event.shiftKey && document.activeElement===items[0]){event.preventDefault();items.at(-1)?.focus();}
+                else if(!event.shiftKey && document.activeElement===items.at(-1)){event.preventDefault();items[0]?.focus();}
+            }
+        });
+        host.addEventListener('click',event=>{if(event.target.closest('[data-dx-close]')){dxCloseDialog();context?.view.focus();}});
+        document.body.appendChild(host);DX.dialog=host;host.querySelector('input,select,button')?.focus();return host;
+    }
+    function dxSafeLink(value) {
+        const raw=String(value || '').trim();
+        if(!raw || /[\u0000-\u0020\u007f]/.test(raw))return null;
+        try {const parsed=new URL(raw,location.href);return ['http:','https:','mailto:','tel:'].includes(parsed.protocol)?parsed.href:null;} catch (_) {return null;}
+    }
+    function dxLink(context) {
+        const old=context.owner?.getAttributes?.('link')?.href || '';
+        const dialog=dxDialog('编辑链接',`<label>链接地址<input type="url" data-dx-url maxlength="4000" value="${dxEsc(old)}" placeholder="https://…"></label><p>应用到当前文字选区；光标位于已有链接内时修改整条链接。支持 HTTP、HTTPS、邮箱和电话地址。</p>`,`<button data-dx-save>保存链接</button><button data-dx-remove>取消链接</button>`,context);
+        dialog.addEventListener('click',event=>{
+            if(!event.target.closest('[data-dx-save],[data-dx-remove]'))return;
+            if(!dxRestore(context))return;
+            const remove=Boolean(event.target.closest('[data-dx-remove]'));
+            const href=remove?null:dxSafeLink(dialog.querySelector('[data-dx-url]').value);
+            if(!remove && !href){showToast('请输入有效的链接地址');return;}
+            if(context.selection.empty && !old){showToast('请先选中需要添加链接的文字');return;}
+            if(context.selection.empty && old && dxCan('extendMarkRange',['link']))context.owner.commands.extendMarkRange('link');
+            const active=dxContext();
+            if(dxCommand(remove?'unsetLink':'setLink',remove?[]:[{href}],active))dxCloseDialog();
+        });
+    }
+    function dxDimension(value) {
+        const raw=String(value).trim();if(!raw)return null;
+        if(!/^\d+$/.test(raw))throw new Error('尺寸须为整数像素，或留空使用默认尺寸');
+        const number=Number(raw);if(number<1 || number>10000)throw new Error('尺寸范围为 1–10000 像素');return number;
+    }
+    function dxImage(context) {
+        const target=dxNode(context,'image');if(!target){showToast('请先点击选中正文图片');return;}
+        const dialog=dxDialog('图片尺寸',`<div class="dx-fields"><label>宽度（px）<input type="number" min="1" max="10000" data-dx-width value="${dxEsc(target.node.attrs.width || '')}" placeholder="自动"></label><label>高度（px）<input type="number" min="1" max="10000" data-dx-height value="${dxEsc(target.node.attrs.height || '')}" placeholder="自动"></label></div><p>留空使用默认尺寸。只设置一项时，显示比例由编辑器决定。</p>`,`<button data-dx-save>保存尺寸</button><button data-dx-reset>恢复默认尺寸</button>`,context);
+        dialog.addEventListener('click',event=>{
+            const reset=event.target.closest('[data-dx-reset]');if(!reset && !event.target.closest('[data-dx-save]'))return;
+            try {
+                const attrs=Object.fromEntries(['width','height'].map(key=>[key,reset?target.node.type.spec.attrs?.[key]?.default ?? null:dxDimension(dialog.querySelector('[data-dx-'+key+']').value)]));
+                if(dxWriteAttrs(context,target,attrs)){dxCloseDialog();showToast('已更新图片尺寸，可撤销');}
+            } catch(error){showToast(error.message);}
+        });
+    }
+    async function dxCopy(text) {
+        try {
+            if(typeof GM_setClipboard==='function')GM_setClipboard(text,'text');
+            else await navigator.clipboard.writeText(text);
+            showToast('已复制');
+        } catch (_) {showToast('复制失败，请手动选择内容复制');}
+    }
+    function dxCode(context) {
+        const target=dxNode(context,'codeBlock'),language=target?.node.attrs.language || '';
+        const languages=['','sql','javascript','typescript','python','json','html','css','bash','plaintext'];
+        if(language && !languages.includes(language))languages.push(language);
+        const dialog=dxDialog('代码块工具',`<label>代码语言<select data-dx-language>${languages.map(item=>`<option value="${dxEsc(item)}" ${item===language?'selected':''}>${dxEsc(item || '未指定')}</option>`).join('')}</select></label><p>语言标签会保存到文档；语法着色取决于当前编辑器支持。</p>${target?'<textarea readonly aria-label="当前代码">'+dxEsc(target.node.textContent)+'</textarea>':'<p>将当前段落或所选段落转换为代码块。</p>'}`,`<button data-dx-save>${target?'更新语言':'转换为代码块'}</button>${target?'<button data-dx-copy>复制代码</button><button data-dx-paragraph>转为普通段落</button>':''}`,context);
+        dialog.addEventListener('click',event=>{
+            if(event.target.closest('[data-dx-copy]')){dxCopy(target.node.textContent);return;}
+            if(event.target.closest('[data-dx-paragraph]')){if(dxCommand('setParagraph',[],context))dxCloseDialog();return;}
+            if(!event.target.closest('[data-dx-save]'))return;
+            const value=dialog.querySelector('[data-dx-language]').value || null;
+            const done=target?dxWriteAttrs(context,target,{language:value}):dxCommand('setCodeBlock',[{language:value}],context);
+            if(done)dxCloseDialog();
+        });
+    }
+    const DX_LISTS=[['toggleBulletList','无序列表'],['toggleOrderedList','有序列表'],['sinkListItem','增加缩进'],['liftListItem','减少缩进']];
+    function dxLists(context) {
+        const dialog=dxDialog('列表快捷操作','<p>作用于打开菜单前的段落或选区。</p>',DX_LISTS.map(([command,label])=>`<button data-dx-list="${command}" ${dxCan(command,/ListItem$/.test(command)?['listItem']:[])?'':'disabled'}>${label}</button>`).join(''),context);
+        dialog.addEventListener('click',event=>{const command=event.target.closest('[data-dx-list]')?.dataset.dxList;if(command && dxCommand(command,/ListItem$/.test(command)?['listItem']:[],context))dxCloseDialog();});
+    }
+    function dxTableIssues() {
+        const tables=getTopLevelTables(S.editor),result=[];
+        for(const [index,table] of tables.entries()) {
+            try {
+                const grid=getTableGrid(table);
+                let holes=0;for(let r=0;r<grid.height;r++)for(let c=0;c<grid.width;c++)if(!grid.grid[r]?.[c])holes++;
+                result.push({table:index+1,rows:table.rows.length,columns:grid.width,status:holes?'存在未覆盖位置':'未发现覆盖空位'});
+            } catch (_) {result.push({table:index+1,status:'结构无法解析'});}
+        }
+        return result;
+    }
+    function dxRepair(context) {
+        const rows=dxTableIssues();
+        const dialog=dxDialog('表格结构检查',`<p>检查文档顶层表格的行列覆盖。原生修复会检查文档中的表格结构，不会展开或重排内容。</p><pre>${dxEsc(JSON.stringify(rows,null,2))}</pre><p>修复是否可执行取决于当前编辑器；无异常时可能无需修改。</p>`,`<button data-dx-repair ${dxCan('fixTables')?'':'disabled'}>执行原生表格修复</button>`,context);
+        dialog.addEventListener('click',event=>{if(event.target.closest('[data-dx-repair]') && dxCommand('fixTables',[],context)){dxCloseDialog();showToast('已执行原生结构检查与修复');}});
+    }
+    function dxCapabilities() {
+        const context=dxContext();if(!context)return {editorFound:false};
+        const {view,owner}=context;
+        const commands=Object.keys(owner?.commands || {}).sort();
+        // Probe only known zero-argument commands, never execute commands during inspection.
+        const probe=new Set(['toggleBold','toggleItalic','toggleUnderline','toggleStrike','toggleCode','toggleBulletList','toggleOrderedList','undo','redo','addRowBefore','addRowAfter','addColumnBefore','addColumnAfter','mergeCells','splitCell','toggleHeaderRow','toggleHeaderColumn','toggleHeaderCell','goToPreviousCell','goToNextCell','fixTables','unsetLink']);
+        return {editorFound:true,ownerFound:Boolean(owner),editable:view.editable!==false,
+            extensions:owner?.extensionManager?.extensions?.map(item=>({name:item.name,type:item.type})) || [],
+            nodes:Object.entries(view.state.schema.nodes).map(([name,type])=>({name,attributes:Object.keys(type.spec.attrs || {})})),
+            marks:Object.entries(view.state.schema.marks).map(([name,type])=>({name,attributes:Object.keys(type.spec.attrs || {})})),
+            commands:commands.map(name=>({name,available:probe.has(name)?dxCan(name):null})),
+            selection:context.selection.constructor.name};
+    }
+    function dxShowCapabilities(context) {
+        const report=dxCapabilities();
+        const dialog=dxDialog('编辑器能力检测',`<p>已注册表示命令存在；可用状态针对打开面板前的选区。需要参数的命令未自动探测。</p><pre>${dxEsc(JSON.stringify(report,null,2))}</pre>`,`<button data-dx-copy>复制检测结果</button>`,context);
+        dialog.addEventListener('click',event=>{if(event.target.closest('[data-dx-copy]'))dxCopy(JSON.stringify(report,null,2));});
+    }
+    function dxFocus(active) {
+        DX.focusPage?.classList.remove('att-doc-focus-v7210');DX.focusPage=null;
+        document.body.classList.remove('att-doc-focus-active-v7210');
+        if(active && dxEnabled('focus')) {
+            const page=S.editor?.closest('.document-view-page,.document-view-shell') || S.editor?.closest('.document-editor')?.parentElement;
+            if(page){page.classList.add('att-doc-focus-v7210');document.body.classList.add('att-doc-focus-active-v7210');DX.focusPage=page;}
+        }
+        dxSchedule();
+    }
+    function dxAction(action,context=dxContext()) {
+        if(!context){showToast('请先打开文档并点击正文');return;}
+        if(!dxEnabled(action))return;
+        if(action==='focus'){dxFocus(!DX.focusPage);return;}
+        if(action==='capabilities'){dxShowCapabilities(context);return;}
+        if(!dxValid(context)){showToast('当前文档不可编辑或已变化');return;}
+        if(action==='links')dxLink(context);
+        if(action==='images')dxImage(context);
+        if(action==='code')dxCode(context);
+        if(action==='lists')dxLists(context);
+        if(action==='repair')dxRepair(context);
+    }
+    function dxRenderSettings(card) {
+        let box=card.querySelector('[data-dx-settings]');if(!box){box=document.createElement('div');box.dataset.dxSettings='';card.appendChild(box);}
+        box.innerHTML=`<div class="att-divider"></div><div class="att-card-title">文档编辑与阅读工具</div><div class="att-sub-label">独立开关；原生格式修改支持文档保存，显示工具仅影响当前页面。</div>${Object.entries(DX_FEATURES).map(([name,[title,desc]])=>toggleRow('doc'+name,title,desc)).join('')}`;
+    }
+    function dxBar() {
+        if(DX.bar?.isConnected)return DX.bar;
+        const bar=document.createElement('div');bar.id='att-doc-tools-bar-v7210';bar.setAttribute('contenteditable','false');
+        bar.setAttribute('data-lumatrace-ignore','');bar.setAttribute('role','toolbar');bar.setAttribute('aria-label','文档编辑与阅读工具');
+        bar.addEventListener('pointerdown',event=>{event.preventDefault();event.stopPropagation();DX.token=dxContext();});
+        bar.addEventListener('click',event=>{const action=event.target.closest('[data-dx-action]')?.dataset.dxAction;if(action)dxAction(action,event.detail===0?dxContext():(DX.token || dxContext()));});
+        DX.bar=bar;return bar;
+    }
+    function dxSelectionUi() {
+        DX.popup?.remove();DX.popup=null;
+        const context=dxContext();
+        if(!dxEnabled('selection') || !context || context.view.editable===false || context.selection.empty || context.selection.$anchorCell || DX.dialog || DX.focusPage)return;
+        const selection=window.getSelection();if(!selection?.rangeCount || !S.editor.contains(selection.anchorNode) || !S.editor.contains(selection.focusNode))return;
+        const range=selection.getRangeAt(0),rect=range.getBoundingClientRect();if(!rect.width && !rect.height)return;
+        const popup=document.createElement('div');popup.id='att-doc-selection-tools-v7210';popup.setAttribute('data-lumatrace-ignore','');popup.setAttribute('role','toolbar');popup.setAttribute('aria-label','选中文字工具');
+        const items=[['toggleBold','加粗'],['toggleItalic','斜体'],['toggleUnderline','下划线'],['toggleStrike','删除线'],['toggleCode','行内代码']];
+        popup.innerHTML=items.map(([command,label])=>`<button data-dx-command="${command}" ${dxCan(command)?'':'disabled'}>${label}</button>`).join('')+(dxEnabled('links')?'<button data-dx-action="links">链接</button>':'')+(dxEnabled('code')?'<button data-dx-action="code">代码块</button>':'')+(globalThis.__attDocumentWorkspaceV7190?.bookmarksEnabled && globalThis.__attDocumentWorkspaceV7190?.addBookmark?'<button data-dx-bookmark>书签</button>':'');
+        popup.addEventListener('pointerdown',event=>{event.preventDefault();event.stopPropagation();});
+        popup.addEventListener('click',event=>{
+            const button=event.target.closest('button');if(!button || button.disabled)return;
+            if(button.dataset.dxCommand)dxCommand(button.dataset.dxCommand,[],context);
+            else if(button.dataset.dxAction)dxAction(button.dataset.dxAction,context);
+            else if(button.hasAttribute('data-dx-bookmark') && dxRestore(context)){context.view.focus();globalThis.__attDocumentWorkspaceV7190?.addBookmark();}
+        });
+        document.body.appendChild(popup);DX.popup=popup;
+        const width=window.innerWidth,height=window.innerHeight,p=popup.getBoundingClientRect();
+        popup.style.left=Math.max(8,Math.min(width-p.width-8,rect.left))+'px';
+        popup.style.top=Math.max(8,Math.min(height-p.height-8,rect.top>p.height+12?rect.top-p.height-8:rect.bottom+8))+'px';
+    }
+    function dxRefresh() {
+        DX.raf=0;const editor=S.editor;
+        if(DX.focusPage && (!editor?.isConnected || !DX.focusPage.contains(editor) || !dxEnabled('focus')))dxFocus(false);
+        const parent=editor?.closest('.document-editor'),toolbar=parent?.querySelector('.document-toolbar') || editor?.closest('.document-view-page,.document-view-shell')?.querySelector('.document-toolbar');
+        const names=[['links','链接'],['images','图片尺寸'],['code','代码块'],['lists','列表'],['repair','表格检查'],['capabilities','编辑器能力'],['focus',DX.focusPage?'退出专注':'专注阅读']].filter(([key])=>dxEnabled(key));
+        if(!editor?.isConnected){DX.bar?.remove();DX.popup?.remove();return;}
+        if(!toolbar || !names.length){DX.bar?.remove();dxSelectionUi();return;}
+        const bar=dxBar();if(bar.parentElement!==toolbar.parentElement || bar.previousElementSibling!==toolbar)toolbar.after(bar);
+        const signature=names.map(item=>item.join(':')).join('|');
+        if(bar.dataset.signature!==signature){bar.dataset.signature=signature;bar.innerHTML=names.map(([key,label])=>`<button type="button" data-dx-action="${key}">${label}</button>`).join('');}
+        bar.querySelectorAll('[data-dx-action]').forEach(button=>{const action=button.dataset.dxAction;button.disabled=!['focus','capabilities'].includes(action) && getEditorView()?.editable===false;});
+        dxSelectionUi();
+    }
+    function dxSchedule() {if(!DX.raf)DX.raf=requestAnimationFrame(dxRefresh);}
+    function dxSettingsChanged() {
+        if(DX.dialog)dxCloseDialog();
+        if(!dxEnabled('focus'))dxFocus(false);
+        dxSchedule();
+    }
+    function dxInit() {
+        const style=document.createElement('style');style.id='att-doc-tools-style-v7210';style.textContent=`
+        #att-doc-tools-bar-v7210{display:flex;flex-wrap:wrap;gap:5px;padding:5px 8px;border-bottom:1px solid var(--border-color,#475569);font-size:12px;}
+        #att-doc-tools-bar-v7210 button,#att-doc-selection-tools-v7210 button,#att-doc-tools-dialog-v7210 button{font:inherit;color:inherit;background:var(--surface-subtle,#27313a);border:1px solid var(--border-color,#475569);border-radius:6px;padding:5px 9px;cursor:pointer;}
+        #att-doc-tools-bar-v7210 button:disabled,#att-doc-selection-tools-v7210 button:disabled,#att-doc-tools-dialog-v7210 button:disabled{opacity:.45;cursor:default;}
+        #att-doc-selection-tools-v7210{position:fixed;z-index:2147483000;display:flex;flex-wrap:wrap;gap:4px;max-width:calc(100vw - 16px);box-sizing:border-box;padding:6px;border-radius:8px;background:var(--surface-main,#20272f);color:var(--text-primary,#e2e8f0);box-shadow:0 4px 20px #0006;font-size:12px;}
+        #att-doc-tools-dialog-v7210{position:fixed;inset:0;z-index:2147483100;background:#0007;display:flex;align-items:center;justify-content:center;padding:12px;box-sizing:border-box;color:var(--text-primary,#e2e8f0);font-size:13px;}
+        #att-doc-tools-dialog-v7210>[role=dialog]{width:min(640px,100%);max-height:calc(100dvh - 24px);min-height:0;display:flex;flex-direction:column;background:var(--surface-main,#20272f);border:1px solid var(--border-color,#475569);border-radius:10px;box-shadow:0 8px 40px #0007;}
+        #att-doc-tools-dialog-v7210 header,#att-doc-tools-dialog-v7210 footer{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px;flex:none;}
+        #att-doc-tools-dialog-v7210 header{justify-content:space-between;}#att-doc-tools-dialog-v7210 .dx-body{padding:0 12px 12px;overflow:auto;min-height:0;overscroll-behavior:contain;}
+        #att-doc-tools-dialog-v7210 label{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}#att-doc-tools-dialog-v7210 input,#att-doc-tools-dialog-v7210 select,#att-doc-tools-dialog-v7210 textarea{font:inherit;color:inherit;background:var(--surface-subtle,#27313a);border:1px solid var(--border-color,#475569);border-radius:6px;padding:8px;box-sizing:border-box;width:100%;}
+        #att-doc-tools-dialog-v7210 textarea{min-height:160px;resize:vertical;}#att-doc-tools-dialog-v7210 pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;}#att-doc-tools-dialog-v7210 .dx-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;}#att-doc-tools-dialog-v7210 p{line-height:1.6;opacity:.8;}
+        .att-doc-focus-v7210 #att-document-outline,.att-doc-focus-v7210 .document-toolbar,.att-doc-focus-v7210 #att-doc-page-search-bar-v62{display:none!important;}
+        body.att-doc-focus-active-v7210 #att-doc-table-mini-toolbar-v7170,body.att-doc-focus-active-v7210 #att-dtp-edges-v7180,body.att-doc-focus-active-v7210 #att-dtp-column-hit-v7181{display:none!important;}
+        .att-doc-focus-v7210 #att-doc-tools-bar-v7210 button:not([data-dx-action=focus]){display:none;}
+        @media print{#att-doc-tools-bar-v7210,#att-doc-selection-tools-v7210,#att-doc-tools-dialog-v7210{display:none!important;}}
+        `;document.head.appendChild(style);
+        for(const event of ['selectionchange','pointerup','keyup','focusin'])document.addEventListener(event,dxSchedule,true);
+        document.addEventListener('scroll',()=>{DX.popup?.remove();DX.popup=null;},true);
+        window.addEventListener('resize',()=>{DX.popup?.remove();DX.popup=null;});
+        document.addEventListener('keydown',event=>{if(event.key==='Escape' && !DX.dialog && DX.focusPage){event.preventDefault();dxFocus(false);}},true);
+        dxSchedule();
+    }
+
     function exposeDiagnostics() {
         const api = {
             version: DTP.version,
@@ -36857,6 +37191,7 @@
                     metrics: {...S.metrics}
                 };
             },
+            capabilities:dxCapabilities,
             refresh() { scheduleContextRefresh(); scheduleContentRefresh(0); }
         };
         try { globalThis.__attDocTablePlus = api; } catch (_) {}
@@ -36876,6 +37211,7 @@
         ensureGuard();
         ensureToast();
         exposeDiagnostics();
+        dxInit();
         ensureSettingsCard();
         refreshTableInventory();
         scheduleContextRefresh();
