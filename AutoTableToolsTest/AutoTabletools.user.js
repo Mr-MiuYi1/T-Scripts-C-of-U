@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.21.1
-// @description  AutoTable 一体化效率增强工具：文档链接编辑、图片尺寸、代码块、列表快捷操作、原生表格修复、编辑器能力面板、专注阅读、选中文字工具栏与八项独立开关、表格内容居中显示与独立开关、菜单使用说明书图标与居中对齐修复、表格联系信息显示优化与独立开关（手机号分组显示，原始值保持不变）、文档表格增强（大纲可见高度与底部滚动修复 / 查找范围同行布局 / 书签独立开关 / 导航与书签分栏切换及侧栏收起 / 查找替换布局修复 / 大纲搜索筛选 / 批量展开折叠 / 文档阅读与折叠记忆 / 自定义书签 / 章节复制与导出 / 范围查找与替换预览 / 两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.21.2
+// @description  AutoTable 一体化效率增强工具：文档链接编辑、图片尺寸、代码块、列表快捷操作、原生表格修复、编辑器能力面板、专注阅读、选中文字工具栏、代码块右上角一键复制与独立开关、表格内容居中显示与独立开关、菜单使用说明书图标与居中对齐修复、表格联系信息显示优化与独立开关（手机号分组显示，原始值保持不变）、文档表格增强（大纲可见高度与底部滚动修复 / 查找范围同行布局 / 书签独立开关 / 导航与书签分栏切换及侧栏收起 / 查找替换布局修复 / 大纲搜索筛选 / 批量展开折叠 / 文档阅读与折叠记忆 / 自定义书签 / 章节复制与导出 / 范围查找与替换预览 / 两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -215,7 +215,7 @@
     const PERF = globalThis.__attPerfStats || null;
 
     const APP = {
-        version: 'V7.21.1',
+        version: 'V7.21.2',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -33459,7 +33459,8 @@
             doccapabilities:'att_doc_tools_capabilities_enabled_v7210',
             docfocus:'att_doc_tools_focus_enabled_v7210',
             docselection:'att_doc_tools_selection_enabled_v7210',
-            docicons:'att_doc_tools_icons_enabled_v7211'
+            docicons:'att_doc_tools_icons_enabled_v7211',
+            doccodecopy:'att_doc_tools_codecopy_enabled_v7212'
         }
     };
 
@@ -33482,7 +33483,8 @@
         doccapabilities:true,
         docfocus:true,
         docselection:true,
-        docicons:false
+        docicons:false,
+        doccodecopy:true
     };
 
     const S = {
@@ -36905,6 +36907,7 @@
         capabilities:['编辑器能力面板','查看命令、节点属性和当前选区可用状态。'],
         focus:['专注阅读模式','临时收起大纲和编辑工具，按 Esc 或按钮退出。'],
         selection:['选中文字快捷工具栏','就近使用文字格式、链接、代码和书签。'],
+        codecopy:['代码块一键复制','在代码块右上角显示复制按钮，仅复制原始代码文本。'],
         icons:['快捷工具栏仅显示图标','文档工具栏和选中文字工具栏只显示图标，悬停查看功能名称和说明。']
     };
     const DX = {bar:null,popup:null,dialog:null,raf:0,focusPage:null,token:null};
@@ -36968,10 +36971,49 @@
     }
     function dxMountBar(toolbar,bar,focus) {
         bar.classList.toggle('dx-reading-exit',Boolean(focus));
+        DX.mountSection?.classList.remove('dx-native-tools-section');DX.mountSection=null;
         if(focus){if(bar.parentElement!==toolbar.parentElement || bar.previousElementSibling!==toolbar)toolbar.after(bar);return;}
+        // Find the native undo control instead of assuming the final section owns all utility buttons.
+        const undo=[...toolbar.querySelectorAll('button')].find(button=>!bar.contains(button) && (/撤销|undo/i.test([button.title,button.getAttribute('aria-label'),button.textContent].join(' ')) || button.querySelector('.anticon-undo,[data-icon="undo"]')));
+        if(undo && undo.parentElement!==toolbar){
+            const section=undo.parentElement;section.classList.add('dx-native-tools-section');DX.mountSection=section;
+            if(bar.parentElement!==section || bar.nextElementSibling!==undo)section.insertBefore(bar,undo);
+            return;
+        }
         const sections=[...toolbar.children].filter(child=>child!==bar);
-        const right=sections.length>1?sections.at(-1):null;
+        const right=undo || (sections.length>1?sections.at(-1):null);
         if(bar.parentElement!==toolbar || bar.nextElementSibling!==right)toolbar.insertBefore(bar,right);
+    }
+    function dxCodeCopies() {
+        const editor=S.editor;
+        if(!dxEnabled('codecopy') || !editor?.isConnected) {
+            DX.codeCopies?.forEach(button=>button.remove());DX.codeCopies?.clear();return;
+        }
+        if(!DX.codeCopies)DX.codeCopies=new Map();
+        const blocks=new Set(editor.querySelectorAll('pre'));
+        for(const [block,button] of DX.codeCopies)if(!blocks.has(block)){button.remove();DX.codeCopies.delete(block);}
+        for(const block of blocks) {
+            let button=DX.codeCopies.get(block);
+            if(!button) {
+                button=document.createElement('button');button.type='button';button.className='att-doc-code-copy-v7212';button.textContent='复制代码';button.dataset.dxCopy='';
+                button.setAttribute('data-lumatrace-ignore','');button.setAttribute('aria-label','复制代码：复制此代码块的原始文本');
+                button.addEventListener('pointerdown',event=>{event.preventDefault();event.stopPropagation();});
+                button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();if(S.editor===editor && block.isConnected && editor.contains(block) && dxEnabled('codecopy'))dxCopy((block.querySelector('code') || block).textContent);});
+                const wrapper={classList:{toggle(){}},querySelectorAll:()=>[button]};dxDecorate(wrapper,false);button.title='复制代码：复制此代码块的原始文本';
+                document.body.appendChild(button);DX.codeCopies.set(block,button);
+            }
+            dxTheme(button);
+            const rect=block.getBoundingClientRect(),clip={left:0,top:0,right:window.innerWidth,bottom:window.innerHeight};
+            for(let el=block.parentElement,n=0;el && el!==document.body && n<20;el=el.parentElement,n++) {
+                const css=getComputedStyle(el),r=el.getBoundingClientRect();
+                if(/auto|scroll|hidden|clip/.test(css.overflowX)){clip.left=Math.max(clip.left,r.left);clip.right=Math.min(clip.right,r.right);}
+                if(/auto|scroll|hidden|clip/.test(css.overflowY)){clip.top=Math.max(clip.top,r.top);clip.bottom=Math.min(clip.bottom,r.bottom);}
+            }
+            const width=96,height=28,left=Math.min(rect.right,clip.right)-width-8,top=rect.top+8;
+            const visible=rect.width>width+16 && rect.height>=height+16 && top>=clip.top && top+height<=Math.min(rect.bottom,clip.bottom) && left>=Math.max(rect.left,clip.left);
+            button.hidden=!visible;
+            if(visible){button.style.left=left+'px';button.style.top=top+'px';}
+        }
     }
 
     function dxContext() {
@@ -37184,7 +37226,7 @@
         popup.style.top=Math.max(8,Math.min(height-p.height-8,rect.top>p.height+12?rect.top-p.height-8:rect.bottom+8))+'px';
     }
     function dxRefresh() {
-        DX.raf=0;const editor=S.editor;
+        DX.raf=0;const editor=S.editor;dxCodeCopies();
         if(DX.focusPage && (!editor?.isConnected || !DX.focusPage.contains(editor) || !dxEnabled('focus')))dxFocus(false);
         const parent=editor?.closest('.document-editor'),toolbar=parent?.querySelector('.document-toolbar') || editor?.closest('.document-view-page,.document-view-shell')?.querySelector('.document-toolbar');
         const names=[['links','链接'],['images','图片尺寸'],['code','代码块'],['lists','列表'],['repair','表格检查'],['capabilities','编辑器能力'],['focus',DX.focusPage?'退出专注':'专注阅读']].filter(([key])=>dxEnabled(key));
@@ -37235,10 +37277,18 @@
         .att-doc-focus-v7210 #att-doc-tools-bar-v7210 button:not([data-dx-action=focus]){display:none;}
         @media print{#att-doc-tools-bar-v7210,#att-doc-selection-tools-v7210,#att-doc-tools-dialog-v7210{display:none!important;}}
 
-        `;document.head.appendChild(style);
+        
+        .document-toolbar .dx-native-tools-section{flex:1 1 auto;min-width:0;display:flex;align-items:center;}
+        .document-toolbar .dx-native-tools-section>.document-toolbar__button{flex-shrink:0;}
+        .att-doc-code-copy-v7212{position:fixed;z-index:2147482900;width:96px;height:28px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:3px 7px;border-radius:5px;border:1px solid var(--dx-border);background:var(--dx-surface);color:var(--dx-muted);font:12px sans-serif;cursor:pointer;}
+        .att-doc-code-copy-v7212:hover{color:var(--dx-text);filter:brightness(1.1);}
+        .att-doc-code-copy-v7212:focus-visible{outline:2px solid var(--dx-muted);outline-offset:1px;}
+        .att-doc-code-copy-v7212[hidden]{display:none!important;}
+        @media print{.att-doc-code-copy-v7212{display:none!important;}}
+`;document.head.appendChild(style);
         for(const event of ['selectionchange','pointerup','keyup','focusin'])document.addEventListener(event,dxSchedule,true);
-        document.addEventListener('scroll',()=>{DX.popup?.remove();DX.popup=null;},true);
-        window.addEventListener('resize',()=>{DX.popup?.remove();DX.popup=null;});
+        document.addEventListener('scroll',()=>{DX.popup?.remove();DX.popup=null;if(!DX.codeRaf)DX.codeRaf=requestAnimationFrame(()=>{DX.codeRaf=0;dxCodeCopies();});},true);
+        window.addEventListener('resize',()=>{DX.popup?.remove();DX.popup=null;dxSchedule();});
         document.addEventListener('keydown',event=>{if(event.key==='Escape' && !DX.dialog && DX.focusPage){event.preventDefault();dxFocus(false);}},true);
         dxSchedule();
     }
