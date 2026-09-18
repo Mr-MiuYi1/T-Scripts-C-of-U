@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.23.3
+// @version      7.23.4
 // @description  AutoTable 一体化效率增强工具：上下文快捷栏、更多文档工具、按钮勾选排序及独立开关、清除格式、图片说明、代码显示偏好、引用块及独立开关、文档链接编辑、图片尺寸、代码块、列表快捷操作、原生表格修复、编辑器能力面板、专注阅读、选中文字工具栏、代码块右上角复制图标与独立开关、表格内容居中显示与独立开关、菜单使用说明书图标与居中对齐修复、表格联系信息显示优化与独立开关（手机号分组显示，原始值保持不变）、文档表格增强（大纲可见高度与底部滚动修复 / 查找范围同行布局 / 书签独立开关 / 导航与书签分栏切换及侧栏收起 / 查找替换布局修复 / 大纲搜索筛选 / 批量展开折叠 / 文档阅读与折叠记忆 / 自定义书签 / 章节复制与导出 / 范围查找与替换预览 / 两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
@@ -215,7 +215,7 @@
     const PERF = globalThis.__attPerfStats || null;
 
     const APP = {
-        version: 'V7.23.3',
+        version: 'V7.23.4',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -34473,6 +34473,7 @@
 
     function decorateTableMenu(menu) {
         if(!menu)return;
+        dxTheme(menu);
         menu.setAttribute('role','menu');
         menu.querySelectorAll('button').forEach(button=>{
             const key=button.dataset.dtpAction || button.dataset.dtpCmd;
@@ -34831,6 +34832,7 @@
 
     function updateToolbar() {
         const bar = ensureToolbar();
+        for(const id of [DTP.toolbarId,MORE_POPUP_ID,PLUS.menuId,PLUS.edgeId,DTP.guardId])dxTheme(document.getElementById(id));
         if (S.pointerGesture) { hideToolbar(); return; }
         const show = Boolean(
             S.settings.enabled && S.settings.miniToolbar && S.table && S.cell && S.table.isConnected && S.cell.isConnected
@@ -35423,6 +35425,7 @@
     function showTableDialog(message,confirmLabel,confirm) {
         closeTableDialog();
         const dialog=document.createElement('div');dialog.id=PLUS.dialogId;dialog.setAttribute('data-lumatrace-ignore','');
+        dxTheme(dialog);
         dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-label','表格操作确认');
         dialog.innerHTML=`<div><p>${escapeHtml(message)}</p><button type="button" data-choice="cancel">取消</button>
             <button type="button" data-choice="confirm">${escapeHtml(confirmLabel)}</button></div>`;
@@ -36759,6 +36762,38 @@
             body.att-native-dark #${DTP.navId} .att-dtp-nav-item-v7170:hover {color:var(--text-main,var(--edge-text,#f3f3f3));}
             body.att-native-dark #${DTP.navId} .att-dtp-nav-item-v7170.is-active {color:var(--primary,var(--edge-blue,#60cdff));background:var(--primary-bg,rgba(96,205,255,.12));}
             #${DTP.navId} .att-dtp-nav-empty-v7170 { padding:8px 10px 11px; color:var(--text-muted,#94a3b8); font-size:10px; text-align:center; }
+        `;
+        // Table UI uses the same native palette as the document tools.
+        style.textContent += `
+            #${DTP.toolbarId},#${MORE_POPUP_ID},#${PLUS.menuId},#${DTP.guardId} {
+                background:var(--dx-surface,#242424);color:var(--dx-text,#dedede);
+                border-color:var(--dx-border,rgba(128,128,128,.25));border-radius:7px;
+                box-shadow:0 3px 12px #0003;
+            }
+            #${DTP.toolbarId} {gap:4px;padding:4px 6px;}
+            #${DTP.toolbarId} .att-dtp-status-v7170 {color:var(--dx-muted,#999);}
+            #${DTP.toolbarId} button,#${MORE_POPUP_ID} button,#${PLUS.menuId} button,#${DTP.guardId} button {
+                background:transparent;color:var(--dx-text,#dedede);border:1px solid transparent;border-radius:5px;
+            }
+            #${MORE_POPUP_ID},#${PLUS.menuId} {gap:2px;padding:5px;scrollbar-width:thin;}
+            #${DTP.toolbarId} button:hover,#${MORE_POPUP_ID} button:hover,#${PLUS.menuId} button:hover,#${DTP.guardId} button:hover {
+                background:rgba(128,128,128,.14);border-color:transparent;
+            }
+            #${DTP.toolbarId} button[aria-pressed="true"],#${MORE_POPUP_ID} button[aria-pressed="true"] {
+                background:rgba(128,128,128,.2);border-color:var(--dx-border);color:var(--dx-text);
+            }
+            #${DTP.toolbarId} button:focus-visible,#${MORE_POPUP_ID} button:focus-visible,#${PLUS.menuId} button:focus-visible {
+                outline:2px solid var(--dx-muted);outline-offset:-2px;
+            }
+            #${MORE_POPUP_ID} button.danger,#${PLUS.menuId} button.danger {color:#e56d69;}
+            #${MORE_POPUP_ID} button.confirming,#${PLUS.menuId} button.confirming,#${DTP.toolbarId} button.confirming {
+                color:#fff;background:#7f1d1d;border-color:#a33;
+            }
+            #${PLUS.edgeId} button {background:var(--dx-surface,#242424);color:var(--dx-muted,#bbb);border-color:var(--dx-border,rgba(128,128,128,.25));}
+            #${PLUS.edgeId} button:hover,#${PLUS.edgeId} button.is-target {background:var(--dx-text,#dedede);color:var(--dx-surface,#242424);}
+            #${PLUS.dialogId}>div {background:var(--dx-surface,#242424);color:var(--dx-text,#dedede);border:1px solid var(--dx-border);border-radius:9px;box-shadow:0 8px 30px #0004;}
+            #${PLUS.dialogId} button {background:transparent;border-color:var(--dx-border);color:var(--dx-text);}
+            #${PLUS.dialogId} button:hover,#${PLUS.dialogId} button[data-choice="confirm"] {background:rgba(128,128,128,.2);}
         `;
         document.documentElement.appendChild(style);
     }
