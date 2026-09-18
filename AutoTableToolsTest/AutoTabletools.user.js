@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.22.2
-// @description  AutoTable 一体化效率增强工具：清除格式、图片说明、代码显示偏好、引用块及独立开关、文档链接编辑、图片尺寸、代码块、列表快捷操作、原生表格修复、编辑器能力面板、专注阅读、选中文字工具栏、代码块右上角复制图标与独立开关、表格内容居中显示与独立开关、菜单使用说明书图标与居中对齐修复、表格联系信息显示优化与独立开关（手机号分组显示，原始值保持不变）、文档表格增强（大纲可见高度与底部滚动修复 / 查找范围同行布局 / 书签独立开关 / 导航与书签分栏切换及侧栏收起 / 查找替换布局修复 / 大纲搜索筛选 / 批量展开折叠 / 文档阅读与折叠记忆 / 自定义书签 / 章节复制与导出 / 范围查找与替换预览 / 两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.23.0
+// @description  AutoTable 一体化效率增强工具：上下文快捷栏、更多文档工具、按钮勾选排序及独立开关、清除格式、图片说明、代码显示偏好、引用块及独立开关、文档链接编辑、图片尺寸、代码块、列表快捷操作、原生表格修复、编辑器能力面板、专注阅读、选中文字工具栏、代码块右上角复制图标与独立开关、表格内容居中显示与独立开关、菜单使用说明书图标与居中对齐修复、表格联系信息显示优化与独立开关（手机号分组显示，原始值保持不变）、文档表格增强（大纲可见高度与底部滚动修复 / 查找范围同行布局 / 书签独立开关 / 导航与书签分栏切换及侧栏收起 / 查找替换布局修复 / 大纲搜索筛选 / 批量展开折叠 / 文档阅读与折叠记忆 / 自定义书签 / 章节复制与导出 / 范围查找与替换预览 / 两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -215,7 +215,7 @@
     const PERF = globalThis.__attPerfStats || null;
 
     const APP = {
-        version: 'V7.22.2',
+        version: 'V7.23.0',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -19921,6 +19921,11 @@
         globalThis.__attDocumentWorkspaceV7190 = {
             get bookmarksEnabled() {return docState.bookmarksEnabled !== false;},
             addBookmark() {workspaceCaptureSelection();workspaceEditBookmark();},
+            chapterAction(target,action) {
+                if(!['copy-chapter','copy-tables','export-text','export-html'].includes(action))return;
+                const element=target?.nodeType===1?target:target?.parentElement,heading=workspaceHeadingForTarget(element);
+                if(heading)workspaceChapterAction(heading,action);else workspaceNotice('当前位置没有所属章节',true);
+            },
             buildSearchIndex:workspaceBuildSearchIndex,literalMatches:workspaceLiteralMatches,regexMatches:workspaceRegexMatches,
             requestReplaceAll:workspaceRequestReplaceAll,attachSearchBar:workspaceAttachSearchBar,noteTarget:workspaceNoteTarget,
             allowStandalone:table => W.mode !== 'headings' && (!W.record || W.tableMatches.has(table)),
@@ -33464,7 +33469,9 @@
             docclear:'att_doc_tools_clear_enabled_v7220',
             docimagedesc:'att_doc_tools_imagedesc_enabled_v7220',
             doccodedisplay:'att_doc_tools_codedisplay_enabled_v7220',
-            docquote:'att_doc_tools_quote_enabled_v7220'
+            docquote:'att_doc_tools_quote_enabled_v7220',
+            docquickcontext:'att_doc_quick_context_enabled_v7230',
+            docquickmore:'att_doc_quick_more_enabled_v7230'
         }
     };
 
@@ -33489,7 +33496,7 @@
         docselection:true,
         docicons:false,
         doccodecopy:true,
-        docclear:true, docimagedesc:true, doccodedisplay:true, docquote:true
+        docclear:true, docimagedesc:true, doccodedisplay:true, docquote:true, docquickcontext:true, docquickmore:true
     };
 
     const S = {
@@ -36904,6 +36911,8 @@
 
     // Document tools: native commands and schema transactions; no editor DOM writes.
     const DX_FEATURES = {
+        quickcontext:['快捷栏按上下文调整','图片、代码块和列表优先显示相关操作。'],
+        quickmore:['快捷栏常用项与更多','直接显示前六个按钮，其他工具收进更多菜单。'],
         clear:['清除格式工具','点击直接清除选中文字格式，不弹出确认。'],
         imagedesc:['图片说明编辑','编辑图片替代文字 alt 和标题 title，保存到文档。'],
         codedisplay:['代码块显示设置','设置自动换行、行号和字号，仅影响页面显示。'],
@@ -36923,6 +36932,8 @@
     function dxEnabled(name) {return Boolean(S.settings['doc'+name]);}
     function dxEsc(value) {return String(value ?? '').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
     const DX_ICONS = {
+        more:'M5 12h.01 M12 12h.01 M19 12h.01',find:'M10 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14 M15 15l6 6',
+        chaptercopy:'M5 3h14v18H5z M8 7h8 M8 11h8 M8 15h5',chaptertables:'M3 4h18v16H3z M3 9h18 M9 4v16',chaptertext:'M5 3h14v18H5z M8 7h8 M8 11h8 M8 15h5',chapterhtml:'M5 3h14v18H5z M10 10l-3 3 3 3 M14 10l3 3-3 3',
         clear:'M4 17l9-14 8 6-9 14H8z M4 17l4 6 M12 23h9',
         imagedesc:'M3 3h18v18H3z M7 8h10 M7 12h10 M7 16h6',
         codedisplay:'M2 4h20v16H2z M6 8h2 M6 12h2 M12 8h6 M12 12h6',
@@ -37087,7 +37098,7 @@
         const host=document.createElement('div');host.id='att-doc-tools-dialog-v7210';host.className='dx-anchored-panel';host.setAttribute('data-lumatrace-ignore','');
         host.innerHTML=`<div role="dialog" aria-modal="false" aria-label="${dxEsc(title)}"><header><b>${dxEsc(title)}</b><button type="button" data-dx-close>×</button></header><div class="dx-body">${body}</div>${buttons?'<footer>'+buttons+'</footer>':''}</div>`;
         dxTheme(host);dxDecorate(host,false);document.body.appendChild(host);DX.dialog=host;
-        const anchor=DX.actionAnchor?.isConnected?DX.actionAnchor:DX.bar,rect=anchor?.getBoundingClientRect() || context.editor.getBoundingClientRect(),panel=host.getBoundingClientRect();
+        const anchor=DX.actionAnchor?.isConnected?DX.actionAnchor:DX.bar,rect=DX.actionAnchor?.isConnected?DX.actionAnchor.getBoundingClientRect():DX.actionRect || anchor?.getBoundingClientRect() || context.editor.getBoundingClientRect(),panel=host.getBoundingClientRect();
         host.style.left=Math.max(8,Math.min(window.innerWidth-panel.width-8,rect.left))+'px';
         host.style.top=Math.max(8,Math.min(window.innerHeight-panel.height-8,rect.bottom+panel.height+8<=window.innerHeight?rect.bottom+6:rect.top-panel.height-6))+'px';
         host.addEventListener('pointerdown',event=>{event.stopPropagation();if(event.target.closest('button'))event.preventDefault();});
@@ -37303,7 +37314,8 @@
     }
     function dxRenderSettings(card) {
         let box=card.querySelector('[data-dx-settings]');if(!box){box=document.createElement('div');box.dataset.dxSettings='';card.appendChild(box);}
-        box.innerHTML=`<div class="att-divider"></div><div class="att-card-title">文档编辑与阅读工具</div><div class="att-sub-label">独立开关；原生格式修改支持文档保存，显示工具仅影响当前页面。</div>${Object.entries(DX_FEATURES).map(([name,[title,desc]])=>toggleRow('doc'+name,title,desc)).join('')}`;
+        box.innerHTML=`<div class="att-divider"></div><div class="att-card-title">文档编辑与阅读工具</div><div class="att-sub-label">独立开关；原生格式修改支持文档保存，显示工具仅影响当前页面。</div>${Object.entries(DX_FEATURES).map(([name,[title,desc]])=>toggleRow('doc'+name,title,desc)).join('')}<button type="button" data-dq-settings>配置快捷栏按钮与顺序</button>`;
+        if(!box.dataset.dqBound){box.dataset.dqBound='1';box.addEventListener('click',event=>{if(event.target.closest('[data-dq-settings]')){DX.actionAnchor=event.target.closest('button');dqCustomize();}});}
     }
     function dxBar() {
         if(DX.bar?.isConnected)return DX.bar;
@@ -37313,28 +37325,97 @@
         bar.addEventListener('click',event=>{const button=event.target.closest('[data-dx-action]'),action=button?.dataset.dxAction;if(action && !button.disabled){DX.actionAnchor=button;dxAction(action,event.detail===0?dxContext():(DX.token || dxContext()));}});
         DX.bar=bar;return bar;
     }
-    function dxSelectionUi() {
-        DX.popup?.remove();DX.popup=null;
-        const context=dxContext();
-        if(!dxEnabled('selection') || !context || context.view.editable===false || context.selection.empty || context.selection.$anchorCell || DX.dialog || DX.focusPage)return;
-        const selection=window.getSelection();if(!selection?.rangeCount || !S.editor.contains(selection.anchorNode) || !S.editor.contains(selection.focusNode))return;
-        const range=selection.getRangeAt(0),rect=range.getBoundingClientRect();if(!rect.width && !rect.height)return;
-        const popup=document.createElement('div');popup.id='att-doc-selection-tools-v7210';popup.setAttribute('data-lumatrace-ignore','');popup.setAttribute('role','toolbar');popup.setAttribute('aria-label','选中文字工具');
-        const items=[['toggleBold','加粗'],['toggleItalic','斜体'],['toggleUnderline','下划线'],['toggleStrike','删除线'],['toggleCode','行内代码']];
-        popup.innerHTML=items.map(([command,label])=>`<button data-dx-command="${command}" ${dxCan(command)?'':'disabled'}>${label}</button>`).join('')+(dxEnabled('clear')?'<button data-dx-action="clear">清除格式</button>':'')+(dxEnabled('quote')?'<button data-dx-action="quote">引用块</button>':'')+(dxEnabled('links')?'<button data-dx-action="links">链接</button>':'')+(dxEnabled('code')?'<button data-dx-action="code">代码块</button>':'')+(globalThis.__attDocumentWorkspaceV7190?.bookmarksEnabled && globalThis.__attDocumentWorkspaceV7190?.addBookmark?'<button data-dx-bookmark>书签</button>':'');
-        popup.addEventListener('pointerdown',event=>{event.preventDefault();event.stopPropagation();});
-        popup.addEventListener('click',event=>{
-            const button=event.target.closest('button');if(!button || button.disabled)return;
-            if(button.dataset.dxCommand)dxCommand(button.dataset.dxCommand,[],context);
-            else if(button.dataset.dxAction){DX.actionAnchor=button;dxAction(button.dataset.dxAction,context);}
-            else if(button.hasAttribute('data-dx-bookmark') && dxRestore(context)){context.view.focus();globalThis.__attDocumentWorkspaceV7190?.addBookmark();}
-        });
-        dxTheme(popup);dxDecorate(popup,dxEnabled('icons'));dxRefreshButtonStates(popup);
-        document.body.appendChild(popup);DX.popup=popup;
-        const width=window.innerWidth,height=window.innerHeight,p=popup.getBoundingClientRect();
-        popup.style.left=Math.max(8,Math.min(width-p.width-8,rect.left))+'px';
-        popup.style.top=Math.max(8,Math.min(height-p.height-8,rect.top>p.height+12?rect.top-p.height-8:rect.bottom+8))+'px';
+    const DQ_ITEMS=[
+        ['bold','加粗','toggleBold'],['italic','斜体','toggleItalic'],['underline','下划线','toggleUnderline'],['strike','删除线','toggleStrike'],['inlinecode','行内代码','toggleCode'],
+        ['links','链接'],['clear','清除格式'],['quote','引用块'],['code','代码块'],['images','图片尺寸'],['imagedesc','图片说明'],['codedisplay','代码显示'],
+        ['copycode','复制代码'],['plain','转为普通段落'],['bullet','无序列表','toggleBulletList'],['ordered','有序列表','toggleOrderedList'],['indent','增加缩进','sinkListItem'],['outdent','减少缩进','liftListItem'],
+        ['lists','列表工具'],['bookmark','添加书签'],['find','查找与替换'],['chaptercopy','复制整章'],['chaptertables','复制章节表格'],['chaptertext','导出章节文本'],['chapterhtml','导出章节 HTML'],
+        ['repair','表格检查'],['capabilities','编辑器能力'],['focus','专注阅读']
+    ];
+    function dqPrefs() {
+        const saved=safeGet('att_doc_quick_buttons_v7230',{}),known=DQ_ITEMS.map(item=>item[0]);
+        const order=[...new Set([...(Array.isArray(saved?.order)?saved.order:[]),...known])].filter(key=>known.includes(key));
+        return {order,hidden:Array.isArray(saved?.hidden)?saved.hidden.filter(key=>known.includes(key)):[]};
     }
+    function dqItems(context) {
+        const prefs=dqPrefs(),owner=context.owner;
+        const image=Boolean(dxNode(context,'image')),code=Boolean(dxNode(context,'codeBlock'));
+        let list=false;try{list=Boolean(owner?.isActive?.('bulletList') || owner?.isActive?.('orderedList'));}catch(_){}
+        const enabled=key=>key==='bookmark'?Boolean(globalThis.__attDocumentWorkspaceV7190?.bookmarksEnabled):key==='copycode'?dxEnabled('codecopy'):key==='plain'?dxEnabled('clear') || dxEnabled('code'):['bullet','ordered','indent','outdent'].includes(key)?dxEnabled('lists'):DX_FEATURES[key]?dxEnabled(key):true;
+        let items=prefs.order.map(key=>DQ_ITEMS.find(item=>item[0]===key)).filter(item=>!prefs.hidden.includes(item[0]) && enabled(item[0]));
+        const preferred=image?['images','imagedesc','bookmark']:code?['copycode','code','codedisplay','plain','bookmark']:list?['bullet','ordered','indent','outdent','bold','links']:['bold','italic','underline','strike','inlinecode','links'];
+        if(dxEnabled('quickcontext'))items.sort((a,b)=>{const x=preferred.indexOf(a[0]),y=preferred.indexOf(b[0]);return (x<0?99:x)-(y<0?99:y);});
+        return {items,image,code,list};
+    }
+    function dqButton(item,context) {
+        const [key,label,command]=item,action=DX_FEATURES[key]?key:null;
+        let disabled=false;
+        if(command)disabled=!dxCan(command,/ListItem$/.test(command)?['listItem']:[]);
+        if(['images','imagedesc'].includes(key))disabled=!dxNode(context,'image');
+        if(key==='copycode')disabled=!dxNode(context,'codeBlock');
+        if(key==='plain')disabled=!dxCan('clearNodes');
+        if(key==='links' && context.selection.empty){try{disabled=!context.owner?.getAttributes?.('link')?.href;}catch(_){disabled=true;}}
+        if(key==='clear')disabled=context.selection.empty || !dxCan('unsetAllMarks');
+        return `<button type="button" data-dq-key="${key}" ${command?'data-dx-command="'+command+'"':action?'data-dx-action="'+action+'"':''} ${disabled?'disabled':''}>${dxIcon(command || (key==='copycode'?'copy':key==='plain'?'paragraph':key==='bookmark'?'bookmark':key))}<span class="dx-button-label">${dxEsc(label)}</span></button>`;
+    }
+    function dqLabelButtons(host) {
+        host.querySelectorAll('[data-dq-key]').forEach(button=>{
+            const item=DQ_ITEMS.find(item=>item[0]===button.dataset.dqKey);if(!item)return;
+            button.innerHTML=dxIcon(item[2] || (item[0]==='copycode'?'copy':item[0]==='plain'?'paragraph':item[0]))+'<span class="dx-button-label">'+dxEsc(item[1])+'</span>';
+            const desc=DX_FEATURES[item[0]]?.[1] || DX_COMMAND_HINTS[item[2]] || ({copycode:'复制当前代码块原始文本',plain:'将当前段落或所选段落转为普通段落',indent:'增加当前列表项缩进',outdent:'减少当前列表项缩进',chaptercopy:'复制当前标题对应的整章内容',chaptertables:'复制当前章节内的表格',chaptertext:'导出当前章节为文本文件',chapterhtml:'导出当前章节为 HTML 文件',find:'打开文档查找与替换',bookmark:'为当前位置或选区添加书签'}[item[0]]) || item[1];
+            button.title=item[1]+'：'+desc;button.setAttribute('aria-label',button.title);
+        });dxRefreshButtonStates(host);
+    }
+    function dqRun(key,context,anchor) {
+        DX.actionAnchor=anchor;DX.actionRect=anchor?.getBoundingClientRect?.() || null;
+        if(key==='customize'){dqCustomize(context);return;}
+        if(key==='more'){
+            const all=dqItems(context).items,main=dxEnabled('quickmore')?all.slice(0,6):all;
+            const rest=all.filter(item=>!main.includes(item));
+            const panel=dxPanel('更多文档工具','',rest.map(item=>dqButton(item,context)).join('')+'<button data-dq-key="customize">配置快捷栏</button>',context);
+            panel.classList.add('dq-more-panel');dqLabelButtons(panel);
+            panel.addEventListener('click',event=>{const button=event.target.closest('[data-dq-key]');if(!button || button.disabled)return;dxCloseDialog();dqRun(button.dataset.dqKey,context,anchor);});return;
+        }
+        const item=DQ_ITEMS.find(item=>item[0]===key);if(!item || !dqItems(context).items.some(item=>item[0]===key))return;
+        if(DX_FEATURES[key]){if(dxEnabled(key))dxAction(key,context);return;}
+        if(!dxRestore(context))return;
+        if(item[2]){dxCommand(item[2],/ListItem$/.test(item[2])?['listItem']:[],context);return;}
+        if(key==='copycode' && dxEnabled('codecopy')){const target=dxNode(context,'codeBlock');if(target)dxCopy(target.node.textContent);return;}
+        if(key==='plain'){dxCommand('clearNodes',[],context);return;}
+        if(key==='bookmark'){context.view.focus();if(globalThis.__attDocumentWorkspaceV7190?.bookmarksEnabled)globalThis.__attDocumentWorkspaceV7190.addBookmark();return;}
+        if(key.startsWith('chapter')){const target=context.view.domAtPos(context.selection.from).node;globalThis.__attDocumentWorkspaceV7190?.chapterAction(target,{chaptercopy:'copy-chapter',chaptertables:'copy-tables',chaptertext:'export-text',chapterhtml:'export-html'}[key]);return;}
+        if(key==='find'){context.view.focus();const toolbar=context.editor.closest('.document-editor')?.querySelector('.document-toolbar');const button=[...(toolbar?.querySelectorAll('button.document-toolbar__button') || [])].find(b=>/查找/.test([b.title,b.getAttribute('aria-label'),b.textContent].join(' ')));if(button)button.click();else showToast('当前页面未找到文档查找入口');}
+    }
+    function dqCustomize(context=dxContext()) {
+        if(!context){showToast('请先打开文档');return;}
+        let prefs=dqPrefs();
+        const panel=dxPanel('配置快捷栏','<p>勾选显示的按钮，使用上移、下移调整顺序。关闭“按上下文调整”后严格按此顺序显示。</p><div data-dq-config></div>','<button data-dq-reset>恢复默认</button>',context);
+        const render=()=>{panel.querySelector('[data-dq-config]').innerHTML=prefs.order.map((key,i)=>`<label class="dq-config-row"><input type="checkbox" data-dq-show="${key}" ${prefs.hidden.includes(key)?'':'checked'}><span>${dxEsc(DQ_ITEMS.find(item=>item[0]===key)[1])}</span><button type="button" data-dq-move="${key}" data-dq-delta="-1" ${i===0?'disabled':''} title="上移">↑</button><button type="button" data-dq-move="${key}" data-dq-delta="1" ${i===prefs.order.length-1?'disabled':''} title="下移">↓</button></label>`).join('');};
+        const save=()=>{safeSet('att_doc_quick_buttons_v7230',prefs);dxSchedule();};render();
+        panel.addEventListener('change',event=>{const key=event.target.dataset.dqShow;if(!key)return;prefs.hidden=prefs.hidden.filter(k=>k!==key);if(!event.target.checked)prefs.hidden.push(key);save();});
+        panel.addEventListener('click',event=>{const move=event.target.closest('[data-dq-move]');if(move){const i=prefs.order.indexOf(move.dataset.dqMove),j=i+Number(move.dataset.dqDelta);if(j>=0 && j<prefs.order.length){[prefs.order[i],prefs.order[j]]=[prefs.order[j],prefs.order[i]];save();render();}}else if(event.target.closest('[data-dq-reset]')){prefs={order:DQ_ITEMS.map(item=>item[0]),hidden:[]};save();render();}});
+    }
+    function dxSelectionUi() {
+        if(DX.popup?.isConnected && DX.popup.contains(document.activeElement) && !DX.dialog)return;
+        DX.popup?.remove();DX.popup=null;const context=dxContext();
+        if(!dxEnabled('selection') || !context || context.view.editable===false || context.selection.$anchorCell || DX.dialog || DX.focusPage)return;
+        const info=dqItems(context),selection=window.getSelection();
+        if(context.selection.empty && !(dxEnabled('quickcontext') && (info.image || info.code || info.list)))return;
+        if(!S.editor.contains(document.activeElement) && !S.editor.contains(selection?.anchorNode))return;
+        let rect;
+        if(info.image){const dom=context.view.nodeDOM(context.selection.from);rect=dom?.getBoundingClientRect();}
+        if(!rect && selection?.rangeCount && S.editor.contains(selection.anchorNode) && S.editor.contains(selection.focusNode))rect=selection.getRangeAt(0).getBoundingClientRect();
+        if(!rect || !rect.height){try{const p=context.view.coordsAtPos(context.selection.from);rect={left:p.left,top:p.top,bottom:p.bottom,width:1,height:p.bottom-p.top};}catch(_){return;}}
+        const items=dxEnabled('quickmore')?info.items.slice(0,6):info.items;
+        const popup=document.createElement('div');popup.id='att-doc-selection-tools-v7210';popup.setAttribute('data-lumatrace-ignore','');popup.setAttribute('role','toolbar');popup.setAttribute('aria-label','文档快捷工具栏');popup.classList.toggle('dx-icon-only',dxEnabled('icons'));
+        popup.innerHTML=items.map(item=>dqButton(item,context)).join('')+'<button type="button" data-dq-key="more" title="更多：查看其他文档工具与快捷栏配置" aria-label="更多文档工具">'+dxIcon('more')+'<span class="dx-button-label">更多</span></button>';
+        popup.addEventListener('pointerdown',event=>{event.preventDefault();event.stopPropagation();});
+        popup.addEventListener('click',event=>{const button=event.target.closest('[data-dq-key]');if(button && !button.disabled)dqRun(button.dataset.dqKey,context,button);});
+        popup.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();popup.remove();DX.popup=null;context.view.focus();}});
+        dxTheme(popup);dqLabelButtons(popup);document.body.appendChild(popup);DX.popup=popup;
+        const p=popup.getBoundingClientRect();popup.style.left=Math.max(8,Math.min(window.innerWidth-p.width-8,rect.left))+'px';popup.style.top=Math.max(8,Math.min(window.innerHeight-p.height-8,rect.top>p.height+12?rect.top-p.height-8:rect.bottom+8))+'px';
+    }
+
     function dxRefresh() {
         DX.raf=0;const editor=S.editor;dxCodeVisuals();dxCodeCopies();
         if(DX.focusPage && (!editor?.isConnected || !DX.focusPage.contains(editor) || !dxEnabled('focus')))dxFocus(false);
@@ -37413,6 +37494,13 @@
         #att-doc-tools-dialog-v7210.dx-anchored-panel footer{padding:8px 10px;gap:4px;}
         #att-doc-tools-dialog-v7210.dx-anchored-panel p{margin:0;font-size:12px;}
         #att-doc-tools-bar-v7210 button.dx-is-active,#att-doc-selection-tools-v7210 button.dx-is-active{background:rgba(128,128,128,.2);border-color:var(--dx-border);color:var(--dx-text);}
+
+        #att-doc-tools-dialog-v7210.dq-more-panel footer{display:grid;grid-template-columns:1fr 1fr;}
+        #att-doc-tools-dialog-v7210.dq-more-panel footer button{justify-content:flex-start;}
+        #att-doc-tools-dialog-v7210 .dq-config-row{display:flex;flex-direction:row;align-items:center;gap:6px;margin:3px 0;}
+        #att-doc-tools-dialog-v7210 .dq-config-row input{width:auto;flex:none;}
+        #att-doc-tools-dialog-v7210 .dq-config-row>span{flex:1;}
+        #att-doc-tools-dialog-v7210 .dq-config-row button{padding:3px 7px;}
 `;document.head.appendChild(style);
         for(const event of ['selectionchange','pointerup','keyup','focusin'])document.addEventListener(event,dxSchedule,true);
         document.addEventListener('scroll',event=>{if(DX.dialog?.classList.contains('dx-anchored-panel') && !DX.dialog.contains(event.target))dxCloseDialog();DX.popup?.remove();DX.popup=null;/* Outer document scrolling carries the sibling layer automatically. */if(event.target instanceof Element && S.editor?.contains(event.target)){dxCodeVisuals();dxCodeCopies();}},true);
