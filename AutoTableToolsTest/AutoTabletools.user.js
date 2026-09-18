@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.23.2
+// @version      7.23.3
 // @description  AutoTable 一体化效率增强工具：上下文快捷栏、更多文档工具、按钮勾选排序及独立开关、清除格式、图片说明、代码显示偏好、引用块及独立开关、文档链接编辑、图片尺寸、代码块、列表快捷操作、原生表格修复、编辑器能力面板、专注阅读、选中文字工具栏、代码块右上角复制图标与独立开关、表格内容居中显示与独立开关、菜单使用说明书图标与居中对齐修复、表格联系信息显示优化与独立开关（手机号分组显示，原始值保持不变）、文档表格增强（大纲可见高度与底部滚动修复 / 查找范围同行布局 / 书签独立开关 / 导航与书签分栏切换及侧栏收起 / 查找替换布局修复 / 大纲搜索筛选 / 批量展开折叠 / 文档阅读与折叠记忆 / 自定义书签 / 章节复制与导出 / 范围查找与替换预览 / 两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
@@ -215,7 +215,7 @@
     const PERF = globalThis.__attPerfStats || null;
 
     const APP = {
-        version: 'V7.23.2',
+        version: 'V7.23.3',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -37279,6 +37279,28 @@
         const dialog=dxPanel('代码块显示',`<label>换行<select data-dx-wrap><option value="false" ${prefs.wrap?'':'selected'}>保留长行，横向滚动</option><option value="true" ${prefs.wrap?'selected':''}>自动换行</option></select></label><label>行号<select data-dx-numbers><option value="false" ${prefs.numbers?'':'selected'}>隐藏行号</option><option value="true" ${prefs.numbers?'selected':''}>显示行号</option></select></label><label>字号<select data-dx-size>${[12,14,16,18,20,24].map(size=>`<option value="${size}" ${size===prefs.size?'selected':''}>${size} px</option>`).join('')}</select></label><p>应用于文档代码块，仅优化当前浏览器的显示，不改变保存或复制的代码。更改后立即生效，显示偏好会记忆。</p>`,`<button data-dx-close>关闭</button>`,context);
         dialog.addEventListener('change',()=>{safeSet('att_doc_code_display_v7220',{wrap:dialog.querySelector('[data-dx-wrap]').value==='true',numbers:dialog.querySelector('[data-dx-numbers]').value==='true',size:Number(dialog.querySelector('[data-dx-size]').value)});dxCodeVisuals();dxCodeCopies();});
     }
+    function dqVisibility() {
+        const mode=safeGet('att_doc_quick_visibility_v7233','auto');return ['auto','always','selection'].includes(mode)?mode:'auto';
+    }
+    function dqShouldShow(selection,info,mode=dqVisibility()) {
+        return mode==='always' || (mode==='selection'?!selection.empty:!selection.empty || info.image || info.code || info.list);
+    }
+    function dxNativeLineTops(block,code,layer) {
+        const text=code.textContent,walker=document.createTreeWalker(code,4),nodes=[];
+        let node;while((node=walker.nextNode()))if(node.textContent.length)nodes.push(node);
+        const starts=[0];for(let i=0;i<text.length;i++)if(text[i]==='\n')starts.push(i+1);
+        const blockRect=block.getBoundingClientRect(),css=getComputedStyle(code),pre=getComputedStyle(block),fallback=(parseFloat(css.lineHeight) || parseFloat(css.fontSize)*1.6 || 22.4),scale=layer.offsetWidth?layer.getBoundingClientRect().width/layer.offsetWidth:1;
+        let index=0,base=0,lastTop=(parseFloat(pre.paddingTop)||0)+(parseFloat(pre.borderTopWidth)||0)-block.scrollTop;
+        return starts.map((offset,line)=>{
+            while(index<nodes.length-1 && offset>=base+nodes[index].textContent.length){base+=nodes[index].textContent.length;index++;}
+            let rect=null;
+            if(nodes[index]){const range=document.createRange(),local=Math.min(nodes[index].textContent.length,offset-base);range.setStart(nodes[index],local);range.collapse(true);rect=range.getBoundingClientRect();if(!rect.height && local<nodes[index].textContent.length){range.setEnd(nodes[index],local+1);rect=range.getBoundingClientRect();}}
+            let top=rect?.height?rect.top-blockRect.top:line?lastTop+fallback*(scale || 1):lastTop;
+            // Empty logical lines still need one native line-height; wrapped lines use the measured text position.
+            if(line && top<=lastTop)top=lastTop+fallback*(scale || 1);
+            lastTop=top;return top/(scale || 1);
+        });
+    }
     function dxCodeVisuals() {
         if(!DX.codeStyle){DX.codeStyle=document.createElement('style');DX.codeStyle.id='att-doc-code-display-style-v7220';document.head.appendChild(DX.codeStyle);}
         const on=dxEnabled('codedisplay'),prefs=dxCodePrefs(),layer=dxCodeLayer();
@@ -37292,14 +37314,12 @@
             if(!overlay){overlay=document.createElement('div');overlay.className='att-doc-code-lines-v7220';overlay.setAttribute('aria-hidden','true');overlay.setAttribute('data-lumatrace-ignore','');layer.appendChild(overlay);DX.codeNumbers.set(block,overlay);}
             if(overlay.parentElement!==layer)layer.appendChild(overlay);
             const rect=block.getBoundingClientRect(),css=getComputedStyle(block),code=block.querySelector('code') || block,text=code.textContent;
-            const signature=String(prefs.wrap)+'|'+text;
-            if(overlay.dataset.signature!==signature){overlay.dataset.signature=signature;overlay.innerHTML=text.split('\n').map((line,i)=>`<div class="dx-code-line"><span>${i+1}</span><span class="dx-code-ghost">${dxEsc(line) || ' '}</span></div>`).join('');}
-            const paddingTop=parseFloat(css.paddingTop)||0,paddingRight=parseFloat(css.paddingRight)||0,border=parseFloat(css.borderTopWidth)||0;
-            const point=dxCodePoint(layer,rect.left+12,rect.top+paddingTop+border-block.scrollTop);
-            Object.assign(overlay.style,{left:point.left+'px',top:point.top+'px',width:Math.max(0,rect.width-12-paddingRight)+'px',fontFamily:getComputedStyle(code).fontFamily,fontSize:prefs.size+'px',lineHeight:'1.6',whiteSpace:prefs.wrap?'pre-wrap':'pre',overflowWrap:prefs.wrap?'anywhere':'normal',tabSize:css.tabSize});
+            const point=dxCodePoint(layer,rect.left+8,rect.top),tops=dxNativeLineTops(block,code,layer);
+            overlay.innerHTML=tops.map((top,i)=>`<span class="dx-native-line-number" style="top:${top}px">${i+1}</span>`).join('');
+            Object.assign(overlay.style,{left:point.left+'px',top:point.top+'px',width:'32px',height:rect.height+'px',fontFamily:getComputedStyle(code).fontFamily,fontSize:prefs.size+'px',lineHeight:'normal'});
             const clip={left:rect.left,top:rect.top,right:rect.right,bottom:rect.bottom};
             for(let el=block,n=0;el && el!==S.editor.parentElement && n<20;el=el.parentElement,n++) {const st=getComputedStyle(el),r=el.getBoundingClientRect();if(/auto|scroll|hidden|clip/.test(st.overflowX)){clip.left=Math.max(clip.left,r.left);clip.right=Math.min(clip.right,r.right);}if(/auto|scroll|hidden|clip/.test(st.overflowY)){clip.top=Math.max(clip.top,r.top);clip.bottom=Math.min(clip.bottom,r.bottom);}}
-            const x=rect.left+12,y=rect.top+paddingTop+border-block.scrollTop;
+            const x=rect.left+8,y=rect.top;
             overlay.style.clipPath=`inset(${Math.max(0,clip.top-y)}px ${Math.max(0,rect.right-clip.right)}px ${Math.max(0,overlay.getBoundingClientRect().bottom-clip.bottom)}px ${Math.max(0,clip.left-x)}px)`;
             overlay.hidden=rect.bottom<=clip.top || rect.top>=clip.bottom || rect.right<=clip.left || rect.left>=clip.right;
             dxTheme(overlay);
@@ -37324,8 +37344,8 @@
     }
     function dxRenderSettings(card) {
         let box=card.querySelector('[data-dx-settings]');if(!box){box=document.createElement('div');box.dataset.dxSettings='';card.appendChild(box);}
-        box.innerHTML=`<div class="att-divider"></div><div class="att-card-title">文档编辑与阅读工具</div><div class="att-sub-label">独立开关；原生格式修改支持文档保存，显示工具仅影响当前页面。</div>${Object.entries(DX_FEATURES).map(([name,[title,desc]])=>toggleRow('doc'+name,title,desc)).join('')}<button type="button" data-dq-settings>配置快捷栏按钮与顺序</button>`;
-        if(!box.dataset.dqBound){box.dataset.dqBound='1';box.addEventListener('click',event=>{if(event.target.closest('[data-dq-settings]')){DX.actionAnchor=event.target.closest('button');dqCustomize();}});}
+        box.innerHTML=`<div class="att-divider"></div><div class="att-card-title">文档编辑与阅读工具</div><div class="att-sub-label">独立开关；原生格式修改支持文档保存，显示工具仅影响当前页面。</div>${Object.entries(DX_FEATURES).map(([name,[title,desc]])=>toggleRow('doc'+name,title,desc)).join('')}<label class="dq-visibility-control">快捷菜单显示模式<select data-dq-visibility>${[['auto','自动按上下文'],['always','始终显示'],['selection','选择内容后显示']].map(([value,label])=>`<option value="${value}" ${dqVisibility()===value?'selected':''}>${label}</option>`).join('')}</select></label><button type="button" data-dq-settings>配置快捷栏按钮与顺序</button>`;
+        if(!box.dataset.dqBound){box.dataset.dqBound='1';box.addEventListener('change',event=>{if(event.target.matches('[data-dq-visibility]')){safeSet('att_doc_quick_visibility_v7233',event.target.value);dxSchedule();}});box.addEventListener('click',event=>{if(event.target.closest('[data-dq-settings]')){DX.actionAnchor=event.target.closest('button');dqCustomize();}});}
     }
     function dxBar() {
         if(DX.bar?.isConnected)return DX.bar;
@@ -37420,10 +37440,10 @@
     function dxSelectionUi() {
         if(DX.popup?.isConnected && DX.popup.contains(document.activeElement) && !DX.dialog)return;
         DX.popup?.remove();DX.popup=null;const context=dxContext();
-        if(!dxEnabled('selection') || !context || context.view.editable===false || context.selection.$anchorCell || DX.dialog || DX.focusPage)return;
+        if(!dxEnabled('selection') || !context || context.view.editable===false || (context.selection.$anchorCell && dqVisibility()!=='always') || DX.dialog || DX.focusPage)return;
         const info=dqItems(context),selection=window.getSelection();
-        if(context.selection.empty && !(dxEnabled('quickcontext') && (info.image || info.code || info.list)))return;
-        if(!S.editor.contains(document.activeElement) && !S.editor.contains(selection?.anchorNode))return;
+        if(!dqShouldShow(context.selection,info))return;
+        if(dqVisibility()!=='always' && !S.editor.contains(document.activeElement) && !S.editor.contains(selection?.anchorNode))return;
         let rect;
         if(info.image){const dom=context.view.nodeDOM(context.selection.from);rect=dom?.getBoundingClientRect();}
         if(!rect && selection?.rangeCount && S.editor.contains(selection.anchorNode) && S.editor.contains(selection.focusNode))rect=selection.getRangeAt(0).getBoundingClientRect();
@@ -37537,9 +37557,13 @@
         #att-doc-tools-dialog-v7210 .dq-config-row>input{margin:0;justify-self:center;}
         #att-doc-tools-dialog-v7210 .dq-config-order{display:flex;justify-content:flex-end;gap:2px;}
         #att-doc-tools-dialog-v7210 .dq-config-head{padding:7px 0;color:var(--dx-muted);font-size:12px;}
+
+        .att-doc-code-lines-v7220 .dx-native-line-number{position:absolute;left:0;right:0;text-align:right;white-space:nowrap;opacity:.65;user-select:none;}
+        .dq-visibility-control{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:10px 0;}
+        .dq-visibility-control select{font:inherit;color:inherit;background:transparent;border:1px solid rgba(128,128,128,.3);border-radius:5px;padding:5px;}
 `;document.head.appendChild(style);
         for(const event of ['selectionchange','pointerup','keyup','focusin'])document.addEventListener(event,dxSchedule,true);
-        document.addEventListener('scroll',event=>{if(DX.dialog?.classList.contains('dx-anchored-panel') && !DX.dialog.contains(event.target))dxCloseDialog();DX.popup?.remove();DX.popup=null;/* Outer document scrolling carries the sibling layer automatically. */if(event.target instanceof Element && S.editor?.contains(event.target)){dxCodeVisuals();dxCodeCopies();}},true);
+        document.addEventListener('scroll',event=>{if(DX.dialog?.classList.contains('dx-anchored-panel') && !DX.dialog.contains(event.target))dxCloseDialog();DX.popup?.remove();DX.popup=null;if(dqVisibility()==='always')dxSchedule();/* Outer document scrolling carries the sibling layer automatically. */if(event.target instanceof Element && S.editor?.contains(event.target)){dxCodeVisuals();dxCodeCopies();}},true);
         window.addEventListener('resize',()=>{if(DX.dialog?.classList.contains('dx-anchored-panel'))dxCloseDialog();DX.popup?.remove();DX.popup=null;dxSchedule();});
         document.addEventListener('keydown',event=>{if(event.key==='Escape' && !DX.dialog && DX.focusPage){event.preventDefault();dxFocus(false);}},true);
         dxSchedule();
