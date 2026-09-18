@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.21.0
+// @version      7.21.1
 // @description  AutoTable 一体化效率增强工具：文档链接编辑、图片尺寸、代码块、列表快捷操作、原生表格修复、编辑器能力面板、专注阅读、选中文字工具栏与八项独立开关、表格内容居中显示与独立开关、菜单使用说明书图标与居中对齐修复、表格联系信息显示优化与独立开关（手机号分组显示，原始值保持不变）、文档表格增强（大纲可见高度与底部滚动修复 / 查找范围同行布局 / 书签独立开关 / 导航与书签分栏切换及侧栏收起 / 查找替换布局修复 / 大纲搜索筛选 / 批量展开折叠 / 文档阅读与折叠记忆 / 自定义书签 / 章节复制与导出 / 范围查找与替换预览 / 两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
@@ -215,7 +215,7 @@
     const PERF = globalThis.__attPerfStats || null;
 
     const APP = {
-        version: 'V7.21.0',
+        version: 'V7.21.1',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -33458,7 +33458,8 @@
             docrepair:'att_doc_tools_repair_enabled_v7210',
             doccapabilities:'att_doc_tools_capabilities_enabled_v7210',
             docfocus:'att_doc_tools_focus_enabled_v7210',
-            docselection:'att_doc_tools_selection_enabled_v7210'
+            docselection:'att_doc_tools_selection_enabled_v7210',
+            docicons:'att_doc_tools_icons_enabled_v7211'
         }
     };
 
@@ -33480,7 +33481,8 @@
         docrepair:true,
         doccapabilities:true,
         docfocus:true,
-        docselection:true
+        docselection:true,
+        docicons:false
     };
 
     const S = {
@@ -36902,11 +36904,76 @@
         repair:['表格结构检查与修复','检查当前表格或文档表格，并调用原生修复。'],
         capabilities:['编辑器能力面板','查看命令、节点属性和当前选区可用状态。'],
         focus:['专注阅读模式','临时收起大纲和编辑工具，按 Esc 或按钮退出。'],
-        selection:['选中文字快捷工具栏','就近使用文字格式、链接、代码和书签。']
+        selection:['选中文字快捷工具栏','就近使用文字格式、链接、代码和书签。'],
+        icons:['快捷工具栏仅显示图标','文档工具栏和选中文字工具栏只显示图标，悬停查看功能名称和说明。']
     };
     const DX = {bar:null,popup:null,dialog:null,raf:0,focusPage:null,token:null};
     function dxEnabled(name) {return Boolean(S.settings['doc'+name]);}
     function dxEsc(value) {return String(value ?? '').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+    const DX_ICONS = {
+        links:'M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-2 2 M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l2-2',
+        images:'M3 3h18v18H3z M3 17l6-6 4 4 4-5 4 5 M8 7h.01',
+        code:'M8 6l-6 6 6 6 M16 6l6 6-6 6 M14 3l-4 18',
+        lists:'M9 5h12 M9 12h12 M9 19h12 M3 5h1 M3 12h1 M3 19h1',
+        repair:'M3 3h18v18H3z M3 9h18 M9 3v18 M13 16l2 2 4-4',
+        capabilities:'M4 3h16v18H4z M8 7h8 M8 11h8 M8 15h3 M14 15h2',
+        focus:'M8 3H3v5 M16 3h5v5 M3 16v5h5 M21 16v5h-5',
+        toggleBold:'M6 3h7a5 5 0 0 1 0 10H6 M6 13h8a4 4 0 0 1 0 8H6V3',
+        toggleItalic:'M10 3h10 M4 21h10 M15 3L9 21',
+        toggleUnderline:'M5 3v7a7 7 0 0 0 14 0V3 M3 21h18',
+        toggleStrike:'M18 5c-4-4-12-2-12 3 0 3 5 3 9 5 6 3 2 9-6 7 M3 12h18',
+        toggleCode:'M8 6l-6 6 6 6 M16 6l6 6-6 6',
+        bookmark:'M6 3h12v18l-6-4-6 4z',
+        toggleBulletList:'M9 5h12 M9 12h12 M9 19h12 M3 5h1 M3 12h1 M3 19h1',
+        toggleOrderedList:'M9 5h12 M9 12h12 M9 19h12 M3 3v4 M2 3h1 M2 11h3l-3 4h3 M2 18h3v4H2',
+        sinkListItem:'M10 4h11 M10 9h11 M10 15h11 M10 20h11 M3 8l4 4-4 4',
+        liftListItem:'M10 4h11 M10 9h11 M10 15h11 M10 20h11 M7 8l-4 4 4 4',
+        save:'M3 3h16l2 2v16H3z M7 3v6h10V3 M7 21v-8h10v8',
+        remove:'M4 7h16 M9 3h6v4 M6 7l1 14h10l1-14 M10 11v6 M14 11v6',
+        reset:'M4 4v6h6 M4 10a8 8 0 1 1 0 5',
+        copy:'M9 9h12v12H9z M15 5V3H3v12h2',
+        paragraph:'M13 3h-3a5 5 0 0 0 0 10h3 M13 3v18 M18 3v18 M13 3h8',
+        close:'M5 5l14 14 M19 5L5 19'
+    };
+    const DX_COMMAND_HINTS={toggleBold:'切换选中文字的加粗格式',toggleItalic:'切换选中文字的斜体格式',toggleUnderline:'切换选中文字的下划线',toggleStrike:'切换选中文字的删除线',toggleCode:'切换选中文字的行内代码格式',bookmark:'为选中文字添加可命名书签'};
+    function dxIcon(name) {return `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${DX_ICONS[name] || DX_ICONS.capabilities}"></path></svg>`;}
+    function dxTheme(host) {
+        const toolbar=S.editor?.closest('.document-editor')?.querySelector('.document-toolbar') || S.editor?.closest('.document-view-page,.document-view-shell')?.querySelector('.document-toolbar');
+        const opaque=element=>{
+            for(let el=element,n=0;el && n<8;el=el.parentElement,n++) {
+                const bg=getComputedStyle(el).backgroundColor;
+                if(bg && bg!=='transparent' && !/^rgba\([^)]*,\s*0(?:\.0+)?\s*\)$/.test(bg))return bg;
+            }
+            return getComputedStyle(document.body).backgroundColor || '#fff';
+        };
+        if(!host || !S.editor)return;
+        const native=getComputedStyle(toolbar || S.editor),text=getComputedStyle(S.editor),control=toolbar?.querySelector('.document-toolbar__button,button');
+        const muted=control?getComputedStyle(control).color:native.color;
+        host.style.setProperty('--dx-surface',opaque(toolbar || S.editor));
+        host.style.setProperty('--dx-text',text.color);
+        host.style.setProperty('--dx-muted',muted);
+        host.style.setProperty('--dx-border',native.borderTopWidth!=='0px'?native.borderTopColor:'rgba(128,128,128,.25)');
+    }
+    function dxDecorate(host,iconOnly=false) {
+        host.classList.toggle('dx-icon-only',iconOnly);
+        host.querySelectorAll('button').forEach(button=>{
+            const label=button.dataset.dxLabel || button.textContent.trim();button.dataset.dxLabel=label;
+            let key=button.dataset.dxAction || button.dataset.dxCommand || button.dataset.dxList;
+            if(!key)key=button.hasAttribute('data-dx-bookmark')?'bookmark':button.hasAttribute('data-dx-save')?'save':button.hasAttribute('data-dx-remove')?'remove':button.hasAttribute('data-dx-reset')?'reset':button.hasAttribute('data-dx-copy')?'copy':button.hasAttribute('data-dx-paragraph')?'paragraph':button.hasAttribute('data-dx-repair')?'repair':'close';
+            const desc=DX_FEATURES[key]?.[1] || DX_COMMAND_HINTS[key] || label;
+            const fullName=label==='×'?'关闭':label;
+            button.title=fullName+'：'+desc;button.setAttribute('aria-label',fullName+'：'+desc);
+            button.innerHTML=dxIcon(key)+`<span class="dx-button-label">${dxEsc(label)}</span>`;
+        });
+    }
+    function dxMountBar(toolbar,bar,focus) {
+        bar.classList.toggle('dx-reading-exit',Boolean(focus));
+        if(focus){if(bar.parentElement!==toolbar.parentElement || bar.previousElementSibling!==toolbar)toolbar.after(bar);return;}
+        const sections=[...toolbar.children].filter(child=>child!==bar);
+        const right=sections.length>1?sections.at(-1):null;
+        if(bar.parentElement!==toolbar || bar.nextElementSibling!==right)toolbar.insertBefore(bar,right);
+    }
+
     function dxContext() {
         const view=getEditorView();
         return view && S.editor?.isConnected ? {view,doc:view.state.doc,selection:view.state.selection,editor:S.editor,owner:getEditorOwner()} : null;
@@ -36962,6 +37029,7 @@
             }
         });
         host.addEventListener('click',event=>{if(event.target.closest('[data-dx-close]')){dxCloseDialog();context?.view.focus();}});
+        dxTheme(host);dxDecorate(host,false);
         document.body.appendChild(host);DX.dialog=host;host.querySelector('input,select,button')?.focus();return host;
     }
     function dxSafeLink(value) {
@@ -37109,6 +37177,7 @@
             else if(button.dataset.dxAction)dxAction(button.dataset.dxAction,context);
             else if(button.hasAttribute('data-dx-bookmark') && dxRestore(context)){context.view.focus();globalThis.__attDocumentWorkspaceV7190?.addBookmark();}
         });
+        dxTheme(popup);dxDecorate(popup,dxEnabled('icons'));
         document.body.appendChild(popup);DX.popup=popup;
         const width=window.innerWidth,height=window.innerHeight,p=popup.getBoundingClientRect();
         popup.style.left=Math.max(8,Math.min(width-p.width-8,rect.left))+'px';
@@ -37121,9 +37190,9 @@
         const names=[['links','链接'],['images','图片尺寸'],['code','代码块'],['lists','列表'],['repair','表格检查'],['capabilities','编辑器能力'],['focus',DX.focusPage?'退出专注':'专注阅读']].filter(([key])=>dxEnabled(key));
         if(!editor?.isConnected){DX.bar?.remove();DX.popup?.remove();return;}
         if(!toolbar || !names.length){DX.bar?.remove();dxSelectionUi();return;}
-        const bar=dxBar();if(bar.parentElement!==toolbar.parentElement || bar.previousElementSibling!==toolbar)toolbar.after(bar);
-        const signature=names.map(item=>item.join(':')).join('|');
-        if(bar.dataset.signature!==signature){bar.dataset.signature=signature;bar.innerHTML=names.map(([key,label])=>`<button type="button" data-dx-action="${key}">${label}</button>`).join('');}
+        const bar=dxBar();dxMountBar(toolbar,bar,DX.focusPage);dxTheme(bar);
+        const signature=names.map(item=>item.join(':')).join('|')+'|icons:'+dxEnabled('icons');
+        if(bar.dataset.signature!==signature){bar.dataset.signature=signature;bar.innerHTML=names.map(([key,label])=>`<button type="button" data-dx-action="${key}">${label}</button>`).join('');dxDecorate(bar,dxEnabled('icons'));}
         bar.querySelectorAll('[data-dx-action]').forEach(button=>{const action=button.dataset.dxAction;button.disabled=!['focus','capabilities'].includes(action) && getEditorView()?.editable===false;});
         dxSelectionUi();
     }
@@ -37135,20 +37204,37 @@
     }
     function dxInit() {
         const style=document.createElement('style');style.id='att-doc-tools-style-v7210';style.textContent=`
-        #att-doc-tools-bar-v7210{display:flex;flex-wrap:wrap;gap:5px;padding:5px 8px;border-bottom:1px solid var(--border-color,#475569);font-size:12px;}
-        #att-doc-tools-bar-v7210 button,#att-doc-selection-tools-v7210 button,#att-doc-tools-dialog-v7210 button{font:inherit;color:inherit;background:var(--surface-subtle,#27313a);border:1px solid var(--border-color,#475569);border-radius:6px;padding:5px 9px;cursor:pointer;}
-        #att-doc-tools-bar-v7210 button:disabled,#att-doc-selection-tools-v7210 button:disabled,#att-doc-tools-dialog-v7210 button:disabled{opacity:.45;cursor:default;}
-        #att-doc-selection-tools-v7210{position:fixed;z-index:2147483000;display:flex;flex-wrap:wrap;gap:4px;max-width:calc(100vw - 16px);box-sizing:border-box;padding:6px;border-radius:8px;background:var(--surface-main,#20272f);color:var(--text-primary,#e2e8f0);box-shadow:0 4px 20px #0006;font-size:12px;}
-        #att-doc-tools-dialog-v7210{position:fixed;inset:0;z-index:2147483100;background:#0007;display:flex;align-items:center;justify-content:center;padding:12px;box-sizing:border-box;color:var(--text-primary,#e2e8f0);font-size:13px;}
-        #att-doc-tools-dialog-v7210>[role=dialog]{width:min(640px,100%);max-height:calc(100dvh - 24px);min-height:0;display:flex;flex-direction:column;background:var(--surface-main,#20272f);border:1px solid var(--border-color,#475569);border-radius:10px;box-shadow:0 8px 40px #0007;}
-        #att-doc-tools-dialog-v7210 header,#att-doc-tools-dialog-v7210 footer{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px;flex:none;}
-        #att-doc-tools-dialog-v7210 header{justify-content:space-between;}#att-doc-tools-dialog-v7210 .dx-body{padding:0 12px 12px;overflow:auto;min-height:0;overscroll-behavior:contain;}
-        #att-doc-tools-dialog-v7210 label{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}#att-doc-tools-dialog-v7210 input,#att-doc-tools-dialog-v7210 select,#att-doc-tools-dialog-v7210 textarea{font:inherit;color:inherit;background:var(--surface-subtle,#27313a);border:1px solid var(--border-color,#475569);border-radius:6px;padding:8px;box-sizing:border-box;width:100%;}
-        #att-doc-tools-dialog-v7210 textarea{min-height:160px;resize:vertical;}#att-doc-tools-dialog-v7210 pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;}#att-doc-tools-dialog-v7210 .dx-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;}#att-doc-tools-dialog-v7210 p{line-height:1.6;opacity:.8;}
+        #att-doc-tools-bar-v7210{display:flex;align-items:center;flex:1 1 0;min-width:0;gap:3px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;padding:0 8px;margin:0 5px;border:0;border-left:1px solid var(--dx-border);font-size:12px;background:transparent;color:var(--dx-muted);}
+        #att-doc-tools-bar-v7210.dx-reading-exit{padding:5px 8px;border:0;}
+        #att-doc-tools-bar-v7210 button,#att-doc-selection-tools-v7210 button,#att-doc-tools-dialog-v7210 button{display:inline-flex;align-items:center;justify-content:center;gap:6px;flex:none;min-height:28px;box-sizing:border-box;font:inherit;color:var(--dx-text);background:transparent;border:1px solid transparent;border-radius:5px;padding:4px 7px;cursor:pointer;white-space:nowrap;}
+        #att-doc-tools-bar-v7210 button{color:var(--dx-muted);}
+        #att-doc-tools-bar-v7210 button:hover,#att-doc-selection-tools-v7210 button:hover,#att-doc-tools-dialog-v7210 button:hover{background:rgba(128,128,128,.14);color:var(--dx-text);}
+        #att-doc-tools-bar-v7210 button:focus-visible,#att-doc-selection-tools-v7210 button:focus-visible,#att-doc-tools-dialog-v7210 button:focus-visible{outline:2px solid var(--dx-muted);outline-offset:1px;}
+        #att-doc-tools-bar-v7210 button:disabled,#att-doc-selection-tools-v7210 button:disabled,#att-doc-tools-dialog-v7210 button:disabled{opacity:.4;cursor:default;background:transparent;}
+        #att-doc-tools-bar-v7210 svg,#att-doc-selection-tools-v7210 svg,#att-doc-tools-dialog-v7210 svg{display:block;flex:none;}
+        #att-doc-tools-bar-v7210.dx-icon-only .dx-button-label,#att-doc-selection-tools-v7210.dx-icon-only .dx-button-label{display:none;}
+        #att-doc-tools-bar-v7210.dx-icon-only button,#att-doc-selection-tools-v7210.dx-icon-only button{width:29px;padding:5px;}
+        #att-doc-selection-tools-v7210{position:fixed;z-index:2147483000;display:flex;flex-wrap:wrap;align-items:center;gap:2px;max-width:calc(100vw - 16px);box-sizing:border-box;padding:4px;border:1px solid var(--dx-border);border-radius:7px;background:var(--dx-surface);color:var(--dx-text);box-shadow:0 3px 12px #0003;font-size:12px;}
+        #att-doc-selection-tools-v7210 [data-dx-action=links],#att-doc-selection-tools-v7210 [data-dx-bookmark]{margin-left:3px;border-left-color:var(--dx-border);}
+        #att-doc-tools-dialog-v7210{position:fixed;inset:0;z-index:2147483100;background:#0005;display:flex;align-items:center;justify-content:center;padding:12px;box-sizing:border-box;color:var(--dx-text);font-size:13px;}
+        #att-doc-tools-dialog-v7210>[role=dialog]{width:min(640px,100%);max-height:calc(100dvh - 24px);min-height:0;display:flex;flex-direction:column;background:var(--dx-surface);border:1px solid var(--dx-border);border-radius:9px;box-shadow:0 8px 30px #0004;}
+        #att-doc-tools-dialog-v7210 header,#att-doc-tools-dialog-v7210 footer{display:flex;flex-wrap:wrap;align-items:center;gap:7px;padding:12px;flex:none;}
+        #att-doc-tools-dialog-v7210 header{justify-content:space-between;border-bottom:1px solid var(--dx-border);margin-bottom:12px;}
+        #att-doc-tools-dialog-v7210 footer{border-top:1px solid var(--dx-border);}
+        #att-doc-tools-dialog-v7210 footer button{border-color:var(--dx-border);}
+        #att-doc-tools-dialog-v7210 header [data-dx-close] .dx-button-label{display:none;}
+        #att-doc-tools-dialog-v7210 .dx-body{padding:0 12px 12px;overflow:auto;min-height:0;overscroll-behavior:contain;}
+        #att-doc-tools-dialog-v7210 label{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+        #att-doc-tools-dialog-v7210 input,#att-doc-tools-dialog-v7210 select,#att-doc-tools-dialog-v7210 textarea{font:inherit;color:var(--dx-text);background:rgba(128,128,128,.07);border:1px solid var(--dx-border);border-radius:5px;padding:8px;box-sizing:border-box;width:100%;color-scheme:inherit;}
+        #att-doc-tools-dialog-v7210 textarea{min-height:160px;resize:vertical;}
+        #att-doc-tools-dialog-v7210 pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;}
+        #att-doc-tools-dialog-v7210 .dx-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+        #att-doc-tools-dialog-v7210 p{line-height:1.6;color:var(--dx-muted);}
         .att-doc-focus-v7210 #att-document-outline,.att-doc-focus-v7210 .document-toolbar,.att-doc-focus-v7210 #att-doc-page-search-bar-v62{display:none!important;}
         body.att-doc-focus-active-v7210 #att-doc-table-mini-toolbar-v7170,body.att-doc-focus-active-v7210 #att-dtp-edges-v7180,body.att-doc-focus-active-v7210 #att-dtp-column-hit-v7181{display:none!important;}
         .att-doc-focus-v7210 #att-doc-tools-bar-v7210 button:not([data-dx-action=focus]){display:none;}
         @media print{#att-doc-tools-bar-v7210,#att-doc-selection-tools-v7210,#att-doc-tools-dialog-v7210{display:none!important;}}
+
         `;document.head.appendChild(style);
         for(const event of ['selectionchange','pointerup','keyup','focusin'])document.addEventListener(event,dxSchedule,true);
         document.addEventListener('scroll',()=>{DX.popup?.remove();DX.popup=null;},true);
