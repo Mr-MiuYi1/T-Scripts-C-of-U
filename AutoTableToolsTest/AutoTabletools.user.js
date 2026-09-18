@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.21.2
-// @description  AutoTable 一体化效率增强工具：文档链接编辑、图片尺寸、代码块、列表快捷操作、原生表格修复、编辑器能力面板、专注阅读、选中文字工具栏、代码块右上角一键复制与独立开关、表格内容居中显示与独立开关、菜单使用说明书图标与居中对齐修复、表格联系信息显示优化与独立开关（手机号分组显示，原始值保持不变）、文档表格增强（大纲可见高度与底部滚动修复 / 查找范围同行布局 / 书签独立开关 / 导航与书签分栏切换及侧栏收起 / 查找替换布局修复 / 大纲搜索筛选 / 批量展开折叠 / 文档阅读与折叠记忆 / 自定义书签 / 章节复制与导出 / 范围查找与替换预览 / 两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
+// @version      7.22.0
+// @description  AutoTable 一体化效率增强工具：清除格式、图片说明、代码显示偏好、引用块及独立开关、文档链接编辑、图片尺寸、代码块、列表快捷操作、原生表格修复、编辑器能力面板、专注阅读、选中文字工具栏、代码块右上角复制图标与独立开关、表格内容居中显示与独立开关、菜单使用说明书图标与居中对齐修复、表格联系信息显示优化与独立开关（手机号分组显示，原始值保持不变）、文档表格增强（大纲可见高度与底部滚动修复 / 查找范围同行布局 / 书签独立开关 / 导航与书签分栏切换及侧栏收起 / 查找替换布局修复 / 大纲搜索筛选 / 批量展开折叠 / 文档阅读与折叠记忆 / 自定义书签 / 章节复制与导出 / 范围查找与替换预览 / 两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
 // @match        https://115.190.74.246/*
@@ -215,7 +215,7 @@
     const PERF = globalThis.__attPerfStats || null;
 
     const APP = {
-        version: 'V7.21.2',
+        version: 'V7.22.0',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -33460,7 +33460,11 @@
             docfocus:'att_doc_tools_focus_enabled_v7210',
             docselection:'att_doc_tools_selection_enabled_v7210',
             docicons:'att_doc_tools_icons_enabled_v7211',
-            doccodecopy:'att_doc_tools_codecopy_enabled_v7212'
+            doccodecopy:'att_doc_tools_codecopy_enabled_v7212',
+            docclear:'att_doc_tools_clear_enabled_v7220',
+            docimagedesc:'att_doc_tools_imagedesc_enabled_v7220',
+            doccodedisplay:'att_doc_tools_codedisplay_enabled_v7220',
+            docquote:'att_doc_tools_quote_enabled_v7220'
         }
     };
 
@@ -33484,7 +33488,8 @@
         docfocus:true,
         docselection:true,
         docicons:false,
-        doccodecopy:true
+        doccodecopy:true,
+        docclear:true, docimagedesc:true, doccodedisplay:true, docquote:true
     };
 
     const S = {
@@ -36899,6 +36904,10 @@
 
     // Document tools: native commands and schema transactions; no editor DOM writes.
     const DX_FEATURES = {
+        clear:['清除格式工具','清除选中文字格式，或将当前段落转为普通段落。'],
+        imagedesc:['图片说明编辑','编辑图片替代文字 alt 和标题 title，保存到文档。'],
+        codedisplay:['代码块显示设置','设置自动换行、行号和字号，仅影响页面显示。'],
+        quote:['引用块快捷操作','将当前段落设为引用块，或取消引用。'],
         links:['链接编辑菜单','设置、修改或取消选中文字的链接。'],
         images:['图片尺寸调整','选择图片后设置宽高或恢复默认尺寸。'],
         code:['代码块工具','转换代码块、设置语言、复制当前代码。'],
@@ -36914,6 +36923,10 @@
     function dxEnabled(name) {return Boolean(S.settings['doc'+name]);}
     function dxEsc(value) {return String(value ?? '').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
     const DX_ICONS = {
+        clear:'M4 17l9-14 8 6-9 14H8z M4 17l4 6 M12 23h9',
+        imagedesc:'M3 3h18v18H3z M7 8h10 M7 12h10 M7 16h6',
+        codedisplay:'M2 4h20v16H2z M6 8h2 M6 12h2 M12 8h6 M12 12h6',
+        quote:'M4 5h6v7H4v-7 M4 12v3l4 4 M14 5h6v7h-6v-7 M14 12v3l4 4',
         links:'M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-2 2 M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l2-2',
         images:'M3 3h18v18H3z M3 17l6-6 4 4 4-5 4 5 M8 7h.01',
         code:'M8 6l-6 6 6 6 M16 6l6 6-6 6 M14 3l-4 18',
@@ -36962,7 +36975,7 @@
         host.querySelectorAll('button').forEach(button=>{
             const label=button.dataset.dxLabel || button.textContent.trim();button.dataset.dxLabel=label;
             let key=button.dataset.dxAction || button.dataset.dxCommand || button.dataset.dxList;
-            if(!key)key=button.hasAttribute('data-dx-bookmark')?'bookmark':button.hasAttribute('data-dx-save')?'save':button.hasAttribute('data-dx-remove')?'remove':button.hasAttribute('data-dx-reset')?'reset':button.hasAttribute('data-dx-copy')?'copy':button.hasAttribute('data-dx-paragraph')?'paragraph':button.hasAttribute('data-dx-repair')?'repair':'close';
+            if(!key)key=button.hasAttribute('data-dx-bookmark')?'bookmark':button.hasAttribute('data-dx-save')?'save':button.hasAttribute('data-dx-remove')?'remove':button.hasAttribute('data-dx-reset')?'reset':button.hasAttribute('data-dx-copy')?'copy':button.hasAttribute('data-dx-paragraph')?'paragraph':button.hasAttribute('data-dx-repair')?'repair':button.hasAttribute('data-dx-clear')?'clear':button.hasAttribute('data-dx-plain')?'paragraph':button.hasAttribute('data-dx-quote-set') || button.hasAttribute('data-dx-quote-unset')?'quote':'close';
             const desc=DX_FEATURES[key]?.[1] || DX_COMMAND_HINTS[key] || label;
             const fullName=label==='×'?'关闭':label;
             button.title=fullName+'：'+desc;button.setAttribute('aria-label',fullName+'：'+desc);
@@ -36999,7 +37012,7 @@
                 button.setAttribute('data-lumatrace-ignore','');button.setAttribute('aria-label','复制代码：复制此代码块的原始文本');
                 button.addEventListener('pointerdown',event=>{event.preventDefault();event.stopPropagation();});
                 button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();if(S.editor===editor && block.isConnected && editor.contains(block) && dxEnabled('codecopy'))dxCopy((block.querySelector('code') || block).textContent);});
-                const wrapper={classList:{toggle(){}},querySelectorAll:()=>[button]};dxDecorate(wrapper,false);button.title='复制代码：复制此代码块的原始文本';
+                button.innerHTML=dxIcon('copy');button.title='复制代码：复制此代码块的原始文本';
                 document.body.appendChild(button);DX.codeCopies.set(block,button);
             }
             dxTheme(button);
@@ -37009,7 +37022,7 @@
                 if(/auto|scroll|hidden|clip/.test(css.overflowX)){clip.left=Math.max(clip.left,r.left);clip.right=Math.min(clip.right,r.right);}
                 if(/auto|scroll|hidden|clip/.test(css.overflowY)){clip.top=Math.max(clip.top,r.top);clip.bottom=Math.min(clip.bottom,r.bottom);}
             }
-            const width=96,height=28,left=Math.min(rect.right,clip.right)-width-8,top=rect.top+8;
+            const width=28,height=28,left=Math.min(rect.right,clip.right)-width-8,top=rect.top+8;
             const visible=rect.width>width+16 && rect.height>=height+16 && top>=clip.top && top+height<=Math.min(rect.bottom,clip.bottom) && left>=Math.max(rect.left,clip.left);
             button.hidden=!visible;
             if(visible){button.style.left=left+'px';button.style.top=top+'px';}
@@ -37179,12 +37192,64 @@
         }
         dxSchedule();
     }
+    function dxClearFormat(context) {
+        const dialog=dxDialog('清除格式','<p>清除文字格式会移除选中文字的加粗、斜体、下划线、删除线、行内代码及链接；不会删除文字。转为普通段落作用于当前段落或所选段落，不自动清除文字格式。</p>',`<button data-dx-clear ${context.selection.empty || !dxCan('unsetAllMarks')?'disabled':''}>清除文字格式</button><button data-dx-plain ${!dxCan('clearNodes')?'disabled':''}>转为普通段落</button>`,context);
+        dialog.addEventListener('click',event=>{const clear=event.target.closest('[data-dx-clear]'),plain=event.target.closest('[data-dx-plain]');if(clear && !context.selection.empty && dxCommand('unsetAllMarks',[],context) || plain && dxCommand('clearNodes',[],context))dxCloseDialog();});
+    }
+    function dxImageDescription(context) {
+        const target=dxNode(context,'image');if(!target){showToast('请先点击选中正文图片');return;}
+        const attrs=target.node.type.spec.attrs || {};
+        const dialog=dxDialog('图片说明',`<label>替代文字 alt<input data-dx-alt maxlength="2000" value="${dxEsc(target.node.attrs.alt || '')}" ${'alt' in attrs?'':'disabled'} placeholder="说明图片内容，供无障碍阅读使用"></label><label>图片标题 title<input data-dx-title maxlength="2000" value="${dxEsc(target.node.attrs.title || '')}" ${'title' in attrs?'':'disabled'} placeholder="图片的补充说明"></label><p>说明会保存到文档，不修改图片地址和尺寸。</p>`,`<button data-dx-save ${!('alt' in attrs) && !('title' in attrs)?'disabled':''}>保存说明</button>`,context);
+        dialog.addEventListener('click',event=>{if(!event.target.closest('[data-dx-save]'))return;const values={};for(const key of ['alt','title'])if(key in attrs)values[key]=dialog.querySelector('[data-dx-'+key+']').value.slice(0,2000);if(Object.keys(values).length && dxWriteAttrs(context,target,values)){dxCloseDialog();showToast('已更新图片说明，可撤销');}});
+    }
+    function dxQuote(context) {
+        const dialog=dxDialog('引用块','<p>将当前段落或所选段落设为引用块，或取消现有引用。保留文字内容与文字格式。</p>',`<button data-dx-quote-set ${dxCan('setBlockquote')?'':'disabled'}>设为引用块</button><button data-dx-quote-unset ${dxCan('unsetBlockquote')?'':'disabled'}>取消引用</button>`,context);
+        dialog.addEventListener('click',event=>{const name=event.target.closest('[data-dx-quote-set]')?'setBlockquote':event.target.closest('[data-dx-quote-unset]')?'unsetBlockquote':null;if(name && dxCommand(name,[],context))dxCloseDialog();});
+    }
+    function dxCodePrefs() {
+        const raw=safeGet('att_doc_code_display_v7220',{});
+        return {wrap:raw?.wrap===true,numbers:raw?.numbers===true,size:[12,14,16,18,20,24].includes(Number(raw?.size))?Number(raw.size):14};
+    }
+    function dxCodeDisplay(context) {
+        const prefs=dxCodePrefs();
+        const dialog=dxDialog('代码块显示',`<label>换行<select data-dx-wrap><option value="false" ${prefs.wrap?'':'selected'}>保留长行，横向滚动</option><option value="true" ${prefs.wrap?'selected':''}>自动换行</option></select></label><label>行号<select data-dx-numbers><option value="false" ${prefs.numbers?'':'selected'}>隐藏行号</option><option value="true" ${prefs.numbers?'selected':''}>显示行号</option></select></label><label>字号<select data-dx-size>${[12,14,16,18,20,24].map(size=>`<option value="${size}" ${size===prefs.size?'selected':''}>${size} px</option>`).join('')}</select></label><p>应用于文档代码块，仅优化当前浏览器的显示，不改变保存或复制的代码。显示偏好会记忆。</p>`,`<button data-dx-save>应用显示设置</button>`,context);
+        dialog.addEventListener('click',event=>{if(!event.target.closest('[data-dx-save]'))return;safeSet('att_doc_code_display_v7220',{wrap:dialog.querySelector('[data-dx-wrap]').value==='true',numbers:dialog.querySelector('[data-dx-numbers]').value==='true',size:Number(dialog.querySelector('[data-dx-size]').value)});dxCloseDialog();dxCodeVisuals();dxSchedule();});
+    }
+    function dxCodeVisuals() {
+        if(!DX.codeStyle){DX.codeStyle=document.createElement('style');DX.codeStyle.id='att-doc-code-display-style-v7220';document.head.appendChild(DX.codeStyle);}
+        const on=dxEnabled('codedisplay'),prefs=dxCodePrefs();
+        const css=on?`@media screen{.document-editor__content pre{font-size:${prefs.size}px!important;line-height:1.6!important;white-space:${prefs.wrap?'pre-wrap':'pre'}!important;overflow-wrap:${prefs.wrap?'anywhere':'normal'}!important;${prefs.numbers?'padding-left:48px!important;':''}}.document-editor__content pre code{font-size:inherit!important;line-height:inherit!important;white-space:inherit!important;overflow-wrap:inherit!important;word-break:normal!important;}}`:'';
+        if(DX.codeStyle.textContent!==css)DX.codeStyle.textContent=css;
+        if(!DX.codeNumbers)DX.codeNumbers=new Map();
+        const blocks=on && prefs.numbers && S.editor?.isConnected?new Set(S.editor.querySelectorAll('pre')):new Set();
+        for(const [block,overlay] of DX.codeNumbers)if(!blocks.has(block)){overlay.remove();DX.codeNumbers.delete(block);}
+        for(const block of blocks) {
+            let overlay=DX.codeNumbers.get(block);
+            if(!overlay){overlay=document.createElement('div');overlay.className='att-doc-code-lines-v7220';overlay.setAttribute('aria-hidden','true');overlay.setAttribute('data-lumatrace-ignore','');document.body.appendChild(overlay);DX.codeNumbers.set(block,overlay);}
+            const rect=block.getBoundingClientRect(),css=getComputedStyle(block),code=block.querySelector('code') || block,text=code.textContent;
+            const signature=String(prefs.wrap)+'|'+text;
+            if(overlay.dataset.signature!==signature){overlay.dataset.signature=signature;overlay.innerHTML=text.split('\n').map((line,i)=>`<div class="dx-code-line"><span>${i+1}</span><span class="dx-code-ghost">${dxEsc(line) || ' '}</span></div>`).join('');}
+            const paddingTop=parseFloat(css.paddingTop)||0,paddingRight=parseFloat(css.paddingRight)||0,border=parseFloat(css.borderTopWidth)||0;
+            Object.assign(overlay.style,{left:(rect.left+12)+'px',top:(rect.top+paddingTop+border-block.scrollTop)+'px',width:Math.max(0,rect.width-12-paddingRight)+'px',fontFamily:getComputedStyle(code).fontFamily,fontSize:prefs.size+'px',lineHeight:'1.6',whiteSpace:prefs.wrap?'pre-wrap':'pre',overflowWrap:prefs.wrap?'anywhere':'normal',tabSize:css.tabSize});
+            const clip={left:0,top:0,right:window.innerWidth,bottom:window.innerHeight};
+            for(let el=block,n=0;el && el!==document.body && n<20;el=el.parentElement,n++) {const st=getComputedStyle(el),r=el.getBoundingClientRect();if(/auto|scroll|hidden|clip/.test(st.overflowX)){clip.left=Math.max(clip.left,r.left);clip.right=Math.min(clip.right,r.right);}if(/auto|scroll|hidden|clip/.test(st.overflowY)){clip.top=Math.max(clip.top,r.top);clip.bottom=Math.min(clip.bottom,r.bottom);}}
+            const x=rect.left+12,y=rect.top+paddingTop+border-block.scrollTop;
+            overlay.style.clipPath=`inset(${Math.max(0,clip.top-y)}px ${Math.max(0,rect.right-clip.right)}px ${Math.max(0,overlay.getBoundingClientRect().bottom-Math.min(rect.bottom,clip.bottom))}px ${Math.max(0,clip.left-x)}px)`;
+            overlay.hidden=rect.bottom<=clip.top || rect.top>=clip.bottom || rect.right<=clip.left || rect.left>=clip.right;
+            dxTheme(overlay);
+        }
+    }
+
     function dxAction(action,context=dxContext()) {
         if(!context){showToast('请先打开文档并点击正文');return;}
         if(!dxEnabled(action))return;
         if(action==='focus'){dxFocus(!DX.focusPage);return;}
         if(action==='capabilities'){dxShowCapabilities(context);return;}
+        if(action==='codedisplay'){dxCodeDisplay(context);return;}
         if(!dxValid(context)){showToast('当前文档不可编辑或已变化');return;}
+        if(action==='clear')dxClearFormat(context);
+        if(action==='imagedesc')dxImageDescription(context);
+        if(action==='quote')dxQuote(context);
         if(action==='links')dxLink(context);
         if(action==='images')dxImage(context);
         if(action==='code')dxCode(context);
@@ -37211,7 +37276,7 @@
         const range=selection.getRangeAt(0),rect=range.getBoundingClientRect();if(!rect.width && !rect.height)return;
         const popup=document.createElement('div');popup.id='att-doc-selection-tools-v7210';popup.setAttribute('data-lumatrace-ignore','');popup.setAttribute('role','toolbar');popup.setAttribute('aria-label','选中文字工具');
         const items=[['toggleBold','加粗'],['toggleItalic','斜体'],['toggleUnderline','下划线'],['toggleStrike','删除线'],['toggleCode','行内代码']];
-        popup.innerHTML=items.map(([command,label])=>`<button data-dx-command="${command}" ${dxCan(command)?'':'disabled'}>${label}</button>`).join('')+(dxEnabled('links')?'<button data-dx-action="links">链接</button>':'')+(dxEnabled('code')?'<button data-dx-action="code">代码块</button>':'')+(globalThis.__attDocumentWorkspaceV7190?.bookmarksEnabled && globalThis.__attDocumentWorkspaceV7190?.addBookmark?'<button data-dx-bookmark>书签</button>':'');
+        popup.innerHTML=items.map(([command,label])=>`<button data-dx-command="${command}" ${dxCan(command)?'':'disabled'}>${label}</button>`).join('')+(dxEnabled('clear')?'<button data-dx-action="clear">清除格式</button>':'')+(dxEnabled('quote')?'<button data-dx-action="quote">引用块</button>':'')+(dxEnabled('links')?'<button data-dx-action="links">链接</button>':'')+(dxEnabled('code')?'<button data-dx-action="code">代码块</button>':'')+(globalThis.__attDocumentWorkspaceV7190?.bookmarksEnabled && globalThis.__attDocumentWorkspaceV7190?.addBookmark?'<button data-dx-bookmark>书签</button>':'');
         popup.addEventListener('pointerdown',event=>{event.preventDefault();event.stopPropagation();});
         popup.addEventListener('click',event=>{
             const button=event.target.closest('button');if(!button || button.disabled)return;
@@ -37226,16 +37291,16 @@
         popup.style.top=Math.max(8,Math.min(height-p.height-8,rect.top>p.height+12?rect.top-p.height-8:rect.bottom+8))+'px';
     }
     function dxRefresh() {
-        DX.raf=0;const editor=S.editor;dxCodeCopies();
+        DX.raf=0;const editor=S.editor;dxCodeVisuals();dxCodeCopies();
         if(DX.focusPage && (!editor?.isConnected || !DX.focusPage.contains(editor) || !dxEnabled('focus')))dxFocus(false);
         const parent=editor?.closest('.document-editor'),toolbar=parent?.querySelector('.document-toolbar') || editor?.closest('.document-view-page,.document-view-shell')?.querySelector('.document-toolbar');
-        const names=[['links','链接'],['images','图片尺寸'],['code','代码块'],['lists','列表'],['repair','表格检查'],['capabilities','编辑器能力'],['focus',DX.focusPage?'退出专注':'专注阅读']].filter(([key])=>dxEnabled(key));
+        const names=[['clear','清除格式'],['quote','引用块'],['links','链接'],['images','图片尺寸'],['imagedesc','图片说明'],['codedisplay','代码显示'],['code','代码块'],['lists','列表'],['repair','表格检查'],['capabilities','编辑器能力'],['focus',DX.focusPage?'退出专注':'专注阅读']].filter(([key])=>dxEnabled(key));
         if(!editor?.isConnected){DX.bar?.remove();DX.popup?.remove();return;}
         if(!toolbar || !names.length){DX.bar?.remove();dxSelectionUi();return;}
         const bar=dxBar();dxMountBar(toolbar,bar,DX.focusPage);dxTheme(bar);
         const signature=names.map(item=>item.join(':')).join('|')+'|icons:'+dxEnabled('icons');
         if(bar.dataset.signature!==signature){bar.dataset.signature=signature;bar.innerHTML=names.map(([key,label])=>`<button type="button" data-dx-action="${key}">${label}</button>`).join('');dxDecorate(bar,dxEnabled('icons'));}
-        bar.querySelectorAll('[data-dx-action]').forEach(button=>{const action=button.dataset.dxAction;button.disabled=!['focus','capabilities'].includes(action) && getEditorView()?.editable===false;});
+        bar.querySelectorAll('[data-dx-action]').forEach(button=>{const action=button.dataset.dxAction;button.disabled=!['focus','capabilities','codedisplay'].includes(action) && getEditorView()?.editable===false;});
         dxSelectionUi();
     }
     function dxSchedule() {if(!DX.raf)DX.raf=requestAnimationFrame(dxRefresh);}
@@ -37280,14 +37345,21 @@
         
         .document-toolbar .dx-native-tools-section{flex:1 1 auto;min-width:0;display:flex;align-items:center;}
         .document-toolbar .dx-native-tools-section>.document-toolbar__button{flex-shrink:0;}
-        .att-doc-code-copy-v7212{position:fixed;z-index:2147482900;width:96px;height:28px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:3px 7px;border-radius:5px;border:1px solid var(--dx-border);background:var(--dx-surface);color:var(--dx-muted);font:12px sans-serif;cursor:pointer;}
+        .att-doc-code-copy-v7212{position:fixed;z-index:2147482900;width:28px;height:28px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:0;padding:5px;border-radius:5px;border:1px solid var(--dx-border);background:var(--dx-surface);color:var(--dx-muted);font:12px sans-serif;cursor:pointer;}
         .att-doc-code-copy-v7212:hover{color:var(--dx-text);filter:brightness(1.1);}
         .att-doc-code-copy-v7212:focus-visible{outline:2px solid var(--dx-muted);outline-offset:1px;}
         .att-doc-code-copy-v7212[hidden]{display:none!important;}
         @media print{.att-doc-code-copy-v7212{display:none!important;}}
+
+        .att-doc-code-lines-v7220{position:fixed;z-index:2147482800;pointer-events:none;color:var(--dx-muted);box-sizing:border-box;}
+        .att-doc-code-lines-v7220 .dx-code-line{display:grid;grid-template-columns:28px minmax(0,1fr);gap:8px;}
+        .att-doc-code-lines-v7220 .dx-code-line>span:first-child{text-align:right;opacity:.65;white-space:nowrap;user-select:none;}
+        .att-doc-code-lines-v7220 .dx-code-ghost{visibility:hidden;min-width:0;white-space:inherit;overflow-wrap:inherit;}
+        .att-doc-code-lines-v7220[hidden]{display:none!important;}
+        @media print{.att-doc-code-lines-v7220{display:none!important;}}
 `;document.head.appendChild(style);
         for(const event of ['selectionchange','pointerup','keyup','focusin'])document.addEventListener(event,dxSchedule,true);
-        document.addEventListener('scroll',()=>{DX.popup?.remove();DX.popup=null;if(!DX.codeRaf)DX.codeRaf=requestAnimationFrame(()=>{DX.codeRaf=0;dxCodeCopies();});},true);
+        document.addEventListener('scroll',()=>{DX.popup?.remove();DX.popup=null;if(!DX.codeRaf)DX.codeRaf=requestAnimationFrame(()=>{DX.codeRaf=0;dxCodeVisuals();dxCodeCopies();});},true);
         window.addEventListener('resize',()=>{DX.popup?.remove();DX.popup=null;dxSchedule();});
         document.addEventListener('keydown',event=>{if(event.key==='Escape' && !DX.dialog && DX.focusPage){event.preventDefault();dxFocus(false);}},true);
         dxSchedule();
