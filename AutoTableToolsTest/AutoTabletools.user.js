@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AutoTable 工具集
 // @namespace    miuyi.autotable.toolbox
-// @version      7.23.0
+// @version      7.23.2
 // @description  AutoTable 一体化效率增强工具：上下文快捷栏、更多文档工具、按钮勾选排序及独立开关、清除格式、图片说明、代码显示偏好、引用块及独立开关、文档链接编辑、图片尺寸、代码块、列表快捷操作、原生表格修复、编辑器能力面板、专注阅读、选中文字工具栏、代码块右上角复制图标与独立开关、表格内容居中显示与独立开关、菜单使用说明书图标与居中对齐修复、表格联系信息显示优化与独立开关（手机号分组显示，原始值保持不变）、文档表格增强（大纲可见高度与底部滚动修复 / 查找范围同行布局 / 书签独立开关 / 导航与书签分栏切换及侧栏收起 / 查找替换布局修复 / 大纲搜索筛选 / 批量展开折叠 / 文档阅读与折叠记忆 / 自定义书签 / 章节复制与导出 / 范围查找与替换预览 / 两种导航模式统一层级与折叠体验 / 标题与表格层级导航及独立开关 / 菜单边界定位与图标 / 冻结表头样式和停靠修复 / 表格跳转不抬升页面 / 行列浮层随文档滚动 / 跨度校验后的合并与拆分 / 合并格粘贴和行列编辑 / 合并格分组排序 / 区域 TSV/HTML 复制与矩形粘贴 / 扩行扩列确认 / 行列选择柄与排序 / 四方向插入 / 列宽设置 / 首行表头与冻结 / 右键菜单 / 跨格原生矩形拖选 / Shift 点击选区 / 无拖动区域选择 / 整行整列整表选择 / 拖选性能修复 / 迷你工具栏 / 原生命令适配 / 多单元格状态识别 / 防误嵌套 / 表格导航与健康检查 / 列宽热区增强）、四区式悬浮菜单信息架构（快捷 / 表格 / 文档 / 设置）、修复悬浮菜单打开异常、高亮状态显式反馈、页面加载期间悬浮菜单焦点稳定、字段组合编辑会话与草稿保护、无感性能加固（事件驱动菜单刷新 / 分区增量渲染 / 一帧上下文与字段缓存 / 默认不可见性能诊断）、工作流快捷操作、可配置正式记录条件、胶囊智能补位、鼠标松开零闪烁、可双向点击收展、可调尺寸上限且动效更丝滑的紧凑全视图搜索记录与搜索栏内置清空、收起侧边栏智能微标签识别增强、记录详情多行字段快捷短语适配、智能复制与稳定行列聚焦、字段组合、左右列置顶与列宽记忆及全部字段集中管理、自定义表格视觉样式、字段条件高亮规则组、快捷切换、重构后的分层规则管理面板、一体化组/规则操作流、日期语义、高级安全表达式、整行上下强调边缘与快捷开关、分页与批量进展、统一快捷短语规则中心、表格滚轮横纵轴反转、丝滑高级交互动效、Edge / Fluent 深色优化、文档工具，以及全部设置导出/导入/一键重置。
 // @author       MiuYi
 // @match        http://115.190.74.246/*
@@ -215,7 +215,7 @@
     const PERF = globalThis.__attPerfStats || null;
 
     const APP = {
-        version: 'V7.23.0',
+        version: 'V7.23.2',
         prefix: 'att_v3_',
         rootId: 'att-toolbox-root',
         panelId: 'att-toolbox-panel',
@@ -37093,14 +37093,24 @@
         context.view.dispatch(tr);context.view.focus();scheduleContentRefresh(0);dxSchedule();return true;
     }
     function dxCloseDialog() {DX.panelCleanup?.();DX.panelCleanup=null;DX.dialog?.remove();DX.dialog=null;}
+    function dxPositionPanel(host) {
+        if(!host)return;
+        const viewport=window.visualViewport,left=viewport?.offsetLeft || 0,top=viewport?.offsetTop || 0,width=viewport?.width || window.innerWidth,height=viewport?.height || window.innerHeight;
+        const availableWidth=Math.max(1,width-16),availableHeight=Math.max(1,height-16);
+        host.style.maxWidth=availableWidth+'px';host.style.maxHeight=availableHeight+'px';host.style.setProperty('--dx-panel-height',availableHeight+'px');
+        const rect=host.dxAnchorRect || {left,top,bottom:top},measured=host.getBoundingClientRect(),w=Math.min(measured.width,availableWidth),h=Math.min(measured.height,availableHeight);
+        const below=rect.bottom+6,above=rect.top-h-6;
+        const y=below+h<=top+height-8?below:above>=top+8?above:Math.max(top+8,Math.min(top+height-h-8,below));
+        host.style.left=Math.max(left+8,Math.min(left+width-w-8,rect.left))+'px';host.style.top=Math.max(top+8,Math.min(top+height-h-8,y))+'px';
+    }
     function dxPanel(title,body,buttons,context) {
         dxCloseDialog();
         const host=document.createElement('div');host.id='att-doc-tools-dialog-v7210';host.className='dx-anchored-panel';host.setAttribute('data-lumatrace-ignore','');
         host.innerHTML=`<div role="dialog" aria-modal="false" aria-label="${dxEsc(title)}"><header><b>${dxEsc(title)}</b><button type="button" data-dx-close>×</button></header><div class="dx-body">${body}</div>${buttons?'<footer>'+buttons+'</footer>':''}</div>`;
         dxTheme(host);dxDecorate(host,false);document.body.appendChild(host);DX.dialog=host;
-        const anchor=DX.actionAnchor?.isConnected?DX.actionAnchor:DX.bar,rect=DX.actionAnchor?.isConnected?DX.actionAnchor.getBoundingClientRect():DX.actionRect || anchor?.getBoundingClientRect() || context.editor.getBoundingClientRect(),panel=host.getBoundingClientRect();
-        host.style.left=Math.max(8,Math.min(window.innerWidth-panel.width-8,rect.left))+'px';
-        host.style.top=Math.max(8,Math.min(window.innerHeight-panel.height-8,rect.bottom+panel.height+8<=window.innerHeight?rect.bottom+6:rect.top-panel.height-6))+'px';
+        const anchor=DX.actionAnchor?.isConnected?DX.actionAnchor:DX.bar;
+        host.dxAnchorRect=DX.actionAnchor?.isConnected?DX.actionAnchor.getBoundingClientRect():DX.actionRect || anchor?.getBoundingClientRect() || context.editor.getBoundingClientRect();
+        dxPositionPanel(host);
         host.addEventListener('pointerdown',event=>{event.stopPropagation();if(event.target.closest('button'))event.preventDefault();});
         host.addEventListener('click',event=>{if(event.target.closest('[data-dx-close]')){dxCloseDialog();context.view.focus();}});
         host.addEventListener('keydown',event=>{event.stopPropagation();if(event.key==='Escape'){event.preventDefault();dxCloseDialog();context.view.focus();}});
@@ -37335,7 +37345,7 @@
     function dqPrefs() {
         const saved=safeGet('att_doc_quick_buttons_v7230',{}),known=DQ_ITEMS.map(item=>item[0]);
         const order=[...new Set([...(Array.isArray(saved?.order)?saved.order:[]),...known])].filter(key=>known.includes(key));
-        return {order,hidden:Array.isArray(saved?.hidden)?saved.hidden.filter(key=>known.includes(key)):[]};
+        return {order,hidden:Array.isArray(saved?.hidden)?saved.hidden.filter(key=>known.includes(key)):[],favorites:Array.isArray(saved?.favorites)?[...new Set(saved.favorites)].filter(key=>known.includes(key)):[]};
     }
     function dqItems(context) {
         const prefs=dqPrefs(),owner=context.owner;
@@ -37346,6 +37356,11 @@
         const preferred=image?['images','imagedesc','bookmark']:code?['copycode','code','codedisplay','plain','bookmark']:list?['bullet','ordered','indent','outdent','bold','links']:['bold','italic','underline','strike','inlinecode','links'];
         if(dxEnabled('quickcontext'))items.sort((a,b)=>{const x=preferred.indexOf(a[0]),y=preferred.indexOf(b[0]);return (x<0?99:x)-(y<0?99:y);});
         return {items,image,code,list};
+    }
+    function dqMain(items) {
+        if(!dxEnabled('quickmore'))return items;
+        const prefs=dqPrefs(),favorites=prefs.order.filter(key=>prefs.favorites.includes(key)).map(key=>items.find(item=>item[0]===key)).filter(Boolean);
+        return prefs.favorites.length?favorites:items.slice(0,6);
     }
     function dqButton(item,context) {
         const [key,label,command]=item,action=DX_FEATURES[key]?key:null;
@@ -37370,10 +37385,10 @@
         DX.actionAnchor=anchor;DX.actionRect=anchor?.getBoundingClientRect?.() || null;
         if(key==='customize'){dqCustomize(context);return;}
         if(key==='more'){
-            const all=dqItems(context).items,main=dxEnabled('quickmore')?all.slice(0,6):all;
+            const all=dqItems(context).items,main=dqMain(all);
             const rest=all.filter(item=>!main.includes(item));
             const panel=dxPanel('更多文档工具','',rest.map(item=>dqButton(item,context)).join('')+'<button data-dq-key="customize">配置快捷栏</button>',context);
-            panel.classList.add('dq-more-panel');dqLabelButtons(panel);
+            panel.classList.add('dq-more-panel');dqLabelButtons(panel);dxPositionPanel(panel);
             panel.addEventListener('click',event=>{const button=event.target.closest('[data-dq-key]');if(!button || button.disabled)return;dxCloseDialog();dqRun(button.dataset.dqKey,context,anchor);});return;
         }
         const item=DQ_ITEMS.find(item=>item[0]===key);if(!item || !dqItems(context).items.some(item=>item[0]===key))return;
@@ -37389,12 +37404,19 @@
     function dqCustomize(context=dxContext()) {
         if(!context){showToast('请先打开文档');return;}
         let prefs=dqPrefs();
-        const panel=dxPanel('配置快捷栏','<p>勾选显示的按钮，使用上移、下移调整顺序。关闭“按上下文调整”后严格按此顺序显示。</p><div data-dq-config></div>','<button data-dq-reset>恢复默认</button>',context);
-        const render=()=>{panel.querySelector('[data-dq-config]').innerHTML=prefs.order.map((key,i)=>`<label class="dq-config-row"><input type="checkbox" data-dq-show="${key}" ${prefs.hidden.includes(key)?'':'checked'}><span>${dxEsc(DQ_ITEMS.find(item=>item[0]===key)[1])}</span><button type="button" data-dq-move="${key}" data-dq-delta="-1" ${i===0?'disabled':''} title="上移">↑</button><button type="button" data-dq-move="${key}" data-dq-delta="1" ${i===prefs.order.length-1?'disabled':''} title="下移">↓</button></label>`).join('');};
+        const panel=dxPanel('配置快捷栏','<p>“显示”控制功能是否进入快捷栏或更多菜单；“常用”让功能固定显示在快捷栏。未勾选常用时自动选择六项。更改即时保存。</p><div class="dq-config-head"><span>显示</span><span>功能</span><span>常用</span><span>排序</span></div><div data-dq-config></div>','<button data-dq-reset>恢复默认</button>',context);
+        panel.classList.add('dq-config-panel');
+        const render=()=>{panel.querySelector('[data-dq-config]').innerHTML=prefs.order.map((key,i)=>`<div class="dq-config-row"><input type="checkbox" data-dq-show="${key}" ${prefs.hidden.includes(key)?'':'checked'} aria-label="显示 ${dxEsc(DQ_ITEMS.find(item=>item[0]===key)[1])}"><span>${dxEsc(DQ_ITEMS.find(item=>item[0]===key)[1])}</span><input type="checkbox" data-dq-favorite="${key}" ${prefs.favorites.includes(key)?'checked':''} aria-label="固定常用 ${dxEsc(DQ_ITEMS.find(item=>item[0]===key)[1])}" title="固定显示在快捷栏"><span class="dq-config-order"><button type="button" data-dq-move="${key}" data-dq-delta="-1" ${i===0?'disabled':''} title="上移">↑</button><button type="button" data-dq-move="${key}" data-dq-delta="1" ${i===prefs.order.length-1?'disabled':''} title="下移">↓</button></span></div>`).join('');dxPositionPanel(panel);};
         const save=()=>{safeSet('att_doc_quick_buttons_v7230',prefs);dxSchedule();};render();
-        panel.addEventListener('change',event=>{const key=event.target.dataset.dqShow;if(!key)return;prefs.hidden=prefs.hidden.filter(k=>k!==key);if(!event.target.checked)prefs.hidden.push(key);save();});
-        panel.addEventListener('click',event=>{const move=event.target.closest('[data-dq-move]');if(move){const i=prefs.order.indexOf(move.dataset.dqMove),j=i+Number(move.dataset.dqDelta);if(j>=0 && j<prefs.order.length){[prefs.order[i],prefs.order[j]]=[prefs.order[j],prefs.order[i]];save();render();}}else if(event.target.closest('[data-dq-reset]')){prefs={order:DQ_ITEMS.map(item=>item[0]),hidden:[]};save();render();}});
+        panel.addEventListener('change',event=>{
+            const favorite=event.target.dataset.dqFavorite,key=favorite || event.target.dataset.dqShow;if(!key)return;
+            if(favorite){prefs.favorites=prefs.favorites.filter(k=>k!==key);if(event.target.checked){prefs.favorites.push(key);prefs.hidden=prefs.hidden.filter(k=>k!==key);}}
+            else{prefs.hidden=prefs.hidden.filter(k=>k!==key);if(!event.target.checked){prefs.hidden.push(key);prefs.favorites=prefs.favorites.filter(k=>k!==key);}}
+            save();render();
+        });
+        panel.addEventListener('click',event=>{const move=event.target.closest('[data-dq-move]');if(move){const i=prefs.order.indexOf(move.dataset.dqMove),j=i+Number(move.dataset.dqDelta);if(j>=0 && j<prefs.order.length){[prefs.order[i],prefs.order[j]]=[prefs.order[j],prefs.order[i]];save();render();}}else if(event.target.closest('[data-dq-reset]')){prefs={order:DQ_ITEMS.map(item=>item[0]),hidden:[],favorites:[]};save();render();}});
     }
+
     function dxSelectionUi() {
         if(DX.popup?.isConnected && DX.popup.contains(document.activeElement) && !DX.dialog)return;
         DX.popup?.remove();DX.popup=null;const context=dxContext();
@@ -37406,7 +37428,7 @@
         if(info.image){const dom=context.view.nodeDOM(context.selection.from);rect=dom?.getBoundingClientRect();}
         if(!rect && selection?.rangeCount && S.editor.contains(selection.anchorNode) && S.editor.contains(selection.focusNode))rect=selection.getRangeAt(0).getBoundingClientRect();
         if(!rect || !rect.height){try{const p=context.view.coordsAtPos(context.selection.from);rect={left:p.left,top:p.top,bottom:p.bottom,width:1,height:p.bottom-p.top};}catch(_){return;}}
-        const items=dxEnabled('quickmore')?info.items.slice(0,6):info.items;
+        const items=dqMain(info.items);
         const popup=document.createElement('div');popup.id='att-doc-selection-tools-v7210';popup.setAttribute('data-lumatrace-ignore','');popup.setAttribute('role','toolbar');popup.setAttribute('aria-label','文档快捷工具栏');popup.classList.toggle('dx-icon-only',dxEnabled('icons'));
         popup.innerHTML=items.map(item=>dqButton(item,context)).join('')+'<button type="button" data-dq-key="more" title="更多：查看其他文档工具与快捷栏配置" aria-label="更多文档工具">'+dxIcon('more')+'<span class="dx-button-label">更多</span></button>';
         popup.addEventListener('pointerdown',event=>{event.preventDefault();event.stopPropagation();});
@@ -37501,6 +37523,20 @@
         #att-doc-tools-dialog-v7210 .dq-config-row input{width:auto;flex:none;}
         #att-doc-tools-dialog-v7210 .dq-config-row>span{flex:1;}
         #att-doc-tools-dialog-v7210 .dq-config-row button{padding:3px 7px;}
+
+        #att-doc-tools-dialog-v7210.dx-anchored-panel{overflow:hidden;box-sizing:border-box;}
+        #att-doc-tools-dialog-v7210.dx-anchored-panel>[role=dialog]{max-height:var(--dx-panel-height,calc(100dvh - 16px));box-sizing:border-box;overflow:hidden;}
+        #att-doc-tools-dialog-v7210.dx-anchored-panel footer{flex:0 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;}
+        #att-doc-tools-dialog-v7210.dx-anchored-panel .dx-body{flex:0 1 auto;}
+        #att-doc-tools-dialog-v7210.dq-more-panel footer{grid-template-columns:repeat(2,minmax(0,1fr));}
+        #att-doc-tools-dialog-v7210.dq-more-panel footer button{min-width:0;}
+        #att-doc-tools-dialog-v7210.dq-more-panel footer .dx-button-label{min-width:0;overflow:hidden;text-overflow:ellipsis;}
+
+        #att-doc-tools-dialog-v7210{z-index:2147483647;}
+        #att-doc-tools-dialog-v7210 .dq-config-row,#att-doc-tools-dialog-v7210 .dq-config-head{display:grid;grid-template-columns:28px minmax(0,1fr) 34px 58px;align-items:center;gap:4px;}
+        #att-doc-tools-dialog-v7210 .dq-config-row>input{margin:0;justify-self:center;}
+        #att-doc-tools-dialog-v7210 .dq-config-order{display:flex;justify-content:flex-end;gap:2px;}
+        #att-doc-tools-dialog-v7210 .dq-config-head{padding:7px 0;color:var(--dx-muted);font-size:12px;}
 `;document.head.appendChild(style);
         for(const event of ['selectionchange','pointerup','keyup','focusin'])document.addEventListener(event,dxSchedule,true);
         document.addEventListener('scroll',event=>{if(DX.dialog?.classList.contains('dx-anchored-panel') && !DX.dialog.contains(event.target))dxCloseDialog();DX.popup?.remove();DX.popup=null;/* Outer document scrolling carries the sibling layer automatically. */if(event.target instanceof Element && S.editor?.contains(event.target)){dxCodeVisuals();dxCodeCopies();}},true);
